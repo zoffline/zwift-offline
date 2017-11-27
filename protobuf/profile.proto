@@ -1,0 +1,221 @@
+message Profile {
+    optional int64 id = 1;
+    optional int32 is_connected_to_strava = 2;
+    optional bytes f3 = 3;
+    optional bytes f4 = 4;
+    optional bytes f5 = 5;
+    optional bool is_male = 6;
+    optional bytes f7 = 7;
+    optional uint32 weight_in_grams = 9;
+    optional uint32 ftp = 10;
+    optional uint32 f11 = 11;
+    optional uint32 f12 = 12;
+    optional uint32 f13 = 13;
+    optional uint32 f14 = 14;
+    optional uint32 f15 = 15;
+    optional uint32 f16 = 16;
+    optional uint32 f17 = 17;
+    optional uint32 f18 = 18;
+    optional uint32 f19 = 19;
+    optional fixed32 f20 = 20;
+    optional fixed32 f21 = 21;
+    optional fixed32 f22 = 22;
+    optional fixed32 f23 = 23;
+    optional fixed32 f24 = 24;
+    optional fixed32 f25 = 25;
+    optional fixed32 f26 = 26;
+    optional fixed64 f27 = 27;
+    optional fixed64 f28 = 28;
+    optional fixed64 f29 = 29;
+    optional fixed64 f30 = 30;
+    optional fixed64 f31 = 31;
+    optional fixed64 f32 = 32;
+    optional bytes f33 = 33;
+    optional uint32 country_code = 34;
+    optional uint32 total_distance_in_meters = 35;
+    optional uint32 elevation_gain_in_meters = 36;
+    optional uint32 time_ridden_in_minutes = 37;
+    optional uint32 f38 = 38; /* time in jersey X */
+    optional uint32 f39 = 39; /* time in jersey Y */
+    optional uint32 f40 = 40; /* time in jersey Z */
+    optional uint32 total_watt_hours = 41;
+    optional uint32 height_in_millimeters = 42;
+    optional string dob = 43;
+    optional uint32 f44 = 44;
+    optional bool f45 = 45;
+    optional uint32 total_xp = 46;
+    optional uint32 f47 = 47;
+    
+    optional PlayerType player_type = 48;
+    enum PlayerType {
+        PLAYERTYPE0 = 0;
+        NORMAL = 1;
+        PLAYERTYPE2 = 2;
+        PLAYERTYPE3 = 3;
+        PLAYERTYPE4 = 4;
+    }
+    
+    optional uint32 achievement_level = 49;
+    optional bool f50 = 50;
+    optional bool f51 = 51;
+    optional uint32 f52 = 52;
+    optional uint32 f53 = 53;
+    optional uint32 f54 = 54;
+    optional uint32 age = 55;
+    optional fixed32 f56 = 56;
+    optional uint32 f57 = 57;
+    optional bytes f58 = 58;
+    optional fixed64 f59 = 59;
+    repeated bytes f60 = 60; /* related to subscription/billing */
+    
+    optional ProfileSocialFacts social_facts = 61;
+    message ProfileSocialFacts {
+        optional int64 profile_id = 1;
+        optional int64 f2 = 2;
+        optional int64 f3 = 3;
+        optional int64 f4 = 4;
+        optional ProfileFollowStatus f5 = 5;
+        optional ProfileFollowStatus f6 = 6;
+        optional bool f7 = 7;
+    }
+    
+    optional ProfileFollowStatus f62 = 62;
+    optional bool f63 = 63;
+    optional bool f64 = 64;
+    
+    optional ProfileEnrolledProgram f65 = 65;
+    enum ProfileEnrolledProgram {
+        ENROLLEDPROGRAM0 = 0;
+        ENROLLEDPROGRAM1 = 1;
+        ENROLLEDPROGRAM2 = 2;
+        ENROLLEDPROGRAM3 = 3;
+        ENROLLEDPROGRAM4 = 4;
+    }
+    
+    optional bytes f66 = 66;
+    optional uint32 f67 = 67;
+    optional fixed32 f68 = 68;
+    optional fixed32 f69 = 69;
+    optional fixed32 f70 = 70;
+    optional fixed32 f71 = 71;
+    optional fixed32 f72 = 72;
+    optional fixed32 f73 = 73;
+    optional uint32 f74 = 74;
+    optional uint32 f75 = 75;
+    optional fixed32 f76 = 76;
+    optional fixed32 f77 = 77;
+    optional fixed32 f78 = 78;
+    optional fixed32 f79 = 79;
+    optional uint32 f80 = 80;
+    optional uint32 f81 = 81;
+    optional Subscription f82 = 82;
+    enum Sport {
+        SPORT0 = 0;
+        SPORT1 = 1;
+        SPORT2 = 2;
+        SPORT3 = 3;
+        SPORT4 = 4;
+    }
+    optional string mix_panel_distinct_id = 83;
+    optional uint32 f84 = 84;
+    optional uint32 f85 = 85;
+    optional Sport sport = 86;
+    optional uint32 f87 = 87;
+    optional bool f88 = 88;
+    optional string preferred_language = 89;
+    optional uint32 f90 = 90;
+    optional uint32 f91 = 91;
+    optional uint32 f92 = 92;
+    optional uint32 f93 = 93;
+    optional uint32 f94 = 94;
+    optional uint32 f95 = 95;
+    optional uint32 f96 = 96;
+    optional uint32 f97 = 97;
+    optional uint32 f98 = 98;
+    optional uint32 f99 = 99;
+    optional uint32 f100 = 100;
+    optional uint32 f101 = 101;
+    optional uint32 f102 = 102;
+    optional uint32 f103 = 103;
+    optional uint32 f104 = 104;
+    optional bool f105 = 105;
+    optional bool f106 = 106;
+    repeated bytes f107 = 107;
+    optional string launched_game_client = 108;
+    optional int64 f109 = 109;
+    optional bool f110 = 110;
+}
+
+message ProfileEntitlement {
+    optional EntitlementType f1 = 1;
+    enum EntitlementType {
+        ENTITLEMENTTYPE0 = 0;
+        ENTITLEMENTTYPE1 = 1;
+        ENTITLEMENTTYPE2 = 2;
+        ENTITLEMENTTYPE3 = 3;
+        ENTITLEMENTTYPE4 = 4;
+    }
+    
+    optional int64 f2 = 2;
+    
+    optional ProfileEntitlementStatus c = 3;
+    enum ProfileEntitlementStatus {
+        ENTITLEMENTSTATUS0 = 0;
+        ENTITLEMENTSTATUS1 = 1;
+        ENTITLEMENTSTATUS2 = 2;
+        ENTITLEMENTSTATUS3 = 3;
+        ENTITLEMENTSTATUS4 = 4;
+    }
+    
+    optional bytes f4 = 4;
+    optional uint32 f5 = 5;
+    optional uint32 f6 = 6;
+    optional uint32 f7 = 7;
+    optional uint32 f8 = 8;
+    optional uint32 f9 = 9;
+    optional bytes f10 = 10;
+    
+    optional Platform f11 = 11;
+    enum Platform {
+        PLATFORM0 = 0;
+        PLATFORM1 = 1;
+        PLATFORM2 = 2;
+        PLATFORM3 = 3;
+        PLATFORM4 = 4;
+        PLATFORM5 = 5;
+        PLATFORM6 = 6;
+    }
+    
+    optional uint32 f12 = 12;
+    optional bool f13 = 13;
+}
+
+enum ProfileFollowStatus {
+    FOLLOWSTATUS0 = 0;
+    SELF = 1;
+    FOLLOWSTATUS2 = 2;
+    FOLLOWSTATUS3 = 3;
+    FOLLOWSTATUS4 = 4;
+}
+
+message Subscription {
+    optional Gateway f1 = 1;
+    enum Gateway {
+        GATEWAY0 = 0;
+        GATEWAY1 = 1;
+        GATEWAY2 = 2;
+        GATEWAY3 = 3;
+        GATEWAY4 = 4;
+    }
+    
+    optional SubscriptionStatus f2 = 2;
+    enum SubscriptionStatus {
+        STATUS0 = 0;
+        STATUS1 = 1;
+        ACTIVE = 2;
+        ACTIVE_CANCELLED = 3;
+        STATUS4 = 4;
+        STATUS5 = 5;
+        STATUS6 = 6;
+    }
+}

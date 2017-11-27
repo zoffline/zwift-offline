@@ -1,0 +1,13 @@
+message PeriodicInfo {
+	required string game_server_ip = 1;
+	optional uint32 f2 = 2;
+	optional uint32 f3 = 3;
+	optional uint32 f4 = 4;
+	optional uint32 f5 = 5;
+	optional uint32 f6 = 6;
+}
+
+
+message PeriodicInfos {
+	repeated PeriodicInfo infos = 1;
+}

@@ -1,0 +1,3 @@
+message PerSessionInfo {
+	required string relay_url = 1;
+}

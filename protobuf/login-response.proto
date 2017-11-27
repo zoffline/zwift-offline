@@ -1,0 +1,3 @@
+message LoginResponse {
+	required string session_id = 1;
+}

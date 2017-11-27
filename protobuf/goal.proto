@@ -1,0 +1,19 @@
+message Goal {
+	optional uint64 id = 1;
+	optional uint64 player_id = 2;
+	optional uint32 f3 = 3; /* status or sport? */
+	optional string name = 4;
+	optional uint32 type = 5; /* 0=distance, 1=time */
+	optional uint32 periodicity = 6; /* 0=weekly, 1=monthly */
+	optional float target_distance = 7; /* in meters. set to dur for dur goals */
+	optional float target_duration = 8; /* in minutes. set to dist for dist goals */
+	optional float actual_distance = 9; /* in minutes. is also set for dur goals? */
+	optional float actual_duration = 10; /* in meters. is also set for dist goals? */
+	optional uint64 created_on = 11;  /* in ms since epoch */
+	optional uint64 period_end_date = 12; /* "" */
+	optional uint64 f13 = 13; /* status or sport? */
+}
+
+message Goals {
+	repeated Goal goals = 1;
+}

@@ -1,0 +1,33 @@
+message Activity {
+	optional uint64 id = 1;
+	required uint64 player_id = 2;
+	required uint32 f3 = 3; /* world_id or player_type_id */
+	required string name = 4;
+	optional uint32 f5 = 5;
+
+	optional uint32 f6 = 6;
+	required string start_date = 7;
+	optional string end_date = 8;
+	optional float distance = 9; /* in meters */
+	optional float avg_heart_rate = 10;
+	optional float max_heart_rate = 11;
+	optional float avg_watts = 12;
+	optional float max_watts = 13;
+	optional float avg_cadence = 14;
+	optional float max_cadence = 15;
+	optional float avg_speed = 16; /* in m/s */
+	optional float max_speed = 17; /* in m/s */
+	optional float calories = 18;
+	optional float total_elevation = 19;
+	optional uint64 strava_upload_id = 20;
+	optional uint64 strava_activity_id = 21;
+	optional uint32 f23 = 23;
+	optional bytes fit = 24;
+	optional string fit_filename = 25;
+	optional uint32 f29 = 29;
+	optional string date = 31;
+}
+
+message Activities {
+	repeated Activity activities = 1;
+}

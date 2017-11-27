@@ -1,0 +1,29 @@
+message SegmentResult {
+    optional uint64 id = 1;
+    required uint64 player_id = 2;
+    optional uint32 f3 = 3;
+    optional uint32 f4 = 4;
+    optional uint64 segment_id = 5;
+    optional uint64 event_subgroup_id = 6;
+    required string first_name = 7;
+    required string last_name = 8;
+    optional uint64 world_time = 9;
+    optional string finish_time_str = 10;
+    required uint64 elapsed_ms = 11;
+    optional bool f12 = 12;
+    optional uint32 f13 = 13;
+    optional uint32 f14 = 14;
+    optional uint32 f15 = 15;
+    optional bool f16 = 16;
+    optional string f17 = 17;
+    optional uint64 f18 = 18;
+    optional uint32 f19 = 19;
+    optional uint32 f20 = 20;
+}
+
+message SegmentResults {
+    required uint32 world_id = 1;
+    required uint64 segment_id = 2;
+    optional uint64 event_subgroup_id = 3;
+    repeated SegmentResult segment_results = 4;
+}

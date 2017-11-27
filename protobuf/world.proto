@@ -1,0 +1,13 @@
+message World {
+	required uint32 id = 1;
+	required string name = 2;
+	required uint32 f3 = 3;
+	/* missing 4 */
+	required uint64 f5 = 5;
+	required uint64 world_time = 6;
+	required uint64 real_time = 7;
+}
+
+message Worlds {
+	repeated World worlds = 1;
+}
