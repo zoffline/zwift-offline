@@ -206,7 +206,7 @@ def api_profiles_activities_id(player_id, activity_id):
         with open('%s/strava_token.txt' % STORAGE_DIR, 'r') as f:
             strava.access_token = f.read().rstrip('\r\n')
     except:
-        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt.")
+        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % STORAGE_DIR)
         return response, 200
     try:
         # See if there's internet to upload to Strava
