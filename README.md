@@ -33,9 +33,9 @@ subdirectory.
 I've only done this with Windows 10 so your mileage may vary on other versions.
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.25225 you may have to uninstall, then reinstall after installing zoffline.
-  * If your Zwift version is 1.0.25225, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.25225 will be installed instead of the latest).
+  * If your Zwift version is newer than 1.0.26736 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.26736, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.26736 will be installed instead of the latest).
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-us-or.p12``
   * ``ssl/cert-zwift-secure.p12``
