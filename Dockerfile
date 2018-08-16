@@ -1,5 +1,5 @@
 FROM httpd:2.4
-MAINTAINER zoffline <zoffline@mailinator.com>
+MAINTAINER zoffline <zoffline@tutanota.com>
 
 RUN apt-get update && apt-get install -y python-dev python-flask libapache2-mod-wsgi python-pip protobuf-compiler git
 RUN pip install --upgrade six
