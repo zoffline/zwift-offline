@@ -32,6 +32,7 @@ subdirectory.
 ### Step 2: Configure Zwift client to use zoffline
 
 <details><summary>Windows 10 Instructions</summary>
+
 * Install Zwift
   * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
   * If your Zwift version is 1.0.28901, you're all set.
@@ -55,9 +56,11 @@ subdirectory.
 Why: We need to redirect Zwift to use zoffline and convince Windows and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
+
 </details>
 
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
+
 * Install Zwift
   * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
   * If your Zwift version is 1.0.28901, you're all set.
@@ -82,6 +85,7 @@ to generate your own certificates and do the same.
 Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
+
 </details>
 
 
