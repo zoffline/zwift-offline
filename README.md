@@ -30,23 +30,23 @@ subdirectory.
 
 
 ### Step 2: Configure Zwift client to use zoffline
-I've only done this with Windows 10 so your mileage may vary on other versions.
 
+<details><summary>Windows 10 Instructions</summary>
 * Install Zwift
   * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
   * If your Zwift version is 1.0.28901, you're all set.
   * If Zwift is not installed install it after installing zoffline (1.0.28901 will be installed instead of the latest).
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-us-or.p12``
-  * ``ssl/cert-zwift-secure.p12``
+  * ``ssl/cert-secure-zwift.p12``
   * ``ssl/cert-us-or.pem``
-  * ``ssl/cert-zwift-secure.pem``
+  * ``ssl/cert-secure-zwift.pem``
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-us-or.p12``
-  * ``certutil.exe -importpfx Root cert-zwift-secure.p12``
+  * ``certutil.exe -importpfx Root cert-secure-zwift.p12``
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
   * Append the contents of ``ssl/cert-us-or.pem`` to cacert.pem
-  * Append the contents of ``ssl/cert-zwift-secure.pem`` to cacert.pem
+  * Append the contents of ``ssl/cert-secure-zwift.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -55,6 +55,35 @@ I've only done this with Windows 10 so your mileage may vary on other versions.
 Why: We need to redirect Zwift to use zoffline and convince Windows and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
+</details>
+
+<details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
+* Install Zwift
+  * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.28901, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.28901 will be installed instead of the latest).
+* On your Mac machine running Zwift, copy the following files in this repo to a known location:
+  * ``ssl/cert-us-or.p12``
+  * ``ssl/cert-secure-zwift.p12``
+  * ``ssl/cert-us-or.pem``
+  * ``ssl/cert-secure-zwift.pem``
+* Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
+    * Click "File - Import Items..." and import ``ssl/cert-secure-zwift.p12``
+    * Right click "secure.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
+    * Repeat this procedure with ``ssl/cert-us-or.p12`` ("us-or-rly101.zwift.com").
+* Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
+  * Append the contents of ``ssl/cert-us-or.pem`` to cacert.pem
+  * Append the contents of ``ssl/cert-secure-zwift.pem`` to cacert.pem
+* Using a text editor (with admin privileges) open ``/etc/hosts``
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
+    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
+    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
+
+Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
+accept zoffline's self signed certificates for Zwift's domain names. Feel free
+to generate your own certificates and do the same.
+</details>
+
 
 #### Enabling/Disabling zoffline
 

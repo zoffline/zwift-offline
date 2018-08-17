@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, redirect
 
 app = Flask(__name__)
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+FAKE_TOKEN = '{"access_token":"abc","expires_in":10800,"refresh_expires_in":2592000,"refresh_token":"abc","token_type":"bearer","id_token":"abc","not-before-policy":1408458483,"session-state":"a-b-c"}'
 
 
 @app.route('/auth/rb_bf03269xbi', methods=['POST'])
@@ -37,13 +37,21 @@ def auth_realms_zwift_protocol_openid_connect_registrations():
 # Unused as it's a direct redirect now from auth/login
 @app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])
 def auth_realms_zwift_login_actions_startriding():
-    return redirect("http://zwift/?code=abc", code=302)
-
+    return redirect("http://zwift/?code=abc", 302)
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
-    return '{"access_token":"abc","expires_in":10800,"refresh_expires_in":2592000,"refresh_token":"abc","token_type":"bearer","id_token":"abc","not-before-policy":1408458483,"session-state":"a-b-c"}', 200
+    return FAKE_TOKEN, 200
 
+# Called by Mac, but not Windows
+@app.route('/auth/realms/zwift/tokens/login', methods=['GET'])
+def auth_realms_zwift_tokens_login():
+    return redirect("http://zwift/?code=abc", 302)
+
+# Called by Mac, but not Windows
+@app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
+def auth_realms_zwift_tokens_access_codes():
+    return FAKE_TOKEN, 200
 
 if __name__ == "__main__":
     app.run(ssl_context=('ssl/cert-secure-zwift.pem', 'ssl/key-secure-zwift.pem'),
