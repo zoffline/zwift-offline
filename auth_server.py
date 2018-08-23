@@ -49,6 +49,11 @@ def auth_realms_zwift_tokens_login():
     return redirect("http://zwift/?code=abc", 302)
 
 # Called by Mac, but not Windows
+@app.route('/launcher', methods=['GET'])
+def launcher():
+    return redirect("http://zwift/?code=abc", 302)
+
+# Called by Mac, but not Windows
 @app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
 def auth_realms_zwift_tokens_access_codes():
     return FAKE_TOKEN, 200
