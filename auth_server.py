@@ -6,6 +6,10 @@ from flask import Flask, request, jsonify, redirect
 
 app = Flask(__name__)
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+AUTOLAUNCH_FILE = "%s/storage/auto_launch.txt" % SCRIPT_DIR
+NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
+
 # Token expires at INT32_MAX... because apparently Zwift or the library they're
 # using thinks time can be negative.
 ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJiYjQ4czgyOS03NDgzLTQzbzEtbzg1NC01ZDc5M3E1bjAwbjkiLCJleHAiOjIxNDc0ODM2NDcsIm5iZiI6MCwiaWF0IjoxNTM1NTA4MDg3LCJpc3MiOiJodHRwczovL3NlY3VyZS56d2lmdC5jb20vYXV0aC9yZWFsbXMvendpZnQiLCJhdWQiOiJHYW1lX0xhdW5jaGVyIiwic3ViIjoiMDJyM2RlYjUtbnE5cS00NzZzLTlzczAtMDM0cTk3N3NwMnIxIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiR2FtZV9MYXVuY2hlciIsImF1dGhfdGltZSI6MTUzNTUwNzI0OSwic2Vzc2lvbl9zdGF0ZSI6IjA4NDZubzluLTc2NXEtNHAzcy1uMjBwLTZwbnA5cjg2cjVzMyIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9sYXVuY2hlci56d2lmdC5jb20qIiwiaHR0cDovL3p3aWZ0Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJldmVyeWJvZHkiLCJ0cmlhbC1zdWJzY3JpYmVyIiwiZXZlcnlvbmUiLCJiZXRhLXRlc3RlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7Im15LXp3aWZ0Ijp7InJvbGVzIjpbImF1dGhlbnRpY2F0ZWQtdXNlciJdfSwiR2FtZV9MYXVuY2hlciI6eyJyb2xlcyI6WyJhdXRoZW50aWNhdGVkLXVzZXIiXX0sIlp3aWZ0IFJFU1QgQVBJIC0tIHByb2R1Y3Rpb24iOnsicm9sZXMiOlsiYXV0aG9yaXplZC1wbGF5ZXIiLCJhdXRoZW50aWNhdGVkLXVzZXIiXX0sIlp3aWZ0IFplbmRlc2siOnsicm9sZXMiOlsiYXV0aGVudGljYXRlZC11c2VyIl19LCJad2lmdCBSZWxheSBSRVNUIEFQSSAtLSBwcm9kdWN0aW9uIjp7InJvbGVzIjpbImF1dGhvcml6ZWQtcGxheWVyIl19LCJlY29tLXNlcnZlciI6eyJyb2xlcyI6WyJhdXRoZW50aWNhdGVkLXVzZXIiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJad2lmdCBPZmZsaW5lIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiem9mZmxpbmVAdHV0YW5vdGEuY29tIiwiZ2l2ZW5fbmFtZSI6Ilp3aWZ0IiwiZmFtaWx5X25hbWUiOiJPZmZsaW5lIiwiZW1haWwiOiJ6b2ZmbGluZUB0dXRhbm90YS5jb20ifQ.clrW88C2NWOtj8eCcWkWYK1sDtKLS5v7c_nf6YY03Ww"
@@ -23,18 +27,16 @@ def api_auth():
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
-def auth_realms_zwift_protocol_openid_connect_auth():
-    return redirect("http://zwift/?code=abc", 302)
-
-
 @app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
-def auth_realms_zwift_login_actions_request_login():
-    return redirect("http://zwift/?code=abc", 302)
-
-
 @app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
-def auth_realms_zwift_protocol_openid_connect_registrations():
-    return redirect("http://zwift/?code=abc", 302)
+@app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])  # Unused as it's a direct redirect now from auth/login
+@app.route('/auth/realms/zwift/tokens/login', methods=['GET'])  # Called by Mac, but not Windows
+@app.route('/launcher', methods=['GET'])  # Called by Mac, but not Windows
+def launch_zwift():
+    if not os.path.exists(AUTOLAUNCH_FILE):
+        return redirect(NOAUTO_EMBED, 302)
+    else:
+        return redirect("http://zwift/?code=abc", 302)
 
 
 #@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['GET'])
@@ -42,24 +44,10 @@ def auth_realms_zwift_protocol_openid_connect_registrations():
 #    return redirect("https://secure.zwift.com/auth/realms/zwift/protocol/openid-connect/auth?client_id=Game_Launcher&response_type=code&redirect_uri=http://zwift/", code=302)
 
 
-# Unused as it's a direct redirect now from auth/login
-@app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])
-def auth_realms_zwift_login_actions_startriding():
-    return redirect("http://zwift/?code=abc", 302)
-
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
     return FAKE_JWT, 200
 
-# Called by Mac, but not Windows
-@app.route('/auth/realms/zwift/tokens/login', methods=['GET'])
-def auth_realms_zwift_tokens_login():
-    return redirect("http://zwift/?code=abc", 302)
-
-# Called by Mac, but not Windows
-@app.route('/launcher', methods=['GET'])
-def launcher():
-    return redirect("http://zwift/?code=abc", 302)
 
 # Called by Mac, but not Windows
 @app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
