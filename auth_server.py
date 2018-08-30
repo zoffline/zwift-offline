@@ -32,6 +32,7 @@ def api_auth():
 @app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])  # Unused as it's a direct redirect now from auth/login
 @app.route('/auth/realms/zwift/tokens/login', methods=['GET'])  # Called by Mac, but not Windows
 @app.route('/launcher', methods=['GET'])  # Called by Mac, but not Windows
+@app.route('/auth/realms/zwift/tokens/registrations', methods=['GET'])  # Called by Mac, but not Windows
 def launch_zwift():
     if not os.path.exists(AUTOLAUNCH_FILE):
         return redirect(NOAUTO_EMBED, 302)
