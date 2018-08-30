@@ -194,7 +194,11 @@ def api_profiles_activities_id(player_id, activity_id):
     update_protobuf_in_db('activity', activity, activity_id)
 
     response = '{"id":%s}' % activity_id
-    if request.args.get('upload-to-strava') != 'true':
+# Zwift 1.0.29337 doesn't seem to pass upload-to-strava anymore?
+# Not going to debug, just going to use presence of strava_token.txt
+#    if request.args.get('upload-to-strava') != 'true':
+#        return response, 200
+    if not os.path.exists("%s/strava_token.txt" % STORAGE_DIR):
         return response, 200
     try:
         from stravalib.client import Client
