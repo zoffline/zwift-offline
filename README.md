@@ -34,9 +34,9 @@ subdirectory.
 <details><summary>Windows 10 Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
-  * If your Zwift version is 1.0.28901, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.28901 will be installed instead of the latest).
+  * If your Zwift version is newer than 1.0.29337 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.29337, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.29337 will be installed instead of the latest).
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-us-or.p12``
   * ``ssl/cert-secure-zwift.p12``
@@ -62,9 +62,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.28901 you may have to uninstall, then reinstall after installing zoffline.
-  * If your Zwift version is 1.0.28901, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.28901 will be installed instead of the latest).
+  * If your Zwift version is newer than 1.0.29337 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.29337, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.29337 will be installed instead of the latest).
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-us-or.p12``
   * ``ssl/cert-secure-zwift.p12``
