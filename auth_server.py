@@ -37,7 +37,7 @@ def launch_zwift():
     if not os.path.exists(AUTOLAUNCH_FILE):
         return redirect(NOAUTO_EMBED, 302)
     else:
-        return redirect("http://zwift/?code=abc", 302)
+        return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
 
 #@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['GET'])
