@@ -26,23 +26,19 @@ def api_auth():
     return 'OK(Java)'
 
 
+@app.route('/launcher', methods=['GET'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
 @app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
 @app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])  # Unused as it's a direct redirect now from auth/login
 @app.route('/auth/realms/zwift/tokens/login', methods=['GET'])  # Called by Mac, but not Windows
-@app.route('/launcher', methods=['GET'])  # Called by Mac, but not Windows
 @app.route('/auth/realms/zwift/tokens/registrations', methods=['GET'])  # Called by Mac, but not Windows
+@app.route('/ride', methods=['GET'])
 def launch_zwift():
-    if not os.path.exists(AUTOLAUNCH_FILE):
+    if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
         return redirect(NOAUTO_EMBED, 302)
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
-
-
-#@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['GET'])
-#def auth_realms_zwift_protocol_openid_connect_logout():
-#    return redirect("https://secure.zwift.com/auth/realms/zwift/protocol/openid-connect/auth?client_id=Game_Launcher&response_type=code&redirect_uri=http://zwift/", code=302)
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
