@@ -108,7 +108,6 @@ def get_id(table_name):
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
-    print "api_auth"
     return '{"realm":"zwift","url":"https://secure.zwift.com/auth/"}'
 
 
