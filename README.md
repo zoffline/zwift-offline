@@ -8,7 +8,26 @@ game node is not implemented.
 
 ### Step 1: Install zoffline
 
-The easiest way to install zoffline is through
+
+<details><summary>Basic usage</summary>
+To install zoffline on Linux, Windows, or Mac OS X:
+* Install Python 2 (https://www.python.org/downloads/) if not already installed
+* Install dependencies: python-protobuf, protobuf_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install protobuf protobuf_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install protobuf protobuf_to_dict stravalib``
+* Clone or download this repo
+* Run standalone.py before starting Zwift
+  * e.g., on Linux/Mac: ``sudo ./standalone.py``
+    * sudo is needed because we're binding to the privileged ports 80 and 443.
+  * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
+* Start Zwift with standalone.py running
+
+zoffline can be installed on the same machine as Zwift or another local machine.
+</details>
+
+
+<details><summary>Advanced usage (using Apache)</summary>
+The easiest way to install zoffline with Apache is through
 [Docker](https://www.docker.com/). zoffline can either be installed on the same
 machine as Zwift or another local machine.
 
@@ -25,8 +44,8 @@ machine as Zwift or another local machine.
 If you don't use the Docker container you will need to set up an Apache server (or
 write your own nginx/uWSGI configuration and use nginx) and install the
 dependencies listed below. The necessary Apache configuration is inside the
-``apache`` subdir. You'll also need to run ``make`` inside the ``protobuf``
-subdirectory.
+``apache`` subdir.
+</details>
 
 
 ### Step 2: Configure Zwift client to use zoffline

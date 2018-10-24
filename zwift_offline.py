@@ -521,7 +521,7 @@ def auth_realms_zwift_tokens_access_codes():
 
 
 def run_standalone():
-    app.run(ssl_context=('ssl/cert-zwift-com.pem', 'ssl/key-zwift-com.pem'),
+    app.run(ssl_context=('%s/ssl/cert-zwift-com.pem' % SCRIPT_DIR, '%s/ssl/key-zwift-com.pem' % SCRIPT_DIR),
             port=443,
             threaded=True,
             host='0.0.0.0')
