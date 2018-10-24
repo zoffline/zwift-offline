@@ -1,14 +1,5 @@
-#!/usr/bin/env python
-
-import os
-import time
-from flask import Flask, request, jsonify, redirect
-
-app = Flask(__name__)
-
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-AUTOLAUNCH_FILE = "%s/storage/auto_launch.txt" % SCRIPT_DIR
-NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
+# Tokens to be imported for auth server
+# Not very pythonic, but don't want this cluttering main source
 
 # Token expires at INT32_MAX... because apparently Zwift or the library they're
 # using thinks time can be negative.
@@ -19,40 +10,3 @@ REFRESH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJiYjQ4czgyOS03ND
 ID_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJiYjQ4czgyOS03NDgzLTQzbzEtbzg1NC01ZDc5M3E1bjAwbjciLCJleHAiOjIxNDc0ODM2NDcsIm5iZiI6MCwiaWF0IjoxNTM1NTA4MDg3LCJpc3MiOiJodHRwczovL3NlY3VyZS56d2lmdC5jb20vYXV0aC9yZWFsbXMvendpZnQiLCJhdWQiOiJHYW1lX0xhdW5jaGVyIiwic3ViIjoiMDJyM2RlYjUtbnE5cS00NzZzLTlzczAtMDM0cTk3N3NwMnIxIiwidHlwIjoiSUQiLCJhenAiOiJHYW1lX0xhdW5jaGVyIiwiYXV0aF90aW1lIjoxNTM1NTA3MjQ5LCJzZXNzaW9uX3N0YXRlIjoiMDg0Nm5vOW4tNzY1cS00cDNzLW4yMHAtNnBucDlyODZyNXMzIiwiYWNyIjoiMCIsIm5hbWUiOiJad2lmdCBPZmZsaW5lIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiem9mZmxpbmVAdHV0YW5vdGEuY29tIiwiZ2l2ZW5fbmFtZSI6Ilp3aWZ0IiwiZmFtaWx5X25hbWUiOiJPZmZsaW5lIiwiZW1haWwiOiJ6b2ZmbGluZUB0dXRhbm90YS5jb20ifQ.rWGSvv5TFO-i6LKczHNUUcB87Hfd5ow9IMG9O5EGR4Y"
 
 FAKE_JWT = """{"access_token":"%s","expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":"%s","token_type":"bearer","id_token":"%s","not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}""" % (ACCESS_TOKEN, REFRESH_TOKEN, ID_TOKEN)
-
-
-@app.route('/auth/rb_bf03269xbi', methods=['POST'])
-def api_auth():
-    return 'OK(Java)'
-
-
-@app.route('/launcher', methods=['GET'])
-@app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
-@app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
-@app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
-@app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])  # Unused as it's a direct redirect now from auth/login
-@app.route('/auth/realms/zwift/tokens/login', methods=['GET'])  # Called by Mac, but not Windows
-@app.route('/auth/realms/zwift/tokens/registrations', methods=['GET'])  # Called by Mac, but not Windows
-@app.route('/ride', methods=['GET'])
-def launch_zwift():
-    if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return redirect(NOAUTO_EMBED, 302)
-    else:
-        return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
-
-
-@app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
-def auth_realms_zwift_protocol_openid_connect_token():
-    return FAKE_JWT, 200
-
-
-# Called by Mac, but not Windows
-@app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
-def auth_realms_zwift_tokens_access_codes():
-    return FAKE_JWT, 200
-
-if __name__ == "__main__":
-    app.run(ssl_context=('ssl/cert-secure-zwift.pem', 'ssl/key-secure-zwift.pem'),
-            port=9000,
-            host='0.0.0.0',
-            debug=True)

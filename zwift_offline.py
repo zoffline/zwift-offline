@@ -11,7 +11,7 @@ from copy import copy
 from datetime import timedelta
 from io import BytesIO
 
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, redirect
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 
@@ -32,6 +32,10 @@ DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_CUR_VER = 0
 
+# For auth server
+AUTOLAUNCH_FILE = "%s/storage/auto_launch.txt" % SCRIPT_DIR
+NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
+from tokens import *
 
 ####
 # Set up protobuf_to_dict call map
@@ -104,6 +108,7 @@ def get_id(table_name):
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
+    print "api_auth"
     return '{"realm":"zwift","url":"https://secure.zwift.com/auth/"}'
 
 
@@ -478,8 +483,50 @@ def init_database():
     # Migrate database if necessary
 
 
+####################
+#
+# Auth server (secure.zwift.com) routes below here
+#
+####################
+
+@app.route('/auth/rb_bf03269xbi', methods=['POST'])
+def auth_rb():
+    return 'OK(Java)'
+
+
+@app.route('/launcher', methods=['GET'])
+@app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
+@app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
+@app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
+@app.route('/auth/realms/zwift/login-actions/startriding', methods=['GET'])  # Unused as it's a direct redirect now from auth/login
+@app.route('/auth/realms/zwift/tokens/login', methods=['GET'])  # Called by Mac, but not Windows
+@app.route('/auth/realms/zwift/tokens/registrations', methods=['GET'])  # Called by Mac, but not Windows
+@app.route('/ride', methods=['GET'])
+def launch_zwift():
+    if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
+        return redirect(NOAUTO_EMBED, 302)
+    else:
+        return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
+
+
+@app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
+def auth_realms_zwift_protocol_openid_connect_token():
+    return FAKE_JWT, 200
+
+
+# Called by Mac, but not Windows
+@app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
+def auth_realms_zwift_tokens_access_codes():
+    return FAKE_JWT, 200
+
+
+def run_standalone():
+    app.run(ssl_context=('ssl/cert-zwift-com.pem', 'ssl/key-zwift-com.pem'),
+            port=443,
+            threaded=True,
+            host='0.0.0.0')
+#            debug=True, use_reload=False)
+
+
 if __name__ == "__main__":
-    app.run(#ssl_context=('ssl/cert-us-or.pem', 'ssl/key-us-or.pem'),
-            port=8000,
-            host='0.0.0.0',
-            debug=True)
+    run_standalone()
