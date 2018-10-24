@@ -21,7 +21,7 @@ To install zoffline on Linux, Windows, or Mac OS X:
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
   * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
-* Start Zwift with standalone.py running
+* Start Zwift with standalone.py running (after completing step 2)
 
 zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
