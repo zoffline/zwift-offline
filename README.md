@@ -11,6 +11,7 @@ game node is not implemented.
 
 <details><summary>Basic usage</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
+
 * Install Python 2 (https://www.python.org/downloads/) if not already installed
 * Install dependencies: python-protobuf, protobuf_to_dict, stravalib (optional)
   * e.g., on Linux/Mac: ``pip install protobuf protobuf_to_dict stravalib``
