@@ -13,9 +13,9 @@ game node is not implemented.
 To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 2 (https://www.python.org/downloads/) if not already installed
-* Install dependencies: python-protobuf, protobuf_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install protobuf protobuf_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install protobuf protobuf_to_dict stravalib``
+* Install dependencies: flask, python-protobuf, protobuf_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install flask protobuf protobuf_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf_to_dict stravalib``
 * Clone or download this repo
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
@@ -126,6 +126,8 @@ Docker
 -or-
 
 * Python 2 (https://www.python.org/downloads/)
+* Flask (http://flask.pocoo.org/)
+  * ``pip install flask``
 * python-protobuf
   * ``pip install protobuf``
 * protobuf_to_dict (https://github.com/benhodgson/protobuf-to-dict)
