@@ -38,16 +38,12 @@ subdirectory.
   * If your Zwift version is 1.0.30362, you're all set.
   * If Zwift is not installed install it after installing zoffline (1.0.30362 will be installed instead of the latest).
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
-  * ``ssl/cert-us-or.p12``
-  * ``ssl/cert-secure-zwift.p12``
-  * ``ssl/cert-us-or.pem``
-  * ``ssl/cert-secure-zwift.pem``
+  * ``ssl/cert-zwift-com.p12``
+  * ``ssl/cert-zwift-com.pem``
 * Open Command Prompt as an admin, cd to that location and run
-  * ``certutil.exe -importpfx Root cert-us-or.p12``
-  * ``certutil.exe -importpfx Root cert-secure-zwift.p12``
+  * ``certutil.exe -importpfx Root cert-zwift-com.p12``
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
-  * Append the contents of ``ssl/cert-us-or.pem`` to cacert.pem
-  * Append the contents of ``ssl/cert-secure-zwift.pem`` to cacert.pem
+  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -66,17 +62,13 @@ to generate your own certificates and do the same.
   * If your Zwift version is 1.0.30362, you're all set.
   * If Zwift is not installed install it after installing zoffline (1.0.30362 will be installed instead of the latest).
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
-  * ``ssl/cert-us-or.p12``
-  * ``ssl/cert-secure-zwift.p12``
-  * ``ssl/cert-us-or.pem``
-  * ``ssl/cert-secure-zwift.pem``
+  * ``ssl/cert-zwift-com.p12``
+  * ``ssl/cert-zwift-com.pem``
 * Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
-    * Click "File - Import Items..." and import ``ssl/cert-secure-zwift.p12``
-    * Right click "secure.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
-    * Repeat this procedure with ``ssl/cert-us-or.p12`` ("us-or-rly101.zwift.com").
+    * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
+    * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
-  * Append the contents of ``ssl/cert-us-or.pem`` to cacert.pem
-  * Append the contents of ``ssl/cert-secure-zwift.pem`` to cacert.pem
+  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
