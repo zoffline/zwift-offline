@@ -1,4 +1,3 @@
 *.pyc
-protobuf/*_pb2.py
 storage/*
 !storage/force_dir_in_git.txt

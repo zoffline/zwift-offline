@@ -105,12 +105,9 @@ Docker
 
 -or-
 
-* protobuf compiler
-  * ``apt-get install protobuf-compiler`` (on Debian/Ubuntu)
-* GNU Make
-  * ``apt-get install make`` (on Debian/Ubuntu)
+* Python 2 (https://www.python.org/downloads/)
 * python-protobuf
-  * ``pip install python-protobuf``
+  * ``pip install protobuf``
 * protobuf_to_dict (https://github.com/benhodgson/protobuf-to-dict)
   * ``pip install protobuf_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
