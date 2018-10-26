@@ -119,6 +119,14 @@ To obtain your current profile:
   * If using Docker, move profile.bin into the path you passed to ``-v``
 
 
+### Step 4 [OPTIONAL]: Obtain Strava API token
+
+* Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
+* Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
+* Open http://localhost:8000/ and authorize.
+* Add the resulting access token to ``storage/strava_token.txt``
+
+
 ## Dependencies
 
 Docker
