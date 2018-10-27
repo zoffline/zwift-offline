@@ -100,6 +100,31 @@ to generate your own certificates and do the same.
 
 </details>
 
+<details><summary>Android (requires a rooted device)</summary>
+
+* Install Zwift on the device
+* Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacerts.pem`` on the device
+  * Note: this file will only exist after the first run of Zwift since it's downloaded after the initial install
+  * Simple approach to achieve this if your device doesn't have a text editor:
+    * ``adb push ssl/cert-zwift-com.pem /data/data/com.zwift.zwiftgame/dataES/``
+    * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
+    * In ``adb shell``: ``cat cert-zwift-com.pem >> cacerts.pem``
+    * However you do it, ensure the permissions and ownership of the file remains the same.
+* Modify the device's /etc/hosts file
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
+    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
+    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
+  * If no text editor on the device, recommend:
+    * ``adb pull /etc/hosts``
+    * (modify on PC)
+    * ``adb push hosts /etc/hosts``
+* Start Zwift and sign in using any email/password
+
+Why: We need to redirect Zwift to use zoffline and convince Zwift to
+accept zoffline's self signed certificates for Zwift's domain names. Feel free
+to generate your own certificates and do the same.
+
+</details>
 
 #### Enabling/Disabling zoffline
 

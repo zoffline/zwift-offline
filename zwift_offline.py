@@ -24,7 +24,8 @@ import protobuf.profile_pb2 as profile_pb2
 import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
 
-app = Flask(__name__)
+# Android uses https for cdn
+app = Flask(__name__, static_folder='cdn/gameassets', static_url_path='/gameassets')
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 STORAGE_DIR = "%s/storage" % SCRIPT_DIR
@@ -337,29 +338,47 @@ def api_profiles_goals_id(player_id, goal_id):
     return '', 200
 
 
+def relay_worlds_generic(world_id=None):
+    # Android client also requests a JSON version
+    if request.headers['Accept'] == 'application/json':
+        world = { 'currentDateTime': int(time.time()),
+                  'currentWorldTime': int(time.time())*1000,
+                  'friendsInWorld': [],
+                  'mapId': 1,
+                  'name': 'Public Watopia',
+                  'playerCount': 0,
+                  'worldId': 1
+                }
+        if world_id:
+            world['mapId'] = world_id
+            return jsonify(world)
+        else:
+            return jsonify([ world ])
+    else:  # protobuf request
+        worlds = world_pb2.Worlds()
+        world = worlds.worlds.add()
+        world.id = 1
+        world.name = 'Public Watopia'
+        world.f3 = 1
+        # Windows client crashes if playerCount is 0
+        world.f5 = 1  # playerCount
+        world.world_time = int(time.time())*1000
+        world.real_time = int(time.time())
+        if world_id:
+            world.id = world_id
+            return worlds.SerializeToString()
+        else:
+            return world.SerializeToString()
+
+
 @app.route('/relay/worlds', methods=['GET'])
 def relay_worlds():
-    worlds = world_pb2.Worlds()
-    world = worlds.worlds.add()
-    world.id = 1
-    world.name = 'Public Watopia'
-    world.f3 = 1
-    world.f5 = 1
-    world.world_time = int(time.time())*1000
-    world.real_time = int(time.time())
-    return worlds.SerializeToString(), 200
+    return relay_worlds_generic()
 
 
 @app.route('/relay/worlds/<int:world_id>', methods=['GET'])
 def relay_worlds_id(world_id):
-    # XXX: Will need to keep MapSchedule.xml up to date
-    return jsonify({ 'currentDateTime': int(time.time()),
-                     'currentWorldTime': int(time.time())*1000,
-                     'friendsInWorld': [ ],
-                     'mapId': world_id,
-                     'name': 'Public Watopia',
-                     'playerCount': 0,
-                     'worldId': 1 })
+    return relay_worlds_generic(world_id)
 
 
 @app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
