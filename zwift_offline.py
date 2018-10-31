@@ -425,6 +425,9 @@ def handle_segment_results(request):
 #    world_id = int(request.args.get('world_id'))
     player_id = request.args.get('player_id')
 #    full = request.args.get('full') == 'true'
+    # Require segment_id
+    if not request.args.get('segment_id'):
+        return '', 422
     segment_id = int(request.args.get('segment_id')) & 0xffffffffffffffff
 #    only_best = request.args.get('only-best') == 'true'
     from_date = request.args.get('from')
