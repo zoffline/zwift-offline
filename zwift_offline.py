@@ -366,9 +366,9 @@ def relay_worlds_generic(world_id=None):
         world.real_time = int(time.time())
         if world_id:
             world.id = world_id
-            return worlds.SerializeToString()
-        else:
             return world.SerializeToString()
+        else:
+            return worlds.SerializeToString()
 
 
 @app.route('/relay/worlds', methods=['GET'])
