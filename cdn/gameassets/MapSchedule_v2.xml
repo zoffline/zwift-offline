@@ -1,55 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <MapSchedule>
-    <appointments>
-        
-        <appointment map="WATOPIA"		start="2018-09-01T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-09-04T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-09-07T00:01-04"/>
-        <appointment map="LONDON"		start="2018-09-09T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-09-11T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-09-13T00:01-04"/>
-        <appointment map="LONDON"		start="2018-09-16T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-09-18T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-09-20T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-09-23T00:01-04"/>
+	<appointments>
 
-        <appointment map="WATOPIA"		start="2018-10-01T00:01-04"/>
-        <appointment map="LONDON"		start="2018-10-04T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-10-06T00:01-04"/>
-        <appointment map="LONDON"		start="2018-10-12T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-10-14T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-10-15T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-10-16T00:01-04"/>
-        <appointment map="NEWYORK"		start="2018-10-19T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-10-26T00:01-04"/>
-        <appointment map="NEWYORK"		start="2018-10-28T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-10-31T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-03-01T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-03-04T00:01-04"/>
+		<appointment map="LONDON"       start="2019-03-05T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-03-08T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-03-10T00:01-04"/>
+		<appointment map="LONDON"       start="2019-03-13T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-03-15T00:01-04"/>
+		<appointment map="LONDON"       start="2019-03-16T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-03-18T00:01-04"/>
+		<appointment map="LONDON"       start="2019-03-19T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-03-21T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-03-23T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-03-25T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-03-26T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-03-29T00:01-04"/>
+		<appointment map="LONDON"       start="2019-03-30T00:01-04"/>
 
-        <appointment map="WATOPIA"		start="2018-11-01T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-11-04T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-11-07T00:01-04"/>
-        <appointment map="LONDON"		start="2018-11-09T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-11-11T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-11-13T00:01-04"/>
-        <appointment map="LONDON"		start="2018-11-16T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-11-18T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-11-20T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-11-23T00:01-04"/>
+		<appointment map="RICHMOND"    start="2019-04-01T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-04-02T00:01-04"/>
+		<appointment map="LONDON"      start="2019-04-06T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-04-08T00:01-04"/>
+		<appointment map="LONDON"      start="2019-04-09T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-04-12T00:01-04"/>
+		<appointment map="RICHMOND"    start="2019-04-15T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-04-16T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-04-18T00:01-04"/>
+		<appointment map="LONDON"      start="2019-04-20T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-04-22T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-04-23T00:01-04"/>
+		<appointment map="LONDON"      start="2019-04-25T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-04-28T00:01-04"/>
 
-        <appointment map="WATOPIA"		start="2018-12-01T00:01-04"/>
-        <appointment map="LONDON"		start="2018-12-04T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-12-06T00:01-04"/>
-        <appointment map="LONDON"		start="2018-12-12T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-12-14T00:01-04"/>
-        <appointment map="INNSBRUCK"	start="2018-12-15T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-12-16T00:01-04"/>
-        <appointment map="NEWYORK"		start="2018-12-19T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-12-26T00:01-04"/>
-        <appointment map="NEWYORK"		start="2018-12-28T00:01-04"/>
-        <appointment map="WATOPIA"		start="2018-12-31T00:01-04"/>
+		<appointment map="LONDON"      start="2019-05-01T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-05-04T00:01-04"/>
+		<appointment map="LONDON"       start="2019-05-05T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-05-08T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-05-10T00:01-04"/>
+		<appointment map="LONDON"       start="2019-05-13T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-05-15T00:01-04"/>
+		<appointment map="LONDON"       start="2019-05-16T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-05-18T00:01-04"/>
+		<appointment map="LONDON"       start="2019-05-19T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-05-21T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-05-23T00:01-04"/>
+		<appointment map="INNSBRUCK"    start="2019-05-25T00:01-04"/>
+		<appointment map="NEWYORK"      start="2019-05-26T00:01-04"/>
+		<appointment map="RICHMOND"     start="2019-05-29T00:01-04"/>
+		<appointment map="LONDON"       start="2019-05-30T00:01-04"/>
 
+		<appointment map="RICHMOND"    start="2019-06-01T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-06-02T00:01-04"/>
+		<appointment map="LONDON"      start="2019-06-06T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-06-08T00:01-04"/>
+		<appointment map="LONDON"      start="2019-06-09T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-06-12T00:01-04"/>
+		<appointment map="RICHMOND"    start="2019-06-15T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-06-16T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-06-18T00:01-04"/>
+		<appointment map="LONDON"      start="2019-06-20T00:01-04"/>
+		<appointment map="INNSBRUCK"   start="2019-06-22T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-06-23T00:01-04"/>
+		<appointment map="LONDON"      start="2019-06-25T00:01-04"/>
+		<appointment map="NEWYORK"     start="2019-06-30T00:01-04"/>
 
-    </appointments>
-    <VERSION>1</VERSION>
+	</appointments>
+	<VERSION>1</VERSION>
 </MapSchedule>
