@@ -141,6 +141,18 @@ def api_events_search():
     return '', 200
 
 
+# Probably don't need, haven't investigated
+@app.route('/api/zfiles/list', methods=['POST'])
+def api_zfiles_list():
+    return '', 200
+
+
+# Probably don't need, haven't investigated
+@app.route('/api/private_event/feed', methods=['POST'])
+def api_private_event_feed():
+    return '', 200
+
+
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
     profile_file = '%s/profile.bin' % STORAGE_DIR
@@ -372,6 +384,7 @@ def relay_worlds_generic(world_id=None):
 
 
 @app.route('/relay/worlds', methods=['GET'])
+@app.route('/relay/dropin', methods=['GET'])
 def relay_worlds():
     return relay_worlds_generic()
 
