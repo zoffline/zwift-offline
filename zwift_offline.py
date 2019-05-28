@@ -442,7 +442,7 @@ def handle_segment_results(request):
     if not request.args.get('segment_id'):
         return '', 422
     segment_id = int(request.args.get('segment_id')) & 0xffffffffffffffff
-#    only_best = request.args.get('only-best') == 'true'
+    only_best = request.args.get('only-best') == 'true'
     from_date = request.args.get('from')
     to_date = request.args.get('to')
 
@@ -462,6 +462,8 @@ def handle_segment_results(request):
     if to_date:
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
         where_args.append(to_date)
+    if only_best:
+        where_stmt += " ORDER BY elapsed_ms LIMIT 1"
     cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in cur.fetchall():
         result = results.segment_results.add()
