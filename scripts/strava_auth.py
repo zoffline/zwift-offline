@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 """
-Same as https://github.com/hozn/stravalib/blob/master/stravalib/tests/auth_responder.py
-
-Just added "scope=write" to the authorization URL.
-
 A basic authorization server.  Run this with your Strava Client ID and Client Secret and access from your
 browser (because the Strava OAuth page uses javascript) in order to get a resulting access token.  That access
 token can then be used to initialize a Client that can read (and/or write) data from the Strava API.
@@ -65,18 +61,29 @@ class RequestHandler(BaseHTTPRequestHandler):
             code = urlparse.parse_qs(parsed_path.query).get('code')
             if code:
                 code = code[0]
-                access_token = client.exchange_code_for_token(client_id=self.server.client_id,
+                token_response = client.exchange_code_for_token(client_id=self.server.client_id,
                                                               client_secret=self.server.client_secret,
                                                               code=code)
+                access_token = token_response['access_token']
+                refresh_token = token_response['refresh_token']
+                expires_at = token_response['expires_at']
                 self.server.logger.info("Exchanged code {} for access token {}".format(code, access_token))
                 self.wfile.write(six.b("Access Token: {}\n".format(access_token)))
+                self.wfile.write(six.b("Refresh Token: {}\n".format(refresh_token)))
+                self.wfile.write(six.b("Expires at: {}\n".format(expires_at)))
+                with open('strava_token.txt', 'w') as f:
+                    f.write(self.server.client_id + '\r\n');
+                    f.write(self.server.client_secret + '\r\n');
+                    f.write(access_token + '\r\n');
+                    f.write(refresh_token + '\r\n');
+                    f.write(str(expires_at) + '\r\n');
             else:
                 self.server.logger.error("No code param received.")
                 self.wfile.write(six.b("ERROR: No code param recevied.\n"))
         else:
             url = client.authorization_url(client_id=self.server.client_id,
                                            redirect_uri='http://localhost:{}/authorization'.format(self.server.server_port),
-                                           scope='write')
+                                           scope='activity:write')
 
             self.send_response(302)
             self.send_header(six.b("Content-type"), six.b("text/plain"))
