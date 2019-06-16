@@ -226,7 +226,6 @@ def api_profiles_activities_id(player_id, activity_id):
             strava.access_token = f.readline().rstrip('\r\n')
             strava.refresh_token = f.readline().rstrip('\r\n')
             strava.expires_at = f.readline().rstrip('\r\n')
-            f.close()
     except:
         logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % STORAGE_DIR)
         return response, 200
