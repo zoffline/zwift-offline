@@ -221,9 +221,26 @@ def api_profiles_activities_id(player_id, activity_id):
     strava = Client()
     try:
         with open('%s/strava_token.txt' % STORAGE_DIR, 'r') as f:
-            strava.access_token = f.read().rstrip('\r\n')
+            client_id = f.readline().rstrip('\n')
+            client_secret = f.readline().rstrip('\n')
+            strava.access_token = f.readline().rstrip('\n')
+            refresh_token = f.readline().rstrip('\n')
+            expires_at = f.readline().rstrip('\n')
     except:
         logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % STORAGE_DIR)
+        return response, 200
+    try:
+        if time.time() > int(expires_at):
+            refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
+                                                           refresh_token=refresh_token)
+            with open('%s/strava_token.txt' % STORAGE_DIR, 'w') as f:
+                f.write(client_id + '\n');
+                f.write(client_secret + '\n');
+                f.write(refresh_response['access_token'] + '\n');
+                f.write(refresh_response['refresh_token'] + '\n');
+                f.write(str(refresh_response['expires_at']) + '\n');
+    except:
+        logger.warn("Failed to refresh token. Skipping Strava upload attempt.")
         return response, 200
     try:
         # See if there's internet to upload to Strava
