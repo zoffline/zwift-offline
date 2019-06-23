@@ -48,6 +48,12 @@ dependencies listed below. The necessary Apache configuration is inside the
 ``apache`` subdir.
 </details>
 
+<details><summary>If zoffline is out of date from Zwift's official client</summary>
+If zoffline is behind in support of the latest Zwift client it can be updated to run using the latest Zwift version by running this script from within the zwift-offline repository: https://gist.github.com/zoffline/b874e93e24439f0f4fbd7b55f3876fd2
+
+Note: there is no guarantee that an untested Zwift update will work with zoffline. However, historically, Zwift updates have not broken zoffline.
+</details>
+
 
 ### Step 2: Configure Zwift client to use zoffline
 
