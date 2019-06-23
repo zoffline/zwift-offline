@@ -109,6 +109,7 @@ to generate your own certificates and do the same.
 <details><summary>Android (requires a rooted device)</summary>
 
 * Install Zwift on the device
+* Open Zwift once to complete installation (i.e download all extra files).
 * Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacerts.pem`` on the device
   * Note: this file will only exist after the first run of Zwift since it's downloaded after the initial install
   * Simple approach to achieve this if your device doesn't have a text editor:
