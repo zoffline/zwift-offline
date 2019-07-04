@@ -471,7 +471,7 @@ def handle_segment_results(request):
     cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in cur.fetchall():
         result = results.segment_results.add()
-        row_to_protobuf(row, result)
+        row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
 
     return results.SerializeToString(), 200
 
