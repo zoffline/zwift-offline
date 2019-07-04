@@ -550,14 +550,17 @@ def init_database():
         return
     cur_version = cur.execute('SELECT version FROM version')
     version = cur.fetchall()[0][0]
-    if version != DATABASE_CUR_VER:  # Back up database before making changes
-        try:  # Try writing to storage dir
-            copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(time.time())))
+    if version == DATABASE_CUR_VER:
+        conn.close()
+        return
+    # Database needs to be upgraded, try to back it up first
+    try:  # Try writing to storage dir
+        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(time.time())))
+    except:
+        try:  # Fall back to a temporary dir
+            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
         except:
-            try:  # Fall back to a temporary dir
-                copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
-            except:
-                logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
+            logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
 
     if version < 1:
         # Adjust old world_time values in segment results to new rough estimate of Zwift's
