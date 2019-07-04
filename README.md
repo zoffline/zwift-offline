@@ -48,6 +48,12 @@ dependencies listed below. The necessary Apache configuration is inside the
 ``apache`` subdir.
 </details>
 
+<details><summary>If zoffline is out of date from Zwift's official client</summary>
+If zoffline is behind in support of the latest Zwift client it can be updated (if running Linux) to run using the latest Zwift version by running this script from within the zwift-offline repository: https://gist.github.com/zoffline/b874e93e24439f0f4fbd7b55f3876fd2
+
+Note: there is no guarantee that an untested Zwift update will work with zoffline. However, historically, Zwift updates have not broken zoffline.
+</details>
+
 
 ### Step 2: Configure Zwift client to use zoffline
 
@@ -103,6 +109,7 @@ to generate your own certificates and do the same.
 <details><summary>Android (requires a rooted device)</summary>
 
 * Install Zwift on the device
+* Open Zwift once to complete installation (i.e download all extra files).
 * Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacerts.pem`` on the device
   * Note: this file will only exist after the first run of Zwift since it's downloaded after the initial install
   * Simple approach to achieve this if your device doesn't have a text editor:
@@ -152,7 +159,7 @@ To obtain your current profile:
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
-* Add the resulting access token to ``storage/strava_token.txt``
+* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage`` directory.
 
 
 ## Dependencies
@@ -170,7 +177,6 @@ Docker
   * ``pip install protobuf_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
-  * Add your Strava API token to ``storage/strava_token.txt``
 
 
 ## Known issues
