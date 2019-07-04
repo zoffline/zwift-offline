@@ -6,10 +6,12 @@ import logging
 import os
 import random
 import sqlite3
+import tempfile
 import time
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
+from shutil import copyfile
 
 from flask import Flask, request, jsonify, g, redirect
 from google.protobuf.descriptor import FieldDescriptor
@@ -31,7 +33,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 STORAGE_DIR = "%s/storage" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
-DATABASE_CUR_VER = 0
+DATABASE_CUR_VER = 1
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/storage/auto_launch.txt" % SCRIPT_DIR
@@ -516,16 +518,37 @@ def teardown_request(exception):
 
 @app.before_first_request
 def init_database():
-    # Nothing to do for now
+    conn = connect_db()
+    cur = conn.cursor()
     if not os.path.exists(DATABASE_PATH):
-        conn = connect_db()
-        cur = conn.cursor()
         # Create a new database
         with open(DATABASE_INIT_SQL, 'r') as f:
             cur.executescript(f.read())
             cur.execute('INSERT INTO version VALUES (?)', (DATABASE_CUR_VER,))
         conn.close()
+        return
     # Migrate database if necessary
+    if not os.access(DATABASE_PATH, os.W_OK):
+        logging.error("zwift-offline.db is not writable. Unable to upgrade database!")
+        return
+    cur_version = cur.execute('SELECT version FROM version')
+    version = cur.fetchall()[0][0]
+    if version != DATABASE_CUR_VER:  # Back up database before making changes
+        try:  # Try writing to storage dir
+            copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(time.time())))
+        except:
+            try:  # Fall back to a temporary dir
+                copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
+            except:
+                logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
+
+    if version < 1:
+        # Adjust old world_time values in segment results to new rough estimate of Zwift's
+        logging.info("Upgrading zwift-offline.db to version 1")
+        cur.execute('UPDATE segment_result SET world_time = cast(world_time/1000*64.4131403573055 as int)')
+        cur.execute('UPDATE version SET version = 1')
+    conn.commit()
+    conn.close()
 
 
 ####################
