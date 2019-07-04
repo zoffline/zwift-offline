@@ -11,3 +11,8 @@ message World {
 message Worlds {
 	repeated World worlds = 1;
 }
+
+message WorldAttributes {
+	/* repeated RiderAttributes riders = 1; */
+	required int64 world_time = 2;
+}

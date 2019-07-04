@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='world.proto',
   package='',
   syntax='proto2',
-  serialized_pb=_b('\n\x0bworld.proto\"`\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World')
+  serialized_pb=_b('\n\x0bworld.proto\"`\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -122,9 +122,41 @@ _WORLDS = _descriptor.Descriptor(
   serialized_end=145,
 )
 
+
+_WORLDATTRIBUTES = _descriptor.Descriptor(
+  name='WorldAttributes',
+  full_name='WorldAttributes',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='world_time', full_name='WorldAttributes.world_time', index=0,
+      number=2, type=3, cpp_type=2, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=147,
+  serialized_end=184,
+)
+
 _WORLDS.fields_by_name['worlds'].message_type = _WORLD
 DESCRIPTOR.message_types_by_name['World'] = _WORLD
 DESCRIPTOR.message_types_by_name['Worlds'] = _WORLDS
+DESCRIPTOR.message_types_by_name['WorldAttributes'] = _WORLDATTRIBUTES
 
 World = _reflection.GeneratedProtocolMessageType('World', (_message.Message,), dict(
   DESCRIPTOR = _WORLD,
@@ -139,6 +171,13 @@ Worlds = _reflection.GeneratedProtocolMessageType('Worlds', (_message.Message,),
   # @@protoc_insertion_point(class_scope:Worlds)
   ))
 _sym_db.RegisterMessage(Worlds)
+
+WorldAttributes = _reflection.GeneratedProtocolMessageType('WorldAttributes', (_message.Message,), dict(
+  DESCRIPTOR = _WORLDATTRIBUTES,
+  __module__ = 'world_pb2'
+  # @@protoc_insertion_point(class_scope:WorldAttributes)
+  ))
+_sym_db.RegisterMessage(WorldAttributes)
 
 
 # @@protoc_insertion_point(module_scope)

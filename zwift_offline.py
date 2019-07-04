@@ -408,7 +408,12 @@ def relay_worlds_my_hash_seeds(world_id):
     return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
 
 
-# XXX: relay/worlds/<id>/attributes not implemented. seems okay with a 404
+# XXX: attributes have not been thoroughly investigated
+@app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
+def relay_worlds_attributes(world_id):
+    attribs = world_pb2.WorldAttributes()
+    attribs.world_time = world_time()
+    return attribs.SerializeToString(), 200
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
