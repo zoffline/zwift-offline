@@ -107,6 +107,10 @@ def get_id(table_name):
     return ident
 
 
+def world_time():
+    return int(time.time()*64.4131403573055)
+
+
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
     return '{"realm":"zwift","url":"https://secure.zwift.com/auth/"}'
@@ -354,7 +358,7 @@ def relay_worlds_generic(world_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         world = { 'currentDateTime': int(time.time()),
-                  'currentWorldTime': int(time.time())*1000,
+                  'currentWorldTime': world_time(),
                   'friendsInWorld': [],
                   'mapId': 1,
                   'name': 'Public Watopia',
@@ -374,7 +378,7 @@ def relay_worlds_generic(world_id=None):
         world.f3 = 1
         # Windows client crashes if playerCount is 0
         world.f5 = 1  # playerCount
-        world.world_time = int(time.time())*1000
+        world.world_time = world_time()
         world.real_time = int(time.time())
         if world_id:
             world.id = world_id
@@ -396,7 +400,7 @@ def relay_worlds_id(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
 def relay_worlds_id_join(world_id):
-    return '{"worldTime":%ld}' % (time.time()*1000)
+    return '{"worldTime":%ld}' % world_time()
 
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
@@ -428,7 +432,7 @@ def handle_segment_results(request):
         result = segment_result_pb2.SegmentResult()
         result.ParseFromString(request.stream.read())
         result.id = get_id('segment_result')
-        result.world_time = int(time.time())*1000
+        result.world_time = world_time()
         result.finish_time_str = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
@@ -484,7 +488,7 @@ def api_segment_results():
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
-    return '{"worldtime":%ld}' % (time.time()*1000)
+    return '{"worldtime":%ld}' % world_time()
 
 
 def connect_db():
