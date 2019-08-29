@@ -148,13 +148,13 @@ def api_events_search():
 
 
 # Probably don't need, haven't investigated
-@app.route('/api/zfiles/list', methods=['POST'])
+@app.route('/api/zfiles/list', methods=['GET', 'POST'])
 def api_zfiles_list():
     return '', 200
 
 
 # Probably don't need, haven't investigated
-@app.route('/api/private_event/feed', methods=['POST'])
+@app.route('/api/private_event/feed', methods=['GET', 'POST'])
 def api_private_event_feed():
     return '', 200
 
