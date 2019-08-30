@@ -22,6 +22,7 @@ To install zoffline on Linux, Windows, or Mac OS X:
     * sudo is needed because we're binding to the privileged ports 80 and 443.
   * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
 * Start Zwift with standalone.py running (after completing step 2)
+* Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
 zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
@@ -35,7 +36,7 @@ machine as Zwift or another local machine.
 * Install Docker
 * Create the docker container with:<br>
   ``docker create --name zwift-offline -p 443:443 -p 80:80 -v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
-  * You can optionally exclude ``-v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage`` if you don't care if zoffline data is persistent across zoffline updates.
+  * You can optionally exclude ``-v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage`` if you don't care if your Zwift progress state is retained across zoffline updates (unlikely).
   * The path you pass to ``-v`` will likely need to be world readable and writable.
   * A list of valid ``<timezone>`` values (e.g. America/New_York) can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
   * Adding ``--restart unless-stopped`` will make zoffline start on boot if you have Docker v1.9.0 or greater.
