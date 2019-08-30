@@ -15,9 +15,10 @@ There are three ways with which to install and run zoffline depending on your pl
 To install zoffline on Windows:
 
 * Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
-* Run the downloaded zoffline.exe prior to starting Zwift (__after completing step 2__)
+* Run the downloaded zoffline.exe
   * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
-  * It takes a few seconds to start. Wait until text appears in the new command prompt before opening Zwift.
+* Start Zwift with zoffline.exe running (__after completing step 2__)
+  * It takes zoffline few seconds to start. Wait until text appears in the command prompt before opening Zwift.
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
 
@@ -33,7 +34,7 @@ To install zoffline on Linux, Windows, or Mac OS X:
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
   * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
-* Start Zwift with standalone.py running (after completing step 2)
+* Start Zwift with standalone.py running (__after completing step 2__)
 * Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
 zoffline can be installed on the same machine as Zwift or another local machine.
