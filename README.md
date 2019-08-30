@@ -17,6 +17,7 @@ To install zoffline on Windows:
 * Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
 * Run the downloaded zoffline.exe prior to starting Zwift (__after completing step 2__)
   * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
+  * It takes a few seconds to start. Wait until text appears in the new command prompt before opening Zwift.
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
 
