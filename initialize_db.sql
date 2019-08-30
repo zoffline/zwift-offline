@@ -1,6 +1,6 @@
 CREATE TABLE version ( version INTEGER );
 
-INSERT INTO version VALUES (0);
+INSERT INTO version VALUES (1);
 
 /* column names must match protobuf field names */
 
