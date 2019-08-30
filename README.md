@@ -6,10 +6,21 @@ game node is not implemented.
 
 ## Install
 
+Setting up zoffline requires two primary steps. First, zoffline must be installed and run on a system before running Zwift (either on the system running Zwift or on another locally networked system).  Second, Zwift must be configured to use zoffline instead of the official Zwift server.
+
 ### Step 1: Install zoffline
+There are three ways with which to install and run zoffline depending on your platform:
 
+<details><summary>Simplest (Windows only)</summary>
+To install zoffline on Windows:
 
-<details><summary>Basic usage</summary>
+* Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
+* Run the downloaded zoffline.exe prior to starting Zwift (__after completing step 2__)
+  * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
+* When done with Zwift, press Ctrl+C in the command line to close zoffline.
+</details>
+
+<details><summary>Linux, Windows, or Mac OS X</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 2 (https://www.python.org/downloads/) if not already installed
@@ -28,11 +39,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
 
 
-<details><summary>Advanced usage (using Apache)</summary>
-The easiest way to install zoffline with Apache is through
-[Docker](https://www.docker.com/). zoffline can either be installed on the same
-machine as Zwift or another local machine.
-
+<details><summary>Using Docker (recommended for Linux)</summary>
 * Install Docker
 * Create the docker container with:<br>
   ``docker create --name zwift-offline -p 443:443 -p 80:80 -v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
@@ -47,12 +54,6 @@ If you don't use the Docker container you will need to set up an Apache server (
 write your own nginx/uWSGI configuration and use nginx) and install the
 dependencies listed below. The necessary Apache configuration is inside the
 ``apache`` subdir.
-</details>
-
-<details><summary>If zoffline is out of date from Zwift's official client</summary>
-If zoffline is behind in support of the latest Zwift client it can be updated (if running Linux) to run using the latest Zwift version by running this script from within the zwift-offline repository: https://gist.github.com/zoffline/b874e93e24439f0f4fbd7b55f3876fd2
-
-Note: there is no guarantee that an untested Zwift update will work with zoffline. However, historically, Zwift updates have not broken zoffline.
 </details>
 
 
@@ -120,8 +121,7 @@ to generate your own certificates and do the same.
     * However you do it, ensure the permissions and ownership of the file remains the same.
 * Modify the device's /etc/hosts file
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
-    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
-    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
+    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline.)
   * If no text editor on the device, recommend:
     * ``adb pull /etc/hosts``
     * (modify on PC)
@@ -149,6 +149,7 @@ height, etc.)
 To obtain your current profile:
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
 * Move the resulting profile.bin (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
+  * If using zoffline.exe on Windows, create the ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
   * If using Docker, move profile.bin into the path you passed to ``-v``
 
 
@@ -172,8 +173,6 @@ Docker
 * Python 2 (https://www.python.org/downloads/)
 * Flask (http://flask.pocoo.org/)
   * ``pip install flask``
-* python-protobuf
-  * ``pip install protobuf``
 * protobuf_to_dict (https://github.com/benhodgson/protobuf-to-dict)
   * ``pip install protobuf_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
@@ -192,6 +191,12 @@ enabled Zwift updates will not be installed.
 
 Don't expose zoffline to the internet, it was not designed with that in mind.
 
+<details><summary>If zoffline is out of date from Zwift's official client</summary>
+If zoffline is behind in support of the latest Zwift client it can be updated (if running Linux) to run using the latest Zwift version by running this script from within the zwift-offline repository: https://gist.github.com/zoffline/b874e93e24439f0f4fbd7b55f3876fd2
+
+Note: there is no guarantee that an untested Zwift update will work with zoffline. However, historically, Zwift updates rarely break zoffline.
+</details>
+
 
 ## Disclaimer
 
@@ -200,3 +205,4 @@ this project and does not endorse this project.
 
 All product and company names are trademarks of their respective holders. Use of
 them does not imply any affiliation with or endorsement by them.
+

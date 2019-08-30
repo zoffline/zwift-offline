@@ -9,7 +9,12 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import zwift_offline
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+if getattr(sys, 'frozen', False):
+    # If we're running as a pyinstaller bundle
+    CDN_DIR = "%s/cdn" % sys._MEIPASS
+else:
+    CDN_DIR = "%s/cdn" % os.path.dirname(os.path.realpath(__file__))
+
 
 def sigint_handler(num, frame):
 	httpd.shutdown()
@@ -23,7 +28,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
         path = SimpleHTTPRequestHandler.translate_path(self, path)
         relpath = os.path.relpath(path, os.getcwd())
-        fullpath = os.path.join("%s/cdn" % SCRIPT_DIR, relpath)
+        fullpath = os.path.join(CDN_DIR, relpath)
         return fullpath
 
 SocketServer.ThreadingTCPServer.allow_reuse_address = True

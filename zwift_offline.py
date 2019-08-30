@@ -6,6 +6,7 @@ import logging
 import os
 import random
 import sqlite3
+import sys
 import tempfile
 import time
 from copy import copy
@@ -25,20 +26,43 @@ import protobuf.periodic_info_pb2 as periodic_info_pb2
 import protobuf.profile_pb2 as profile_pb2
 import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
+import protobuf.zfiles_pb2 as zfiles_pb2
 
-# Android uses https for cdn
-app = Flask(__name__, static_folder='cdn/gameassets', static_url_path='/gameassets')
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-STORAGE_DIR = "%s/storage" % SCRIPT_DIR
-DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
+logging.basicConfig()
+logger = logging.getLogger('zoffline')
+logger.setLevel(logging.WARN)
+
+if getattr(sys, 'frozen', False):
+    # If we're running as a pyinstaller bundle
+    SCRIPT_DIR = sys._MEIPASS
+    STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
+else:
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+    STORAGE_DIR = "%s/storage" % SCRIPT_DIR
+
+try:
+    # Ensure storage dir exists
+    if not os.path.isdir(STORAGE_DIR):
+        os.makedirs(STORAGE_DIR)
+except IOError, e:
+    logger.error("failed to create storage dir (%s):  %s", STORAGE_DIR, str(e))
+    sys.exit(1)
+
+SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
+DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 1
 
 # For auth server
-AUTOLAUNCH_FILE = "%s/storage/auto_launch.txt" % SCRIPT_DIR
+AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
 from tokens import *
+
+
+# Android uses https for cdn
+app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets')
+
 
 ####
 # Set up protobuf_to_dict call map
@@ -47,10 +71,6 @@ type_callable_map = copy(TYPE_CALLABLE_MAP)
 type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
-
-
-logger = logging.getLogger('zoffline')
-logger.setLevel(logging.WARN)
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -195,8 +215,6 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
-    if not os.path.exists(STORAGE_DIR):
-        os.makedirs(STORAGE_DIR)
     with open('%s/profile.bin' % STORAGE_DIR, 'wb') as f:
         f.write(request.stream.read())
     return '', 204
@@ -556,7 +574,7 @@ def teardown_request(exception):
 def init_database():
     conn = connect_db()
     cur = conn.cursor()
-    if not os.path.exists(DATABASE_PATH):
+    if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
         # Create a new database
         with open(DATABASE_INIT_SQL, 'r') as f:
             cur.executescript(f.read())
@@ -628,7 +646,7 @@ def auth_realms_zwift_tokens_access_codes():
 
 
 def run_standalone():
-    app.run(ssl_context=('%s/ssl/cert-zwift-com.pem' % SCRIPT_DIR, '%s/ssl/key-zwift-com.pem' % SCRIPT_DIR),
+    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
             port=443,
             threaded=True,
             host='0.0.0.0')
