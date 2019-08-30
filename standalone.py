@@ -5,6 +5,7 @@ import signal
 import SocketServer
 import sys
 import threading
+from datetime import datetime
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import zwift_offline
@@ -15,6 +16,7 @@ if getattr(sys, 'frozen', False):
 else:
     CDN_DIR = "%s/cdn" % os.path.dirname(os.path.realpath(__file__))
 
+MAP_OVERRIDE = None
 
 def sigint_handler(num, frame):
 	httpd.shutdown()
@@ -30,6 +32,26 @@ class CDNHandler(SimpleHTTPRequestHandler):
         relpath = os.path.relpath(path, os.getcwd())
         fullpath = os.path.join(CDN_DIR, relpath)
         return fullpath
+
+    def do_GET(self):
+        global MAP_OVERRIDE
+        print self.path
+        path_end = self.path.rsplit('/', 1)[1]
+        if path_end in [ 'INNSBRUCK', 'LONDON', 'NEWYORK', 'RICHMOND', 'WATOPIA' ]:
+            MAP_OVERRIDE = path_end
+            self.send_response(302)
+            self.send_header('Location', 'https://secure.zwift.com/ride')
+            self.end_headers()
+            return
+        if MAP_OVERRIDE and self.path == '/gameassets/MapSchedule_v2.xml':
+            print "Overrode map schedule with %s" % MAP_OVERRIDE
+            self.send_response(200)
+            self.send_header('Content-type', 'text/xml')
+            self.end_headers()
+            self.wfile.write('<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (MAP_OVERRIDE, datetime.now().strftime("%Y-%m-%dT00:01-04")))
+            MAP_OVERRIDE = None
+            return
+        SimpleHTTPRequestHandler.do_GET(self)
 
 SocketServer.ThreadingTCPServer.allow_reuse_address = True
 httpd = SocketServer.ThreadingTCPServer(('', 80), CDNHandler)

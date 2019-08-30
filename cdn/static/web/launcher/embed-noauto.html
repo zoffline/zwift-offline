@@ -1,16 +1,37 @@
 <html>
 <head>
     <title>Loading Zwift</title>
+<style>
+a, a:visited {
+        color: blue;
+}
+</style>
 </head>
 <body>
 <h1>zoffline Launcher</h1>
-</br></br>
-<h2><a href="https://secure.zwift.com/ride">Click here to start Zwift</a></h2>
 
-</br></br>
+</br>
+<h2><a href="https://secure.zwift.com/ride">Click here to start Zwift</a></h2>
+</br>
+
+<h3>Launch into a specific map*:
+<table border=0 cellpadding=15><tr>
+        <td><a href="http://cdn.zwift.com/INNSBRUCK">Innsbruck</a></td>
+        <td><a href="http://cdn.zwift.com/LONDON">London</a></td>
+        <td><a href="http://cdn.zwift.com/NEWYORK">New York</a></td>
+        <td><a href="http://cdn.zwift.com/RICHMOND">Richmond</a></td>
+        <td><a href="http://cdn.zwift.com/WATOPIA">Watopia</a></td>
+</tr></table>
+</h3>
+
+</br>
 To automatically launch Zwift and skip this step create a file called "auto_launch.txt" inside zoffline's storage directory.
 </br>
 <b>Warning:</b> If there's a pending Zwift update that zoffline supports, auto launching will prevent that update from being installed and Zwift will not behave nicely. Always ensure zoffline is disabled to apply updates in advance if auto launching.
+</br>
+</br>
+</br>
+<small>*specific map launch does not work with Docker installs.</small>
 
 </body>
 </html>
