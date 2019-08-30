@@ -40,6 +40,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 
 
 <details><summary>Using Docker (recommended for Linux)</summary>
+ 
 * Install Docker
 * Create the docker container with:<br>
   ``docker create --name zwift-offline -p 443:443 -p 80:80 -v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
