@@ -155,6 +155,17 @@ def api_events_search():
     return '', 200
 
 
+@app.route('/api/zfiles', methods=['POST'])
+def api_zfiles():
+    # Don't care about zfiles, but shuts up some errors in Zwift log.
+    zfile = zfiles_pb2.ZFile()
+    zfile.id = int(random.getrandbits(31))
+    zfile.folder = "logfiles"
+    zfile.filename = "yep_took_good_care_of_that_file.txt"
+    zfile.timestamp = int(time.time())
+    return zfile.SerializeToString(), 200
+
+
 # Probably don't need, haven't investigated
 @app.route('/api/zfiles/list', methods=['GET', 'POST'])
 def api_zfiles_list():

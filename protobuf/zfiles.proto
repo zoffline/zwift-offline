@@ -1,0 +1,6 @@
+message ZFile {
+    required uint64 id = 1;
+    required string folder = 2;
+    required string filename = 3;
+    required uint64 timestamp = 4;
+}

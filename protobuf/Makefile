@@ -7,6 +7,7 @@ all:
 	protoc --python_out=. periodic-info.proto
 	protoc --python_out=. world.proto
 	protoc --python_out=. goal.proto
+	protoc --python_out=. zfiles.proto
 
 clean:
 	rm -f *_pb2.py *_pb2.pyc
