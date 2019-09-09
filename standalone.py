@@ -35,16 +35,14 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         global MAP_OVERRIDE
-        print self.path
         path_end = self.path.rsplit('/', 1)[1]
-        if path_end in [ 'INNSBRUCK', 'LONDON', 'NEWYORK', 'RICHMOND', 'WATOPIA' ]:
+        if path_end in [ 'INNSBRUCK', 'LONDON', 'NEWYORK', 'RICHMOND', 'WATOPIA', 'YORKSHIRE' ]:
             MAP_OVERRIDE = path_end
             self.send_response(302)
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
         if MAP_OVERRIDE and self.path == '/gameassets/MapSchedule_v2.xml':
-            print "Overrode map schedule with %s" % MAP_OVERRIDE
             self.send_response(200)
             self.send_header('Content-type', 'text/xml')
             self.end_headers()
