@@ -73,6 +73,7 @@ dependencies listed below. The necessary Apache configuration is inside the
   * ``ssl/cert-zwift-com.pem``
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
+  * If you're prompted for a password, just leave it blank. There is no password.
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
@@ -98,6 +99,7 @@ to generate your own certificates and do the same.
 * Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
     * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
+    * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Using a text editor (with admin privileges) open ``/etc/hosts``
