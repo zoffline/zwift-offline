@@ -77,7 +77,7 @@ dependencies listed below. The necessary Apache configuration is inside the
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
-  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
 
