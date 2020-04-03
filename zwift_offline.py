@@ -200,14 +200,18 @@ def api_private_event_feed():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
+    profile = profile_pb2.Profile()
     profile_file = '%s/profile.bin' % STORAGE_DIR
     if not os.path.isfile(profile_file):
-        profile = profile_pb2.Profile()
         profile.id = 1000
         profile.is_connected_to_strava = True
+        profile.f3 = 'user@email.com'
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
-        return fd.read()
+        profile.ParseFromString(fd.read())
+        if not profile.f3:
+            profile.f3 = 'user@email.com'
+        return profile.SerializeToString(), 200
 
 
 # FIXME (not going to fix unless really bored): only supports 1 profile
