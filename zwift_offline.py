@@ -14,7 +14,7 @@ from datetime import timedelta
 from io import BytesIO
 from shutil import copyfile
 
-from flask import Flask, request, jsonify, g, redirect
+from flask import Flask, request, jsonify, g, redirect, render_template
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 
@@ -61,7 +61,7 @@ from tokens import *
 
 
 # Android uses https for cdn
-app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets')
+app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
 
 
 ####
@@ -135,7 +135,7 @@ def world_time():
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
-    return '{"realm":"zwift","url":"https://secure.zwift.com/auth/"}'
+    return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
 
 
 @app.route('/api/users/login', methods=['POST'])
@@ -624,6 +624,7 @@ def auth_rb():
 
 
 @app.route('/launcher', methods=['GET'])
+@app.route('/launcher/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
 @app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
@@ -648,6 +649,10 @@ def auth_realms_zwift_protocol_openid_connect_token():
 @app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
 def auth_realms_zwift_tokens_access_codes():
     return FAKE_JWT, 200
+
+@app.route('/static/web/launcher/<filename>', methods=['GET'])
+def static_web_launcher(filename):
+    return render_template(filename)
 
 
 def run_standalone():
