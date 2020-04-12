@@ -77,6 +77,7 @@ selected_profile = 1000
 
 def list_profiles():
     global profiles
+    global selected_profile
     for (root, dirs, files) in os.walk(STORAGE_DIR, topdown=True):
         for profile_id in dirs:
             profile = profile_pb2.Profile()
@@ -88,10 +89,11 @@ def list_profiles():
     profile = profile_pb2.Profile()
     if profiles:
         profile.id = profiles[-1].id + 1
+        # select first profile for auto launch
+        selected_profile = profiles[0].id
     else:
         profile.id = 1000
-    profile.f4 = 'New'
-    profile.f5 = 'profile'
+    profile.f4 = 'New profile'
     profiles.append(profile)
 
 def move_old_profile():
