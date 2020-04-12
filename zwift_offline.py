@@ -103,12 +103,12 @@ def move_old_profile():
             profile = profile_pb2.Profile()
             profile.ParseFromString(fd.read())
             profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
-        try:
-            if not os.path.isdir(profile_dir):
-                os.makedirs(profile_dir)
-        except IOError, e:
-            logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-            sys.exit(1)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError, e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
         os.rename(profile_file, '%s/profile.bin' % profile_dir)
         strava_file = '%s/strava_token.txt' % STORAGE_DIR
         if os.path.isfile(strava_file):
