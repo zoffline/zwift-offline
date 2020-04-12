@@ -72,28 +72,51 @@ type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 
 
-selected_profile = 1000
-# create profiles list
 profiles = list()
-for (root, dirs, files) in os.walk(STORAGE_DIR, topdown=True):
-    for profile_id in dirs:
-        profile = profile_pb2.Profile()
-        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
-        if os.path.isfile(profile_file):
-            with open(profile_file, 'rb') as fd:
-                profile.ParseFromString(fd.read())
-                profiles.append(profile)
-# add option to create new profile
-profile = profile_pb2.Profile()
-if profiles:
-    profile.id = profiles[-1].id + 1
-else:
-    profile.id = 1000
-profile.is_connected_to_strava = True
-profile.f3 = 'user@email.com'
-profile.f4 = 'New'
-profile.f5 = 'profile'
-profiles.append(profile)
+selected_profile = 1000
+
+def list_profiles():
+    global profiles
+    for (root, dirs, files) in os.walk(STORAGE_DIR, topdown=True):
+        for profile_id in dirs:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+                    profiles.append(profile)
+    profile = profile_pb2.Profile()
+    if profiles:
+        profile.id = profiles[-1].id + 1
+    else:
+        profile.id = 1000
+    profile.is_connected_to_strava = True
+    profile.f3 = 'user@email.com'
+    profile.f4 = 'New'
+    profile.f5 = 'profile'
+    profiles.append(profile)
+
+def move_old_profile():
+    profile_file = '%s/profile.bin' % STORAGE_DIR
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
+        try:
+            if not os.path.isdir(profile_dir):
+                os.makedirs(profile_dir)
+        except IOError, e:
+            logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+            sys.exit(1)
+        os.rename(profile_file, '%s/profile.bin' % profile_dir)
+        strava_file = '%s/strava_token.txt' % STORAGE_DIR
+        if os.path.isfile(strava_file):
+            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
+
+move_old_profile()
+
+list_profiles()
 
 
 def insert_protobuf_into_db(table_name, msg):
