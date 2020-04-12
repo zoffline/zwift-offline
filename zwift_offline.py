@@ -90,8 +90,6 @@ def list_profiles():
         profile.id = profiles[-1].id + 1
     else:
         profile.id = 1000
-    profile.is_connected_to_strava = True
-    profile.f3 = 'user@email.com'
     profile.f4 = 'New'
     profile.f5 = 'profile'
     profiles.append(profile)
