@@ -678,6 +678,7 @@ def auth_rb():
 
 @app.route('/launcher', methods=['GET'])
 @app.route('/launcher/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
+@app.route('/launcher/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
 @app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
