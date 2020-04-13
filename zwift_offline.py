@@ -56,7 +56,6 @@ DATABASE_CUR_VER = 1
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
-NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
 from tokens import *
 
 
@@ -71,6 +70,55 @@ type_callable_map = copy(TYPE_CALLABLE_MAP)
 type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
+
+
+profiles = list()
+selected_profile = 1000
+
+def list_profiles():
+    global profiles
+    global selected_profile
+    del profiles[:]
+    for (root, dirs, files) in os.walk(STORAGE_DIR):
+        dirs.sort()
+        for profile_id in dirs:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+                    profiles.append(profile)
+    profile = profile_pb2.Profile()
+    if profiles:
+        profile.id = profiles[-1].id + 1
+        # select first profile for auto launch
+        selected_profile = profiles[0].id
+    else:
+        profile.id = 1000
+    profile.f4 = 'New profile'
+    profiles.append(profile)
+
+def move_old_profile():
+    profile_file = '%s/profile.bin' % STORAGE_DIR
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError, e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
+        os.rename(profile_file, '%s/profile.bin' % profile_dir)
+        strava_file = '%s/strava_token.txt' % STORAGE_DIR
+        if os.path.isfile(strava_file):
+            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
+
+move_old_profile()
+
+list_profiles()
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -155,6 +203,8 @@ def api_users_login():
 
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
+    # update profiles list in case new user was created
+    list_profiles()
     return '', 204
 
 
@@ -200,10 +250,17 @@ def api_private_event_feed():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
+    profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
+    try:
+        if not os.path.isdir(profile_dir):
+            os.makedirs(profile_dir)
+    except IOError, e:
+        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+        sys.exit(1)
     profile = profile_pb2.Profile()
-    profile_file = '%s/profile.bin' % STORAGE_DIR
+    profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
-        profile.id = 1000
+        profile.id = selected_profile
         profile.is_connected_to_strava = True
         profile.f3 = 'user@email.com'
         return profile.SerializeToString(), 200
@@ -214,12 +271,11 @@ def api_profiles_me():
         return profile.SerializeToString(), 200
 
 
-# FIXME (not going to fix unless really bored): only supports 1 profile
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
-    with open('%s/profile.bin' % STORAGE_DIR, 'wb') as f:
+    with open('%s/%s/profile.bin' % (STORAGE_DIR, selected_profile), 'wb') as f:
         f.write(request.stream.read())
     return '', 204
 
@@ -265,22 +321,23 @@ def api_profiles_activities_id(player_id, activity_id):
     except ImportError:
         logger.warn("stravalib is not installed. Skipping Strava upload attempt.")
         return response, 200
+    profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
     strava = Client()
     try:
-        with open('%s/strava_token.txt' % STORAGE_DIR, 'r') as f:
+        with open('%s/strava_token.txt' % profile_dir, 'r') as f:
             client_id = f.readline().rstrip('\n')
             client_secret = f.readline().rstrip('\n')
             strava.access_token = f.readline().rstrip('\n')
             refresh_token = f.readline().rstrip('\n')
             expires_at = f.readline().rstrip('\n')
     except:
-        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % STORAGE_DIR)
+        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
         return response, 200
     try:
         if time.time() > int(expires_at):
             refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
                                                            refresh_token=refresh_token)
-            with open('%s/strava_token.txt' % STORAGE_DIR, 'w') as f:
+            with open('%s/strava_token.txt' % profile_dir, 'w') as f:
                 f.write(client_id + '\n');
                 f.write(client_secret + '\n');
                 f.write(refresh_response['access_token'] + '\n');
@@ -636,7 +693,7 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return redirect(NOAUTO_EMBED, 302)
+        return render_template("embed-noauto.html", profiles=profiles)
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
@@ -644,6 +701,17 @@ def launch_zwift():
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
     return FAKE_JWT, 200
+
+
+@app.route("/start-zwift" , methods=['POST'])
+def start_zwift():
+    global selected_profile
+    selected_profile = int(request.form.get('id'))
+    selected_map = request.form.get('map')
+    if selected_map == 'CALENDAR':
+        return redirect("/ride", 302)
+    else:
+        return redirect("http://cdn.zwift.com/%s" % selected_map, 302)
 
 
 # Called by Mac, but not Windows
