@@ -11,13 +11,14 @@ Setting up zoffline requires two primary steps. First, zoffline must be installe
 ### Step 1: Install zoffline
 There are three ways with which to install and run zoffline depending on your platform:
 
-<details><summary>Simplest (Windows only)</summary>
-To install zoffline on Windows:
+<details><summary>Simplest (Windows or Mac OS X)</summary>
+To install zoffline on Windows or Mac OS X:
 
 * Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
-* Run the downloaded zoffline.exe
+* Run the downloaded zoffline executable
+  * On Mac OS X, sudo is needed because we're binding to the privileged ports 80 and 443.
   * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
-* Start Zwift with zoffline.exe running (__after completing step 2__)
+* Start Zwift with zoffline running (__after completing step 2__)
   * It takes zoffline few seconds to start. Wait until text appears in the command prompt before opening Zwift.
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
