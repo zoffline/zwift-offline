@@ -1,35 +1,30 @@
 <html>
 <head>
     <title>Loading Zwift</title>
-<style>
-a, a:visited {
-        color: blue;
-}
-</style>
 </head>
 <body>
 <h1>zoffline Launcher</h1>
 
 <form method="POST" action="/start-zwift">
-    <p>Select profile:</p>
+    <table border=0 cellpadding=15>
+	<tr><td><p>Select profile:</p>
     <select name="id">
-        {% for profile in profiles %}
-            <option value="{{ profile.id }}">{{ profile.f4 + ' ' + profile.f5 }}</option>
-        {% endfor %}
-    </select>
-    <p>Select map*:</p>
+    {% for profile in profiles %}
+        <option value="{{ profile.id }}">{{ profile.f4 + ' ' + profile.f5 }}</option>
+    {% endfor %}
+    </select></td>
+    <td><p>Select map*:</p>
     <select name="map">
-            <option value="CALENDAR">Calendar</option>
-            <option value="INNSBRUCK">Innsbruck</option>
-            <option value="LONDON">London</option>
-            <option value="NEWYORK">New York</option>
-            <option value="RICHMOND">Richmond</option>
-            <option value="WATOPIA">Watopia</option>
-            <option value="YORKSHIRE">Yorkshire</option>
-    </select>
-    </br>
-    </br>
-    <button type="submit">Start Zwift</button>
+        <option value="CALENDAR">Calendar</option>
+        <option value="INNSBRUCK">Innsbruck</option>
+        <option value="LONDON">London</option>
+        <option value="NEWYORK">New York</option>
+        <option value="RICHMOND">Richmond</option>
+        <option value="WATOPIA">Watopia</option>
+        <option value="YORKSHIRE">Yorkshire</option>
+    </select></td></tr>
+    <tr><td><button type="submit">Start Zwift</button></td></tr>
+    </table>
 </form>
 
 </br>
