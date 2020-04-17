@@ -278,6 +278,10 @@ def api_profiles_me():
         #    profile.id = selected_profile
         if not profile.f3:
             profile.f3 = 'user@email.com'
+        # clear f60 to remove free trial limit
+        if profile.f60:
+           logger.warn('Profile contains bytes related to subscription/billing, removing...')
+           del profile.f60[:]
         return profile.SerializeToString(), 200
 
 
