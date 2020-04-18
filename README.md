@@ -188,7 +188,7 @@ To obtain your current profile:
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
-* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage`` directory.
+* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<profile_id>`` directory.
 
 
 ## Dependencies
