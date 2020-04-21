@@ -29,7 +29,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 
 
-logging.basicConfig()
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
 
@@ -87,8 +87,8 @@ def list_profiles():
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
-                    # ensure profile.id = directory? (in case directory is renamed)
-                    #profile.id = int(profile_id)
+                    # ensure profile.id = directory (in case directory is renamed)
+                    profile.id = int(profile_id)
                     profiles.append(profile)
     profile = profile_pb2.Profile()
     if profiles:
@@ -268,14 +268,15 @@ def api_profiles_me():
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
-        # ensure profile.id = directory? (in case directory is renamed)
-        #if not profile.id == selected_profile:
-        #    cur = g.db.cursor()
-        #    cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-        #    cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-        #    cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-        #    g.db.commit()
-        #    profile.id = selected_profile
+        # ensure profile.id = directory (in case directory is renamed)
+        if profile.id != selected_profile:
+            logger.warn('player_id is different from profile directory, updating database...')
+            cur = g.db.cursor()
+            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            g.db.commit()
+            profile.id = selected_profile
         if not profile.f3:
             profile.f3 = 'user@email.com'
         # clear f60 to remove free trial limit
