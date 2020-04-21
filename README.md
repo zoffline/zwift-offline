@@ -188,7 +188,20 @@ To obtain your current profile:
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
-* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<profile_id>`` directory.
+* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<player_id>`` directory.
+
+
+### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
+
+* Install dependencies: garmin-uploader
+  * e.g., on Linux/Mac: ``pip install garmin-uploader``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader``
+* Create a file garmin_credentials.txt in the ``storage/<player_id>`` directory containing your login credentials
+  ```
+  <username>
+  <password>
+  ```
+  * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
 
 
 ## Dependencies
