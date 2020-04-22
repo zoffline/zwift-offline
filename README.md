@@ -24,8 +24,8 @@ To install zoffline on Windows or Mac OS X:
   <details><summary>Mac OS X</summary>
 
   * Move the app from ``Downloads`` folder before running, otherwise it will be run from ``/private/var/folders`` which is read-only.
-  * Once run, zoffline will create a ``storage`` folder in ``zoffline.app/Contents/Resources`` to store your Zwift progress.
   * sudo is needed because we're binding to the privileged ports 80 and 443.
+  * Once run, zoffline will create a ``storage`` folder in ``zoffline.app/Contents/Resources`` to store your Zwift progress.
   </details>
 
 * Start Zwift with zoffline running (__after completing step 2__)
