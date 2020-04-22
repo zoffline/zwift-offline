@@ -106,15 +106,6 @@ to generate your own certificates and do the same.
     * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
-* Using a text editor (with admin privileges) open ``/etc/hosts``
-  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
-    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
-    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
-
-Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
-accept zoffline's self signed certificates for Zwift's domain names. Feel free
-to generate your own certificates and do the same.
-
 * Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
   * Append these keys:
     ```
@@ -132,6 +123,14 @@ to generate your own certificates and do the same.
 	       </dict>
    	</dict>
     ```
+* Using a text editor (with admin privileges) open ``/etc/hosts``
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
+    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
+    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
+
+Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
+accept zoffline's self signed certificates for Zwift's domain names. Feel free
+to generate your own certificates and do the same.
 
 </details>
 
