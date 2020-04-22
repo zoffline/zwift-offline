@@ -189,9 +189,9 @@ To obtain your current profile:
 
 ### Step 4 [OPTIONAL]: Obtain Strava API token
 
-* Install dependencies: stravalib, six
-  * e.g., on Linux/Mac: ``pip install stravalib six``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib six``
+* Install dependencies: stravalib
+  * e.g., on Linux/Mac: ``pip install stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib``
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
