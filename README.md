@@ -15,12 +15,21 @@ There are three ways with which to install and run zoffline depending on your pl
 To install zoffline on Windows or Mac OS X:
 
 * Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
-* Run the downloaded zoffline executable
-  * On Mac OS X, sudo is needed because we're binding to the privileged ports 80 and 443.
+
+<details><summary>Windows</summary>
+
+* Run the downloaded zoffline.exe
   * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
-* On Mac OS X you can use the app bundle
+</details>
+
+<details><summary>Mac OS X</summary>
+
+* Run the downloaded zoffline.app
   * Move the app from ``Downloads`` folder before running, otherwise it will be run from ``/private/var/folders`` which is read-only.
-  * The ``storage`` folder will be created inside ``zoffline.app/Contents/Resources``. When updating, copy it from the previous release to keep your Zwift progress.
+  * Once run, zoffline will create a ``storage`` folder in ``zoffline.app/Contents/Resources`` to store your Zwift progress.
+  * sudo is needed because we're binding to the privileged ports 80 and 443.
+</details>
+
 * Start Zwift with zoffline running (__after completing step 2__)
   * It takes zoffline few seconds to start. Wait until text appears in the command prompt before opening Zwift.
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
