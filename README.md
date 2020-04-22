@@ -224,6 +224,8 @@ Docker
   * ``pip install protobuf_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
+* OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
+  * ``pip install garmin-uploader``
 
 
 ## Known issues
