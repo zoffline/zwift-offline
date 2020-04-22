@@ -745,14 +745,25 @@ def launch_zwift():
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
+    # select profile on Android
+    global selected_profile
+    profile_id = None
+    username = request.form.get('username')
+    if username:
+        try:
+            profile_id = int(username)
+        except ValueError:
+            pass
+        if profile_id:
+            selected_profile = profile_id
     return FAKE_JWT, 200
 
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
     global selected_profile
-    selected_profile = int(request.form.get('id'))
-    selected_map = request.form.get('map')
+    selected_profile = int(request.form['id'])
+    selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
     else:

@@ -154,6 +154,7 @@ to generate your own certificates and do the same.
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
 * Start Zwift and sign in using any email/password
+  * To change profile, sign in using ``player_id`` (numeric, default is 1000) and any password (Thanks @kienkhuat!)
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
