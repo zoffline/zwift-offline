@@ -22,11 +22,6 @@ To install zoffline on Windows:
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
 
-* Start Zwift with zoffline running (__after completing step 2__)
-  * It takes zoffline few seconds to start. Wait until text appears in the command prompt before opening Zwift.
-* When done with Zwift, press Ctrl+C in the command line to close zoffline.
-</details>
-
 <details><summary>Linux, Windows, or Mac OS X</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
