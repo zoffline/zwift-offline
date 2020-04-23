@@ -75,49 +75,6 @@ type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 profiles = list()
 selected_profile = 1000
 
-def list_profiles():
-    global profiles
-    global selected_profile
-    del profiles[:]
-    for (root, dirs, files) in os.walk(STORAGE_DIR):
-        dirs.sort()
-        for profile_id in dirs:
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
-            if os.path.isfile(profile_file):
-                with open(profile_file, 'rb') as fd:
-                    profile.ParseFromString(fd.read())
-                    # ensure profile.id = directory (in case directory is renamed)
-                    profile.id = int(profile_id)
-                    profiles.append(profile)
-    profile = profile_pb2.Profile()
-    if profiles:
-        profile.id = profiles[-1].id + 1
-        # select first profile for auto launch
-        selected_profile = profiles[0].id
-    else:
-        profile.id = 1000
-    profile.f4 = 'New profile'
-    profiles.append(profile)
-
-def move_old_profile():
-    profile_file = '%s/profile.bin' % STORAGE_DIR
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile = profile_pb2.Profile()
-            profile.ParseFromString(fd.read())
-            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
-            try:
-                if not os.path.isdir(profile_dir):
-                    os.makedirs(profile_dir)
-            except IOError, e:
-                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-                sys.exit(1)
-        os.rename(profile_file, '%s/profile.bin' % profile_dir)
-        strava_file = '%s/strava_token.txt' % STORAGE_DIR
-        if os.path.isfile(strava_file):
-            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
-
 
 def insert_protobuf_into_db(table_name, msg):
     cur = g.db.cursor()
@@ -672,10 +629,52 @@ def teardown_request(exception):
         g.db.close()
 
 
-@app.before_first_request
-def before_first_request():
-    move_old_profile()
-    list_profiles()
+def move_old_profile():
+    profile_file = '%s/profile.bin' % STORAGE_DIR
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError, e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
+        os.rename(profile_file, '%s/profile.bin' % profile_dir)
+        strava_file = '%s/strava_token.txt' % STORAGE_DIR
+        if os.path.isfile(strava_file):
+            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
+
+
+def list_profiles():
+    global profiles
+    global selected_profile
+    del profiles[:]
+    for (root, dirs, files) in os.walk(STORAGE_DIR):
+        dirs.sort()
+        for profile_id in dirs:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+                    # ensure profile.id = directory (in case directory is renamed)
+                    profile.id = int(profile_id)
+                    profiles.append(profile)
+    profile = profile_pb2.Profile()
+    if profiles:
+        profile.id = profiles[-1].id + 1
+        # select first profile for auto launch
+        selected_profile = profiles[0].id
+    else:
+        profile.id = 1000
+    profile.f4 = 'New profile'
+    profiles.append(profile)
+
+
+def init_database():
     conn = connect_db()
     cur = conn.cursor()
     if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
@@ -710,6 +709,13 @@ def before_first_request():
         cur.execute('UPDATE version SET version = 1')
     conn.commit()
     conn.close()
+
+
+@app.before_first_request
+def before_first_request():
+    move_old_profile()
+    list_profiles()
+    init_database()
 
 
 ####################
