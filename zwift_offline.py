@@ -118,10 +118,6 @@ def move_old_profile():
         if os.path.isfile(strava_file):
             os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
 
-move_old_profile()
-
-list_profiles()
-
 
 def insert_protobuf_into_db(table_name, msg):
     cur = g.db.cursor()
@@ -677,7 +673,9 @@ def teardown_request(exception):
 
 
 @app.before_first_request
-def init_database():
+def before_first_request():
+    move_old_profile()
+    list_profiles()
     conn = connect_db()
     cur = conn.cursor()
     if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
