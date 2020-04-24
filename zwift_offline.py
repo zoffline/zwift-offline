@@ -14,7 +14,7 @@ from datetime import timedelta
 from io import BytesIO
 from shutil import copyfile
 
-from flask import Flask, request, jsonify, g, redirect
+from flask import Flask, request, jsonify, g, redirect, render_template
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 
@@ -29,7 +29,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 
 
-logging.basicConfig()
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
 
@@ -56,12 +56,11 @@ DATABASE_CUR_VER = 1
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
-NOAUTO_EMBED = "http://cdn.zwift.com/static/web/launcher/embed-noauto.html"
 from tokens import *
 
 
 # Android uses https for cdn
-app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets')
+app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
 
 
 ####
@@ -71,6 +70,10 @@ type_callable_map = copy(TYPE_CALLABLE_MAP)
 type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
+
+
+profiles = list()
+selected_profile = 1000
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -135,7 +138,7 @@ def world_time():
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
-    return '{"realm":"zwift","url":"https://secure.zwift.com/auth/"}'
+    return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
 
 
 @app.route('/api/users/login', methods=['POST'])
@@ -155,6 +158,8 @@ def api_users_login():
 
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
+    # update profiles list in case new user was created
+    list_profiles()
     return '', 204
 
 
@@ -200,26 +205,45 @@ def api_private_event_feed():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
+    profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
+    try:
+        if not os.path.isdir(profile_dir):
+            os.makedirs(profile_dir)
+    except IOError, e:
+        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+        sys.exit(1)
     profile = profile_pb2.Profile()
-    profile_file = '%s/profile.bin' % STORAGE_DIR
+    profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
-        profile.id = 1000
+        profile.id = selected_profile
         profile.is_connected_to_strava = True
         profile.f3 = 'user@email.com'
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
+        # ensure profile.id = directory (in case directory is renamed)
+        if profile.id != selected_profile:
+            logger.warn('player_id is different from profile directory, updating database...')
+            cur = g.db.cursor()
+            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            g.db.commit()
+            profile.id = selected_profile
         if not profile.f3:
             profile.f3 = 'user@email.com'
+        # clear f60 to remove free trial limit
+        if profile.f60:
+           logger.warn('Profile contains bytes related to subscription/billing, removing...')
+           del profile.f60[:]
         return profile.SerializeToString(), 200
 
 
-# FIXME (not going to fix unless really bored): only supports 1 profile
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
-    with open('%s/profile.bin' % STORAGE_DIR, 'wb') as f:
+    with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(request.stream.read())
     return '', 204
 
@@ -246,6 +270,70 @@ def api_profiles_activities(player_id):
     return activities.SerializeToString(), 200
 
 
+def strava_upload(player_id, activity):
+    try:
+        from stravalib.client import Client
+    except ImportError:
+        logger.warn("stravalib is not installed. Skipping Strava upload attempt.")
+        return
+    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    strava = Client()
+    try:
+        with open('%s/strava_token.txt' % profile_dir, 'r') as f:
+            client_id = f.readline().rstrip('\r\n')
+            client_secret = f.readline().rstrip('\r\n')
+            strava.access_token = f.readline().rstrip('\r\n')
+            refresh_token = f.readline().rstrip('\r\n')
+            expires_at = f.readline().rstrip('\r\n')
+    except:
+        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
+        return
+    try:
+        if time.time() > int(expires_at):
+            refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
+                                                           refresh_token=refresh_token)
+            with open('%s/strava_token.txt' % profile_dir, 'w') as f:
+                f.write(client_id + '\n')
+                f.write(client_secret + '\n')
+                f.write(refresh_response['access_token'] + '\n')
+                f.write(refresh_response['refresh_token'] + '\n')
+                f.write(str(refresh_response['expires_at']) + '\n')
+    except:
+        logger.warn("Failed to refresh token. Skipping Strava upload attempt.")
+        return
+    try:
+        # See if there's internet to upload to Strava
+        strava.upload_activity(BytesIO(activity.fit), data_type='fit', name=activity.name)
+        # XXX: assume the upload succeeds on strava's end. not checking on it.
+    except:
+        logger.warn("Strava upload failed. No internet?")
+
+def garmin_upload(player_id, activity):
+    try:
+        from garmin_uploader.workflow import Workflow
+    except ImportError:
+        logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt.")
+        return
+    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    try:
+        with open('%s/garmin_credentials.txt' % profile_dir, 'r') as f:
+            username = f.readline().rstrip('\r\n')
+            password = f.readline().rstrip('\r\n')
+    except:
+        logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt." % profile_dir)
+        return
+    try:
+        with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
+            f.write(activity.fit)
+    except:
+        logger.warn("Failed to save fit file. Skipping Garmin upload attempt.")
+        return
+    try:
+        w = Workflow(['%s/last_activity.fit' % profile_dir], activity_name=activity.name, username=username, password=password)
+        w.run()
+    except:
+        logger.warn("Garmin upload failed. No internet?")
+
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
 # converter does not handle so it's a string argument
 @app.route('/api/profiles/<int:player_id>/activities/<string:activity_id>', methods=['PUT'])
@@ -260,41 +348,8 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    try:
-        from stravalib.client import Client
-    except ImportError:
-        logger.warn("stravalib is not installed. Skipping Strava upload attempt.")
-        return response, 200
-    strava = Client()
-    try:
-        with open('%s/strava_token.txt' % STORAGE_DIR, 'r') as f:
-            client_id = f.readline().rstrip('\n')
-            client_secret = f.readline().rstrip('\n')
-            strava.access_token = f.readline().rstrip('\n')
-            refresh_token = f.readline().rstrip('\n')
-            expires_at = f.readline().rstrip('\n')
-    except:
-        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % STORAGE_DIR)
-        return response, 200
-    try:
-        if time.time() > int(expires_at):
-            refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
-                                                           refresh_token=refresh_token)
-            with open('%s/strava_token.txt' % STORAGE_DIR, 'w') as f:
-                f.write(client_id + '\n');
-                f.write(client_secret + '\n');
-                f.write(refresh_response['access_token'] + '\n');
-                f.write(refresh_response['refresh_token'] + '\n');
-                f.write(str(refresh_response['expires_at']) + '\n');
-    except:
-        logger.warn("Failed to refresh token. Skipping Strava upload attempt.")
-        return response, 200
-    try:
-        # See if there's internet to upload to Strava
-        strava.upload_activity(BytesIO(activity.fit), data_type='fit', name=activity.name)
-        # XXX: assume the upload succeeds on strava's end. not checking on it.
-    except:
-        logger.warn("Strava upload failed. No internet?")
+    strava_upload(player_id, activity)
+    garmin_upload(player_id, activity)
     return response, 200
 
 
@@ -574,7 +629,51 @@ def teardown_request(exception):
         g.db.close()
 
 
-@app.before_first_request
+def move_old_profile():
+    profile_file = '%s/profile.bin' % STORAGE_DIR
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError, e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
+        os.rename(profile_file, '%s/profile.bin' % profile_dir)
+        strava_file = '%s/strava_token.txt' % STORAGE_DIR
+        if os.path.isfile(strava_file):
+            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
+
+
+def list_profiles():
+    global profiles
+    global selected_profile
+    del profiles[:]
+    for (root, dirs, files) in os.walk(STORAGE_DIR):
+        dirs.sort()
+        for profile_id in dirs:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+                    # ensure profile.id = directory (in case directory is renamed)
+                    profile.id = int(profile_id)
+                    profiles.append(profile)
+    profile = profile_pb2.Profile()
+    if profiles:
+        profile.id = profiles[-1].id + 1
+        # select first profile for auto launch
+        selected_profile = profiles[0].id
+    else:
+        profile.id = 1000
+    profile.f4 = 'New profile'
+    profiles.append(profile)
+
+
 def init_database():
     conn = connect_db()
     cur = conn.cursor()
@@ -612,6 +711,13 @@ def init_database():
     conn.close()
 
 
+@app.before_first_request
+def before_first_request():
+    move_old_profile()
+    list_profiles()
+    init_database()
+
+
 ####################
 #
 # Auth server (secure.zwift.com) routes below here
@@ -624,6 +730,8 @@ def auth_rb():
 
 
 @app.route('/launcher', methods=['GET'])
+@app.route('/launcher/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
+@app.route('/launcher/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/auth', methods=['GET'])
 @app.route('/auth/realms/zwift/login-actions/request/login', methods=['GET', 'POST'])
 @app.route('/auth/realms/zwift/protocol/openid-connect/registrations', methods=['GET'])
@@ -634,20 +742,46 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return redirect(NOAUTO_EMBED, 302)
+        return render_template("embed-noauto.html", profiles=profiles)
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
+    # select profile on Android
+    global selected_profile
+    profile_id = None
+    username = request.form.get('username')
+    if username:
+        try:
+            profile_id = int(username)
+        except ValueError:
+            pass
+        if profile_id:
+            selected_profile = profile_id
     return FAKE_JWT, 200
+
+
+@app.route("/start-zwift" , methods=['POST'])
+def start_zwift():
+    global selected_profile
+    selected_profile = int(request.form['id'])
+    selected_map = request.form['map']
+    if selected_map == 'CALENDAR':
+        return redirect("/ride", 302)
+    else:
+        return redirect("http://cdn.zwift.com/%s" % selected_map, 302)
 
 
 # Called by Mac, but not Windows
 @app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
 def auth_realms_zwift_tokens_access_codes():
     return FAKE_JWT, 200
+
+@app.route('/static/web/launcher/<filename>', methods=['GET'])
+def static_web_launcher(filename):
+    return render_template(filename)
 
 
 def run_standalone():

@@ -1,29 +1,31 @@
 <html>
 <head>
     <title>Loading Zwift</title>
-<style>
-a, a:visited {
-        color: blue;
-}
-</style>
 </head>
 <body>
 <h1>zoffline Launcher</h1>
 
-</br>
-<h2><a href="https://secure.zwift.com/ride">Click here to start Zwift</a></h2>
-</br>
-
-<h3>Launch into a specific map*:
-<table border=0 cellpadding=15><tr>
-        <td><a href="http://cdn.zwift.com/INNSBRUCK">Innsbruck</a></td>
-        <td><a href="http://cdn.zwift.com/LONDON">London</a></td>
-        <td><a href="http://cdn.zwift.com/NEWYORK">New York</a></td>
-        <td><a href="http://cdn.zwift.com/RICHMOND">Richmond</a></td>
-        <td><a href="http://cdn.zwift.com/WATOPIA">Watopia</a></td>
-        <td><a href="http://cdn.zwift.com/YORKSHIRE">Yorkshire</a></td>
-</tr></table>
-</h3>
+<form method="POST" action="/start-zwift">
+    <table border=0 cellpadding=15>
+	<tr><td><p>Select profile:</p>
+    <select name="id">
+    {% for profile in profiles %}
+        <option value="{{ profile.id }}">{{ profile.f4 + ' ' + profile.f5 }}</option>
+    {% endfor %}
+    </select></td>
+    <td><p>Select map*:</p>
+    <select name="map">
+        <option value="CALENDAR">Calendar</option>
+        <option value="INNSBRUCK">Innsbruck</option>
+        <option value="LONDON">London</option>
+        <option value="NEWYORK">New York</option>
+        <option value="RICHMOND">Richmond</option>
+        <option value="WATOPIA">Watopia</option>
+        <option value="YORKSHIRE">Yorkshire</option>
+    </select></td></tr>
+    <tr><td><button type="submit">Start Zwift</button></td></tr>
+    </table>
+</form>
 
 </br>
 To automatically launch Zwift and skip this step create a file called "auto_launch.txt" inside zoffline's storage directory.

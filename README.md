@@ -65,9 +65,9 @@ dependencies listed below. The necessary Apache configuration is inside the
 <details><summary>Windows 10 Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.48307 you may have to uninstall, then reinstall after installing zoffline.
-  * If your Zwift version is 1.0.48307, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.48307 will be installed instead of the latest).
+  * If your Zwift version is newer than 1.0.48969 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.48969, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.48969 will be installed instead of the latest).
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -77,7 +77,7 @@ dependencies listed below. The necessary Apache configuration is inside the
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
-  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
 
@@ -90,9 +90,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.48307 you may have to uninstall, then reinstall after installing zoffline.
-  * If your Zwift version is 1.0.48307, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.48307 will be installed instead of the latest).
+  * If your Zwift version is newer than 1.0.48969 you may have to uninstall, then reinstall after installing zoffline.
+  * If your Zwift version is 1.0.48969, you're all set.
+  * If Zwift is not installed install it after installing zoffline (1.0.48969 will be installed instead of the latest).
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -102,8 +102,25 @@ to generate your own certificates and do the same.
     * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
+* Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
+  * Append these keys:
+    ```
+    <key>NSAppTransportSecurity</key>
+   	<dict>
+	       <key>NSExceptionDomains</key>
+	       <dict>
+	           <key>zwift.com</key>
+	           <dict>
+	               <key>NSExceptionAllowsInsecureHTTPLoads</key>
+	               <true/>
+	               <key>NSIncludesSubdomains</key>
+	               <true/>
+	           </dict>
+	       </dict>
+   	</dict>
+    ```
 * Using a text editor (with admin privileges) open ``/etc/hosts``
-  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
+  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
 
@@ -132,6 +149,7 @@ to generate your own certificates and do the same.
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
 * Start Zwift and sign in using any email/password
+  * To change profile, sign in using ``player_id`` (numeric, default is 1000) and any password (Thanks @kienkhuat!)
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
@@ -160,13 +178,26 @@ To obtain your current profile:
 
 ### Step 4 [OPTIONAL]: Obtain Strava API token
 
-* Install dependencies: stravalib, six
-  * e.g., on Linux/Mac: ``pip install stravalib six``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib six``
+* Install dependencies: stravalib
+  * e.g., on Linux/Mac: ``pip install stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib``
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
-* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage`` directory.
+* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<player_id>`` directory.
+
+
+### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
+
+* Install dependencies: garmin-uploader
+  * e.g., on Linux/Mac: ``pip install garmin-uploader``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader``
+* Create a file garmin_credentials.txt in the ``storage/<player_id>`` directory containing your login credentials
+  ```
+  <username>
+  <password>
+  ```
+  * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
 
 
 ## Dependencies
@@ -182,6 +213,8 @@ Docker
   * ``pip install protobuf_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
+* OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
+  * ``pip install garmin-uploader``
 
 
 ## Known issues
