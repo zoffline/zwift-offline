@@ -93,8 +93,7 @@ to generate your own certificates and do the same.
 * Install Zwift
   * If your Zwift version is 1.0.48969, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.48969 and zoffline is running from source: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.48969 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.48969: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
