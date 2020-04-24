@@ -221,7 +221,6 @@ def api_profiles_me():
         profile.is_connected_to_strava = True
         profile.f3 = 'user@email.com'
         # At least Win Zwift client no longer asks for a name
-        # TODO: Add a profile editor accessible from launcher screen.
         profile.f4 = "zoffline"
         profile.f5 = "user"
         return profile.SerializeToString(), 200

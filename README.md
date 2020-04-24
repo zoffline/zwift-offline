@@ -168,8 +168,9 @@ file before starting Zwift.
 ### Step 3 [OPTIONAL]: Obtain current Zwift profile
 
 If you don't obtain your current Zwift profile before first starting Zwift with
-zoffline enabled, you will be prompted to create a new profile (name, weight,
-height, etc.)
+zoffline enabled, you will be prompted to create a new profile (height, weight,
+gender). Your profile can be further customized and changed via the in game
+menu (e.g. name, nationality, weight change, etc).
 
 To obtain your current profile:
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
