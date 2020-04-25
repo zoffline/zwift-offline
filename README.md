@@ -22,7 +22,7 @@ To install zoffline on Windows:
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
 
-<details><summary>Linux, Windows, or Mac OS X</summary>
+<details><summary>Linux, Windows, or Mac OS X (from source)</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 2 (https://www.python.org/downloads/) if not already installed
@@ -41,12 +41,12 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
 
 
-<details><summary>Using Docker (recommended for Linux)</summary>
+<details><summary>Using Docker</summary>
  
 * Install Docker
 * Create the docker container with:<br>
-  ``docker create --name zwift-offline -p 443:443 -p 80:80 -v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
-  * You can optionally exclude ``-v </path/to/host/storage>:/usr/local/apache2/htdocs/zwift-offline/storage`` if you don't care if your Zwift progress state is retained across zoffline updates (unlikely).
+  ``docker create --name zwift-offline -p 443:443 -p 80:80 -v </path/to/host/storage>:/usr/src/app/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
+  * You can optionally exclude ``-v </path/to/host/storage>:/usr/src/app/zwift-offline/storage`` if you don't care if your Zwift progress state is retained across zoffline updates (unlikely).
   * The path you pass to ``-v`` will likely need to be world readable and writable.
   * A list of valid ``<timezone>`` values (e.g. America/New_York) can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
   * Adding ``--restart unless-stopped`` will make zoffline start on boot if you have Docker v1.9.0 or greater.
@@ -65,9 +65,10 @@ dependencies listed below. The necessary Apache configuration is inside the
 <details><summary>Windows 10 Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.48969 you may have to uninstall, then reinstall after installing zoffline.
   * If your Zwift version is 1.0.48969, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.48969 will be installed instead of the latest).
+  * If Zwift is not installed, install it before installing zoffline.
+  * If your Zwift version is newer than 1.0.48969 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.48969 and zoffline is not running from source: wait for zoffline to be updated.
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -90,9 +91,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
 
 * Install Zwift
-  * If your Zwift version is newer than 1.0.48969 you may have to uninstall, then reinstall after installing zoffline.
   * If your Zwift version is 1.0.48969, you're all set.
-  * If Zwift is not installed install it after installing zoffline (1.0.48969 will be installed instead of the latest).
+  * If Zwift is not installed, install it before installing zoffline.
+  * If your Zwift version is newer than 1.0.48969: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -166,8 +167,9 @@ file before starting Zwift.
 ### Step 3 [OPTIONAL]: Obtain current Zwift profile
 
 If you don't obtain your current Zwift profile before first starting Zwift with
-zoffline enabled, you will be prompted to create a new profile (name, weight,
-height, etc.)
+zoffline enabled, you will be prompted to create a new profile (height, weight,
+gender). Your profile can be further customized and changed via the in game
+menu (e.g. name, nationality, weight change, etc).
 
 To obtain your current profile:
 * Run ``scripts/get_profile.py -u <your_zwift_username>``

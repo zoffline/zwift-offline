@@ -159,6 +159,8 @@ def api_users_login():
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
     # update profiles list in case new user was created
+    # FIXME: Updates are not reflected when using an apache
+    #        based set up. Should just deprecate apache.
     list_profiles()
     return '', 204
 
@@ -218,6 +220,9 @@ def api_profiles_me():
         profile.id = selected_profile
         profile.is_connected_to_strava = True
         profile.f3 = 'user@email.com'
+        # At least Win Zwift client no longer asks for a name
+        profile.f4 = "zoffline"
+        profile.f5 = "user"
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -308,6 +313,7 @@ def strava_upload(player_id, activity):
     except:
         logger.warn("Strava upload failed. No internet?")
 
+
 def garmin_upload(player_id, activity):
     try:
         from garmin_uploader.workflow import Workflow
@@ -334,6 +340,7 @@ def garmin_upload(player_id, activity):
     except:
         logger.warn("Garmin upload failed. No internet?")
 
+
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
 # converter does not handle so it's a string argument
 @app.route('/api/profiles/<int:player_id>/activities/<string:activity_id>', methods=['PUT'])
@@ -348,6 +355,9 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
+    # Unconditionally *try* and upload to strava and garmin since profile may
+    # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
+    # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
     return response, 200
@@ -630,6 +640,9 @@ def teardown_request(exception):
 
 
 def move_old_profile():
+    # Before multi profile support only a single profile located in storage
+    # named profile.bin existed. If upgrading from this, convert to
+    # multi profile file structure.
     profile_file = '%s/profile.bin' % STORAGE_DIR
     if os.path.isfile(profile_file):
         with open(profile_file, 'rb') as fd:
