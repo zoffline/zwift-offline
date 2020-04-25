@@ -13,9 +13,13 @@ import zwift_offline
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     CDN_DIR = "%s/cdn" % sys._MEIPASS
+    STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
 else:
-    CDN_DIR = "%s/cdn" % os.path.dirname(os.path.realpath(__file__))
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+    CDN_DIR = "%s/cdn" % SCRIPT_DIR
+    STORAGE_DIR = "%s/storage" % SCRIPT_DIR
 
+PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 def sigint_handler(num, frame):
@@ -49,6 +53,22 @@ class CDNHandler(SimpleHTTPRequestHandler):
             self.wfile.write('<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (MAP_OVERRIDE, datetime.now().strftime("%Y-%m-%dT00:01-04")))
             MAP_OVERRIDE = None
             return
+        elif self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
+            # PROXYPASS_FILE existence indicates we know what we're doing and
+            # we can try to obtain the official map schedule. This can only work
+            # if we're running on a different machine than the Zwift client.
+            try:
+                import urllib3
+                http = urllib3.PoolManager()
+                r = http.request('GET', 'http://cdn.zwift.com/gameassets/MapSchedule_v2.xml')
+                self.send_response(200)
+                self.send_header('Content-type', 'text/xml')
+                self.end_headers()
+                self.wfile.write(r.data)
+                return
+            except:
+                pass  # fallthrough to return zoffline version
+
         SimpleHTTPRequestHandler.do_GET(self)
 
 SocketServer.ThreadingTCPServer.allow_reuse_address = True
