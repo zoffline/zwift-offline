@@ -274,7 +274,8 @@ def api_profiles_activities(player_id):
     # request.method == 'GET'
     activities = activity_pb2.Activities()
     cur = g.db.cursor()
-    cur.execute("SELECT * FROM activity WHERE player_id = ?", (str(player_id),))
+    # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
+    cur.execute("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = ?", (str(player_id),))
     for row in cur.fetchall():
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
