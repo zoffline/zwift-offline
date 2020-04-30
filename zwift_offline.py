@@ -157,9 +157,9 @@ def api_users_login():
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(time.time())
-#    udp_node = response.info.nodes.node.add()
-#    udp_node.ip = "34.218.60.145"  # TCP telemetry server
-#    udp_node.port = 3023
+    udp_node = response.info.nodes.node.add()
+    udp_node.ip = "127.0.0.1"  # TCP telemetry server
+    udp_node.port = 3023
     return response.SerializeToString(), 200
 
 
