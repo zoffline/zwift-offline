@@ -4,6 +4,7 @@ import calendar
 import datetime
 import logging
 import os
+import platform
 import random
 import sqlite3
 import sys
@@ -32,6 +33,12 @@ import protobuf.zfiles_pb2 as zfiles_pb2
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
+
+if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
+    # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
+    import ctypes
+    kernel32 = ctypes.windll.kernel32
+    kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
