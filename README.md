@@ -68,10 +68,10 @@ dependencies listed below. The necessary Apache configuration is inside the
 <details><summary>Windows 10 Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.49751, you're all set.
+  * If your Zwift version is 1.0.49777, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.49751 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.49751 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.49777 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.49777 and zoffline is not running from source: wait for zoffline to be updated.
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -94,9 +94,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.49751, you're all set.
+  * If your Zwift version is 1.0.49777, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.49751: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.49777: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
