@@ -25,15 +25,18 @@ To install zoffline on Windows:
 <details><summary>Linux, Windows, or Mac OS X (from source)</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
-* Install Python 2 (https://www.python.org/downloads/) if not already installed
-* Install dependencies: flask, python-protobuf, protobuf_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install flask protobuf protobuf_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf_to_dict stravalib``
+* Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
+* Install dependencies: flask, python-protobuf, protobuf3_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install flask protobuf protobuf3_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf3_to_dict stravalib``
+    * Python 3 is installed by default in C:\Users\<username>\AppData\Local\Programs\Python\Python38-32 instead of C:\Python27
 * Clone or download this repo
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
+    * If using Python 3, but Python 3 is not your system default run ``sudo python3 standalone.py``
   * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
+    * For Python 3 the command will likely be ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32\python.exe standalone.py``
 * Start Zwift with standalone.py running (__after completing step 2__)
 * Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
@@ -208,11 +211,13 @@ Docker
 
 -or-
 
-* Python 2 (https://www.python.org/downloads/)
+* Python 2 or 3 (https://www.python.org/downloads/)
 * Flask (http://flask.pocoo.org/)
   * ``pip install flask``
-* protobuf_to_dict (https://github.com/benhodgson/protobuf-to-dict)
-  * ``pip install protobuf_to_dict``
+* python-protobuf (https://pypi.org/project/protobuf/)
+  * ``pip install protobuf``
+* protobuf3_to_dict (https://github.com/kaporzhu/protobuf-to-dict)
+  * ``pip install protobuf3_to_dict``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)

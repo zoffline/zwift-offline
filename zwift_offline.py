@@ -52,7 +52,7 @@ try:
     # Ensure storage dir exists
     if not os.path.isdir(STORAGE_DIR):
         os.makedirs(STORAGE_DIR)
-except IOError, e:
+except IOError as e:
     logger.error("failed to create storage dir (%s):  %s", STORAGE_DIR, str(e))
     sys.exit(1)
 
@@ -86,8 +86,8 @@ selected_profile = 1000
 def insert_protobuf_into_db(table_name, msg):
     cur = g.db.cursor()
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
-    columns = ', '.join(msg_dict.keys())
-    placeholders = ':'+', :'.join(msg_dict.keys())
+    columns = ', '.join(list(msg_dict.keys()))
+    placeholders = ':'+', :'.join(list(msg_dict.keys()))
     query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
     cur.execute(query, msg_dict)
     g.db.commit()
@@ -104,8 +104,8 @@ def update_protobuf_in_db(table_name, msg, id):
         pass
     cur = g.db.cursor()
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
-    columns = ', '.join(msg_dict.keys())
-    placeholders = ':'+', :'.join(msg_dict.keys())
+    columns = ', '.join(list(msg_dict.keys()))
+    placeholders = ':'+', :'.join(list(msg_dict.keys()))
     setters = ', '.join('{}=:{}'.format(key, key) for key in msg_dict)
     query = 'UPDATE %s SET %s WHERE id=%s' % (table_name, setters, id)
     cur.execute(query, msg_dict)
@@ -113,7 +113,7 @@ def update_protobuf_in_db(table_name, msg, id):
 
 
 def row_to_protobuf(row, msg, exclude_fields=[]):
-    for key in msg.DESCRIPTOR.fields_by_name.keys():
+    for key in list(msg.DESCRIPTOR.fields_by_name.keys()):
         if key in exclude_fields:
             continue
         if row[key] is None:
@@ -218,7 +218,7 @@ def api_profiles_me():
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
-    except IOError, e:
+    except IOError as e:
         logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
         sys.exit(1)
     profile = profile_pb2.Profile()
@@ -226,10 +226,10 @@ def api_profiles_me():
     if not os.path.isfile(profile_file):
         profile.id = selected_profile
         profile.is_connected_to_strava = True
-        profile.f3 = 'user@email.com'
+        profile.email = 'user@email.com'
         # At least Win Zwift client no longer asks for a name
-        profile.f4 = "zoffline"
-        profile.f5 = "user"
+        profile.first_name = "zoffline"
+        profile.last_name = "user"
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -242,8 +242,8 @@ def api_profiles_me():
             cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
             g.db.commit()
             profile.id = selected_profile
-        if not profile.f3:
-            profile.f3 = 'user@email.com'
+        if not profile.email:
+            profile.email = 'user@email.com'
         # clear f60 to remove free trial limit
         if profile.f60:
            logger.warn('Profile contains bytes related to subscription/billing, removing...')
@@ -664,7 +664,7 @@ def move_old_profile():
             try:
                 if not os.path.isdir(profile_dir):
                     os.makedirs(profile_dir)
-            except IOError, e:
+            except IOError as e:
                 logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
                 sys.exit(1)
         os.rename(profile_file, '%s/profile.bin' % profile_dir)
@@ -695,7 +695,7 @@ def list_profiles():
         selected_profile = profiles[0].id
     else:
         profile.id = 1000
-    profile.f4 = 'New profile'
+    profile.first_name = 'New profile'
     profiles.append(profile)
 
 

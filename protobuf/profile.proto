@@ -1,9 +1,9 @@
 message Profile {
     optional int64 id = 1;
     optional int32 is_connected_to_strava = 2;
-    optional bytes f3 = 3;
-    optional bytes f4 = 4;
-    optional bytes f5 = 5;
+    optional string email = 3;
+    optional string first_name = 4;
+    optional string last_name = 5;
     optional bool is_male = 6;
     optional bytes f7 = 7;
     optional uint32 weight_in_grams = 9;

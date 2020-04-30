@@ -2,11 +2,15 @@
 
 import os
 import signal
-import SocketServer
 import sys
 import threading
 from datetime import datetime
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+if sys.version_info[0] > 2:
+    import socketserver
+    from http.server import SimpleHTTPRequestHandler
+else:
+    import SocketServer as socketserver
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import zwift_offline
 
@@ -23,9 +27,9 @@ PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 def sigint_handler(num, frame):
-	httpd.shutdown()
-	httpd.server_close()
-        sys.exit(0)
+    httpd.shutdown()
+    httpd.server_close()
+    sys.exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
 
@@ -71,8 +75,8 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
         SimpleHTTPRequestHandler.do_GET(self)
 
-SocketServer.ThreadingTCPServer.allow_reuse_address = True
-httpd = SocketServer.ThreadingTCPServer(('', 80), CDNHandler)
+socketserver.ThreadingTCPServer.allow_reuse_address = True
+httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
