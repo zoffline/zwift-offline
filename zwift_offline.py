@@ -59,7 +59,7 @@ except IOError as e:
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
-DATABASE_CUR_VER = 1
+DATABASE_CUR_VER = 2
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
@@ -140,7 +140,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int(time.time()*64.4131403573055)
+    return int(time.time()-1414016075)*1000
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -733,6 +733,12 @@ def init_database():
         logging.info("Upgrading zwift-offline.db to version 1")
         cur.execute('UPDATE segment_result SET world_time = cast(world_time/1000*64.4131403573055 as int)')
         cur.execute('UPDATE version SET version = 1')
+
+    if version == 1:
+        logging.info("Upgrading zwift-offline.db to version 2")
+        cur.execute('UPDATE segment_result SET world_time = cast(world_time/64.4131403573055-1414016075 as int)*1000')
+        cur.execute('UPDATE version SET version = 2')
+
     conn.commit()
     conn.close()
 
