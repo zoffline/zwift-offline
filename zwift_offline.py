@@ -560,7 +560,7 @@ def relay_worlds_my_hash_seeds(world_id):
 @app.route('/relay/worlds/hash-seeds', methods=['GET'])
 def relay_worlds_hash_seeds():
     # just to shut up some errors in log
-    return bytearray.fromhex('0A1308B7C9C4BC0D10B3D0D3A60518B68289878C050A1308C690A1BD0F10A9C9D5DF0618C7A1D7878C050A1308DC82FB8905109F9FA09B04189BEA92888C050A1308C3A181CA0C10ABE988D303189586EE888C05')
+    return bytearray.fromhex('0a1d08abf1feaddd0510dadeafa2fdffffffff01188dabb382f8ffffffff010a180884eaaeaedd0510acc6d3d8051898ce83a1f8ffffffff010a1808a8ef9bafdd051094dbe6d706189db48bf5f8ffffffff010a1808dce8b5afdd0510b6bce1defaffffffff0118bcc1dbae040a1808dba981b0dd0510f1c0c9bf0218b191b9e8feffffffff01')
 
 
 # XXX: attributes have not been thoroughly investigated
