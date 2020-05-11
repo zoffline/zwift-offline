@@ -148,6 +148,22 @@ def api_auth():
     return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
 
 
+@app.route('/api/telemetry/config', methods=['GET'])
+def api_telemetry_config():
+    # just to shut up some errors in log
+    return '{"isEnabled":false,"url":"https://api.segment.io/v1/track","key":"aXBSdlpza3p1aVlNOENrMTBQSzZEZ004Z2pwRm8zZUE6"}'
+
+
+@app.route('/api/tcp-config', methods=['GET'])
+def api_tcp_config():
+    # just to shut up some errors in log
+    infos = periodic_info_pb2.PeriodicInfos()
+    info = infos.infos.add()
+    info.game_server_ip = '127.0.0.1'
+    info.f2 = 3023
+    return infos.SerializeToString(), 200
+
+
 @app.route('/api/users/login', methods=['POST'])
 def api_users_login():
     # Should just return a binary blob rather than build a "proper" response...
@@ -541,12 +557,22 @@ def relay_worlds_my_hash_seeds(world_id):
     return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
 
 
+@app.route('/relay/worlds/hash-seeds', methods=['GET'])
+def relay_worlds_hash_seeds():
+    # just to shut up some errors in log
+    return bytearray.fromhex('0A1308B7C9C4BC0D10B3D0D3A60518B68289878C050A1308C690A1BD0F10A9C9D5DF0618C7A1D7878C050A1308DC82FB8905109F9FA09B04189BEA92888C050A1308C3A181CA0C10ABE988D303189586EE888C05')
+
+
 # XXX: attributes have not been thoroughly investigated
+# returning a protobuf is throwing this error in Zwift log:
+# NETCLIENT:[ERROR] Error parsing JSON: * Line 1, Column 1
+#   Syntax error: value, object or array expected.
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
 def relay_worlds_attributes(world_id):
-    attribs = world_pb2.WorldAttributes()
-    attribs.world_time = world_time()
-    return attribs.SerializeToString(), 200
+#    attribs = world_pb2.WorldAttributes()
+#    attribs.world_time = world_time()
+#    return attribs.SerializeToString(), 200
+    return relay_worlds_generic(world_id)
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
@@ -730,9 +756,9 @@ def init_database():
 
     if version < 1:
         # Adjust old world_time values in segment results to new rough estimate of Zwift's
-        logging.info("Upgrading zwift-offline.db to version 1")
-        cur.execute('UPDATE segment_result SET world_time = cast(world_time/1000*64.4131403573055 as int)')
-        cur.execute('UPDATE version SET version = 1')
+        logging.info("Upgrading zwift-offline.db to version 2")
+        cur.execute('UPDATE segment_result SET world_time = world_time-1414016075000')
+        cur.execute('UPDATE version SET version = 2')
 
     if version == 1:
         logging.info("Upgrading zwift-offline.db to version 2")
