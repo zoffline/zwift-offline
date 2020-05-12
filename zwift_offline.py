@@ -613,8 +613,9 @@ def handle_segment_results(request):
     # Windows client crashes at foot of Alpe du Zwift
     # if segments 2233445501 - 2233445521 (switchbacks) are returned by zoffline.
     # Overall climb segment (2233445522) isn't affected.
-    if 2233445501 <= segment_id <= 2233445521:
-        return '', 422
+    # Workaround isn't needed if UDP server is reachable.
+    #if 2233445501 <= segment_id <= 2233445521:
+    #    return '', 422
     only_best = request.args.get('only-best') == 'true'
     from_date = request.args.get('from')
     to_date = request.args.get('to')
