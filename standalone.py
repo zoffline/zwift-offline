@@ -80,12 +80,12 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        self.data = self.request.recv(1024)
+        # send packet containing UDP server (127.0.0.1)
+        # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
+        self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a17080110061a093132372e302e302e3120ce170a18080010001a16080010001a093132372e302e302e3120ce1710ce17'))
         while True:
-            self.data = self.request.recv(1024)
-            if not self.data: break
-            # send packet containing UDP server (127.0.0.1)
-            # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
-            self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a17080110061a093132372e302e302e3120ce170a18080010001a16080010001a093132372e302e302e3120ce1710ce17'))
+            time.sleep(25)
             self.request.sendall(bytearray.fromhex('000710e80718005801'))
 
 class UDPHandler(socketserver.BaseRequestHandler):
