@@ -28,9 +28,16 @@ else:
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
+e = threading.Event()
+
 def sigint_handler(num, frame):
     httpd.shutdown()
     httpd.server_close()
+    e.set()
+    tcpserver.shutdown()
+    tcpserver.server_close()
+    udpserver.shutdown()
+    udpserver.server_close()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -85,7 +92,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
         self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a17080110061a093132372e302e302e3120ce170a18080010001a16080010001a093132372e302e302e3120ce1710ce17'))
         while True:
-            time.sleep(25)
+            e.wait(timeout=25)
             self.request.sendall(bytearray.fromhex('000710e80718005801'))
 
 class UDPHandler(socketserver.BaseRequestHandler):
