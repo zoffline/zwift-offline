@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 import threading
+import time
 from datetime import datetime
 if sys.version_info[0] > 2:
     import socketserver
@@ -13,6 +14,7 @@ else:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import zwift_offline
+import protobuf.messages_pb2 as messages_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -76,10 +78,44 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
         SimpleHTTPRequestHandler.do_GET(self)
 
+class TCPHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        self.data = self.request.recv(1024)
+        if self.data:
+            # send packet containing UDP server (127.0.0.1)
+            # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
+            self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a17080110061a093132372e302e302e3120ce170a18080010001a16080010001a093132372e302e302e3120ce1710ce17'))
+
+class UDPHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        data = self.request[0]
+        socket = self.request[1]
+        message = messages_pb2.ServerToClient()
+        message.f1 = 1
+        message.player_id = 1000
+        message.world_time = int(time.time()-1414016075)*1000
+        message.seqno = 1
+        message.f5 = 1
+        message.f11 = 1
+        message.num_msgs = 1
+        message.msgnum = 1
+        socket.sendto(message.SerializeToString(), self.client_address)
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
+
+tcpserver = socketserver.ThreadingTCPServer(('', 3023), TCPHandler)
+tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
+tcpserver_thread.daemon = True
+tcpserver_thread.start()
+
+socketserver.ThreadingUDPServer.allow_reuse_address = True
+udpserver = socketserver.ThreadingUDPServer(('', 3022), UDPHandler)
+udpserver_thread = threading.Thread(target=udpserver.serve_forever)
+udpserver_thread.daemon = True
+udpserver_thread.start()
 
 zwift_offline.run_standalone()
