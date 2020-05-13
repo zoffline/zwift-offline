@@ -28,12 +28,10 @@ else:
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
-e = threading.Event()
-
 def sigint_handler(num, frame):
     httpd.shutdown()
     httpd.server_close()
-    e.set()
+    tcpthreadevent.set()
     tcpserver.shutdown()
     tcpserver.server_close()
     udpserver.shutdown()
@@ -92,11 +90,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
         # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
         self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a17080110061a093132372e302e302e3120ce170a18080010001a16080010001a093132372e302e302e3120ce1710ce17'))
         while True:
-            e.wait(timeout=25)
+            tcpthreadevent.wait(timeout=25)
             try:
                 self.request.sendall(bytearray.fromhex('000710e80718005801'))
             except:
-                self.request.close()
                 break
 
 class UDPHandler(socketserver.BaseRequestHandler):
@@ -120,6 +117,7 @@ zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
 
+tcpthreadevent = threading.Event()
 tcpserver = socketserver.ThreadingTCPServer(('', 3023), TCPHandler)
 tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
