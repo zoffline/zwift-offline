@@ -212,6 +212,12 @@ def api_private_event_feed():
     return '', 200
 
 
+# Disable telemetry (shuts up some errors in log)
+@app.route('/api/telemetry/config', methods=['GET'])
+def api_telemetry_config():
+    return '{"isEnabled":false}'
+
+
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
     profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
