@@ -550,9 +550,10 @@ def relay_worlds_my_hash_seeds(world_id):
 # XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
 def relay_worlds_attributes(world_id):
-    attribs = world_pb2.WorldAttributes()
-    attribs.world_time = world_time()
-    return attribs.SerializeToString(), 200
+#    attribs = world_pb2.WorldAttributes()
+#    attribs.world_time = world_time()
+#    return attribs.SerializeToString(), 200
+    return relay_worlds_generic(world_id)
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
