@@ -224,11 +224,6 @@ Docker
   * ``pip install garmin-uploader``
 
 
-## Known issues
-
-* Segment results always show up as having just occurred.
-
-
 ## Note
 
 Future Zwift updates may break zoffline until it's updated. While zoffline is
