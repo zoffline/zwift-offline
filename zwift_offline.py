@@ -28,6 +28,7 @@ import protobuf.profile_pb2 as profile_pb2
 import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
+import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -545,6 +546,17 @@ def relay_worlds_id_join(world_id):
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
 def relay_worlds_my_hash_seeds(world_id):
     return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
+
+
+@app.route('/relay/worlds/hash-seeds', methods=['GET'])
+def relay_worlds_hash_seeds():
+    seeds = hash_seeds_pb2.HashSeeds()
+    for x in range(4):
+        seed = seeds.seeds.add()
+        seed.seed1 = int(random.getrandbits(31))
+        seed.seed2 = int(random.getrandbits(31))
+        seed.expiryDate = world_time()+(10800+x*1200)*1000
+    return seeds.SerializeToString(), 200
 
 
 # XXX: attributes have not been thoroughly investigated
