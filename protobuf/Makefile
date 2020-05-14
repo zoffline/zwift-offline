@@ -9,6 +9,7 @@ all:
 	protoc --python_out=. goal.proto
 	protoc --python_out=. zfiles.proto
 	protoc --python_out=. messages.proto
+	protoc --python_out=. hash-seeds.proto
 
 clean:
 	rm -f *_pb2.py *_pb2.pyc
