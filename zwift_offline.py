@@ -28,6 +28,7 @@ import protobuf.profile_pb2 as profile_pb2
 import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
+import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -59,7 +60,7 @@ except IOError as e:
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
-DATABASE_CUR_VER = 1
+DATABASE_CUR_VER = 2
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
@@ -140,7 +141,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int(time.time()*64.4131403573055)
+    return int(time.time()-1414016075)*1000
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -210,6 +211,12 @@ def api_zfiles_list():
 @app.route('/api/private_event/feed', methods=['GET', 'POST'])
 def api_private_event_feed():
     return '', 200
+
+
+# Disable telemetry (shuts up some errors in log)
+@app.route('/api/telemetry/config', methods=['GET'])
+def api_telemetry_config():
+    return '{"isEnabled":false}'
 
 
 @app.route('/api/profiles/me', methods=['GET'])
@@ -541,12 +548,24 @@ def relay_worlds_my_hash_seeds(world_id):
     return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
 
 
+@app.route('/relay/worlds/hash-seeds', methods=['GET'])
+def relay_worlds_hash_seeds():
+    seeds = hash_seeds_pb2.HashSeeds()
+    for x in range(4):
+        seed = seeds.seeds.add()
+        seed.seed1 = int(random.getrandbits(31))
+        seed.seed2 = int(random.getrandbits(31))
+        seed.expiryDate = world_time()+(10800+x*1200)*1000
+    return seeds.SerializeToString(), 200
+
+
 # XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
 def relay_worlds_attributes(world_id):
-    attribs = world_pb2.WorldAttributes()
-    attribs.world_time = world_time()
-    return attribs.SerializeToString(), 200
+#    attribs = world_pb2.WorldAttributes()
+#    attribs.world_time = world_time()
+#    return attribs.SerializeToString(), 200
+    return relay_worlds_generic(world_id)
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
@@ -587,8 +606,9 @@ def handle_segment_results(request):
     # Windows client crashes at foot of Alpe du Zwift
     # if segments 2233445501 - 2233445521 (switchbacks) are returned by zoffline.
     # Overall climb segment (2233445522) isn't affected.
-    if 2233445501 <= segment_id <= 2233445521:
-        return '', 422
+    # Workaround isn't needed if UDP server is reachable.
+    #if 2233445501 <= segment_id <= 2233445521:
+    #    return '', 422
     only_best = request.args.get('only-best') == 'true'
     from_date = request.args.get('from')
     to_date = request.args.get('to')
@@ -730,9 +750,15 @@ def init_database():
 
     if version < 1:
         # Adjust old world_time values in segment results to new rough estimate of Zwift's
-        logging.info("Upgrading zwift-offline.db to version 1")
-        cur.execute('UPDATE segment_result SET world_time = cast(world_time/1000*64.4131403573055 as int)')
-        cur.execute('UPDATE version SET version = 1')
+        logging.info("Upgrading zwift-offline.db to version 2")
+        cur.execute('UPDATE segment_result SET world_time = world_time-1414016075000')
+        cur.execute('UPDATE version SET version = 2')
+
+    if version == 1:
+        logging.info("Upgrading zwift-offline.db to version 2")
+        cur.execute('UPDATE segment_result SET world_time = cast(world_time/64.4131403573055-1414016075 as int)*1000')
+        cur.execute('UPDATE version SET version = 2')
+
     conn.commit()
     conn.close()
 

@@ -1,0 +1,9 @@
+message HashSeed {
+	required uint64 seed1 = 1;
+	required uint64 seed2 = 2;
+	required uint64 expiryDate = 3;
+}
+
+message HashSeeds {
+	repeated HashSeed seeds = 1;
+}

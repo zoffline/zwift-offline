@@ -1,0 +1,10 @@
+message ServerToClient {
+	required int32 f1 = 1;
+	required int32 player_id = 2;
+	required int64 world_time = 3;
+	required int32 seqno = 4;
+	required int32 f5 = 5;
+	required int64 f11 = 11;
+	required int32 num_msgs = 18;
+	required int32 msgnum = 19;
+}
