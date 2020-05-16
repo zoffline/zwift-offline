@@ -31,6 +31,7 @@ To install zoffline on Linux, Windows, or Mac OS X:
   * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf3_to_dict stravalib``
     * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
 * Clone or download this repo
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
@@ -53,6 +54,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
   * The path you pass to ``-v`` will likely need to be world readable and writable.
   * A list of valid ``<timezone>`` values (e.g. America/New_York) can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
   * Adding ``--restart unless-stopped`` will make zoffline start on boot if you have Docker v1.9.0 or greater.
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``</path/to/host/storage>`` directory containing the IP address of the PC running zoffline.
 * Start zoffline with:
   ``docker start zwift-offline``
 
