@@ -64,6 +64,7 @@ DATABASE_CUR_VER = 2
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
+SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
 
@@ -159,7 +160,11 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(time.time())
     udp_node = response.info.nodes.node.add()
-    udp_node.ip = "127.0.0.1"  # TCP telemetry server
+    if os.path.exists(SERVER_IP_FILE):
+        with open(SERVER_IP_FILE, 'r') as f:
+            udp_node.ip = f.read().rstrip('\r\n')
+    else:
+        udp_node.ip = "127.0.0.1"  # TCP telemetry server
     udp_node.port = 3023
     return response.SerializeToString(), 200
 
@@ -570,10 +575,13 @@ def relay_worlds_attributes(world_id):
 
 @app.route('/relay/periodic-info', methods=['GET'])
 def relay_periodic_info():
-    # Use 127.0.0.1 as the game server and ignore log errors
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
-    info.game_server_ip = '127.0.0.1'
+    if os.path.exists(SERVER_IP_FILE):
+        with open(SERVER_IP_FILE, 'r') as f:
+            info.game_server_ip = f.read().rstrip('\r\n')
+    else:
+        info.game_server_ip = '127.0.0.1'
     info.f2 = 3022
     info.f3 = 10
     info.f4 = 60

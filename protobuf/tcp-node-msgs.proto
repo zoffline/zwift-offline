@@ -1,0 +1,49 @@
+////////////////////////////////////////
+// Initial TCP response below
+////////////////////////////////////////
+
+message ServerDetails {
+        required int32 f1 = 1;
+	required int32 f2 = 2;
+	required string ip = 3;
+	required int32 port = 4;
+}
+
+message ServersType1 {
+	repeated ServerDetails details = 1;
+        optional int32 f2 = 2;
+        optional int32 f3 = 3;
+        optional int32 f4 = 4;
+}
+
+message ServerConnectionDetailsWrapper {
+	required int32 f1 = 1;  // Value seems to be the same as ConnDetails' f1
+	required int32 f2 = 2;  // Value seems to be the same as ConnDetails' f2
+	repeated ServerDetails details = 3;
+}
+
+message ServersType2 {
+	repeated ServerConnectionDetailsWrapper details_wrapper = 1;
+	required int32 port = 2;
+}
+
+// login-response.proto already defines ServerInfo and Python 3 doesn't like reusing it
+message TCPServerInfo {
+	optional int32 f1 = 1;
+	required int32 player_id = 2;
+	required int32 f3 = 3;
+	repeated ServersType1 servers = 24;
+	repeated ServersType2 other_servers = 25;
+}
+
+
+////////////////////////////////////////
+// Recurring TCP response below
+////////////////////////////////////////
+
+message RecurringTCPResponse {
+	optional int32 f1 = 1;
+	optional int32 player_id = 2;
+	optional int32 f3 = 3;
+	optional int32 f11 = 11;
+}

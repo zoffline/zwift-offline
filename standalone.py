@@ -2,6 +2,7 @@
 
 import os
 import signal
+import struct
 import sys
 import threading
 import time
@@ -14,7 +15,8 @@ else:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import zwift_offline
-import protobuf.messages_pb2 as messages_pb2
+import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
+import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -26,6 +28,7 @@ else:
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
+SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 def sigint_handler(num, frame):
@@ -87,12 +90,58 @@ class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
         # send packet containing UDP server (127.0.0.1)
+        # (very little investigation done into this packet while creating
+        #  protobuf structes hence the excessive "details" usage)
         # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
-        self.request.sendall(bytearray.fromhex('007010e8071800c2012e0a12080110061a093132372e302e302e3120ce170a12080010001a093132372e302e302e3120ce17100a181e2003ca01370a18080110061a12080110061a093132372e302e302e3120ce170a18080010001a12080010001a093132372e302e302e3120ce1710ce17'))
+        msg = tcp_node_msgs_pb2.TCPServerInfo()
+        msg.player_id = 1000 #  *shrug*
+        msg.f3 = 0
+        servers = msg.servers.add()
+        if os.path.exists(SERVER_IP_FILE):
+            with open(SERVER_IP_FILE, 'r') as f:
+                udp_node_ip = f.read().rstrip('\r\n')
+        else:
+            udp_node_ip = "127.0.0.1"
+        details1 = servers.details.add()
+        details1.f1 = 1
+        details1.f2 = 6
+        details1.ip = udp_node_ip
+        details1.port = 3022
+        details2 = servers.details.add()
+        details2.f1 = 0
+        details2.f2 = 0
+        details2.ip = udp_node_ip
+        details2.port = 3022
+        servers.f2 = 10
+        servers.f3 = 30
+        servers.f4 = 3
+        other_servers = msg.other_servers.add()
+        wdetails1 = other_servers.details_wrapper.add()
+        wdetails1.f1 = 1
+        wdetails1.f2 = 6
+        details3 = wdetails1.details.add()
+        details3.CopyFrom(details1)
+        wdetails2 = other_servers.details_wrapper.add()
+        wdetails2.f1 = 0
+        wdetails2.f2 = 0
+        details4 = wdetails2.details.add()
+        details4.CopyFrom(details2)
+        other_servers.port = 3022
+        payload = msg.SerializeToString()
+        # Send size of payload as 2 bytes
+        self.request.sendall(struct.pack('!h', len(payload)))
+        self.request.sendall(payload)
+
+        msg = tcp_node_msgs_pb2.RecurringTCPResponse()
+        msg.player_id = 1000  # *shrug*
+        msg.f3 = 0
+        msg.f11 = 1
+        payload = msg.SerializeToString()
         while True:
             tcpthreadevent.wait(timeout=25)
             try:
-                self.request.sendall(bytearray.fromhex('000710e80718005801'))
+                self.request.sendall(struct.pack('!h', len(payload)))
+                self.request.sendall(payload)
             except:
                 break
 
@@ -100,7 +149,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
         socket = self.request[1]
-        message = messages_pb2.ServerToClient()
+        message = udp_node_msgs_pb2.ServerToClient()
         message.f1 = 1
         message.player_id = 1000
         message.world_time = int(time.time()-1414016075)*1000

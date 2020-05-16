@@ -8,7 +8,8 @@ all:
 	protoc --python_out=. world.proto
 	protoc --python_out=. goal.proto
 	protoc --python_out=. zfiles.proto
-	protoc --python_out=. messages.proto
+	protoc --python_out=. udp-node-msgs.proto
+	protoc --python_out=. tcp-node-msgs.proto
 	protoc --python_out=. hash-seeds.proto
 
 clean:
