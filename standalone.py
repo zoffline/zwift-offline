@@ -91,7 +91,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024)
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
-        #  protobuf structes hence the excessive "details" usage)
+        #  protobuf structures hence the excessive "details" usage)
         # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
         msg = tcp_node_msgs_pb2.TCPServerInfo()
         msg.player_id = 1000 #  *shrug*
