@@ -244,7 +244,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         message.seqno = 1
         message.f5 = 1
 
-        if enable_ghosts and play.ghosts and ghosts and t >= last_play + update_freq:
+        if ghosts and t >= last_play + update_freq:
             ghost_id = 1
             for g in play.ghosts:
                 if len(g.states) > play_count:
