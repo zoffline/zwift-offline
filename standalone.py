@@ -31,6 +31,50 @@ PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
+ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
+enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
+rec = udp_node_msgs_pb2.Ghost()
+play = udp_node_msgs_pb2.Ghosts()
+last_rec = 0
+last_play = 0
+play_count = 0
+last_rt = 0
+last_recv = 0
+ghosts = False
+spawn = list()
+update_freq = 3
+timeout = 10
+
+def saveGhost(player_id, name):
+    if not player_id: return
+    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
+    load = folder + '/load'
+    try:
+        if not os.path.isdir(load):
+            os.makedirs(load)
+    except:
+        return
+    f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name.replace('%20', ' '))
+    with open(f, 'wb') as fd:
+        fd.write(rec.SerializeToString())
+
+def loadGhosts(player_id):
+    global play
+    global spawn
+    if not player_id: return
+    folder = '%s/%s/ghosts/load' % (STORAGE_DIR, player_id)
+    if not os.path.isdir(folder): return
+    files = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
+    del play.ghosts[:]
+    del spawn[:]
+    for f in files:
+        if f.endswith('.bin'):
+            with open(os.path.join(folder, f), 'rb') as fd:
+                g = play.ghosts.add()
+                g.ParseFromString(fd.read())
+                spawn.append(g.states[0].roadTime)
+
+
 def sigint_handler(num, frame):
     httpd.shutdown()
     httpd.server_close()
@@ -83,18 +127,27 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 return
             except:
                 pass  # fallthrough to return zoffline version
+        if path_end.startswith('saveghost?'):
+            self.send_response(200)
+            self.end_headers()
+            saveGhost(rec.player_id, path_end[10:])
+            return
 
         SimpleHTTPRequestHandler.do_GET(self)
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
+        hello = tcp_node_msgs_pb2.TCPHello()
+        try:
+            hello.ParseFromString(self.data[3:-4])
+        except:
+            hello.player_id = 1000
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
-        # it contains player_id (1000) but apparently client doesn't bother, works for other profiles
         msg = tcp_node_msgs_pb2.TCPServerInfo()
-        msg.player_id = 1000 #  *shrug*
+        msg.player_id = hello.player_id
         msg.f3 = 0
         servers = msg.servers.add()
         if os.path.exists(SERVER_IP_FILE):
@@ -133,7 +186,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(payload)
 
         msg = tcp_node_msgs_pb2.RecurringTCPResponse()
-        msg.player_id = 1000  # *shrug*
+        msg.player_id = hello.player_id
         msg.f3 = 0
         msg.f11 = 1
         payload = msg.SerializeToString()
@@ -147,14 +200,62 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        global rec
+        global last_rec
+        global last_play
+        global play_count
+        global last_rt
+        global last_recv
+        global ghosts
         data = self.request[0]
         socket = self.request[1]
+        recv = udp_node_msgs_pb2.ClientToServer()
+        try:
+            recv.ParseFromString(data[:-4])
+        except:
+            pass
+
+        if enable_ghosts:
+            rec.player_id = recv.player_id
+            t = int(time.time())
+            if t > last_recv + timeout:
+                del rec.states[:]
+                last_rt = 0
+                play_count = 0
+                ghosts = False
+                loadGhosts(recv.player_id)
+            last_recv = t
+            if recv.state.roadTime and last_rt and recv.state.roadTime != last_rt:
+                if t >= last_rec + update_freq:
+                    state = rec.states.add()
+                    state.CopyFrom(recv.state)
+                    last_rec = t
+                if not ghosts and spawn:
+                    if recv.state.roadTime > last_rt:
+                        if last_rt > min(spawn): ghosts = True
+                    else:
+                        if last_rt < max(spawn): ghosts = True
+            last_rt = recv.state.roadTime
+
         message = udp_node_msgs_pb2.ServerToClient()
         message.f1 = 1
-        message.player_id = 1000
-        message.world_time = int(time.time()-1414016075)*1000
+        message.player_id = recv.player_id
+        message.world_time = zwift_offline.world_time()
         message.seqno = 1
         message.f5 = 1
+
+        if enable_ghosts and play.ghosts and ghosts and t >= last_play + update_freq:
+            ghost_id = 1
+            for g in play.ghosts:
+                if len(g.states) > play_count:
+                    state = message.states.add()
+                    state.CopyFrom(g.states[play_count])
+                    state.id = ghost_id
+                    state.worldTime = zwift_offline.world_time()
+                    ghost_id += 1
+            last_play = t
+            play_count += 1
+
         message.f11 = 1
         message.num_msgs = 1
         message.msgnum = 1

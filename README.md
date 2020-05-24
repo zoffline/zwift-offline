@@ -207,6 +207,14 @@ To obtain your current profile:
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
 
 
+### Step 6 [OPTIONAL]: Enable ghosts
+
+* Create a file called "enable_ghosts.txt" inside zoffline's storage directory
+* When you save an activity the ghost will be saved in ``storage/<player_id>/ghosts``
+* Copy ghost files to ``storage/<player_id>/ghosts/load`` and they will be loaded in the next activity
+* You must ensure that the loaded ghost files are from the same map and route you are going to ride
+
+
 ## Dependencies
 
 Docker

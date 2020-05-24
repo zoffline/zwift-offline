@@ -36,6 +36,9 @@ message TCPServerInfo {
 	repeated ServersType2 other_servers = 25;
 }
 
+message TCPHello {
+	required int32 player_id = 2;
+}
 
 ////////////////////////////////////////
 // Recurring TCP response below

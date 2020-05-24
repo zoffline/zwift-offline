@@ -146,6 +146,10 @@ message Profile {
     optional bool f110 = 110;
 }
 
+message Profiles {
+     repeated Profile profiles = 1;
+}
+
 message ProfileEntitlement {
     optional EntitlementType f1 = 1;
     enum EntitlementType {
