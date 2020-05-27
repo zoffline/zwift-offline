@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='tcp-node-msgs.proto',
   package='',
   syntax='proto2',
-  serialized_pb=_b('\n\x13tcp-node-msgs.proto\"A\n\rServerDetails\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\n\n\x02\x66\x32\x18\x02 \x02(\x05\x12\n\n\x02ip\x18\x03 \x02(\t\x12\x0c\n\x04port\x18\x04 \x02(\x05\"S\n\x0cServersType1\x12\x1f\n\x07\x64\x65tails\x18\x01 \x03(\x0b\x32\x0e.ServerDetails\x12\n\n\x02\x66\x32\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\n\n\x02\x66\x34\x18\x04 \x01(\x05\"Y\n\x1eServerConnectionDetailsWrapper\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\n\n\x02\x66\x32\x18\x02 \x02(\x05\x12\x1f\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x0e.ServerDetails\"V\n\x0cServersType2\x12\x38\n\x0f\x64\x65tails_wrapper\x18\x01 \x03(\x0b\x32\x1f.ServerConnectionDetailsWrapper\x12\x0c\n\x04port\x18\x02 \x02(\x05\"\x80\x01\n\rTCPServerInfo\x12\n\n\x02\x66\x31\x18\x01 \x01(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\n\n\x02\x66\x33\x18\x03 \x02(\x05\x12\x1e\n\x07servers\x18\x18 \x03(\x0b\x32\r.ServersType1\x12$\n\rother_servers\x18\x19 \x03(\x0b\x32\r.ServersType2\"N\n\x14RecurringTCPResponse\x12\n\n\x02\x66\x31\x18\x01 \x01(\x05\x12\x11\n\tplayer_id\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x05')
+  serialized_pb=_b('\n\x13tcp-node-msgs.proto\"A\n\rServerDetails\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\n\n\x02\x66\x32\x18\x02 \x02(\x05\x12\n\n\x02ip\x18\x03 \x02(\t\x12\x0c\n\x04port\x18\x04 \x02(\x05\"S\n\x0cServersType1\x12\x1f\n\x07\x64\x65tails\x18\x01 \x03(\x0b\x32\x0e.ServerDetails\x12\n\n\x02\x66\x32\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\n\n\x02\x66\x34\x18\x04 \x01(\x05\"Y\n\x1eServerConnectionDetailsWrapper\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\n\n\x02\x66\x32\x18\x02 \x02(\x05\x12\x1f\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x0e.ServerDetails\"V\n\x0cServersType2\x12\x38\n\x0f\x64\x65tails_wrapper\x18\x01 \x03(\x0b\x32\x1f.ServerConnectionDetailsWrapper\x12\x0c\n\x04port\x18\x02 \x02(\x05\"\x80\x01\n\rTCPServerInfo\x12\n\n\x02\x66\x31\x18\x01 \x01(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\n\n\x02\x66\x33\x18\x03 \x02(\x05\x12\x1e\n\x07servers\x18\x18 \x03(\x0b\x32\r.ServersType1\x12$\n\rother_servers\x18\x19 \x03(\x0b\x32\r.ServersType2\"\x1d\n\x08TCPHello\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\"N\n\x14RecurringTCPResponse\x12\n\n\x02\x66\x31\x18\x01 \x01(\x05\x12\x11\n\tplayer_id\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x05')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -272,6 +272,37 @@ _TCPSERVERINFO = _descriptor.Descriptor(
 )
 
 
+_TCPHELLO = _descriptor.Descriptor(
+  name='TCPHello',
+  full_name='TCPHello',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='player_id', full_name='TCPHello.player_id', index=0,
+      number=2, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=485,
+  serialized_end=514,
+)
+
+
 _RECURRINGTCPRESPONSE = _descriptor.Descriptor(
   name='RecurringTCPResponse',
   full_name='RecurringTCPResponse',
@@ -319,8 +350,8 @@ _RECURRINGTCPRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=485,
-  serialized_end=563,
+  serialized_start=516,
+  serialized_end=594,
 )
 
 _SERVERSTYPE1.fields_by_name['details'].message_type = _SERVERDETAILS
@@ -333,6 +364,7 @@ DESCRIPTOR.message_types_by_name['ServersType1'] = _SERVERSTYPE1
 DESCRIPTOR.message_types_by_name['ServerConnectionDetailsWrapper'] = _SERVERCONNECTIONDETAILSWRAPPER
 DESCRIPTOR.message_types_by_name['ServersType2'] = _SERVERSTYPE2
 DESCRIPTOR.message_types_by_name['TCPServerInfo'] = _TCPSERVERINFO
+DESCRIPTOR.message_types_by_name['TCPHello'] = _TCPHELLO
 DESCRIPTOR.message_types_by_name['RecurringTCPResponse'] = _RECURRINGTCPRESPONSE
 
 ServerDetails = _reflection.GeneratedProtocolMessageType('ServerDetails', (_message.Message,), dict(
@@ -369,6 +401,13 @@ TCPServerInfo = _reflection.GeneratedProtocolMessageType('TCPServerInfo', (_mess
   # @@protoc_insertion_point(class_scope:TCPServerInfo)
   ))
 _sym_db.RegisterMessage(TCPServerInfo)
+
+TCPHello = _reflection.GeneratedProtocolMessageType('TCPHello', (_message.Message,), dict(
+  DESCRIPTOR = _TCPHELLO,
+  __module__ = 'tcp_node_msgs_pb2'
+  # @@protoc_insertion_point(class_scope:TCPHello)
+  ))
+_sym_db.RegisterMessage(TCPHello)
 
 RecurringTCPResponse = _reflection.GeneratedProtocolMessageType('RecurringTCPResponse', (_message.Message,), dict(
   DESCRIPTOR = _RECURRINGTCPRESPONSE,
