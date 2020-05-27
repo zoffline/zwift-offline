@@ -216,13 +216,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
             pass
 
         if enable_ghosts:
-            rec.player_id = recv.player_id
             t = int(time.time())
             if t > last_recv + timeout:
                 del rec.states[:]
                 last_rt = 0
                 play_count = 0
                 ghosts = False
+                rec.player_id = recv.player_id
                 loadGhosts(recv.player_id)
             last_recv = t
             if recv.state.roadTime and last_rt and recv.state.roadTime != last_rt:
