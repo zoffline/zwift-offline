@@ -1,10 +1,63 @@
+message PlayerState {
+	required int32 id = 1;
+	required int64 worldTime = 2;
+	required int32 distance = 3;
+	required int32 roadTime = 4;
+	optional int32 laps = 5;
+	required int32 speed = 6;
+	optional int32 roadPosition = 8;
+	optional int32 cadenceUHz = 9;
+	optional int32 heartrate = 11;
+	required int32 power = 12;
+	optional int64 heading = 13;
+	optional int32 lean = 14;
+	optional int32 climbing = 15;
+	required int32 time = 16;
+	required int32 f19 = 19;
+	required int32 f20 = 20;
+	optional int32 progress = 21;
+	optional int64 customisationId = 22;
+	optional int32 justWatching = 23;
+	optional int32 calories = 24;
+	optional float x = 25;
+	optional float altitude = 26;
+	optional float y = 27;
+	optional int32 watchingRiderId = 28;
+	optional int32 groupId = 29;
+	optional int64 sport = 31;
+	required float f34 = 34;
+}
+
+message ClientToServer {
+	required int32 connected = 1;
+	required int32 player_id = 2;
+	required int64 world_time = 3;
+	required int32 seqno = 4;
+	required PlayerState state = 7;
+	required int64 f8 = 8;
+	required int64 f9 = 9;
+	required int64 last_update = 10;
+	required int64 f11 = 11;
+	required int64 last_player_update = 12;
+}
+
 message ServerToClient {
 	required int32 f1 = 1;
 	required int32 player_id = 2;
 	required int64 world_time = 3;
 	required int32 seqno = 4;
 	required int32 f5 = 5;
+	repeated PlayerState states = 8;
 	required int64 f11 = 11;
 	required int32 num_msgs = 18;
 	required int32 msgnum = 19;
+}
+
+message Ghost {
+	required int32 player_id = 1;
+	repeated PlayerState states = 2;
+}
+
+message Ghosts {
+	repeated Ghost ghosts = 1;
 }

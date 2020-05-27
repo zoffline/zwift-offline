@@ -10,6 +10,7 @@ import sqlite3
 import sys
 import tempfile
 import time
+import requests
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
@@ -67,6 +68,7 @@ AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
+ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 
 # Android uses https for cdn
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
@@ -295,6 +297,24 @@ def api_profiles_activities(player_id):
     return activities.SerializeToString(), 200
 
 
+# For ghosts
+@app.route('/api/profiles', methods=['GET'])
+def api_profiles():
+    args = request.args.getlist('id')
+    profile = profile_pb2.Profile()
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, selected_profile)
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile.ParseFromString(fd.read())
+    profiles = profile_pb2.Profiles()
+    for i in args:
+        p = profiles.profiles.add()
+        p.CopyFrom(profile)
+        p.id = int(i)
+        p.last_name = 'Ghost %s' % i
+    return profiles.SerializeToString(), 200
+
+
 def strava_upload(player_id, activity):
     try:
         from stravalib.client import Client
@@ -375,6 +395,8 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
+    if os.path.exists(ENABLEGHOSTS_FILE):
+        requests.get("http://cdn.zwift.com/saveghost?%s" % activity.name)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
