@@ -57,11 +57,6 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``</path/to/host/storage>`` directory containing the IP address of the PC running zoffline.
 * Start zoffline with:
   ``docker start zwift-offline``
-
-If you don't use the Docker container you will need to set up an Apache server (or
-write your own nginx/uWSGI configuration and use nginx) and install the
-dependencies listed below. The necessary Apache configuration is inside the
-``apache`` subdir.
 </details>
 
 
