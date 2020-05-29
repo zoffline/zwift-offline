@@ -1,8 +1,8 @@
 message PlayerState {
-	required int32 id = 1;
-	required int64 worldTime = 2;
+	optional int32 id = 1;
+	optional int64 worldTime = 2;
 	optional int32 distance = 3;
-	optional int32 roadTime = 4;
+	required int32 roadTime = 4;
 	optional int32 laps = 5;
 	optional int32 speed = 6;
 	optional int32 roadPosition = 8;
