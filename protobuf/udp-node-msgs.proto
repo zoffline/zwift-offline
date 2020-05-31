@@ -1,20 +1,20 @@
 message PlayerState {
-	required int32 id = 1;
-	required int64 worldTime = 2;
-	required int32 distance = 3;
+	optional int32 id = 1;
+	optional int64 worldTime = 2;
+	optional int32 distance = 3;
 	required int32 roadTime = 4;
 	optional int32 laps = 5;
-	required int32 speed = 6;
+	optional int32 speed = 6;
 	optional int32 roadPosition = 8;
 	optional int32 cadenceUHz = 9;
 	optional int32 heartrate = 11;
-	required int32 power = 12;
+	optional int32 power = 12;
 	optional int64 heading = 13;
 	optional int32 lean = 14;
 	optional int32 climbing = 15;
-	required int32 time = 16;
-	required int32 f19 = 19;
-	required int32 f20 = 20;
+	optional int32 time = 16;
+	optional int32 f19 = 19;
+	optional int32 f20 = 20;
 	optional int32 progress = 21;
 	optional int64 customisationId = 22;
 	optional int32 justWatching = 23;
@@ -25,7 +25,7 @@ message PlayerState {
 	optional int32 watchingRiderId = 28;
 	optional int32 groupId = 29;
 	optional int64 sport = 31;
-	required float f34 = 34;
+	optional float f34 = 34;
 }
 
 message ClientToServer {

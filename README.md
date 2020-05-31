@@ -2,7 +2,7 @@
 
 zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation
 of a Zwift server. Currently it's designed for only a single user and the UDP
-game node is not implemented.
+game node is minimally implemented.
 
 ## Install
 
@@ -57,11 +57,6 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``</path/to/host/storage>`` directory containing the IP address of the PC running zoffline.
 * Start zoffline with:
   ``docker start zwift-offline``
-
-If you don't use the Docker container you will need to set up an Apache server (or
-write your own nginx/uWSGI configuration and use nginx) and install the
-dependencies listed below. The necessary Apache configuration is inside the
-``apache`` subdir.
 </details>
 
 
@@ -70,10 +65,10 @@ dependencies listed below. The necessary Apache configuration is inside the
 <details><summary>Windows 10 Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.49821, you're all set.
+  * If your Zwift version is 1.0.50775, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.49821 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.49821 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.50775 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.50775 and zoffline is not running from source: wait for zoffline to be updated.
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -96,9 +91,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.49821, you're all set.
+  * If your Zwift version is 1.0.50775, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.49821: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.50775: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
