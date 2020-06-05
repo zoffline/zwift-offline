@@ -252,7 +252,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     state.CopyFrom(g.states[play_count])
                     state.id = ghost_id
                     state.worldTime = zwift_offline.world_time()
-                    ghost_id += 1
+                ghost_id += 1
             last_play = t
             play_count += 1
 
