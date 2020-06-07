@@ -213,7 +213,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         try:
             recv.ParseFromString(data[:-4])
         except:
-            pass
+            recv.player_id = 1000
 
         if enable_ghosts:
             t = int(time.time())
