@@ -2,6 +2,8 @@
 
 block_cipher = None
 
+import sys
+sys.modules['FixTk'] = None
 
 a = Analysis(['standalone.py'],
              pathex=['/home/alexvh/Code/zoffline'],
@@ -10,7 +12,7 @@ a = Analysis(['standalone.py'],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
