@@ -31,6 +31,12 @@ import json
 import os, time, stat
 from collections import namedtuple
 
+if getattr(sys, 'frozen', False):
+    # If we're running as a pyinstaller bundle
+    SCRIPT_DIR = os.path.dirname(sys.executable)
+else:
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 global args
 global dbh
 
@@ -149,24 +155,30 @@ def main(argv):
     parser.add_argument('-u', '--user', help='Zwift user name')
     args = parser.parse_args()
 
+#    if args.user:
+#        password = getpass.getpass("Password for %s? " % args.user)
+#    else:
+#        file = os.environ['HOME'] + '/.zwift_cred.json'
+#        with open(file) as f:
+#            try:
+#                cred = json.load(f)
+#            except ValueError, se:
+#                sys.exit('"%s": %s' % (args.output, se))
+#        f.close
+#        args.user = cred['user']
+#        password = cred['pass']
+
     if args.user:
-        password = getpass.getpass("Password for %s? " % args.user)
+        username = args.user
     else:
-        file = os.environ['HOME'] + '/.zwift_cred.json'
-        with open(file) as f:
-            try:
-                cred = json.load(f)
-            except ValueError, se:
-                sys.exit('"%s": %s' % (args.output, se))
-        f.close
-        args.user = cred['user']
-        password = cred['pass']
+        username = raw_input("Enter Zwift login (e-mail): ")
+    password = getpass.getpass("Enter password: ")
 
     session = requests.session()
 
-    access_token, refresh_token = login(session, args.user, password)
+    access_token, refresh_token = login(session, username, password)
     profile = query_player_profile(session, access_token)
-    with open('profile.bin', 'wb') as f:
+    with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
         f.write(profile)
 
     logout(session, refresh_token)
