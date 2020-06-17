@@ -41,7 +41,7 @@ play_count = 0
 last_rt = 0
 last_recv = 0
 ghosts = False
-spawn = list()
+spawn = 0
 update_freq = 3
 timeout = 10
 
@@ -73,6 +73,7 @@ def loadGhosts(player_id, state):
     if not player_id: return
     folder = '%s/%s/ghosts/load' % (STORAGE_DIR, player_id)
     if not os.path.isdir(folder): return
+    s = list()
     for (root, dirs, files) in os.walk(folder):
         for f in files:
             if f.endswith('.bin'):
@@ -82,16 +83,17 @@ def loadGhosts(player_id, state):
                     if course(g.states[0]) == course(state) and roadID(g.states[0]) == roadID(state) and isForward(g.states[0]) == isForward(state):
                         h = play.ghosts.add()
                         h.CopyFrom(g)
-                        spawn.append(g.states[0].roadTime)
-    spawn.append(state.roadTime)
+                        s.append(g.states[0].roadTime)
+    s.append(state.roadTime)
+    if isForward(state): spawn = max(s)
+    else: spawn = min(s)
     for g in play.ghosts:
         if isForward(g.states[0]):
-            while g.states[0].roadTime < max(spawn):
+            while g.states[0].roadTime < spawn:
                 del g.states[0]
         else:
-            while g.states[0].roadTime > min(spawn):
+            while g.states[0].roadTime > spawn:
                 del g.states[0]
-    del spawn[-1]
 
 
 def sigint_handler(num, frame):
@@ -221,7 +223,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         global rec
         global play
-        global spawn
         global last_rec
         global last_play
         global play_count
@@ -241,13 +242,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             if t > last_recv + timeout:
                 del rec.states[:]
                 del play.ghosts[:]
-                del spawn[:]
                 last_rt = 0
                 play_count = 0
                 ghosts = False
             last_recv = t
             if recv.state.roadTime:
-                if not last_rt and not spawn:
+                if not last_rt and not play.ghosts:
                     loadGhosts(recv.player_id, recv.state)
                     rec.player_id = recv.player_id
                 if last_rt and recv.state.roadTime != last_rt:
@@ -255,11 +255,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state = rec.states.add()
                         state.CopyFrom(recv.state)
                         last_rec = t
-                    if not ghosts and spawn:
+                    if not ghosts and play.ghosts:
                         if isForward(recv.state):
-                            if last_rt > max(spawn): ghosts = True
+                            if recv.state.roadTime > spawn:
+                                ghosts = True
                         else:
-                            if last_rt < min(spawn): ghosts = True
+                            if recv.state.roadTime < spawn:
+                                ghosts = True
             last_rt = recv.state.roadTime
 
         message = udp_node_msgs_pb2.ServerToClient()
