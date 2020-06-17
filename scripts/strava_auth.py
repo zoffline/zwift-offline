@@ -28,6 +28,14 @@ import six
 
 from stravalib import Client
 
+import os, sys
+
+if getattr(sys, 'frozen', False):
+    # If we're running as a pyinstaller bundle
+    SCRIPT_DIR = os.path.dirname(sys.executable)
+else:
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 class StravaAuthHTTPServer(HTTPServer):
 
     def __init__(self, server_address, RequestHandlerClass, client_id, client_secret, bind_and_activate=True):
@@ -71,7 +79,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(six.b("Access Token: {}\n".format(access_token)))
                 self.wfile.write(six.b("Refresh Token: {}\n".format(refresh_token)))
                 self.wfile.write(six.b("Expires at: {}\n".format(expires_at)))
-                with open('strava_token.txt', 'w') as f:
+                with open('%s/strava_token.txt' % SCRIPT_DIR, 'w') as f:
                     f.write(self.server.client_id + '\n');
                     f.write(self.server.client_secret + '\n');
                     f.write(access_token + '\n');
@@ -111,9 +119,9 @@ if __name__ == "__main__":
                         action='store', type=int, default=8000)
 
     parser.add_argument('--client-id', help='Strava API Client ID',
-                        action='store', required=True)
+                        action='store', default='28117')
     parser.add_argument('--client-secret', help='Strava API Client Secret',
-                        action='store', required=True)
+                        action='store', default='41b7b7b76d8cfc5dc12ad5f020adfea17da35468')
     args = parser.parse_args()
 
     main(port=args.port, client_id=args.client_id, client_secret=args.client_secret)
