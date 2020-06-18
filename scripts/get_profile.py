@@ -37,6 +37,11 @@ if getattr(sys, 'frozen', False):
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 global args
 global dbh
 
@@ -76,7 +81,7 @@ def post_credentials(session, username, password):
 
         return (json_dict["access_token"], json_dict["refresh_token"], json_dict["expires_in"])
 
-    except requests.exceptions.RequestException, e:
+    except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
 
 def query_player_profile(session, access_token):
@@ -103,7 +108,7 @@ def query_player_profile(session, access_token):
 
         return response.content
 
-    except requests.exceptions.RequestException, e:
+    except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
 
 
@@ -133,7 +138,7 @@ def logout(session, refresh_token):
                 status_code=response.status_code))
             print('Response HTTP Response Body: {content}'.format(
                 content=response.content))
-    except requests.exceptions.RequestException, e:
+    except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
 
 def login(session, user, password):
@@ -171,7 +176,7 @@ def main(argv):
     if args.user:
         username = args.user
     else:
-        username = raw_input("Enter Zwift login (e-mail): ")
+        username = input("Enter Zwift login (e-mail): ")
     password = getpass.getpass("Enter password: ")
 
     session = requests.session()
@@ -188,5 +193,5 @@ if __name__ == '__main__':
         main(sys.argv)
     except KeyboardInterrupt:
         pass
-    except SystemExit, se:
-        print "ERROR:",se
+    except SystemExit as se:
+        print("ERROR:",se)
