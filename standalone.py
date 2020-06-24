@@ -6,6 +6,7 @@ import struct
 import sys
 import threading
 import time
+import csv
 from datetime import datetime
 if sys.version_info[0] > 2:
     import socketserver
@@ -41,7 +42,8 @@ play_count = 0
 last_rt = 0
 last_recv = 0
 ghosts = False
-spawn = 0
+start_road = 0
+start_rt = 0
 update_freq = 3
 timeout = 10
 
@@ -69,7 +71,8 @@ def saveGhost(player_id, name):
 
 def loadGhosts(player_id, state):
     global play
-    global spawn
+    global start_road
+    global start_rt
     if not player_id: return
     folder = '%s/%s/ghosts/load' % (STORAGE_DIR, player_id)
     if not os.path.isdir(folder): return
@@ -84,15 +87,28 @@ def loadGhosts(player_id, state):
                         h = play.ghosts.add()
                         h.CopyFrom(g)
                         s.append(g.states[0].roadTime)
-    s.append(state.roadTime)
-    if isForward(state): spawn = max(s)
-    else: spawn = min(s)
+    start_road = roadID(state)
+    start_rt = 0
+    sl_file = '%s/start_lines.csv' % STORAGE_DIR
+    if os.path.isfile(sl_file):
+        with open(sl_file, 'r') as fd:
+            sl = [tuple(line) for line in csv.reader(fd)]
+            rt = [t for t in sl if t[0] == str(course(state)) and t[1] == str(roadID(state)) and (t[2] == str(isForward(state)) or not t[2])]
+            if rt:
+                start_road = int(rt[0][3])
+                start_rt = int(rt[0][4])
+    if not start_rt:
+        s.append(state.roadTime)
+        if isForward(state): start_rt = max(s)
+        else: start_rt = min(s)
     for g in play.ghosts:
+        while roadID(g.states[0]) != start_road:
+            del g.states[0]
         if isForward(g.states[0]):
-            while g.states[0].roadTime < spawn:
+            while not (g.states[0].roadTime <= start_rt <= g.states[1].roadTime):
                 del g.states[0]
         else:
-            while g.states[0].roadTime > spawn:
+            while not (g.states[0].roadTime >= start_rt >= g.states[1].roadTime):
                 del g.states[0]
 
 
@@ -163,7 +179,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         try:
             hello.ParseFromString(self.data[3:-4])
         except:
-            hello.player_id = 1000
+            return
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
@@ -235,7 +251,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         try:
             recv.ParseFromString(data[:-4])
         except:
-            recv.player_id = 1000
+            return
 
         if enable_ghosts:
             t = int(time.time())
@@ -255,12 +271,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state = rec.states.add()
                         state.CopyFrom(recv.state)
                         last_rec = t
-                    if not ghosts and play.ghosts:
+                    if not ghosts and play.ghosts and roadID(recv.state) == start_road:
                         if isForward(recv.state):
-                            if recv.state.roadTime > spawn:
+                            if recv.state.roadTime >= start_rt >= last_rt:
                                 ghosts = True
                         else:
-                            if recv.state.roadTime < spawn:
+                            if recv.state.roadTime <= start_rt <= last_rt:
                                 ghosts = True
             last_rt = recv.state.roadTime
 
