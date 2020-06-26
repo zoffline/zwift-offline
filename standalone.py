@@ -119,7 +119,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         global MAP_OVERRIDE
         path_end = self.path.rsplit('/', 1)[1]
-        if path_end in [ 'INNSBRUCK', 'LONDON', 'NEWYORK', 'RICHMOND', 'WATOPIA', 'YORKSHIRE' ]:
+        if path_end in ['FRANCE', 'INNSBRUCK', 'LONDON', 'NEWYORK', 'PARIS', 'RICHMOND', 'WATOPIA', 'YORKSHIRE']:
             MAP_OVERRIDE = path_end
             self.send_response(302)
             self.send_header('Location', 'https://secure.zwift.com/ride')
