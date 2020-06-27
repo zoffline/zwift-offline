@@ -9,7 +9,7 @@ RUN pip install flask protobuf protobuf3_to_dict stravalib garmin-uploader
 RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
 RUN chmod 777 zwift-offline/storage
 
-EXPOSE 443 80
+EXPOSE 443 80 3022/udp 3023
 
 VOLUME /usr/src/app/zwift-offline/storage
 
