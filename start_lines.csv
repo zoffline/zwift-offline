@@ -1,0 +1,11 @@
+course,spawnRoad,isForward,startRoad,roadTime,name
+2,0,,0,996941,Richmond
+6,0,,0,987711,Downtown
+6,22,,23,788778,Volcano Circuit
+6,36,,35,546940,Jungle Circuit
+6,81,True,81,942254,Desert Flats
+6,81,False,81,913245,Titans Grove
+7,0,,0,532687,London
+8,4,,4,173378,New York
+9,7,,7,157428,Innsbruck
+11,0,,0,6043,Yorkshire
