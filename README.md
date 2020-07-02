@@ -102,7 +102,7 @@ to generate your own certificates and do the same.
     * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
     * If you're prompted for a password, just leave it blank. There is no password.
-* In a terminal within the directory cert-zwift-com.pem was copied to, run ``cat cert-zwift-com.pem >> ~/Library/Application Support/Zwift/data/cacert.pem``
+* In a terminal within the directory ``ssl/cert-zwift-com.pem`` was copied to, run ``cat cert-zwift-com.pem >> ~/Library/Application Support/Zwift/data/cacert.pem``
   * Note: Appending the contents of ``ssl/cert-zwift-com.pem`` with a text editor doesn't work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
 * Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
   * Append these keys:
