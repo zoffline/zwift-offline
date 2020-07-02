@@ -62,7 +62,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 
 ### Step 2: Configure Zwift client to use zoffline
 
-<details><summary>Windows 10 Instructions</summary>
+<details><summary>Windows Instructions</summary>
 
 * Install Zwift
   * If your Zwift version is 1.0.53029, you're all set.
@@ -75,6 +75,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
   * ``ssl/cert-zwift-com.pem``
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
+    * For Windows 7: run ``certutil.exe -importpfx cert-zwift-com.p12`` instead
   * If you're prompted for a password, just leave it blank. There is no password.
 * In the same command prompt run ``type cert-zwift-com.pem >> "C:\Program Files (x86)\Zwift\data\cacert.pem"``
   * Note: Appending cert-zwift-com.pem via Notepad will not work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
