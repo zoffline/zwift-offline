@@ -63,6 +63,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 ### Step 2: Configure Zwift client to use zoffline
 
 <details><summary>Windows 10 Instructions</summary>
+
 * Install Zwift
   * If your Zwift version is 1.0.53029, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
