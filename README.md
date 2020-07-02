@@ -141,7 +141,7 @@ to generate your own certificates and do the same.
   * Recommended approach for appending the contents (due to [#62](https://github.com/zoffline/zwift-offline/issues/62)):
     * ``adb push ssl/cert-zwift-com.pem /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
-    * In ``adb shell``: ``cat cert-zwift-com.pem >> cacerts.pem``
+    * In ``adb shell``: ``cat cert-zwift-com.pem >> cacert.pem``
     * However you do it, ensure the permissions and ownership of the file remains the same.
 * Modify the device's /etc/hosts file
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
