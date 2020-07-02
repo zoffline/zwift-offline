@@ -10,11 +10,15 @@ import sqlite3
 import sys
 import tempfile
 import time
-import requests
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
 from shutil import copyfile
+
+if sys.version_info[0] > 2:
+    import urllib.request as urllib2
+else:
+    import urllib2
 
 from flask import Flask, request, jsonify, g, redirect, render_template
 from google.protobuf.descriptor import FieldDescriptor
@@ -396,7 +400,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     if os.path.exists(ENABLEGHOSTS_FILE):
-        requests.get("http://cdn.zwift.com/saveghost?%s" % activity.name)
+        urllib2.urlopen("http://cdn.zwift.com/saveghost?%s" % activity.name)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
