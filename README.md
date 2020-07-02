@@ -1,7 +1,7 @@
 # zoffline
 
 zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation
-of a Zwift server. Currently it's designed for only a single user and the UDP
+of a Zwift server. Currently it's designed for only a single user at a time and the UDP
 game node is minimally implemented.
 
 ## Install
