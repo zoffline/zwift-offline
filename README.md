@@ -76,7 +76,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
   * If you're prompted for a password, just leave it blank. There is no password.
-* In the same command prompt run ``type cert-zwift-com.pem >> C:\Program Files (x86)\Zwift\data\cacert.pem``
+* In the same command prompt run ``type cert-zwift-com.pem >> "C:\Program Files (x86)\Zwift\data\cacert.pem"``
   * Note: Appending cert-zwift-com.pem via Notepad will not work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
