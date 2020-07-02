@@ -63,20 +63,20 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 ### Step 2: Configure Zwift client to use zoffline
 
 <details><summary>Windows 10 Instructions</summary>
-
 * Install Zwift
   * If your Zwift version is 1.0.53029, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
   * If your Zwift version is newer than 1.0.53029 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
   * If your Zwift version is newer than 1.0.53029 and zoffline is not running from source: wait for zoffline to be updated.
+* __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
   * If you're prompted for a password, just leave it blank. There is no password.
-* Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
-  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
+* In the same command prompt run ``type cert-zwift-com.pem >> C:\Program Files (x86)\Zwift\data\cacert.pem``
+  * Note: Appending cert-zwift-com.pem via Notepad will not work (#62)
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -137,7 +137,7 @@ to generate your own certificates and do the same.
 * Open Zwift once to complete installation (i.e download all extra files).
 * Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacerts.pem`` on the device
   * Note: this file will only exist after the first run of Zwift since it's downloaded after the initial install
-  * Simple approach to achieve this if your device doesn't have a text editor:
+  * Recommended approach for appending the contents (due to #62):
     * ``adb push ssl/cert-zwift-com.pem /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cat cert-zwift-com.pem >> cacerts.pem``
@@ -161,7 +161,8 @@ to generate your own certificates and do the same.
 #### Enabling/Disabling zoffline
 
 To use Zwift online like normal, comment out or remove the line added to the ``hosts``
-file before starting Zwift.
+file before starting Zwift. Then ensure Zwift is fully closed (right click
+the Zwift system tray icon and exit) and restart Zwift.
 
 
 ### Step 3 [OPTIONAL]: Obtain current Zwift profile
@@ -172,6 +173,7 @@ gender). Your profile can be further customized and changed via the in game
 menu (e.g. name, nationality, weight change, etc).
 
 To obtain your current profile:
+* Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
 * Move the resulting profile.bin (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
   * If using zoffline.exe on Windows, create the ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
