@@ -176,6 +176,7 @@ menu (e.g. name, nationality, weight change, etc).
 To obtain your current profile:
 * Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
+  * Or, if using the Windows zoffline.exe version without Python installed you can run get_profile.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
 * Move the resulting profile.bin (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
   * If using zoffline.exe on Windows, create the ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
   * If using Docker, move profile.bin into the path you passed to ``-v``
@@ -186,6 +187,7 @@ To obtain your current profile:
 * Install dependencies: stravalib
   * e.g., on Linux/Mac: ``pip install stravalib``
   * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib``
+  * Or, if using the Windows zoffline.exe version without Python installed you can run strava_auth.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
 * Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
 * Open http://localhost:8000/ and authorize.
