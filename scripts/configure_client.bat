@@ -17,10 +17,12 @@ IF %ERRORLEVEL% NEQ 0 (
 
 ECHO.
 
+FOR /F "tokens=4-5 delims=. " %%I IN ('ver') DO SET VERSION=%%I
 certutil.exe -store Root | FIND /C /I "zwift.com" >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Importing certificate
-    ECHO.|certutil.exe -importpfx Root ..\ssl\cert-zwift-com.p12
+    IF %VERSION% == 10 ( ECHO.|certutil.exe -importpfx Root ..\ssl\cert-zwift-com.p12
+    ) ELSE ( ECHO.|certutil.exe -importpfx ..\ssl\cert-zwift-com.p12)
 ) ELSE ( ECHO Certificate found in root store, no changes will be made )
 
 ECHO.
