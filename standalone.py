@@ -11,9 +11,11 @@ from datetime import datetime
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
+    from urllib.parse import unquote
 else:
     import SocketServer as socketserver
     from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from urllib2 import unquote
 
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
@@ -65,7 +67,7 @@ def saveGhost(player_id, name):
             os.makedirs(load)
     except:
         return
-    f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name.replace('%20', ' '))
+    f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), unquote(name))
     with open(f, 'wb') as fd:
         fd.write(rec.SerializeToString())
 
