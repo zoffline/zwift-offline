@@ -9,8 +9,15 @@ import xml.etree.ElementTree as ET
 
 from xml.dom import minidom
 
+try:
+    # Python 2
+    xrange
+except NameError:
+    # Python 3, xrange is now named range
+    xrange = range
+
 # Make london and new york more likely
-MAPS = [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'NEWYORK' ] * 2 + [ 'RICHMOND' ] + [ 'YORKSHIRE' ]
+MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'NEWYORK' ] * 2 + [ 'RICHMOND' ] + [ 'YORKSHIRE' ]
 
 
 dom = minidom.parseString('<MapSchedule><appointments></appointments><VERSION>1</VERSION></MapSchedule>')
@@ -18,7 +25,7 @@ appts = dom.getElementsByTagName('appointments')[0]
 
 now = datetime.datetime.now()
 prev_map = None
-for i in xrange(0, 500):
+for i in range(0, 500):
     map_choice = random.choice(MAPS)
     while map_choice == prev_map:
         map_choice = random.choice(MAPS)
