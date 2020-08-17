@@ -43,7 +43,8 @@ last_play = 0
 play_count = 0
 last_rt = 0
 last_recv = 0
-ghosts = False
+ghosts_loaded = False
+ghosts_started = False
 start_road = 0
 start_rt = 0
 update_freq = 3
@@ -246,7 +247,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
         global play_count
         global last_rt
         global last_recv
-        global ghosts
+        global ghosts_loaded
+        global ghosts_started
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
@@ -262,10 +264,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 del play.ghosts[:]
                 last_rt = 0
                 play_count = 0
-                ghosts = False
+                ghosts_loaded = False
+                ghosts_started = False
             last_recv = t
             if recv.state.roadTime:
-                if not last_rt and not play.ghosts:
+                if not last_rt and not ghosts_loaded:
+                    ghosts_loaded = True
                     loadGhosts(recv.player_id, recv.state)
                     rec.player_id = recv.player_id
                 if last_rt and recv.state.roadTime != last_rt:
@@ -273,13 +277,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state = rec.states.add()
                         state.CopyFrom(recv.state)
                         last_rec = t
-                    if not ghosts and play.ghosts and roadID(recv.state) == start_road:
+                    if not ghosts_started and play.ghosts and roadID(recv.state) == start_road:
                         if isForward(recv.state):
                             if recv.state.roadTime >= start_rt >= last_rt:
-                                ghosts = True
+                                ghosts_started = True
                         else:
                             if recv.state.roadTime <= start_rt <= last_rt:
-                                ghosts = True
+                                ghosts_started = True
             last_rt = recv.state.roadTime
 
         message = udp_node_msgs_pb2.ServerToClient()
@@ -289,7 +293,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         message.seqno = 1
         message.f5 = 1
 
-        if ghosts and t >= last_play + update_freq:
+        if ghosts_started and t >= last_play + update_freq:
             ghost_id = 1
             for g in play.ghosts:
                 if len(g.states) > play_count:
