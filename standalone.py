@@ -303,8 +303,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
             active_ghosts = 0
             for g in play.ghosts:
                 if len(g.states) > play_count: active_ghosts += 1
-            message.num_msgs = active_ghosts // 10
-            if active_ghosts % 10: message.num_msgs += 1
+            if active_ghosts:
+                message.num_msgs = active_ghosts // 10
+                if active_ghosts % 10: message.num_msgs += 1
+            else: message.num_msgs = 1
             msgnum = 1
             ghost_id = 1
             for g in play.ghosts:
