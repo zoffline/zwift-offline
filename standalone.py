@@ -313,8 +313,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state.id = ghost_id
                         state.worldTime = zwift_offline.world_time()
                     else:
-                        message.seqno = seqno
                         message.world_time = zwift_offline.world_time()
+                        message.seqno = seqno
                         message.msgnum = msgnum
                         socket.sendto(message.SerializeToString(), self.client_address)
                         seqno += 1
@@ -327,8 +327,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 ghost_id += 1
             last_play = t
             play_count += 1
-            message.seqno = seqno
             message.world_time = zwift_offline.world_time()
+            message.seqno = seqno
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
             seqno += 1
