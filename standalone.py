@@ -38,18 +38,17 @@ ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
 rec = udp_node_msgs_pb2.Ghost()
 play = udp_node_msgs_pb2.Ghosts()
+seqno = 1
 last_rec = 0
 last_play = 0
 play_count = 0
 last_rt = 0
-last_recv = 0
 loading_ghosts = False
 ghosts_loaded = False
 ghosts_started = False
 start_road = 0
 start_rt = 0
 update_freq = 3
-timeout = 10
 
 def roadID(state):
     return (state.f20 & 0xff00) >> 8
@@ -243,16 +242,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        global seqno
         global rec
         global play
         global last_rec
         global last_play
         global play_count
         global last_rt
-        global last_recv
         global loading_ghosts
         global ghosts_loaded
         global ghosts_started
+
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
@@ -261,17 +261,19 @@ class UDPHandler(socketserver.BaseRequestHandler):
         except:
             return
 
+        if recv.seqno == 1:
+            del rec.states[:]
+            del play.ghosts[:]
+            seqno = 1
+            last_rt = 0
+            play_count = 0
+            loading_ghosts = False
+            ghosts_loaded = False
+            ghosts_started = False
+
+        t = int(time.time())
+
         if enable_ghosts:
-            t = int(time.time())
-            if t > last_recv + timeout:
-                del rec.states[:]
-                del play.ghosts[:]
-                last_rt = 0
-                play_count = 0
-                loading_ghosts = False
-                ghosts_loaded = False
-                ghosts_started = False
-            last_recv = t
             if recv.state.roadTime:
                 if not last_rt and not loading_ghosts:
                     loading_ghosts = True
@@ -296,7 +298,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
             message.player_id = recv.player_id
-            message.seqno = 1
             message.f5 = 1
             message.f11 = 1
             message.num_msgs = 1
@@ -312,32 +313,37 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state.id = ghost_id
                         state.worldTime = zwift_offline.world_time()
                     else:
+                        message.seqno = seqno
                         message.world_time = zwift_offline.world_time()
                         message.msgnum = msgnum
                         socket.sendto(message.SerializeToString(), self.client_address)
+                        seqno += 1
+                        msgnum += 1
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(g.states[play_count])
                         state.id = ghost_id
                         state.worldTime = zwift_offline.world_time()
-                        msgnum += 1
                 ghost_id += 1
             last_play = t
             play_count += 1
+            message.seqno = seqno
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
+            seqno += 1
         else:
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
             message.player_id = recv.player_id
             message.world_time = zwift_offline.world_time()
-            message.seqno = 1
+            message.seqno = seqno
             message.f5 = 1
             message.f11 = 1
             message.num_msgs = 1
             message.msgnum = 1
             socket.sendto(message.SerializeToString(), self.client_address)
+            seqno += 1
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
