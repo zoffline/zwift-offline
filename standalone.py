@@ -300,9 +300,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.player_id = recv.player_id
             message.f5 = 1
             message.f11 = 1
-            message.num_msgs = 1
-            if len(play.ghosts) > 10:
-                message.num_msgs = len(play.ghosts) // 10 + 1
+            active_ghosts = 0
+            for g in play.ghosts:
+                if len(g.states) > play_count: active_ghosts += 1
+            message.num_msgs = active_ghosts // 10
+            if active_ghosts % 10: message.num_msgs += 1
             msgnum = 1
             ghost_id = 1
             for g in play.ghosts:
