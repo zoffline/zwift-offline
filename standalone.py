@@ -300,42 +300,42 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.player_id = recv.player_id
             message.f5 = 1
             message.f11 = 1
+            msgnum = 1
             active_ghosts = 0
             for g in play.ghosts:
                 if len(g.states) > play_count: active_ghosts += 1
             if active_ghosts:
                 message.num_msgs = active_ghosts // 10
                 if active_ghosts % 10: message.num_msgs += 1
+                ghost_id = 1
+                for g in play.ghosts:
+                    if len(g.states) > play_count:
+                        if len(message.states) < 10:
+                            state = message.states.add()
+                            state.CopyFrom(g.states[play_count])
+                            state.id = ghost_id
+                            state.worldTime = zwift_offline.world_time()
+                        else:
+                            message.world_time = zwift_offline.world_time()
+                            message.seqno = seqno
+                            message.msgnum = msgnum
+                            socket.sendto(message.SerializeToString(), self.client_address)
+                            seqno += 1
+                            msgnum += 1
+                            del message.states[:]
+                            state = message.states.add()
+                            state.CopyFrom(g.states[play_count])
+                            state.id = ghost_id
+                            state.worldTime = zwift_offline.world_time()
+                    ghost_id += 1
             else: message.num_msgs = 1
-            msgnum = 1
-            ghost_id = 1
-            for g in play.ghosts:
-                if len(g.states) > play_count:
-                    if len(message.states) < 10:
-                        state = message.states.add()
-                        state.CopyFrom(g.states[play_count])
-                        state.id = ghost_id
-                        state.worldTime = zwift_offline.world_time()
-                    else:
-                        message.world_time = zwift_offline.world_time()
-                        message.seqno = seqno
-                        message.msgnum = msgnum
-                        socket.sendto(message.SerializeToString(), self.client_address)
-                        seqno += 1
-                        msgnum += 1
-                        del message.states[:]
-                        state = message.states.add()
-                        state.CopyFrom(g.states[play_count])
-                        state.id = ghost_id
-                        state.worldTime = zwift_offline.world_time()
-                ghost_id += 1
-            last_play = t
-            play_count += 1
             message.world_time = zwift_offline.world_time()
             message.seqno = seqno
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
             seqno += 1
+            play_count += 1
+            last_play = t
         else:
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
