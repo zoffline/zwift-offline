@@ -59,6 +59,11 @@ def isForward(state):
 def course(state):
     return (state.f19 & 0xff0000) >> 16
 
+def boolean(s):
+    if s.lower() in ['true', 'yes', '1']: return True
+    if s.lower() in ['false', 'no', '0']: return False
+    return None
+
 def saveGhost(player_id, name):
     if not player_id: return
     folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
@@ -97,7 +102,7 @@ def loadGhosts(player_id, state):
     if os.path.isfile(sl_file):
         with open(sl_file, 'r') as fd:
             sl = [tuple(line) for line in csv.reader(fd)]
-            rt = [t for t in sl if t[0] == str(course(state)) and t[1] == str(roadID(state)) and (t[2] == str(isForward(state)) or not t[2])]
+            rt = [t for t in sl if t[0] == str(course(state)) and t[1] == str(roadID(state)) and (boolean(t[2]) == isForward(state) or not t[2])]
             if rt:
                 start_road = int(rt[0][3])
                 start_rt = int(rt[0][4])
