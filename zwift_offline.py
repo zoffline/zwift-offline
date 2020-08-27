@@ -316,7 +316,12 @@ def api_profiles():
         p = profiles.profiles.add()
         p.CopyFrom(profile)
         p.id = int(i)
-        p.last_name = 'Ghost %s' % i
+        p.first_name = 'zoffline'
+        p.last_name = 'ghost %s' % i
+        p.f20 = 3761002195 # basic 4 jersey
+        p.f24 = 1456463855 # tron bike
+        p.f27 = 125 # blue
+        p.country_code = 0
     return profiles.SerializeToString(), 200
 
 
