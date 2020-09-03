@@ -111,14 +111,17 @@ def loadGhosts(player_id, state):
         if isForward(state): start_rt = max(s)
         else: start_rt = min(s)
     for g in play.ghosts:
-        while roadID(g.states[0]) != start_road:
-            del g.states[0]
-        if isForward(g.states[0]):
-            while not (g.states[0].roadTime <= start_rt <= g.states[1].roadTime):
+        try:
+            while roadID(g.states[0]) != start_road:
                 del g.states[0]
-        else:
-            while not (g.states[0].roadTime >= start_rt >= g.states[1].roadTime):
-                del g.states[0]
+            if isForward(g.states[0]):
+                while not (g.states[0].roadTime <= start_rt <= g.states[1].roadTime):
+                    del g.states[0]
+            else:
+                while not (g.states[0].roadTime >= start_rt >= g.states[1].roadTime):
+                    del g.states[0]
+        except IndexError:
+            pass
     ghosts_loaded = True
 
 
