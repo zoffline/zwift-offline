@@ -43,7 +43,6 @@ last_rec = 0
 last_play = 0
 play_count = 0
 last_rt = 0
-loading_ghosts = False
 ghosts_loaded = False
 ghosts_started = False
 start_road = 0
@@ -64,38 +63,52 @@ def boolean(s):
     if s.lower() in ['false', 'no', '0']: return False
     return None
 
-def saveGhost(player_id, name):
-    if not player_id: return
-    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
-    load = folder + '/load'
+def saveGhost(name):
+    if not rec.player_id: return
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, rec.player_id, course(rec.states[0]), roadID(rec.states[0]))
+    if not isForward(rec.states[0]): folder += '/reverse'
     try:
-        if not os.path.isdir(load):
-            os.makedirs(load)
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
     except:
         return
     f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), unquote(name))
     with open(f, 'wb') as fd:
         fd.write(rec.SerializeToString())
 
+def organizeGhosts(folder):
+    # organize ghosts in course/roadID directory structure
+    # previously they were saved directly in player_id/ghosts
+    for f in os.listdir(folder):
+        if f.endswith('.bin'):
+            file = os.path.join(folder, f)
+            with open(file, 'rb') as fd:
+                g = udp_node_msgs_pb2.Ghost()
+                g.ParseFromString(fd.read())
+                dest = '%s/%s/%s' % (folder, course(g.states[0]), roadID(g.states[0]))
+                if not isForward(g.states[0]): dest += '/reverse'
+                try:
+                    if not os.path.isdir(dest):
+                        os.makedirs(dest)
+                except:
+                    return
+            os.rename(file, os.path.join(dest, f))
+
 def loadGhosts(player_id, state):
     global play
     global start_road
     global start_rt
-    global ghosts_loaded
     if not player_id: return
-    folder = '%s/%s/ghosts/load' % (STORAGE_DIR, player_id)
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, course(state), roadID(state))
+    if not isForward(state): folder += '/reverse'
     if not os.path.isdir(folder): return
     s = list()
-    for (root, dirs, files) in os.walk(folder):
-        for f in files:
-            if f.endswith('.bin'):
-                with open(os.path.join(root, f), 'rb') as fd:
-                    g = udp_node_msgs_pb2.Ghost()
-                    g.ParseFromString(fd.read())
-                    if course(g.states[0]) == course(state) and roadID(g.states[0]) == roadID(state) and isForward(g.states[0]) == isForward(state):
-                        h = play.ghosts.add()
-                        h.CopyFrom(g)
-                        s.append(g.states[0].roadTime)
+    for f in os.listdir(folder):
+        if f.endswith('.bin'):
+            with open(os.path.join(folder, f), 'rb') as fd:
+                g = play.ghosts.add()
+                g.ParseFromString(fd.read())
+                s.append(g.states[0].roadTime)
     start_road = roadID(state)
     start_rt = 0
     sl_file = '%s/start_lines.csv' % STORAGE_DIR
@@ -122,7 +135,6 @@ def loadGhosts(player_id, state):
                     del g.states[0]
         except IndexError:
             pass
-    ghosts_loaded = True
 
 
 def sigint_handler(num, frame):
@@ -180,7 +192,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
         if path_end.startswith('saveghost?'):
             self.send_response(200)
             self.end_headers()
-            saveGhost(rec.player_id, path_end[10:])
+            saveGhost(path_end[10:])
             return
 
         SimpleHTTPRequestHandler.do_GET(self)
@@ -257,7 +269,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         global last_play
         global play_count
         global last_rt
-        global loading_ghosts
         global ghosts_loaded
         global ghosts_started
 
@@ -275,31 +286,30 @@ class UDPHandler(socketserver.BaseRequestHandler):
             seqno = 1
             last_rt = 0
             play_count = 0
-            loading_ghosts = False
             ghosts_loaded = False
             ghosts_started = False
+            organizeGhosts('%s/%s/ghosts' % (STORAGE_DIR, recv.player_id))
+            rec.player_id = recv.player_id
 
         t = int(time.time())
 
         if enable_ghosts:
-            if recv.state.roadTime:
-                if not last_rt and not loading_ghosts:
-                    loading_ghosts = True
-                    load = threading.Thread(target=loadGhosts, args=(recv.player_id, recv.state))
-                    load.start()
-                    rec.player_id = recv.player_id
-                if last_rt and recv.state.roadTime != last_rt:
-                    if t >= last_rec + update_freq:
-                        state = rec.states.add()
-                        state.CopyFrom(recv.state)
-                        last_rec = t
-                    if not ghosts_started and ghosts_loaded and play.ghosts and roadID(recv.state) == start_road:
-                        if isForward(recv.state):
-                            if recv.state.roadTime >= start_rt >= last_rt:
-                                ghosts_started = True
-                        else:
-                            if recv.state.roadTime <= start_rt <= last_rt:
-                                ghosts_started = True
+            if not ghosts_loaded and course(recv.state):
+                ghosts_loaded = True
+                load = threading.Thread(target=loadGhosts, args=(recv.player_id, recv.state))
+                load.start()
+            if recv.state.roadTime and recv.state.roadTime != last_rt:
+                if t >= last_rec + update_freq:
+                    state = rec.states.add()
+                    state.CopyFrom(recv.state)
+                    last_rec = t
+                if not ghosts_started and play.ghosts and roadID(recv.state) == start_road:
+                    if isForward(recv.state):
+                        if recv.state.roadTime >= start_rt >= last_rt:
+                            ghosts_started = True
+                    else:
+                        if recv.state.roadTime <= start_rt <= last_rt:
+                            ghosts_started = True
             last_rt = recv.state.roadTime
 
         if ghosts_started and t >= last_play + update_freq:
