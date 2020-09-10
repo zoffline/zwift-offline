@@ -288,16 +288,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
             play_count = 0
             ghosts_loaded = False
             ghosts_started = False
-            organizeGhosts('%s/%s/ghosts' % (STORAGE_DIR, recv.player_id))
             rec.player_id = recv.player_id
+            organizeGhosts('%s/%s/ghosts' % (STORAGE_DIR, recv.player_id))
 
         t = int(time.time())
 
         if enable_ghosts:
             if not ghosts_loaded and course(recv.state):
                 ghosts_loaded = True
-                load = threading.Thread(target=loadGhosts, args=(recv.player_id, recv.state))
-                load.start()
+                loadGhosts(recv.player_id, recv.state)
             if recv.state.roadTime and recv.state.roadTime != last_rt:
                 if t >= last_rec + update_freq:
                     state = rec.states.add()
