@@ -212,6 +212,7 @@ To obtain your current profile:
 
 * Create a file called "enable_ghosts.txt" inside zoffline's storage directory.
 * If you want the ghosts to spawn in the start line, copy the file [start_lines.csv](https://github.com/zoffline/zwift-offline/blob/master/start_lines.csv) to the storage directory.
+  * Move up "Road to Sky" and "Ven-Top" start lines to enable them.
 
 
 ## Dependencies
