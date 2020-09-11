@@ -79,6 +79,7 @@ def saveGhost(name):
 def organizeGhosts(folder):
     # organize ghosts in course/roadID directory structure
     # previously they were saved directly in player_id/ghosts
+    if not os.path.isdir(folder): return
     for f in os.listdir(folder):
         if f.endswith('.bin'):
             file = os.path.join(folder, f)
