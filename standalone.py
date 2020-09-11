@@ -76,9 +76,10 @@ def saveGhost(name):
     with open(f, 'wb') as fd:
         fd.write(rec.SerializeToString())
 
-def organizeGhosts(folder):
+def organizeGhosts(player_id):
     # organize ghosts in course/roadID directory structure
     # previously they were saved directly in player_id/ghosts
+    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
     if not os.path.isdir(folder): return
     for f in os.listdir(folder):
         if f.endswith('.bin'):
@@ -289,7 +290,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts_loaded = False
             ghosts_started = False
             rec.player_id = recv.player_id
-            organizeGhosts('%s/%s/ghosts' % (STORAGE_DIR, recv.player_id))
+            organizeGhosts(recv.player_id)
 
         t = int(time.time())
 
