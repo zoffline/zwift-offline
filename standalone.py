@@ -297,7 +297,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             if not ghosts_loaded and course(recv.state):
                 ghosts_loaded = True
                 loadGhosts(recv.player_id, recv.state)
-            if recv.state.roadTime and recv.state.roadTime != last_rt:
+            if recv.state.roadTime and last_rt and recv.state.roadTime != last_rt:
                 if t >= last_rec + update_freq:
                     state = rec.states.add()
                     state.CopyFrom(recv.state)
