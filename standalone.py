@@ -99,7 +99,6 @@ def loadGhosts(player_id, state):
     global play
     global start_road
     global start_rt
-    if not player_id: return
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, course(state), roadID(state))
     if not isForward(state): folder += '/reverse'
     if not os.path.isdir(folder): return
