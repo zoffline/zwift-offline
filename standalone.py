@@ -40,7 +40,6 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
-ghosts_enabled = os.path.exists(ENABLEGHOSTS_FILE)
 rec = udp_node_msgs_pb2.Ghost()
 play = udp_node_msgs_pb2.Ghosts()
 seqno = 1
@@ -48,6 +47,7 @@ last_rec = 0
 last_play = 0
 play_count = 0
 last_rt = 0
+ghosts_enabled = False
 ghosts_loaded = False
 ghosts_started = False
 start_road = 0
