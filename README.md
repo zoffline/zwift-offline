@@ -213,8 +213,8 @@ To obtain your current profile:
 * Create a file called "enable_ghosts.txt" inside zoffline's storage directory
 * When you save an activity the ghost will be saved in ``storage/<player_id>/ghosts/<course>/<road>``
   * Files from previous version will be organized in subdirectories.
-* If you want the ghosts to spawn in the start line, copy the file [start_lines.csv](https://github.com/zoffline/zwift-offline/blob/master/start_lines.csv) to the storage directory.
-  * Move up "Road to Sky" and "Ven-Top" start lines to enable them.
+* Next time you ride the same route, the ghost will be loaded.
+* Edit the file start_lines.csv to enable optional start lines ("Jungle Circuit", "Road to Sky" and "Ven-Top").
 
 
 ## Dependencies
