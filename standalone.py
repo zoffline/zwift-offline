@@ -40,7 +40,6 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
-enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
 rec = udp_node_msgs_pb2.Ghost()
 play = udp_node_msgs_pb2.Ghosts()
 seqno = 1
@@ -298,7 +297,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         t = int(time.time())
 
-        if enable_ghosts:
+        if os.path.exists(ENABLEGHOSTS_FILE):
             if not ghosts_loaded and course(recv.state):
                 ghosts_loaded = True
                 loadGhosts(recv.player_id, recv.state)
