@@ -24,7 +24,10 @@
         <option value="RICHMOND">Richmond</option>
         <option value="WATOPIA">Watopia</option>
         <option value="YORKSHIRE">Yorkshire</option>
-    </select></td></tr>
+    </select></td>
+    <td><input type="checkbox" name="ghosts" {% if ghosts %} checked {% endif %}>
+    <label for="ghosts">Enable ghosts</label>
+    <p>To change the start line for some routes edit the file "start_lines.csv"</p></td></tr>
     <tr><td><button type="submit">Start Zwift</button></td></tr>
     </table>
 </form>

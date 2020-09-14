@@ -208,15 +208,6 @@ To obtain your current profile:
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
 
 
-### Step 6 [OPTIONAL]: Enable ghosts
-
-* Create a file called "enable_ghosts.txt" inside zoffline's storage directory
-* When you save an activity the ghost will be saved in ``storage/<player_id>/ghosts/<course>/<road>``
-  * Files from previous version will be organized in subdirectories.
-* Next time you ride the same route, the ghost will be loaded.
-* Edit the file start_lines.csv to enable optional start lines ("Jungle Circuit", "Road to Sky" and "Ven-Top").
-
-
 ## Dependencies
 
 Docker
