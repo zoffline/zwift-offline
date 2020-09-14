@@ -8,6 +8,7 @@ import threading
 import time
 import csv
 from datetime import datetime
+from shutil import copyfile
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
@@ -25,10 +26,14 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     CDN_DIR = "%s/cdn" % sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
+    START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
+    if not os.path.isfile(START_LINES_FILE):
+        copyfile('%s/start_lines.csv' % sys._MEIPASS, START_LINES_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     CDN_DIR = "%s/cdn" % SCRIPT_DIR
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
+    START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -112,9 +117,8 @@ def loadGhosts(player_id, state):
                 s.append(g.states[0].roadTime)
     start_road = roadID(state)
     start_rt = 0
-    sl_file = '%s/start_lines.csv' % STORAGE_DIR
-    if os.path.isfile(sl_file):
-        with open(sl_file, 'r') as fd:
+    if os.path.isfile(START_LINES_FILE):
+        with open(START_LINES_FILE, 'r') as fd:
             sl = [tuple(line) for line in csv.reader(fd)]
             rt = [t for t in sl if t[0] == str(course(state)) and t[1] == str(roadID(state)) and (boolean(t[2]) == isForward(state) or not t[2])]
             if rt:
