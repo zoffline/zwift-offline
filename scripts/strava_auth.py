@@ -95,7 +95,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             self.send_response(302)
             self.send_header(six.b("Content-type"), six.b("text/plain"))
-            self.send_header(six.b('Location'), six.b(url))
+            self.send_header('Location', url)
             self.end_headers()
             self.wfile.write(six.b("Redirect to URL: {}\n".format(url)))
 
