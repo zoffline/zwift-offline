@@ -4,6 +4,10 @@ zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a par
 of a Zwift server. Currently it's designed for only a single user at a time and the UDP
 game node is minimally implemented.
 
+zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
+
+Additionally, zoffline's launcher allows selecting a specific map to ride on without mucking about with config files.
+
 ## Install
 
 Setting up zoffline requires two primary steps. First, zoffline must be installed and run on a system before running Zwift (either on the system running Zwift or on another locally networked system).  Second, Zwift must be configured to use zoffline instead of the official Zwift server.
