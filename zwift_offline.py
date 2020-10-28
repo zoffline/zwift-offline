@@ -179,10 +179,6 @@ def api_users_login():
 
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
-    # update profiles list in case new user was created
-    # FIXME: Updates are not reflected when using an apache
-    #        based set up. Should just deprecate apache.
-    list_profiles()
     return '', 204
 
 
@@ -811,7 +807,6 @@ def init_database():
 @app.before_first_request
 def before_first_request():
     move_old_profile()
-    list_profiles()
     init_database()
 
 
@@ -839,6 +834,7 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
+        list_profiles()
         return render_template("embed-noauto.html", profiles=profiles)
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
