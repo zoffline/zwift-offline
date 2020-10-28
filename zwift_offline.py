@@ -839,7 +839,7 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return render_template("embed-noauto.html", profiles=profiles, ghosts=os.path.exists(ENABLEGHOSTS_FILE))
+        return render_template("embed-noauto.html", profiles=profiles)
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
@@ -862,12 +862,6 @@ def auth_realms_zwift_protocol_openid_connect_token():
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
     C["profile"] = request.form['id']
-    if request.form.get('ghosts'):
-        if not os.path.exists(ENABLEGHOSTS_FILE):
-            f = open(ENABLEGHOSTS_FILE, 'w')
-            f.close()
-    elif os.path.exists(ENABLEGHOSTS_FILE):
-        os.remove(ENABLEGHOSTS_FILE)
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
