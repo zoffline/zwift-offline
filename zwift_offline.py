@@ -89,7 +89,6 @@ type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 
 
-profiles = list()
 C = cookies.SimpleCookie()
 
 
@@ -736,9 +735,8 @@ def move_old_profile():
             os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
 
 
-def list_profiles():
-    global profiles
-    del profiles[:]
+def profiles_list():
+    profiles = list()
     for (root, dirs, files) in os.walk(STORAGE_DIR):
         dirs.sort()
         for profile_id in dirs:
@@ -759,6 +757,7 @@ def list_profiles():
         profile.id = 1000
     profile.first_name = 'New profile'
     profiles.append(profile)
+    return profiles
 
 
 def init_database():
@@ -834,8 +833,7 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        list_profiles()
-        return render_template("embed-noauto.html", profiles=profiles)
+        return render_template("embed-noauto.html", profiles=profiles_list())
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
