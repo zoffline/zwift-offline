@@ -24,6 +24,7 @@ else:
 from flask import Flask, request, jsonify, g, redirect, render_template
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
+from http import cookies
 
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
@@ -89,7 +90,7 @@ type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 
 
 profiles = list()
-selected_profile = 1000
+C = cookies.SimpleCookie()
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -233,7 +234,8 @@ def api_telemetry_config():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
-    profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
+    profile_id = int(C["profile"].value)
+    profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -243,7 +245,7 @@ def api_profiles_me():
     profile = profile_pb2.Profile()
     profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
-        profile.id = selected_profile
+        profile.id = profile_id
         profile.is_connected_to_strava = True
         profile.email = 'user@email.com'
         # At least Win Zwift client no longer asks for a name
@@ -253,14 +255,14 @@ def api_profiles_me():
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
         # ensure profile.id = directory (in case directory is renamed)
-        if profile.id != selected_profile:
+        if profile.id != profile_id:
             logger.warn('player_id is different from profile directory, updating database...')
             cur = g.db.cursor()
-            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
+            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
             g.db.commit()
-            profile.id = selected_profile
+            profile.id = profile_id
         if not profile.email:
             profile.email = 'user@email.com'
         # clear f60 to remove free trial limit
@@ -302,26 +304,35 @@ def api_profiles_activities(player_id):
     return activities.SerializeToString(), 200
 
 
-# For ghosts
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
     args = request.args.getlist('id')
-    profile = profile_pb2.Profile()
-    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, selected_profile)
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile.ParseFromString(fd.read())
     profiles = profile_pb2.Profiles()
     for i in args:
-        p = profiles.profiles.add()
-        p.CopyFrom(profile)
-        p.id = int(i)
-        p.first_name = 'zoffline'
-        p.last_name = 'ghost %s' % i
-        p.f20 = 3761002195 # basic 4 jersey
-        p.f24 = 1456463855 # tron bike
-        p.f27 = 125 # blue
-        p.country_code = 0
+        if int(i) < 1000:
+            # For ghosts
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, C["profile"].value)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+            p = profiles.profiles.add()
+            p.CopyFrom(profile)
+            p.id = int(i)
+            p.first_name = 'zoffline'
+            p.last_name = 'ghost %s' % i
+            p.f20 = 3761002195 # basic 4 jersey
+            p.f24 = 1456463855 # tron bike
+            p.f27 = 125 # blue
+            p.country_code = 0
+        else:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+            p = profiles.profiles.add()
+            p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
 
@@ -731,7 +742,6 @@ def move_old_profile():
 
 def list_profiles():
     global profiles
-    global selected_profile
     del profiles[:]
     for (root, dirs, files) in os.walk(STORAGE_DIR):
         dirs.sort()
@@ -748,7 +758,7 @@ def list_profiles():
     if profiles:
         profile.id = profiles[-1].id + 1
         # select first profile for auto launch
-        selected_profile = profiles[0].id
+        C["profile"] = profiles[0].id
     else:
         profile.id = 1000
     profile.first_name = 'New profile'
@@ -837,7 +847,6 @@ def launch_zwift():
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
     # select profile on Android
-    global selected_profile
     profile_id = None
     username = request.form.get('username')
     if username:
@@ -846,14 +855,13 @@ def auth_realms_zwift_protocol_openid_connect_token():
         except ValueError:
             pass
         if profile_id:
-            selected_profile = profile_id
+            C["profile"] = profile_id
     return FAKE_JWT, 200
 
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
-    global selected_profile
-    selected_profile = int(request.form['id'])
+    C["profile"] = request.form['id']
     if request.form.get('ghosts'):
         if not os.path.exists(ENABLEGHOSTS_FILE):
             f = open(ENABLEGHOSTS_FILE, 'w')
