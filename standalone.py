@@ -372,7 +372,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
             message.player_id = recv.player_id
-            message.world_time = zwift_offline.world_time()
             message.f5 = 1
             message.f11 = 1
             msgnum = 1
@@ -387,7 +386,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) < 10:
                         state = message.states.add()
                         state.CopyFrom(player)
+                        state.worldTime = zwift_offline.world_time()
                     else:
+                        message.world_time = zwift_offline.world_time()
                         message.seqno = seqno
                         message.msgnum = msgnum
                         socket.sendto(message.SerializeToString(), self.client_address)
@@ -396,6 +397,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(player)
+                        state.worldTime = zwift_offline.world_time()
+            message.world_time = zwift_offline.world_time()
             message.seqno = seqno
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
