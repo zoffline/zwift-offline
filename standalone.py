@@ -40,6 +40,7 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
+ghosts_enabled = os.path.exists(ENABLEGHOSTS_FILE)
 rec = udp_node_msgs_pb2.Ghost()
 play = udp_node_msgs_pb2.Ghosts()
 seqno = 1
@@ -47,7 +48,6 @@ last_rec = 0
 last_play = 0
 play_count = 0
 last_rt = 0
-ghosts_enabled = False
 ghosts_loaded = False
 ghosts_started = False
 start_road = 0
@@ -275,7 +275,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         global last_play
         global play_count
         global last_rt
-        global ghosts_enabled
         global ghosts_loaded
         global ghosts_started
         global online
@@ -294,7 +293,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
             seqno = 1
             last_rt = 0
             play_count = 0
-            ghosts_enabled = os.path.exists(ENABLEGHOSTS_FILE)
             ghosts_loaded = False
             ghosts_started = False
             rec.player_id = recv.player_id
