@@ -53,6 +53,7 @@ ghosts_started = False
 start_road = 0
 start_rt = 0
 update_freq = 3
+online = list()
 
 def roadID(state):
     return (state.f20 & 0xff00) >> 8
@@ -277,6 +278,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         global ghosts_enabled
         global ghosts_loaded
         global ghosts_started
+        global online
 
         data = self.request[0]
         socket = self.request[1]
@@ -317,6 +319,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         if recv.state.roadTime <= start_rt <= last_rt:
                             ghosts_started = True
             last_rt = recv.state.roadTime
+        else:
+            for player in online:
+                if player.id == recv.player_id:
+                    online.remove(player)
+            if recv.state.roadTime:
+                online.append(recv.state)
 
         if ghosts_started and t >= last_play + update_freq:
             message = udp_node_msgs_pb2.ServerToClient()
@@ -365,11 +373,31 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.f1 = 1
             message.player_id = recv.player_id
             message.world_time = zwift_offline.world_time()
-            message.seqno = seqno
             message.f5 = 1
             message.f11 = 1
-            message.num_msgs = 1
-            message.msgnum = 1
+            msgnum = 1
+            players = len(online)
+            for player in online:
+                if player.id == recv.player_id:
+                    players -= 1
+            message.num_msgs = players // 10
+            if players % 10: message.num_msgs += 1
+            for player in online:
+                if player.id != recv.player_id:
+                    if len(message.states) < 10:
+                        state = message.states.add()
+                        state.CopyFrom(player)
+                    else:
+                        message.seqno = seqno
+                        message.msgnum = msgnum
+                        socket.sendto(message.SerializeToString(), self.client_address)
+                        seqno += 1
+                        msgnum += 1
+                        del message.states[:]
+                        state = message.states.add()
+                        state.CopyFrom(player)
+            message.seqno = seqno
+            message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
             seqno += 1
 
