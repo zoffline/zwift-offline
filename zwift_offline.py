@@ -21,10 +21,12 @@ if sys.version_info[0] > 2:
 else:
     from urllib2 import quote, urlopen
 
-from flask import Flask, request, jsonify, g, redirect, render_template
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from http import cookies
+from flask_sqlalchemy import sqlalchemy, SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
@@ -75,9 +77,108 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
+AUTH_PATH = "%s/auth.db" % STORAGE_DIR
+C = cookies.SimpleCookie()
 
 # Android uses https for cdn
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=AUTH_PATH)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'zoffline'
+
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    uid = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    pass_hash = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return '' % self.username
+
+
+@app.route("/signup/", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        if not (username and password and first_name and last_name):
+            flash("All fields are required.")
+            return redirect(url_for('signup'))
+        else:
+            username = username.strip()
+            password = password.strip()
+            first_name = first_name.strip()
+            last_name = last_name.strip()
+
+        hashed_pwd = generate_password_hash(password, 'sha256')
+
+        new_user = User(username=username, pass_hash=hashed_pwd, first_name=first_name, last_name=last_name)
+        db.session.add(new_user)
+
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            flash("Username {u} is not available.".format(u=username))
+            return redirect(url_for('signup'))
+
+        flash("User account has been created.")
+        return redirect(url_for("login"))
+
+    return render_template("signup.html")
+
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+
+        if not (username and password):
+            flash("Username and password cannot be empty.")
+            return redirect(url_for('login'))
+        else:
+            username = username.strip()
+            password = password.strip()
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.pass_hash, password):
+            session[username] = True
+            return redirect(url_for("user_home", username=username))
+        else:
+            flash("Invalid username or password.")
+
+    return render_template("login_form.html")
+
+
+@app.route("/user/<username>/")
+def user_home(username):
+    if not session.get(username):
+        abort(401)
+
+    user = User.query.filter_by(username=username).first()
+
+    if user:
+        C["profile"] = user.uid + 1000
+        C["username"] = user.username
+        C["first_name"] = user.first_name
+        C["last_name"] = user.last_name
+
+    return render_template("user_home.html", username=username)
+
+
+@app.route("/logout/<username>")
+def logout(username):
+    session.pop(username, None)
+    flash("Successfully logged out.")
+    return redirect(url_for('login'))
 
 
 ####
@@ -87,9 +188,6 @@ type_callable_map = copy(TYPE_CALLABLE_MAP)
 type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
-
-
-C = cookies.SimpleCookie()
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -242,10 +340,9 @@ def api_profiles_me():
     if not os.path.isfile(profile_file):
         profile.id = profile_id
         profile.is_connected_to_strava = True
-        profile.email = 'user@email.com'
-        # At least Win Zwift client no longer asks for a name
-        profile.first_name = "zoffline"
-        profile.last_name = "user"
+        profile.email = C["username"].value
+        profile.first_name = C["first_name"].value
+        profile.last_name = C["last_name"].value
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -713,53 +810,6 @@ def teardown_request(exception):
         g.db.close()
 
 
-def move_old_profile():
-    # Before multi profile support only a single profile located in storage
-    # named profile.bin existed. If upgrading from this, convert to
-    # multi profile file structure.
-    profile_file = '%s/profile.bin' % STORAGE_DIR
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile = profile_pb2.Profile()
-            profile.ParseFromString(fd.read())
-            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
-            try:
-                if not os.path.isdir(profile_dir):
-                    os.makedirs(profile_dir)
-            except IOError as e:
-                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-                sys.exit(1)
-        os.rename(profile_file, '%s/profile.bin' % profile_dir)
-        strava_file = '%s/strava_token.txt' % STORAGE_DIR
-        if os.path.isfile(strava_file):
-            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
-
-
-def profiles_list():
-    profiles = list()
-    for (root, dirs, files) in os.walk(STORAGE_DIR):
-        dirs.sort()
-        for profile_id in dirs:
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
-            if os.path.isfile(profile_file):
-                with open(profile_file, 'rb') as fd:
-                    profile.ParseFromString(fd.read())
-                    # ensure profile.id = directory (in case directory is renamed)
-                    profile.id = int(profile_id)
-                    profiles.append(profile)
-    profile = profile_pb2.Profile()
-    if profiles:
-        profile.id = profiles[-1].id + 1
-        # select first profile for auto launch
-        C["profile"] = profiles[0].id
-    else:
-        profile.id = 1000
-    profile.first_name = 'New profile'
-    profiles.append(profile)
-    return profiles
-
-
 def init_database():
     conn = connect_db()
     cur = conn.cursor()
@@ -805,8 +855,8 @@ def init_database():
 
 @app.before_first_request
 def before_first_request():
-    move_old_profile()
     init_database()
+    db.create_all()
 
 
 ####################
@@ -833,7 +883,7 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return render_template("embed-noauto.html", profiles=profiles_list())
+        return render_template("login_form.html")
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
@@ -855,7 +905,6 @@ def auth_realms_zwift_protocol_openid_connect_token():
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
-    C["profile"] = request.form['id']
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
