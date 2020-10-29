@@ -890,16 +890,18 @@ def launch_zwift():
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
-    # select profile on Android
-    profile_id = None
+    # Android client login
     username = request.form.get('username')
+    password = request.form.get('password')
+
     if username:
-        try:
-            profile_id = int(username)
-        except ValueError:
-            pass
-        if profile_id:
-            C["profile"] = profile_id
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.pass_hash, password):
+            C["profile"] = user.uid + 1000
+        else:
+            return '', 401
+
     return FAKE_JWT, 200
 
 
