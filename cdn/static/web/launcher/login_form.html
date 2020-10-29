@@ -1,0 +1,27 @@
+<!doctype html5>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <form id="login" action="{{ url_for('login')}}" method="post">
+    <table border=0 cellpadding=5>
+      <tr><td>Username:</td><td><input type="text" id="username" name="username" /></td></tr>
+      <tr><td>Password:</td><td><input type="password" id="password" name="password" /></td></tr>
+      <tr><td><button type="submit">Login</button></td></tr>
+	</table>
+  </form>
+  <br/>
+  <a href="/signup">Sign up</a>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+</body>
+</html>
