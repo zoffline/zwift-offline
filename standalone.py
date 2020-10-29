@@ -287,7 +287,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         except:
             return
 
-        if recv.seqno == 1:
+        if recv.seqno == 1 and recv.player_id == 1001:
             del rec.states[:]
             del play.ghosts[:]
             seqno = 1
@@ -300,7 +300,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         t = int(time.time())
 
-        if ghosts_enabled:
+        if ghosts_enabled and recv.player_id == 1001:
             if not ghosts_loaded and course(recv.state):
                 ghosts_loaded = True
                 loadGhosts(recv.player_id, recv.state)
@@ -317,12 +317,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         if recv.state.roadTime <= start_rt <= last_rt:
                             ghosts_started = True
             last_rt = recv.state.roadTime
-        else:
-            for player in online:
-                if player.id == recv.player_id:
-                    online.remove(player)
-            if recv.state.roadTime:
-                online.append(recv.state)
+
+        for player in online:
+            if player.id == recv.player_id:
+                online.remove(player)
+            if zwift_offline.world_time() > player.worldTime + 10000:
+                online.remove(player)
+        if recv.state.roadTime:
+            online.append(recv.state)
 
         if ghosts_started and t >= last_play + update_freq:
             message = udp_node_msgs_pb2.ServerToClient()
@@ -384,7 +386,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) < 10:
                         state = message.states.add()
                         state.CopyFrom(player)
-                        state.worldTime = zwift_offline.world_time()
                     else:
                         message.world_time = zwift_offline.world_time()
                         message.seqno = seqno
@@ -395,7 +396,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(player)
-                        state.worldTime = zwift_offline.world_time()
             message.world_time = zwift_offline.world_time()
             message.seqno = seqno
             message.msgnum = msgnum
