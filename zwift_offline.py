@@ -151,6 +151,10 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
+            C["profile"] = user.uid + 1000
+            C["username"] = user.username
+            C["first_name"] = user.first_name
+            C["last_name"] = user.last_name
             return redirect(url_for("user_home", username=username))
         else:
             flash("Invalid username or password.")
@@ -162,14 +166,6 @@ def login():
 def user_home(username):
     if not session.get(username):
         abort(401)
-
-    user = User.query.filter_by(username=username).first()
-
-    if user:
-        C["profile"] = user.uid + 1000
-        C["username"] = user.username
-        C["first_name"] = user.first_name
-        C["last_name"] = user.last_name
 
     return render_template("user_home.html", username=username)
 
