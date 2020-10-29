@@ -70,7 +70,7 @@ def boolean(s):
     return None
 
 def saveGhost(name):
-    if not rec.player_id: return
+    if not rec.player_id == 1001: return
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, rec.player_id, course(rec.states[0]), roadID(rec.states[0]))
     if not isForward(rec.states[0]): folder += '/reverse'
     try:
