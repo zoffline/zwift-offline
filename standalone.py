@@ -41,15 +41,15 @@ MAP_OVERRIDE = None
 
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 ghosts_enabled = os.path.exists(ENABLEGHOSTS_FILE)
+ghosts_owner = 1001
+ghosts_loaded = False
+ghosts_started = False
 rec = udp_node_msgs_pb2.Ghost()
 play = udp_node_msgs_pb2.Ghosts()
-seqno = 1
 last_rec = 0
 last_play = 0
 play_count = 0
 last_rt = 0
-ghosts_loaded = False
-ghosts_started = False
 start_road = 0
 start_rt = 0
 update_freq = 3
@@ -70,7 +70,7 @@ def boolean(s):
     return None
 
 def saveGhost(name):
-    if not rec.player_id == 1001: return
+    if not rec.player_id == ghosts_owner: return
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, rec.player_id, course(rec.states[0]), roadID(rec.states[0]))
     if not isForward(rec.states[0]): folder += '/reverse'
     try:
@@ -268,7 +268,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        global seqno
         global rec
         global play
         global last_rec
@@ -287,10 +286,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         except:
             return
 
-        if recv.seqno == 1 and recv.player_id == 1001:
+        if recv.seqno == 1 and recv.player_id == ghosts_owner:
             del rec.states[:]
             del play.ghosts[:]
-            seqno = 1
             last_rt = 0
             play_count = 0
             ghosts_loaded = False
@@ -300,7 +298,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         t = int(time.time())
 
-        if ghosts_enabled and recv.player_id == 1001:
+        if ghosts_enabled and recv.player_id == ghosts_owner:
             if not ghosts_loaded and course(recv.state):
                 ghosts_loaded = True
                 loadGhosts(recv.player_id, recv.state)
@@ -330,6 +328,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
             message.player_id = recv.player_id
+            message.seqno = 1
             message.f5 = 1
             message.f11 = 1
             msgnum = 1
@@ -349,10 +348,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                             state.worldTime = zwift_offline.world_time()
                         else:
                             message.world_time = zwift_offline.world_time()
-                            message.seqno = seqno
                             message.msgnum = msgnum
                             socket.sendto(message.SerializeToString(), self.client_address)
-                            seqno += 1
                             msgnum += 1
                             del message.states[:]
                             state = message.states.add()
@@ -362,16 +359,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghost_id += 1
             else: message.num_msgs = 1
             message.world_time = zwift_offline.world_time()
-            message.seqno = seqno
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
-            seqno += 1
             play_count += 1
             last_play = t
         else:
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
             message.player_id = recv.player_id
+            message.seqno = 1
             message.f5 = 1
             message.f11 = 1
             msgnum = 1
@@ -388,19 +384,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         state.CopyFrom(player)
                     else:
                         message.world_time = zwift_offline.world_time()
-                        message.seqno = seqno
                         message.msgnum = msgnum
                         socket.sendto(message.SerializeToString(), self.client_address)
-                        seqno += 1
                         msgnum += 1
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(player)
             message.world_time = zwift_offline.world_time()
-            message.seqno = seqno
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), self.client_address)
-            seqno += 1
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
