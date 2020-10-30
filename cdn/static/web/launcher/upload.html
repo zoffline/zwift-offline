@@ -1,0 +1,15 @@
+<!doctype html5>
+<html>
+<head>
+  <title>zoffline Launcher</title>
+</head>
+<body>
+  <h1>zoffline Launcher</h1>
+  <h2>Logged in as {{ username }}</h2>
+  <p>Upload <strong>profile.bin</strong> or <strong>strava_token.txt</strong></p>
+  <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data">
+    <p><input type="file" name="file"</p>
+    <p><input type="submit" value="Submit"></p>
+  </form>
+</body>
+</html>
