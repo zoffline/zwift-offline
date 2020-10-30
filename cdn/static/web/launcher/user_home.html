@@ -1,9 +1,10 @@
 <!doctype html5>
 <html>
 <head>
-  <title>{{ username }} - Home</title>
+  <title>zoffline Launcher</title>
 </head>
 <body>
+  <h1>zoffline Launcher</h1>
   <h2>Logged in as {{ username }}</h2>
   <p><a href="{{ url_for('logout', username=username) }}">Logout</a></p>
   <form method="POST" action="/start-zwift">
