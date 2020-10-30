@@ -111,11 +111,6 @@ def signup():
         if not (username and password and first_name and last_name):
             flash("All fields are required.")
             return redirect(url_for('signup'))
-        else:
-            username = username.strip()
-            password = password.strip()
-            first_name = first_name.strip()
-            last_name = last_name.strip()
 
         hashed_pwd = generate_password_hash(password, 'sha256')
 
@@ -143,9 +138,6 @@ def login():
         if not (username and password):
             flash("Username and password cannot be empty.")
             return redirect(url_for('login'))
-        else:
-            username = username.strip()
-            password = password.strip()
 
         user = User.query.filter_by(username=username).first()
 
