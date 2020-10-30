@@ -85,6 +85,7 @@ app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=AUTH_PATH)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'zoffline'
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 
@@ -160,6 +161,23 @@ def user_home(username):
         abort(401)
 
     return render_template("user_home.html", username=username)
+
+
+@app.route("/upload/<username>/", methods=["GET", "POST"])
+def upload(username):
+    if not session.get(username):
+        abort(401)
+
+    if request.method == 'POST':
+        uploaded_file = request.files['file']
+        if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
+            uploaded_file.save(os.path.join(STORAGE_DIR, C["profile"].value, uploaded_file.filename))
+            flash("File %s uploaded." % uploaded_file.filename)
+        else:
+            flash("Invalid file name.")
+        return render_template("user_home.html", username=username)
+
+    return render_template("upload.html", username=username)
 
 
 @app.route("/logout/<username>")
