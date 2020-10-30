@@ -6,7 +6,8 @@
 <body>
   <h1>zoffline Launcher</h1>
   <h2>Logged in as {{ username }}</h2>
-  <p><a href="{{ url_for('logout', username=username) }}">Logout</a></p>
+  <p><a href="{{ url_for('upload', username=username) }}">Upload</a> | 
+    <a href="{{ url_for('logout', username=username) }}">Logout</a></p>
   <form method="POST" action="/start-zwift">
     <table border=0 cellpadding=15>
       <tr><td>Select map (optional):</td>
@@ -24,5 +25,14 @@
       <tr><td><button type="submit">Start Zwift</button></td></tr>
     </table>
   </form>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 </body>
 </html>
