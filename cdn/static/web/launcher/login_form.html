@@ -11,10 +11,9 @@
       <tr><td>Username:</td><td><input type="text" id="username" name="username" /></td></tr>
       <tr><td>Password:</td><td><input type="password" id="password" name="password" /></td></tr>
       <tr><td><button type="submit">Login</button></td></tr>
-	</table>
+    </table>
   </form>
-  <br/>
-  <a href="/signup">Sign up</a>
+  <p><a href="/signup">Sign up</a></p>
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <ul>
