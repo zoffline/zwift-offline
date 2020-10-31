@@ -14,11 +14,20 @@ a, a:visited { color: blue; }
     <tr><td>profile.bin</td><td>{{ profile }}</td></tr>
     <tr><td>strava_token.txt</td><td>{{ token }}</td></tr>
   </table>
-  <p>Upload file</p>
+  <h3>Upload file</h3>
   <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data">
     <p><input type="file" name="file"></p>
     <p><input type="submit" value="Submit"></p>
   </form>
   <p><a href="{{ url_for('user_home', username=username) }}">Back</a></p>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 </body>
 </html>
