@@ -9,15 +9,16 @@ a, a:visited { color: blue; }
 <body>
   <h1>zoffline Launcher</h1>
   <h2>Sign up</h2>
-  <form id="signup" action="{{ url_for('signup')}}" method="post">
+  <form id="signup" action="{{ url_for('signup') }}" method="post">
     <table border=0 cellpadding=5>
-      <tr><td>Username:</td><td><input type="text" id="username" name="username" /></td></tr>
-      <tr><td>First name:</td><td><input type="text" id="first_name" name="first_name" /></td></tr>
-      <tr><td>Last name:</td><td><input type="text" id="last_name" name="last_name" /></td></tr>
-      <tr><td>Password:</td><td><input type="password" id="password" name="password" /></td></tr>
-      <tr><td><button type="submit">Sign up</button></td></tr>
+      <tr><td>Username:</td><td><input type="text" id="username" name="username"></td></tr>
+      <tr><td>Password:</td><td><input type="password" id="password" name="password"></td></tr>
+      <tr><td>First name:</td><td><input type="text" id="first_name" name="first_name"></td></tr>
+      <tr><td>Last name:</td><td><input type="text" id="last_name" name="last_name"></td></tr>
+      <tr><td><input type="submit" value="Submit"></td></tr>
 	</table>
   </form>
+  <p><a href="{{ url_for('login') }}">Back</a></p>
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <ul>
