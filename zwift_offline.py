@@ -169,6 +169,9 @@ def upload(username):
         abort(401)
 
     profile_path = os.path.join(STORAGE_DIR, C["profile"].value)
+    if not os.path.isdir(profile_path):
+        os.makedirs(profile_path)
+
     if request.method == 'POST':
         uploaded_file = request.files['file']
         if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
@@ -178,6 +181,7 @@ def upload(username):
             flash("Invalid file name.")
         return render_template("user_home.html", username=username)
 
+    name = ''
     profile = None
     profile_file = os.path.join(profile_path, 'profile.bin')
     if os.path.isfile(profile_file):
