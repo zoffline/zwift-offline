@@ -210,7 +210,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         try:
             hello.ParseFromString(self.data[3:-4])
         except:
-            return
+            pass
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
@@ -284,7 +284,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         try:
             recv.ParseFromString(data[:-4])
         except:
-            return
+            pass
 
         if recv.seqno == 1 and recv.player_id == ghosts_owner:
             del rec.states[:]
