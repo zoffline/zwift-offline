@@ -183,13 +183,17 @@ def upload(username):
     if os.path.isfile(profile_file):
         stat = os.stat(profile_file)
         profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+        with open(profile_file, 'rb') as fd:
+            p = profile_pb2.Profile()
+            p.ParseFromString(fd.read())
+            name = "%s %s" % (p.first_name, p.last_name)
     token = None
     token_file = os.path.join(profile_path, 'strava_token.txt')
     if os.path.isfile(token_file):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
-    return render_template("upload.html", username=username, profile=profile, token=token)
+    return render_template("upload.html", username=username, profile=profile, name=name, token=token)
 
 
 @app.route("/logout/<username>")
