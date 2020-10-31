@@ -6,8 +6,10 @@
 <body>
   <h1>zoffline Launcher</h1>
   <h2>Logged in as {{ username }}</h2>
-  <p><a href="{{ url_for('upload', username=username) }}">Upload</a> | 
-    <a href="{{ url_for('logout', username=username) }}">Logout</a></p>
+  <table border=0 cellpadding=5>
+    <tr><td><a href="{{ url_for('upload', username=username) }}">Upload</a></td>
+	<td><a href="{{ url_for('logout', username=username) }}">Logout</a></td></tr>
+  </table>
   <form method="POST" action="/start-zwift">
     <table border=0 cellpadding=15>
       <tr><td>Select map (optional):</td>
