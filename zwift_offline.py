@@ -168,16 +168,28 @@ def upload(username):
     if not session.get(username):
         abort(401)
 
+    profile_path = os.path.join(STORAGE_DIR, C["profile"].value)
     if request.method == 'POST':
         uploaded_file = request.files['file']
         if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
-            uploaded_file.save(os.path.join(STORAGE_DIR, C["profile"].value, uploaded_file.filename))
+            uploaded_file.save(os.path.join(profile_path, uploaded_file.filename))
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
         return render_template("user_home.html", username=username)
 
-    return render_template("upload.html", username=username)
+    profile = None
+    profile_file = os.path.join(profile_path, 'profile.bin')
+    if os.path.isfile(profile_file):
+        stat = os.stat(profile_file)
+        profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+    token = None
+    token_file = os.path.join(profile_path, 'strava_token.txt')
+    if os.path.isfile(token_file):
+        stat = os.stat(token_file)
+        token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+
+    return render_template("upload.html", username=username, profile=profile, token=token)
 
 
 @app.route("/logout/<username>")
@@ -515,7 +527,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     if os.path.exists(ENABLEGHOSTS_FILE):
-        urlopen("http://cdn.zwift.com/saveghost?%s" % quote(activity.name))
+        urlopen("http://localhost/saveghost?%s" % quote(activity.name))
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
