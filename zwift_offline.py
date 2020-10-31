@@ -183,7 +183,6 @@ def upload(username):
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
-        return render_template("user_home.html", username=username)
 
     name = ''
     profile = None
