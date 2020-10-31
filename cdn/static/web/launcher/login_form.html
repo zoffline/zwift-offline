@@ -8,15 +8,15 @@ a, a:visited { color: blue; }
 </head>
 <body>
   <h1>zoffline Launcher</h1>
+  <p><a href="/signup">Sign up</a></p>
   <h2>Login</h2>
-  <form id="login" action="{{ url_for('login')}}" method="post">
+  <form id="login" action="{{ url_for('login') }}" method="post">
     <table border=0 cellpadding=5>
-      <tr><td>Username:</td><td><input type="text" id="username" name="username" /></td></tr>
-      <tr><td>Password:</td><td><input type="password" id="password" name="password" /></td></tr>
-      <tr><td><button type="submit">Login</button></td></tr>
+      <tr><td>Username:</td><td><input type="text" id="username" name="username"></td></tr>
+      <tr><td>Password:</td><td><input type="password" id="password" name="password"></td></tr>
+      <tr><td><input type="submit" value="Submit"></td></tr>
     </table>
   </form>
-  <p><a href="/signup">Sign up</a></p>
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <ul>
