@@ -9,7 +9,6 @@ a, a:visited { color: blue; }
 <body>
   <h1>zoffline Launcher</h1>
   <h2>Logged in as {{ username }}</h2>
-  <p><a href="{{ url_for('user_home', username=username) }}">Back</a></p>
   <p>{{ name }}</p>
   <table border=0 cellpadding=5>
     <tr><td>profile.bin</td><td>{{ profile }}</td></tr>
@@ -20,5 +19,6 @@ a, a:visited { color: blue; }
     <p><input type="file" name="file"></p>
     <p><input type="submit" value="Submit"></p>
   </form>
+  <p><a href="{{ url_for('user_home', username=username) }}">Back</a></p>
 </body>
 </html>
