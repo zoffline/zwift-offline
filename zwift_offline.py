@@ -372,21 +372,12 @@ def api_profiles_me():
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
-        # ensure profile.id = directory (in case directory is renamed)
-        if profile.id != profile_id:
-            logger.warn('player_id is different from profile directory, updating database...')
-            cur = g.db.cursor()
-            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-            g.db.commit()
-            profile.id = profile_id
+        profile.id = profile_id
         if not profile.email:
             profile.email = 'user@email.com'
-        # clear f60 to remove free trial limit
         if profile.f60:
-           logger.warn('Profile contains bytes related to subscription/billing, removing...')
-           del profile.f60[:]
+            # remove free trial limit
+            del profile.f60[:]
         return profile.SerializeToString(), 200
 
 
