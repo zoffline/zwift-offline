@@ -168,14 +168,18 @@ def upload(username):
     if not session.get(username):
         abort(401)
 
-    profile_path = os.path.join(STORAGE_DIR, C["profile"].value)
-    if not os.path.isdir(profile_path):
-        os.makedirs(profile_path)
+    profile_dir = os.path.join(STORAGE_DIR, C["profile"].value)
+    try:
+        if not os.path.isdir(profile_dir):
+            os.makedirs(profile_dir)
+    except IOError as e:
+        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+        sys.exit(1)
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
         if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
-            uploaded_file.save(os.path.join(profile_path, uploaded_file.filename))
+            uploaded_file.save(os.path.join(profile_dir, uploaded_file.filename))
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
@@ -183,7 +187,7 @@ def upload(username):
 
     name = ''
     profile = None
-    profile_file = os.path.join(profile_path, 'profile.bin')
+    profile_file = os.path.join(profile_dir, 'profile.bin')
     if os.path.isfile(profile_file):
         stat = os.stat(profile_file)
         profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
@@ -192,7 +196,7 @@ def upload(username):
             p.ParseFromString(fd.read())
             name = "%s %s" % (p.first_name, p.last_name)
     token = None
-    token_file = os.path.join(profile_path, 'strava_token.txt')
+    token_file = os.path.join(profile_dir, 'strava_token.txt')
     if os.path.isfile(token_file):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
