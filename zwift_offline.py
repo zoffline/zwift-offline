@@ -145,10 +145,10 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
-            C["profile"] = user.uid + 1000
-            C["username"] = user.username
-            C["first_name"] = user.first_name
-            C["last_name"] = user.last_name
+            session["profile"] = user.uid + 1000
+            session["username"] = user.username
+            session["first_name"] = user.first_name
+            session["last_name"] = user.last_name
             return redirect(url_for("user_home", username=username))
         else:
             flash("Invalid username or password.")
@@ -169,7 +169,7 @@ def upload(username):
     if not session.get(username):
         abort(401)
 
-    profile_dir = os.path.join(STORAGE_DIR, C["profile"].value)
+    profile_dir = os.path.join(STORAGE_DIR, str(session["profile"]))
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -370,9 +370,9 @@ def api_profiles_me():
     if not os.path.isfile(profile_file):
         profile.id = profile_id
         profile.is_connected_to_strava = True
-        profile.email = C["username"].value
-        profile.first_name = C["first_name"].value
-        profile.last_name = C["last_name"].value
+        profile.email = session["username"]
+        profile.first_name = session["first_name"]
+        profile.last_name = session["last_name"]
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -425,7 +425,7 @@ def api_profiles():
         if int(i) < 1000:
             # For ghosts
             profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, C["profile"].value)
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(session["profile"]))
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
@@ -952,7 +952,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
-            C["profile"] = user.uid + 1000
+            session["profile"] = user.uid + 1000
         else:
             return '', 401
 
@@ -961,6 +961,8 @@ def auth_realms_zwift_protocol_openid_connect_token():
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
+    #Store current profile just before starting game, might be problems with many users and different connection-speeds / latency
+    C["profile"] = session["profile"]
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
