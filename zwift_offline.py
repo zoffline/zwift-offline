@@ -357,7 +357,9 @@ def api_telemetry_config():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
-    profile_id = int(C["profile"].value)
+    storedProfile = C[request.remote_addr + ":profile"].value
+    C.pop(request.remote_addr + ":profile")
+    profile_id = int(storedProfile)
     profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
         if not os.path.isdir(profile_dir):
@@ -962,7 +964,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
     #Store current profile just before starting game, might be problems with many users and different connection-speeds / latency
-    C["profile"] = session["profile"]
+    C[request.remote_addr + ":profile"] = session["profile"]
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
