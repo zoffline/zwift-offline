@@ -88,6 +88,7 @@ app.config['SECRET_KEY'] = 'zoffline'
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
+online = list()
 
 
 class User(db.Model):
@@ -672,20 +673,45 @@ def relay_worlds_generic(world_id=None):
             return jsonify([ world ])
     else:  # protobuf request
         worlds = world_pb2.Worlds()
-        world = worlds.worlds.add()
-        world.id = 1
-        world.name = 'Public Watopia'
-        world.f3 = 1
-        # Windows client crashes if playerCount is 0
-        world.f5 = 1  # playerCount
-        world.world_time = world_time()
-        world.real_time = int(time.time())
+        world = None
+        courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
+
+        for course in courses:
+            world = worlds.worlds.add()
+            world.id = 1
+            world.name = 'Public Watopia'
+            world.f3 = course
+            world.world_time = world_time()
+            world.real_time = int(time.time())
+            playersInRegion = 0
+            for player in online:
+                courseId = (player.f19 & 0xff0000) >> 16
+                if course == courseId and player.justWatching == 0:
+                    user = User.query.filter_by(uid=(player.id-1000)).first()
+                    onlinePlayer = world.player_states.add()
+                    onlinePlayer.id = player.id
+                    onlinePlayer.firstName = user.first_name
+                    onlinePlayer.lastName = user.last_name
+                    onlinePlayer.distance = player.distance
+                    onlinePlayer.time = player.time
+                    onlinePlayer.f6 = 840#0
+                    onlinePlayer.f8 = 0
+                    onlinePlayer.f9 = 0
+                    onlinePlayer.f10 = 0
+                    onlinePlayer.f11 = 0
+                    onlinePlayer.power = 250#player.power
+                    onlinePlayer.f13 = 2355
+                    onlinePlayer.x = player.x
+                    onlinePlayer.altitude = player.altitude
+                    onlinePlayer.y = player.y
+                    playersInRegion = playersInRegion + 1
+            world.f5 = playersInRegion
         if world_id:
             world.id = world_id
             return world.SerializeToString()
         else:
             return worlds.SerializeToString()
-
+            
 
 @app.route('/relay/worlds', methods=['GET'])
 @app.route('/relay/dropin', methods=['GET'])
@@ -701,6 +727,14 @@ def relay_worlds_id(world_id):
 @app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
 def relay_worlds_id_join(world_id):
     return '{"worldTime":%ld}' % world_time()
+
+
+@app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
+def relay_worlds_id_players_id(world_id, player_id):
+    for player in online:
+        if player.id == player_id:
+            return player.SerializeToString()
+    return None
 
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
@@ -944,7 +978,9 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
-def run_standalone():
+def run_standalone(passedOnline):
+    global online
+    online = passedOnline
     app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
             port=443,
             threaded=True,
@@ -953,4 +989,4 @@ def run_standalone():
 
 
 if __name__ == "__main__":
-    run_standalone()
+    run_standalone(list())
