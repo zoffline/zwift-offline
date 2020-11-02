@@ -10,6 +10,7 @@ import sqlite3
 import sys
 import tempfile
 import time
+import math
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
@@ -89,6 +90,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 online = list()
+saveGhost = None
 
 
 class User(db.Model):
@@ -359,6 +361,7 @@ def api_telemetry_config():
 def api_profiles_me():
     storedProfile = C[request.remote_addr + ":profile"].value
     C.pop(request.remote_addr + ":profile")
+    session["profile"] = storedProfile
     profile_id = int(storedProfile)
     profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
@@ -424,10 +427,12 @@ def api_profiles():
     args = request.args.getlist('id')
     profiles = profile_pb2.Profiles()
     for i in args:
-        if int(i) < 1000:
+        if int(i) > 10000000:
             # For ghosts
+            ghostId = math.floor(int(i) / 10000000)
+            player_id = int(i) - ghostId * 10000000
             profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(session["profile"]))
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(player_id))
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
@@ -435,7 +440,7 @@ def api_profiles():
             p.CopyFrom(profile)
             p.id = int(i)
             p.first_name = 'zoffline'
-            p.last_name = 'ghost %s' % i
+            p.last_name = 'ghost %s' % ghostId
             p.f20 = 3761002195 # basic 4 jersey
             p.f24 = 1456463855 # tron bike
             p.f27 = 125 # blue
@@ -532,7 +537,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     if os.path.exists(ENABLEGHOSTS_FILE):
-        urlopen("http://localhost/saveghost?%s" % quote(activity.name))
+        saveGhost(activity.name, player_id)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
@@ -982,9 +987,11 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
-def run_standalone(passedOnline):
+def run_standalone(passedOnline, passedSaveGhost):
     global online
+    global saveGhost
     online = passedOnline
+    saveGhost = passedSaveGhost
     app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
             port=443,
             threaded=True,
@@ -993,4 +1000,4 @@ def run_standalone(passedOnline):
 
 
 if __name__ == "__main__":
-    run_standalone(list())
+    run_standalone(list(), saveGhost(name, player_id))
