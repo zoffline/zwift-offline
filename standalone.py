@@ -12,11 +12,9 @@ from shutil import copyfile
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
-    from urllib.parse import unquote
 else:
     import SocketServer as socketserver
     from SimpleHTTPServer import SimpleHTTPRequestHandler
-    from urllib2 import unquote
 
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
@@ -274,10 +272,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         try:
             recv.ParseFromString(data[:-4])
         except:
-            try:
-                recv.ParseFromString(data[3:-4])
-            except:
-                print(binascii.hexlify(data))
+            recv.ParseFromString(data[3:-4])
 
         player_id = recv.player_id
         #Add handling of ghosts for player if it's missing
