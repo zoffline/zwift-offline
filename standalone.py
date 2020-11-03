@@ -313,9 +313,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.last_rt = recv.state.roadTime
 
         for player in online:
-            if player.id == recv.player_id and player in online:
+            if player.id == recv.player_id:
                 online.remove(player)
-            if zwift_offline.world_time() > player.worldTime + 10000 and player in online:
+            if zwift_offline.world_time() > player.worldTime + 10000:
                 online.remove(player)
         if recv.state.roadTime:
             online.append(recv.state)
