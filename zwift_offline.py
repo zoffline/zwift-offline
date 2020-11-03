@@ -545,6 +545,12 @@ def api_profiles_activities_id(player_id, activity_id):
     garmin_upload(player_id, activity)
     return response, 200
 
+@app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
+def api_profiles_activities_rideon(recieving_player_id):
+    sending_player_id = request.json['profileId']
+    response = '{}'
+    return response, 200
+
 
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
 def api_profiles_followees(player_id):

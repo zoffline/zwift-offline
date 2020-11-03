@@ -330,9 +330,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
             online.append(recv.state)
 
         #Remove ghosts entries for inactive players (disconnected?)
-        for p_id in globalGhosts.keys():
+        keys = globalGhosts.keys()
+        removePlayers = list()
+        for p_id in keys:
             if globalGhosts[p_id].lastPackageTime < t - 10:
-                globalGhosts.pop(p_id)
+                removePlayers.insert(0, p_id)
+        for p_id in removePlayers:
+            globalGhosts.pop(p_id)
 
         if ghosts.started and t >= ghosts.last_play + update_freq:
             message = udp_node_msgs_pb2.ServerToClient()
