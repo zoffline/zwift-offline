@@ -16,12 +16,6 @@ from datetime import timedelta
 from io import BytesIO
 from shutil import copyfile
 
-if sys.version_info[0] > 2:
-    from urllib.parse import quote
-    from urllib.request import urlopen
-else:
-    from urllib2 import quote, urlopen
-
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -146,10 +140,7 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
-            session["profile"] = user.uid + 1000
-            session["username"] = user.username
-            session["first_name"] = user.first_name
-            session["last_name"] = user.last_name
+            C[request.remote_addr + ":profile"] = user.uid + 1000
             return redirect(url_for("user_home", username=username))
         else:
             flash("Invalid username or password.")
@@ -170,7 +161,7 @@ def upload(username):
     if not session.get(username):
         abort(401)
 
-    profile_dir = os.path.join(STORAGE_DIR, str(session["profile"]))
+    profile_dir = os.path.join(STORAGE_DIR, C[request.remote_addr + ":profile"].value)
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -359,11 +350,8 @@ def api_telemetry_config():
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
     storedProfile = C[request.remote_addr + ":profile"].value
-    C.pop(request.remote_addr + ":profile")
-    session["profile"] = storedProfile
     storedEnableGhosts = C[request.remote_addr + ":enableghosts"].value
-    C.pop(request.remote_addr + ":enableghosts")
-    ghostsEnabled[session["profile"]] = storedEnableGhosts == 'True'
+    ghostsEnabled[storedProfile] = storedEnableGhosts == 'True'
     profile_id = int(storedProfile)
     profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
@@ -377,9 +365,10 @@ def api_profiles_me():
     if not os.path.isfile(profile_file):
         profile.id = profile_id
         profile.is_connected_to_strava = True
-        profile.email = session["username"]
-        profile.first_name = session["first_name"]
-        profile.last_name = session["last_name"]
+        user = User.query.filter_by(uid=(profile_id-1000)).first()
+        profile.email = user.username
+        profile.first_name = user.first_name
+        profile.last_name = user.last_name
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -538,7 +527,7 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if ghostsEnabled[session["profile"]]:
+    if ghostsEnabled[C[request.remote_addr + ":profile"].value]:
         saveGhost(activity.name, player_id)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
@@ -670,6 +659,19 @@ def api_profiles_goals_id(player_id, goal_id):
     return '', 200
 
 
+@app.route('/api/tcp-config', methods=['GET'])
+def api_tcp_config():
+    infos = periodic_info_pb2.PeriodicInfos()
+    info = infos.infos.add()
+    if os.path.exists(SERVER_IP_FILE):
+        with open(SERVER_IP_FILE, 'r') as f:
+            info.game_server_ip = f.read().rstrip('\r\n')
+    else:
+        info.game_server_ip = '127.0.0.1'
+    info.f2 = 3023
+    return infos.SerializeToString(), 200
+
+
 def relay_worlds_generic(world_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
@@ -702,24 +704,28 @@ def relay_worlds_generic(world_id=None):
             for player in online:
                 courseId = (player.f19 & 0xff0000) >> 16
                 if course == courseId and player.justWatching == 0:
-                    user = User.query.filter_by(uid=(player.id-1000)).first()
-                    onlinePlayer = world.player_states.add()
-                    onlinePlayer.id = player.id
-                    onlinePlayer.firstName = user.first_name
-                    onlinePlayer.lastName = user.last_name
-                    onlinePlayer.distance = player.distance
-                    onlinePlayer.time = player.time
-                    onlinePlayer.f6 = 840#0
-                    onlinePlayer.f8 = 0
-                    onlinePlayer.f9 = 0
-                    onlinePlayer.f10 = 0
-                    onlinePlayer.f11 = 0
-                    onlinePlayer.power = 250#player.power
-                    onlinePlayer.f13 = 2355
-                    onlinePlayer.x = player.x
-                    onlinePlayer.altitude = player.altitude
-                    onlinePlayer.y = player.y
-                    playersInRegion = playersInRegion + 1
+                    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player.id)
+                    if os.path.isfile(profile_file):
+                        with open(profile_file, 'rb') as fd:
+                            profile = profile_pb2.Profile()
+                            profile.ParseFromString(fd.read())
+                            onlinePlayer = world.player_states.add()
+                            onlinePlayer.id = player.id
+                            onlinePlayer.firstName = profile.first_name
+                            onlinePlayer.lastName = profile.last_name
+                            onlinePlayer.distance = player.distance
+                            onlinePlayer.time = player.time
+                            onlinePlayer.f6 = 840#0
+                            onlinePlayer.f8 = 0
+                            onlinePlayer.f9 = 0
+                            onlinePlayer.f10 = 0
+                            onlinePlayer.f11 = 0
+                            onlinePlayer.power = 250#player.power
+                            onlinePlayer.f13 = 2355
+                            onlinePlayer.x = player.x
+                            onlinePlayer.altitude = player.altitude
+                            onlinePlayer.y = player.y
+                            playersInRegion = playersInRegion + 1
             world.f5 = playersInRegion
         if world_id:
             world.id = world_id
@@ -967,7 +973,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
-            session["profile"] = user.uid + 1000
+            C[request.remote_addr + ":profile"] = user.uid + 1000
         else:
             return '', 401
 
@@ -976,8 +982,6 @@ def auth_realms_zwift_protocol_openid_connect_token():
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
-    #Store current profile just before starting game, might be problems with many users and different connection-speeds / latency
-    C[request.remote_addr + ":profile"] = session["profile"]
     C[request.remote_addr + ":enableghosts"] = 'enableghosts' in request.form.keys()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
