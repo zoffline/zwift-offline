@@ -77,7 +77,6 @@ AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
-ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 AUTH_PATH = "%s/auth.db" % STORAGE_DIR
 C = cookies.SimpleCookie()
 
@@ -90,8 +89,8 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 online = list()
+ghostsEnabled = {}
 saveGhost = None
-
 
 class User(db.Model):
     uid = db.Column(db.Integer, primary_key=True)
@@ -362,6 +361,9 @@ def api_profiles_me():
     storedProfile = C[request.remote_addr + ":profile"].value
     C.pop(request.remote_addr + ":profile")
     session["profile"] = storedProfile
+    storedEnableGhosts = C[request.remote_addr + ":enableghosts"].value
+    C.pop(request.remote_addr + ":enableghosts")
+    ghostsEnabled[session["profile"]] = storedEnableGhosts == 'True'
     profile_id = int(storedProfile)
     profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
@@ -536,7 +538,7 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if os.path.exists(ENABLEGHOSTS_FILE):
+    if ghostsEnabled[session["profile"]]:
         saveGhost(activity.name, player_id)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
@@ -976,6 +978,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 def start_zwift():
     #Store current profile just before starting game, might be problems with many users and different connection-speeds / latency
     C[request.remote_addr + ":profile"] = session["profile"]
+    C[request.remote_addr + ":enableghosts"] = 'enableghosts' in request.form.keys()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
@@ -993,10 +996,12 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
-def run_standalone(passedOnline, passedSaveGhost):
+def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost):
     global online
+    global ghostsEnabled
     global saveGhost
     online = passedOnline
+    ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
     app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
             port=443,
@@ -1006,4 +1011,4 @@ def run_standalone(passedOnline, passedSaveGhost):
 
 
 if __name__ == "__main__":
-    run_standalone(list(), saveGhost(name, player_id))
+    run_standalone(list(), None)

@@ -20,7 +20,7 @@
     </div>
     <form method="POST" action="/start-zwift">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 top-buffer">
           <label>Select map (optional)</label>
           <select name="map" class="form-control">
             <option value="CALENDAR">Calendar</option>
@@ -33,6 +33,14 @@
             <option value="WATOPIA">Watopia</option>
             <option value="YORKSHIRE">Yorkshire</option>
           </select>
+        </div>
+        <div class="col-md-4 top-buffer">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" checked="true" id="enableghosts" name="enableghosts">
+            <label class="form-check-label" for="enableghosts">
+              Enable ghosts
+            </label>
+          </div>
         </div>
       </div>
       <div class="row">

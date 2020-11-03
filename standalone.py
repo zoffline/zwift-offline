@@ -39,11 +39,9 @@ PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = None
 
-ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
-ghosts_enabled = os.path.exists(ENABLEGHOSTS_FILE)
-
 update_freq = 3
 globalGhosts = {}
+ghostsEnabled = {}
 online = list()
 
 def roadID(state):
@@ -185,11 +183,6 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 return
             except:
                 pass  # fallthrough to return zoffline version
-        """ if path_end.startswith('saveghost?'):
-            self.send_response(200)
-            self.end_headers()
-            saveGhost(path_end[10:])
-            return """
 
         SimpleHTTPRequestHandler.do_GET(self)
 
@@ -271,7 +264,7 @@ class GhostsVariables:
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         global online
-        global ghosts_enabled
+        global ghostsEnabled
         global globalGhosts
 
         data = self.request[0]
@@ -281,7 +274,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
         try:
             recv.ParseFromString(data[:-4])
         except:
-            pass
+            try:
+                recv.ParseFromString(data[3:-4])
+            except:
+                print(binascii.hexlify(data))
 
         player_id = recv.player_id
         #Add handling of ghosts for player if it's missing
@@ -290,7 +286,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         ghosts = globalGhosts[player_id]
 
-        if recv.seqno == 1: #and player_id == ghosts_owner:
+        if recv.seqno == 1:
             del ghosts.rec.states[:]
             del ghosts.play.ghosts[:]
             ghosts.last_rt = 0
@@ -303,7 +299,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         t = int(time.time())
         ghosts.lastPackageTime = t
 
-        if ghosts_enabled: #and player_id == ghosts_owner:
+        if str(player_id) in ghostsEnabled and ghostsEnabled[str(player_id)]:
             if not ghosts.loaded and course(recv.state):
                 ghosts.loaded = True
                 loadGhosts(player_id, recv.state, ghosts)
@@ -322,9 +318,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.last_rt = recv.state.roadTime
 
         for player in online:
-            if player.id == recv.player_id:
+            if player.id == recv.player_id and player in online:
                 online.remove(player)
-            if zwift_offline.world_time() > player.worldTime + 10000:
+            if zwift_offline.world_time() > player.worldTime + 10000 and player in online:
                 online.remove(player)
         if recv.state.roadTime:
             online.append(recv.state)
@@ -426,4 +422,4 @@ udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
 udpserver_thread.start()
 
-zwift_offline.run_standalone(online, saveGhost)
+zwift_offline.run_standalone(online, ghostsEnabled, saveGhost)
