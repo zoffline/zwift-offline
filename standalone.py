@@ -291,9 +291,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         t = int(time.time())
         ghosts.lastPackageTime = t
 
-        if not str(player_id) in ghostsEnabled:
-            ghostsEnabled[str(player_id)] = True
-
         if str(player_id) in ghostsEnabled and ghostsEnabled[str(player_id)]:
             if not ghosts.loaded and recv.state.roadTime > 0:
                 ghosts.loaded = True

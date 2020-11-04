@@ -11,6 +11,7 @@ import sys
 import tempfile
 import time
 import math
+import threading
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
@@ -72,7 +73,6 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
 AUTH_PATH = "%s/auth.db" % STORAGE_DIR
-C = cookies.SimpleCookie()
 
 # Android uses https for cdn
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
@@ -84,6 +84,8 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 db = SQLAlchemy(app)
 online = {}
 ghostsEnabled = {}
+playerIds = {}
+temporaryLoginValues = {}
 saveGhost = None
 
 class User(db.Model):
@@ -92,10 +94,37 @@ class User(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     pass_hash = db.Column(db.String(100), nullable=False)
+    machine_id = db.Column(db.String(100), nullable=True)
+    enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
 
     def __repr__(self):
         return '' % self.username
 
+def setMachineIdAndGhostsEnabled(request, player_id, ghosts_enabled):
+    machine_id = request.headers.get('X_MACHINE_ID')
+    #Remove machine id for other users
+    users = User.query.filter_by(machine_id=machine_id).all()
+    for user in users:
+        user.machine_id = None
+    #Set machine id for current user
+    user = User.query.filter_by(uid=player_id-1000).first()
+    user.machine_id = machine_id
+    user.enable_ghosts = int(ghosts_enabled)
+    db.session.commit()
+    playerIds[machine_id] = str(player_id)
+    ghostsEnabled[str(player_id)] = ghosts_enabled
+
+def getPlayerId(request):
+    machine_id = request.headers.get('X_MACHINE_ID')
+    ghosts_enabled = True
+    if not machine_id in playerIds:
+        user = User.query.filter_by(machine_id=machine_id).first()
+        playerIds[machine_id] = str(user.uid+1000)
+        ghosts_enabled = bool(user.enable_ghosts)
+    player_id = playerIds[machine_id]
+    if not player_id in ghostsEnabled:
+        ghostsEnabled[player_id] = ghosts_enabled
+    return player_id
 
 @app.route("/signup/", methods=["GET", "POST"])
 def signup():
@@ -140,7 +169,7 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
-            C[request.remote_addr + ":profile"] = user.uid + 1000
+            temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
             return redirect(url_for("user_home", username=username))
         else:
             flash("Invalid username or password.")
@@ -161,7 +190,8 @@ def upload(username):
     if not session.get(username):
         abort(401)
 
-    profile_dir = os.path.join(STORAGE_DIR, C[request.remote_addr + ":profile"].value)
+    player_id = temporaryLoginValues[request.remote_addr + ":player_id"]
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -349,10 +379,12 @@ def api_telemetry_config():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
-    storedProfile = C[request.remote_addr + ":profile"].value
-    storedEnableGhosts = C[request.remote_addr + ":enableghosts"].value
-    ghostsEnabled[storedProfile] = storedEnableGhosts == 'True'
-    profile_id = int(storedProfile)
+    stored_player_id = temporaryLoginValues[request.remote_addr + ":player_id"]
+    stored_enable_ghosts = temporaryLoginValues[request.remote_addr + ":enableghosts"]
+    temporaryLoginValues.pop(request.remote_addr + ":player_id")
+    temporaryLoginValues.pop(request.remote_addr + ":enableghosts")
+    setMachineIdAndGhostsEnabled(request, stored_player_id, stored_enable_ghosts)
+    profile_id = int(stored_player_id)
     profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
         if not os.path.isdir(profile_dir):
@@ -527,7 +559,8 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if ghostsEnabled[C[request.remote_addr + ":profile"].value]:
+    player_id = getPlayerId(request)
+    if ghostsEnabled[player_id]:
         saveGhost(activity.name, player_id)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
@@ -539,8 +572,7 @@ def api_profiles_activities_id(player_id, activity_id):
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
 def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
-    response = '{}'
-    return response, 200
+    return '{}', 200
 
 
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
@@ -861,17 +893,17 @@ def relay_segment_results():
 
 @app.route('/api/segment-results', methods=['GET', 'POST'])
 def api_segment_results():
+    #Checks that online player has values for ghosts and player_id
+    player_id = getPlayerId(request)
     return handle_segment_results(request)
 
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
     #Remove player from online when leaving game/world
-    key = request.remote_addr + ":profile"
-    if key in C:
-        player_id = C[key].value
-        if player_id in online:
-            online.pop(player_id)
+    player_id = getPlayerId(request)
+    if player_id in online:
+        online.pop(player_id)
     return '{"worldtime":%ld}' % world_time()
 
 
@@ -981,7 +1013,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
-            C[request.remote_addr + ":profile"] = user.uid + 1000
+            temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
         else:
             return '', 401
 
@@ -990,7 +1022,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
-    C[request.remote_addr + ":enableghosts"] = 'enableghosts' in request.form.keys()
+    temporaryLoginValues[request.remote_addr + ":enableghosts"] = 'enableghosts' in request.form.keys()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
@@ -1008,6 +1040,28 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
+def check_columns():
+    time.sleep(3)
+    result = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
+    should_have_columns = User.metadata.tables['user'].columns
+    current_columns = list()
+    for row in result:
+        current_columns.append(row[1])
+    for column in should_have_columns:
+        if not column.name in current_columns:
+            nulltext = None
+            if column.nullable:
+                nulltext = "NULL"
+            else:
+                nulltext = "NOT NULL"
+            defaulttext = None
+            if column.default == None:
+                defaulttext = ""
+            else:
+                defaulttext = " DEFAULT %s" % column.default.arg
+            db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
+
+
 def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost):
     global online
     global ghostsEnabled
@@ -1015,11 +1069,9 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost):
     online = passedOnline
     ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
-    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
-            port=443,
-            threaded=True,
-            host='0.0.0.0')
-#            debug=True, use_reload=False)
+    thread = threading.Thread(target=check_columns)
+    thread.start()
+    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
 
 if __name__ == "__main__":

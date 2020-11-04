@@ -3,7 +3,7 @@
     "name": "zoffline",
     "description": "zoffline",
     "scripts": {
-      "protobuf:build": "protoc --python_out=. ./protobuf/activity.proto"
+      "protobuf:build": "protoc --python_out=. ./protobuf/*.proto"
     }
 }
   
