@@ -1,3 +1,4 @@
+syntax = "proto2";
 message Activity {
 	optional uint64 id = 1;
 	required uint64 player_id = 2;

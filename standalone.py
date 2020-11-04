@@ -40,7 +40,7 @@ MAP_OVERRIDE = None
 update_freq = 3
 globalGhosts = {}
 ghostsEnabled = {}
-online = list()
+online = {}
 
 def roadID(state):
     return (state.f20 & 0xff00) >> 8
@@ -250,8 +250,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
 class GhostsVariables:
     loaded = False
     started = False
-    rec = udp_node_msgs_pb2.Ghost()
-    play = udp_node_msgs_pb2.Ghosts()
+    rec = None
+    play = None
     last_rec = 0
     last_play = 0
     play_count = 0
@@ -261,19 +261,16 @@ class GhostsVariables:
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        global online
-        global ghostsEnabled
-        global globalGhosts
-
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
-
+        
         try:
             recv.ParseFromString(data[:-4])
         except:
             recv.ParseFromString(data[3:-4])
 
+        client_address = self.client_address
         player_id = recv.player_id
         #Add handling of ghosts for player if it's missing
         if not player_id in globalGhosts.keys():
@@ -282,8 +279,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
         ghosts = globalGhosts[player_id]
 
         if recv.seqno == 1:
-            del ghosts.rec.states[:]
-            del ghosts.play.ghosts[:]
+            ghosts.rec = udp_node_msgs_pb2.Ghost()
+            ghosts.play = udp_node_msgs_pb2.Ghosts()
             ghosts.last_rt = 0
             ghosts.play_count = 0
             ghosts.loaded = False
@@ -294,8 +291,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
         t = int(time.time())
         ghosts.lastPackageTime = t
 
+        if not str(player_id) in ghostsEnabled:
+            ghostsEnabled[str(player_id)] = True
+
         if str(player_id) in ghostsEnabled and ghostsEnabled[str(player_id)]:
-            if not ghosts.loaded and course(recv.state):
+            if not ghosts.loaded and recv.state.roadTime > 0:
                 ghosts.loaded = True
                 loadGhosts(player_id, recv.state, ghosts)
             if recv.state.roadTime and ghosts.last_rt and recv.state.roadTime != ghosts.last_rt:
@@ -312,13 +312,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
                             ghosts.started = True
             ghosts.last_rt = recv.state.roadTime
 
-        for player in online:
-            if player.id == recv.player_id:
-                online.remove(player)
-            if zwift_offline.world_time() > player.worldTime + 10000:
-                online.remove(player)
+        keys = online.keys()
+        removePlayers = list()
+        for p_id in keys:
+            if zwift_offline.world_time() > online[p_id].worldTime + 10000:
+                removePlayers.insert(0, p_id)
+        for p_id in removePlayers:
+            online.pop(p_id)
         if recv.state.roadTime:
-            online.append(recv.state)
+            online[str(player_id)] = recv.state
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = globalGhosts.keys()
@@ -332,7 +334,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if ghosts.started and t >= ghosts.last_play + update_freq:
             message = udp_node_msgs_pb2.ServerToClient()
             message.f1 = 1
-            message.player_id = recv.player_id
+            message.player_id = player_id
             message.seqno = 1
             message.f5 = 1
             message.f11 = 1
@@ -354,7 +356,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         else:
                             message.world_time = zwift_offline.world_time()
                             message.msgnum = msgnum
-                            socket.sendto(message.SerializeToString(), self.client_address)
+                            socket.sendto(message.SerializeToString(), client_address)
                             msgnum += 1
                             del message.states[:]
                             state = message.states.add()
@@ -365,7 +367,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             else: message.num_msgs = 1
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
-            socket.sendto(message.SerializeToString(), self.client_address)
+            socket.sendto(message.SerializeToString(), client_address)
             ghosts.play_count += 1
             ghosts.last_play = t
         else:
@@ -377,12 +379,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.f11 = 1
             msgnum = 1
             players = len(online)
-            for player in online:
+            for p_id in online.keys():
+                player = online[p_id]
                 if player.id == player_id:
                     players -= 1
             message.num_msgs = players // 10
             if players % 10: message.num_msgs += 1
-            for player in online:
+            for p_id in online.keys():
+                player = online[p_id]
                 if player.id != player_id:
                     if len(message.states) < 10:
                         state = message.states.add()
@@ -390,14 +394,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     else:
                         message.world_time = zwift_offline.world_time()
                         message.msgnum = msgnum
-                        socket.sendto(message.SerializeToString(), self.client_address)
+                        socket.sendto(message.SerializeToString(), client_address)
                         msgnum += 1
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(player)
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
-            socket.sendto(message.SerializeToString(), self.client_address)
+            socket.sendto(message.SerializeToString(), client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)

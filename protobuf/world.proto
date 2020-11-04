@@ -1,3 +1,4 @@
+syntax = "proto2";
 message World {
 	required uint32 id = 1;
 	required string name = 2;

@@ -82,7 +82,7 @@ app.config['SECRET_KEY'] = 'zoffline'
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
-online = list()
+online = {}
 ghostsEnabled = {}
 saveGhost = None
 
@@ -701,7 +701,8 @@ def relay_worlds_generic(world_id=None):
             world.world_time = world_time()
             world.real_time = int(time.time())
             playersInRegion = 0
-            for player in online:
+            for p_id in online.keys():
+                player = online[p_id]
                 courseId = (player.f19 & 0xff0000) >> 16
                 if course == courseId and player.justWatching == 0:
                     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player.id)
@@ -752,7 +753,8 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    for player in online:
+    for p_id in online.keys():
+        player = online[p_id]
         if player.id == player_id:
             return player.SerializeToString()
     return None
@@ -864,6 +866,12 @@ def api_segment_results():
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
+    #Remove player from online when leaving game/world
+    key = request.remote_addr + ":profile"
+    if key in C:
+        player_id = C[key].value
+        if player_id in online:
+            online.pop(player_id)
     return '{"worldtime":%ld}' % world_time()
 
 
@@ -1015,4 +1023,4 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost):
 
 
 if __name__ == "__main__":
-    run_standalone(list(), None)
+    run_standalone({}, {}, None)

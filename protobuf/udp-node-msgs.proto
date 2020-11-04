@@ -1,3 +1,4 @@
+syntax = "proto2";
 message PlayerState {
 	optional int32 id = 1;
 	optional int64 worldTime = 2;
