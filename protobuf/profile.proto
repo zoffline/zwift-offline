@@ -1,3 +1,4 @@
+syntax = "proto2";
 message Profile {
     optional int64 id = 1;
     optional int32 is_connected_to_strava = 2;

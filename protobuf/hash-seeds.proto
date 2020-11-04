@@ -1,3 +1,4 @@
+syntax = "proto2";
 message HashSeed {
 	required uint64 seed1 = 1;
 	required uint64 seed2 = 2;
