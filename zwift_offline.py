@@ -385,8 +385,15 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+    stream = request.stream.read()
     with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
-        f.write(request.stream.read())
+        f.write(stream)
+    profile = profile_pb2.Profile()
+    profile.ParseFromString(stream)
+    user = User.query.filter_by(uid=(player_id-1000)).first()
+    user.first_name = profile.first_name
+    user.last_name = profile.last_name
+    db.session.commit()
     return '', 204
 
 
@@ -705,28 +712,24 @@ def relay_worlds_generic(world_id=None):
                 player = online[p_id]
                 courseId = (player.f19 & 0xff0000) >> 16
                 if course == courseId and player.justWatching == 0:
-                    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player.id)
-                    if os.path.isfile(profile_file):
-                        with open(profile_file, 'rb') as fd:
-                            profile = profile_pb2.Profile()
-                            profile.ParseFromString(fd.read())
-                            onlinePlayer = world.player_states.add()
-                            onlinePlayer.id = player.id
-                            onlinePlayer.firstName = profile.first_name
-                            onlinePlayer.lastName = profile.last_name
-                            onlinePlayer.distance = player.distance
-                            onlinePlayer.time = player.time
-                            onlinePlayer.f6 = 840#0
-                            onlinePlayer.f8 = 0
-                            onlinePlayer.f9 = 0
-                            onlinePlayer.f10 = 0
-                            onlinePlayer.f11 = 0
-                            onlinePlayer.power = 250#player.power
-                            onlinePlayer.f13 = 2355
-                            onlinePlayer.x = player.x
-                            onlinePlayer.altitude = player.altitude
-                            onlinePlayer.y = player.y
-                            playersInRegion = playersInRegion + 1
+                    user = User.query.filter_by(uid=(player.id-1000)).first()
+                    onlinePlayer = world.player_states.add()
+                    onlinePlayer.id = player.id
+                    onlinePlayer.firstName = user.first_name
+                    onlinePlayer.lastName = user.last_name
+                    onlinePlayer.distance = player.distance
+                    onlinePlayer.time = player.time
+                    onlinePlayer.f6 = 840#0
+                    onlinePlayer.f8 = 0
+                    onlinePlayer.f9 = 0
+                    onlinePlayer.f10 = 0
+                    onlinePlayer.f11 = 0
+                    onlinePlayer.power = 250#player.power
+                    onlinePlayer.f13 = 2355
+                    onlinePlayer.x = player.x
+                    onlinePlayer.altitude = player.altitude
+                    onlinePlayer.y = player.y
+                    playersInRegion = playersInRegion + 1
             world.f5 = playersInRegion
         if world_id:
             world.id = world_id
