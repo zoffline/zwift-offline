@@ -1,3 +1,4 @@
 *.pyc
 storage/*
 !storage/force_dir_in_git.txt
+example-requests/*
