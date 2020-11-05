@@ -62,16 +62,17 @@ def saveGhost(name, player_id):
     global globalGhosts
     if not player_id in globalGhosts.keys(): return
     ghosts = globalGhosts[player_id]
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(ghosts.rec.states[0]), roadID(ghosts.rec.states[0]))
-    if not isForward(ghosts.rec.states[0]): folder += '/reverse'
-    try:
-        if not os.path.isdir(folder):
-            os.makedirs(folder)
-    except:
-        return
-    f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name)
-    with open(f, 'wb') as fd:
-        fd.write(ghosts.rec.SerializeToString())
+    if len(ghosts.rec.states) > 0:
+        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(ghosts.rec.states[0]), roadID(ghosts.rec.states[0]))
+        if not isForward(ghosts.rec.states[0]): folder += '/reverse'
+        try:
+            if not os.path.isdir(folder):
+                os.makedirs(folder)
+        except:
+            return
+        f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name)
+        with open(f, 'wb') as fd:
+            fd.write(ghosts.rec.SerializeToString())
 
 def organizeGhosts(player_id):
     # organize ghosts in course/roadID directory structure

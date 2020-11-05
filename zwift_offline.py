@@ -206,23 +206,25 @@ def getPartialProfile(player_id):
 def getCourse(state):
     return (state.f19 & 0xff0000) >> 16
 
-def isNearby(player_state1, player_state2, range = 1000):
+def isNearby(player_state1, player_state2, range = 100000):
     try:
         course1 = getCourse(player_state1)
         course2 = getCourse(player_state2)
         if course1 == course2:
             x1 = int(player_state1.x)
             x2 = int(player_state2.x)
-            if x1 - range <= x2 or x1 + range >= x2:
+            if x1 - range <= x2 and x1 + range >= x2:
                 y1 = int(player_state1.y)
                 y2 = int(player_state2.y)
-                if y1 - range <= y2 or y1 + range >= y2:
+                if y1 - range <= y2 and y1 + range >= y2:
                     a1 = int(player_state1.altitude)
                     a2 = int(player_state2.altitude)
-                    if a1 - range <= a2 or a1 + range >= a2:
+                    if a1 - range <= a2 and a1 + range >= a2:
                         return True
     except:
         pass
+
+
     return False
                 
 
@@ -677,7 +679,10 @@ def api_profiles_activities_id(player_id, activity_id):
         return response, 200
     player_id = getPlayerId(request)
     if ghostsEnabled.get(player_id):
-        saveGhost(activity.name, int(player_id))
+        try:
+            saveGhost(activity.name, int(player_id))
+        except:
+            pass
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
