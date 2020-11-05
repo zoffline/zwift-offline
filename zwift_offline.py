@@ -109,6 +109,54 @@ class PartialProfile:
     last_name: str
     country_code: int
 
+class Online:
+    total: int = 0
+    richmond: int = 0
+    watopia: int = 0
+    london: int = 0
+    newyork: int = 0
+    innsbruck: int = 0
+    yorkshire: int = 0
+    france: int = 0
+    paris: int = 0
+
+coursesLookup = {
+    2: 'Richmond',
+    6: 'Watopia',
+    7: 'London',
+    8: 'New York',
+    9: 'Innsbruck',
+    11: 'Yorkshire',
+    14: 'France',
+    15: 'Paris'
+}
+
+def getOnline():
+    onlineInRegion = Online()
+    for p_id in online:
+        player_state = online[p_id]
+        course = getCourse(player_state)
+        course_name = coursesLookup[course]
+        if course_name == 'Richmond':
+            onlineInRegion.richmond += 1
+        elif course_name == 'Watopia':
+            onlineInRegion.watopia += 1
+        elif course_name == 'London':
+            onlineInRegion.london += 1
+        elif course_name == 'New York':
+            onlineInRegion.newyork += 1
+        elif course_name == 'Innsbruck':
+            onlineInRegion.innsbruck += 1
+        elif course_name == 'Yorkshire':
+            onlineInRegion.yorkshire += 1
+        elif course_name == 'France':
+            onlineInRegion.france += 1
+        elif course_name == 'Paris':
+            onlineInRegion.paris += 1
+        onlineInRegion.total += 1
+    return onlineInRegion
+            
+
 def setMachineIdAndGhostsEnabled(request, player_id, ghosts_enabled):
     machine_id = request.headers.get('X_MACHINE_ID')
     #Remove machine id for other users
@@ -222,7 +270,8 @@ def login():
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
             temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
-            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts)))
+            online = Online()
+            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=getOnline()))
         else:
             flash("Invalid username or password.")
 
@@ -235,7 +284,8 @@ def user_home(username):
         abort(401)
 
     user = User.query.filter_by(username=username).first()
-    return render_template("user_home.html", username=username, enable_ghosts=bool(user.enable_ghosts))
+    online = Online()
+    return render_template("user_home.html", username=username, enable_ghosts=bool(user.enable_ghosts), online=getOnline())
 
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])

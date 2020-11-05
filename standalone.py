@@ -50,7 +50,7 @@ def roadID(state):
 def isForward(state):
     return (state.f19 & 4) != 0
 
-def course(state):
+def getCourse(state):
     return (state.f19 & 0xff0000) >> 16
 
 def boolean(s):
@@ -62,7 +62,7 @@ def saveGhost(name, player_id):
     global globalGhosts
     if not player_id in globalGhosts.keys(): return
     ghosts = globalGhosts[player_id]
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, course(ghosts.rec.states[0]), roadID(ghosts.rec.states[0]))
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(ghosts.rec.states[0]), roadID(ghosts.rec.states[0]))
     if not isForward(ghosts.rec.states[0]): folder += '/reverse'
     try:
         if not os.path.isdir(folder):
@@ -84,7 +84,7 @@ def organizeGhosts(player_id):
             with open(file, 'rb') as fd:
                 g = udp_node_msgs_pb2.Ghost()
                 g.ParseFromString(fd.read())
-                dest = '%s/%s/%s' % (folder, course(g.states[0]), roadID(g.states[0]))
+                dest = '%s/%s/%s' % (folder, getCourse(g.states[0]), roadID(g.states[0]))
                 if not isForward(g.states[0]): dest += '/reverse'
                 try:
                     if not os.path.isdir(dest):
@@ -94,7 +94,7 @@ def organizeGhosts(player_id):
             os.rename(file, os.path.join(dest, f))
 
 def loadGhosts(player_id, state, ghosts):
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, course(state), roadID(state))
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(state), roadID(state))
     if not isForward(state): folder += '/reverse'
     if not os.path.isdir(folder): return
     s = list()
@@ -109,7 +109,7 @@ def loadGhosts(player_id, state, ghosts):
     if os.path.isfile(START_LINES_FILE):
         with open(START_LINES_FILE, 'r') as fd:
             sl = [tuple(line) for line in csv.reader(fd)]
-            rt = [t for t in sl if t[0] == str(course(state)) and t[1] == str(roadID(state)) and (boolean(t[2]) == isForward(state) or not t[2])]
+            rt = [t for t in sl if t[0] == str(getCourse(state)) and t[1] == str(roadID(state)) and (boolean(t[2]) == isForward(state) or not t[2])]
             if rt:
                 ghosts.start_road = int(rt[0][3])
                 ghosts.start_rt = int(rt[0][4])
