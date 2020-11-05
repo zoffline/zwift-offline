@@ -10,21 +10,21 @@ import sqlite3
 import sys
 import tempfile
 import time
+import math
+import threading
 from copy import copy
 from datetime import timedelta
 from io import BytesIO
 from shutil import copyfile
 
-if sys.version_info[0] > 2:
-    from urllib.parse import quote
-    from urllib.request import urlopen
-else:
-    from urllib2 import quote, urlopen
-
-from flask import Flask, request, jsonify, g, redirect, render_template
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
+from http import cookies
+from flask_sqlalchemy import sqlalchemy, SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
+import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
 import protobuf.login_response_pb2 as login_response_pb2
@@ -73,10 +73,269 @@ AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 from tokens import *
 
-ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
+AUTH_PATH = "%s/auth.db" % STORAGE_DIR
 
 # Android uses https for cdn
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=AUTH_PATH)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'zoffline'
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+
+db = SQLAlchemy(app)
+online = {}
+ghostsEnabled = {}
+rideOnQueue = {}
+messageQueue = {}
+playerIds = {}
+playerPartialProfiles = {}
+temporaryLoginValues = {}
+saveGhost = None
+
+class User(db.Model):
+    uid = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    pass_hash = db.Column(db.String(100), nullable=False)
+    machine_id = db.Column(db.String(100), nullable=True)
+    enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
+
+    def __repr__(self):
+        return '' % self.username
+
+class PartialProfile:
+    first_name: str
+    last_name: str
+    country_code: int
+
+class Online:
+    total: int = 0
+    richmond: int = 0
+    watopia: int = 0
+    london: int = 0
+    newyork: int = 0
+    innsbruck: int = 0
+    yorkshire: int = 0
+    france: int = 0
+    paris: int = 0
+
+coursesLookup = {
+    2: 'Richmond',
+    6: 'Watopia',
+    7: 'London',
+    8: 'New York',
+    9: 'Innsbruck',
+    11: 'Yorkshire',
+    14: 'France',
+    15: 'Paris'
+}
+
+def getOnline():
+    onlineInRegion = Online()
+    for p_id in online:
+        player_state = online[p_id]
+        course = getCourse(player_state)
+        course_name = coursesLookup[course]
+        if course_name == 'Richmond':
+            onlineInRegion.richmond += 1
+        elif course_name == 'Watopia':
+            onlineInRegion.watopia += 1
+        elif course_name == 'London':
+            onlineInRegion.london += 1
+        elif course_name == 'New York':
+            onlineInRegion.newyork += 1
+        elif course_name == 'Innsbruck':
+            onlineInRegion.innsbruck += 1
+        elif course_name == 'Yorkshire':
+            onlineInRegion.yorkshire += 1
+        elif course_name == 'France':
+            onlineInRegion.france += 1
+        elif course_name == 'Paris':
+            onlineInRegion.paris += 1
+        onlineInRegion.total += 1
+    return onlineInRegion
+            
+
+def setMachineIdAndGhostsEnabled(request, player_id, ghosts_enabled):
+    machine_id = request.headers.get('X_MACHINE_ID')
+    #Remove machine id for other users
+    users = User.query.filter_by(machine_id=machine_id).all()
+    for user in users:
+        user.machine_id = None
+    #Set machine id for current user
+    user = User.query.filter_by(uid=player_id-1000).first()
+    user.machine_id = machine_id
+    user.enable_ghosts = int(ghosts_enabled)
+    db.session.commit()
+    playerIds[machine_id] = str(player_id)
+    ghostsEnabled[str(player_id)] = ghosts_enabled
+
+def getPlayerId(request):
+    machine_id = request.headers.get('X_MACHINE_ID')
+    ghosts_enabled = True
+    if not machine_id in playerIds:
+        user = User.query.filter_by(machine_id=machine_id).first()
+        playerIds[machine_id] = str(user.uid+1000)
+        ghosts_enabled = bool(user.enable_ghosts)
+    player_id = playerIds[machine_id]
+    if not player_id in ghostsEnabled:
+        ghostsEnabled[player_id] = ghosts_enabled
+    return player_id
+
+def getPartialProfile(player_id):
+    player_id_str = str(player_id)
+    if not player_id_str in playerPartialProfiles:
+        #Read from disk
+        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id_str)
+        if os.path.isfile(profile_file):
+            try:
+                with open(profile_file, 'rb') as fd:
+                    profile = profile_pb2.Profile()
+                    profile.ParseFromString(fd.read())
+                    partialProfile = PartialProfile()
+                    partialProfile.first_name = profile.first_name
+                    partialProfile.last_name = profile.last_name
+                    partialProfile.country_code = profile.country_code
+                    playerPartialProfiles[player_id_str] = partialProfile
+            except:
+                return None
+        else: return None
+    return playerPartialProfiles[player_id_str]
+
+def getCourse(state):
+    return (state.f19 & 0xff0000) >> 16
+
+def isNearby(player_state1, player_state2, range = 100000):
+    try:
+        course1 = getCourse(player_state1)
+        course2 = getCourse(player_state2)
+        if course1 == course2:
+            x1 = int(player_state1.x)
+            x2 = int(player_state2.x)
+            if x1 - range <= x2 and x1 + range >= x2:
+                y1 = int(player_state1.y)
+                y2 = int(player_state2.y)
+                if y1 - range <= y2 and y1 + range >= y2:
+                    a1 = int(player_state1.altitude)
+                    a2 = int(player_state2.altitude)
+                    if a1 - range <= a2 and a1 + range >= a2:
+                        return True
+    except:
+        pass
+
+
+    return False
+                
+
+@app.route("/signup/", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        if not (username and password and first_name and last_name):
+            flash("All fields are required.")
+            return redirect(url_for('signup'))
+
+        hashed_pwd = generate_password_hash(password, 'sha256')
+
+        new_user = User(username=username, pass_hash=hashed_pwd, first_name=first_name, last_name=last_name)
+        db.session.add(new_user)
+
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            flash("Username {u} is not available.".format(u=username))
+            return redirect(url_for('signup'))
+
+        flash("User account has been created.")
+        return redirect(url_for("login"))
+
+    return render_template("signup.html")
+
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+
+        if not (username and password):
+            flash("Username and password cannot be empty.")
+            return redirect(url_for('login'))
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.pass_hash, password):
+            session[username] = True
+            temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
+            online = Online()
+            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=getOnline()))
+        else:
+            flash("Invalid username or password.")
+
+    return render_template("login_form.html")
+
+
+@app.route("/user/<username>/")
+def user_home(username):
+    if not session.get(username):
+        abort(401)
+
+    user = User.query.filter_by(username=username).first()
+    online = Online()
+    return render_template("user_home.html", username=username, enable_ghosts=bool(user.enable_ghosts), online=getOnline())
+
+
+@app.route("/upload/<username>/", methods=["GET", "POST"])
+def upload(username):
+    if not session.get(username):
+        abort(401)
+
+    player_id = temporaryLoginValues[request.remote_addr + ":player_id"]
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
+    try:
+        if not os.path.isdir(profile_dir):
+            os.makedirs(profile_dir)
+    except IOError as e:
+        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+        sys.exit(1)
+
+    if request.method == 'POST':
+        uploaded_file = request.files['file']
+        if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
+            uploaded_file.save(os.path.join(profile_dir, uploaded_file.filename))
+            flash("File %s uploaded." % uploaded_file.filename)
+        else:
+            flash("Invalid file name.")
+
+    name = ''
+    profile = None
+    profile_file = os.path.join(profile_dir, 'profile.bin')
+    if os.path.isfile(profile_file):
+        stat = os.stat(profile_file)
+        profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+        with open(profile_file, 'rb') as fd:
+            p = profile_pb2.Profile()
+            p.ParseFromString(fd.read())
+            name = "%s %s" % (p.first_name, p.last_name)
+    token = None
+    token_file = os.path.join(profile_dir, 'strava_token.txt')
+    if os.path.isfile(token_file):
+        stat = os.stat(token_file)
+        token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+
+    return render_template("upload.html", username=username, profile=profile, name=name, token=token)
+
+
+@app.route("/logout/<username>")
+def logout(username):
+    session.pop(username, None)
+    flash("Successfully logged out.")
+    return redirect(url_for('login'))
 
 
 ####
@@ -86,10 +345,6 @@ type_callable_map = copy(TYPE_CALLABLE_MAP)
 type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
-
-
-profiles = list()
-selected_profile = 1000
 
 
 def insert_protobuf_into_db(table_name, msg):
@@ -149,7 +404,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int(time.time()-1414016075)*1000
+    return int((time.time()-1414016075)*1000)
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -178,10 +433,12 @@ def api_users_login():
 
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
-    # update profiles list in case new user was created
-    # FIXME: Updates are not reflected when using an apache
-    #        based set up. Should just deprecate apache.
-    list_profiles()
+    #Remove player from online when leaving game/world
+    player_id = getPlayerId(request)
+    if player_id in online:
+        online.pop(player_id)
+    if player_id in playerPartialProfiles:
+        playerPartialProfiles.pop(player_id)
     return '', 204
 
 
@@ -233,7 +490,13 @@ def api_telemetry_config():
 
 @app.route('/api/profiles/me', methods=['GET'])
 def api_profiles_me():
-    profile_dir = '%s/%s' % (STORAGE_DIR, selected_profile)
+    stored_player_id = temporaryLoginValues[request.remote_addr + ":player_id"]
+    stored_enable_ghosts = temporaryLoginValues[request.remote_addr + ":enableghosts"]
+    temporaryLoginValues.pop(request.remote_addr + ":player_id")
+    temporaryLoginValues.pop(request.remote_addr + ":enableghosts")
+    setMachineIdAndGhostsEnabled(request, stored_player_id, stored_enable_ghosts)
+    profile_id = int(stored_player_id)
+    profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -243,30 +506,21 @@ def api_profiles_me():
     profile = profile_pb2.Profile()
     profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
-        profile.id = selected_profile
+        profile.id = profile_id
         profile.is_connected_to_strava = True
-        profile.email = 'user@email.com'
-        # At least Win Zwift client no longer asks for a name
-        profile.first_name = "zoffline"
-        profile.last_name = "user"
+        user = User.query.filter_by(uid=(profile_id-1000)).first()
+        profile.email = user.username
+        profile.first_name = user.first_name
+        profile.last_name = user.last_name
         return profile.SerializeToString(), 200
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
-        # ensure profile.id = directory (in case directory is renamed)
-        if profile.id != selected_profile:
-            logger.warn('player_id is different from profile directory, updating database...')
-            cur = g.db.cursor()
-            cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-            cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-            cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(selected_profile), str(profile.id)))
-            g.db.commit()
-            profile.id = selected_profile
+        profile.id = profile_id
         if not profile.email:
             profile.email = 'user@email.com'
-        # clear f60 to remove free trial limit
         if profile.f60:
-           logger.warn('Profile contains bytes related to subscription/billing, removing...')
-           del profile.f60[:]
+            # remove free trial limit
+            del profile.f60[:]
         return profile.SerializeToString(), 200
 
 
@@ -274,8 +528,15 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+    stream = request.stream.read()
     with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
-        f.write(request.stream.read())
+        f.write(stream)
+    profile = profile_pb2.Profile()
+    profile.ParseFromString(stream)
+    user = User.query.filter_by(uid=(player_id-1000)).first()
+    user.first_name = profile.first_name
+    user.last_name = profile.last_name
+    db.session.commit()
     return '', 204
 
 
@@ -302,26 +563,37 @@ def api_profiles_activities(player_id):
     return activities.SerializeToString(), 200
 
 
-# For ghosts
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
     args = request.args.getlist('id')
-    profile = profile_pb2.Profile()
-    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, selected_profile)
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile.ParseFromString(fd.read())
     profiles = profile_pb2.Profiles()
     for i in args:
-        p = profiles.profiles.add()
-        p.CopyFrom(profile)
-        p.id = int(i)
-        p.first_name = 'zoffline'
-        p.last_name = 'ghost %s' % i
-        p.f20 = 3761002195 # basic 4 jersey
-        p.f24 = 1456463855 # tron bike
-        p.f27 = 125 # blue
-        p.country_code = 0
+        if int(i) > 10000000:
+            # For ghosts
+            ghostId = math.floor(int(i) / 10000000)
+            player_id = int(i) - ghostId * 10000000
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(player_id))
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+            p = profiles.profiles.add()
+            p.CopyFrom(profile)
+            p.id = int(i)
+            p.first_name = 'zoffline'
+            p.last_name = 'ghost %s' % ghostId
+            p.f20 = 3761002195 # basic 4 jersey
+            p.f24 = 1456463855 # tron bike
+            p.f27 = 125 # blue
+            p.country_code = 0
+        else:
+            profile = profile_pb2.Profile()
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
+            if os.path.isfile(profile_file):
+                with open(profile_file, 'rb') as fd:
+                    profile.ParseFromString(fd.read())
+            p = profiles.profiles.add()
+            p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
 
@@ -405,14 +677,36 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if os.path.exists(ENABLEGHOSTS_FILE):
-        urlopen("http://cdn.zwift.com/saveghost?%s" % quote(activity.name))
+    player_id = getPlayerId(request)
+    if ghostsEnabled.get(player_id):
+        try:
+            saveGhost(activity.name, int(player_id))
+        except:
+            pass
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
     return response, 200
+
+@app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
+def api_profiles_activities_rideon(recieving_player_id):
+    sending_player_id = request.json['profileId']
+    ride_on = udp_node_msgs_pb2.RideOn()
+    profile = getPartialProfile(sending_player_id)
+    if not profile == None:
+        ride_on.rider_id = int(sending_player_id)
+        ride_on.to_rider_id = int(recieving_player_id)
+        ride_on.firstName = profile.first_name
+        ride_on.lastName = profile.last_name
+        ride_on.countryCode = profile.country_code
+        recieving_player_id_str = str(recieving_player_id)
+        sending_player_id_str = str(sending_player_id)
+        if not recieving_player_id_str in rideOnQueue:
+            rideOnQueue[recieving_player_id_str] = {}
+        rideOnQueue[recieving_player_id_str][sending_player_id_str] = ride_on
+    return '{}', 200
 
 
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
@@ -531,38 +825,99 @@ def api_profiles_goals_id(player_id, goal_id):
     return '', 200
 
 
+@app.route('/api/tcp-config', methods=['GET'])
+def api_tcp_config():
+    infos = periodic_info_pb2.PeriodicInfos()
+    info = infos.infos.add()
+    if os.path.exists(SERVER_IP_FILE):
+        with open(SERVER_IP_FILE, 'r') as f:
+            info.game_server_ip = f.read().rstrip('\r\n')
+    else:
+        info.game_server_ip = '127.0.0.1'
+    info.f2 = 3023
+    return infos.SerializeToString(), 200
+
+
 def relay_worlds_generic(world_id=None):
+    courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
-        world = { 'currentDateTime': int(time.time()),
-                  'currentWorldTime': world_time(),
-                  'friendsInWorld': [],
-                  'mapId': 1,
-                  'name': 'Public Watopia',
-                  'playerCount': 0,
-                  'worldId': 1
-                }
-        if world_id:
-            world['mapId'] = world_id
-            return jsonify(world)
-        else:
-            return jsonify([ world ])
+        if request.content_type == 'application/x-protobuf-lite':
+            chat_message = udp_node_msgs_pb2.ChatMessage()
+            serializedMessage = None
+            try:
+                chat_message.ParseFromString(request.data[6:])
+                serializedMessage = chat_message.SerializeToString()
+            except:
+                #Not chat message    
+                world = { 'currentDateTime': int(time.time()),
+                        'currentWorldTime': world_time(),
+                        'friendsInWorld': [],
+                        'mapId': 1,
+                        'name': 'Public Watopia',
+                        'playerCount': 0,
+                        'worldId': 1
+                        }
+                if world_id:
+                    world['mapId'] = world_id
+                    return jsonify(world)
+                else:
+                    return jsonify([ world ])
+            #Chat message
+            sending_player_id_str = str(chat_message.rider_id)
+            if sending_player_id_str in online:
+                sending_player = online[sending_player_id_str]
+                for p_id in online.keys():
+                    player = online[p_id]
+                    #Check that players are on same course and close to each other
+                    if isNearby(sending_player, player):
+                        recieving_player_id_str = p_id
+                        if not recieving_player_id_str in messageQueue:
+                            messageQueue[recieving_player_id_str] = {}
+                        messageQueue[recieving_player_id_str][sending_player_id_str] = serializedMessage
+            return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
-        world = worlds.worlds.add()
-        world.id = 1
-        world.name = 'Public Watopia'
-        world.f3 = 1
-        # Windows client crashes if playerCount is 0
-        world.f5 = 1  # playerCount
-        world.world_time = world_time()
-        world.real_time = int(time.time())
+        world = None
+
+        for course in courses:
+            world = worlds.worlds.add()
+            world.id = 1
+            world.name = 'Public Watopia'
+            world.f3 = course
+            world.world_time = world_time()
+            world.real_time = int(time.time())
+            playersInRegion = 0
+            for p_id in online.keys():
+                player = online[p_id]
+                courseId = getCourse(player)
+                if course == courseId:
+                    partialProfile = getPartialProfile(player.id)
+                    if not partialProfile == None:
+                        onlinePlayer = world.player_states.add()
+                        onlinePlayer.id = player.id
+                        onlinePlayer.firstName = partialProfile.first_name
+                        onlinePlayer.lastName = partialProfile.last_name
+                        onlinePlayer.distance = player.distance
+                        onlinePlayer.time = player.time
+                        onlinePlayer.f6 = 840#0
+                        onlinePlayer.f8 = 0
+                        onlinePlayer.f9 = 0
+                        onlinePlayer.f10 = 0
+                        onlinePlayer.f11 = 0
+                        onlinePlayer.power = 250#player.power
+                        onlinePlayer.f13 = 2355
+                        onlinePlayer.x = player.x
+                        onlinePlayer.altitude = player.altitude
+                        onlinePlayer.y = player.y
+                        playersInRegion += 1
+            world.f5 = playersInRegion
         if world_id:
             world.id = world_id
             return world.SerializeToString()
         else:
             return worlds.SerializeToString()
-
+            
 
 @app.route('/relay/worlds', methods=['GET'])
 @app.route('/relay/dropin', methods=['GET'])
@@ -578,6 +933,15 @@ def relay_worlds_id(world_id):
 @app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
 def relay_worlds_id_join(world_id):
     return '{"worldTime":%ld}' % world_time()
+
+
+@app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
+def relay_worlds_id_players_id(world_id, player_id):
+    for p_id in online.keys():
+        player = online[p_id]
+        if player.id == player_id:
+            return player.SerializeToString()
+    return None
 
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
@@ -681,6 +1045,8 @@ def relay_segment_results():
 
 @app.route('/api/segment-results', methods=['GET', 'POST'])
 def api_segment_results():
+    #Checks that online player has values for ghosts and player_id
+    player_id = getPlayerId(request)
     return handle_segment_results(request)
 
 
@@ -705,54 +1071,6 @@ def before_request():
 def teardown_request(exception):
     if hasattr(g, 'db'):
         g.db.close()
-
-
-def move_old_profile():
-    # Before multi profile support only a single profile located in storage
-    # named profile.bin existed. If upgrading from this, convert to
-    # multi profile file structure.
-    profile_file = '%s/profile.bin' % STORAGE_DIR
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile = profile_pb2.Profile()
-            profile.ParseFromString(fd.read())
-            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
-            try:
-                if not os.path.isdir(profile_dir):
-                    os.makedirs(profile_dir)
-            except IOError as e:
-                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-                sys.exit(1)
-        os.rename(profile_file, '%s/profile.bin' % profile_dir)
-        strava_file = '%s/strava_token.txt' % STORAGE_DIR
-        if os.path.isfile(strava_file):
-            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
-
-
-def list_profiles():
-    global profiles
-    global selected_profile
-    del profiles[:]
-    for (root, dirs, files) in os.walk(STORAGE_DIR):
-        dirs.sort()
-        for profile_id in dirs:
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
-            if os.path.isfile(profile_file):
-                with open(profile_file, 'rb') as fd:
-                    profile.ParseFromString(fd.read())
-                    # ensure profile.id = directory (in case directory is renamed)
-                    profile.id = int(profile_id)
-                    profiles.append(profile)
-    profile = profile_pb2.Profile()
-    if profiles:
-        profile.id = profiles[-1].id + 1
-        # select first profile for auto launch
-        selected_profile = profiles[0].id
-    else:
-        profile.id = 1000
-    profile.first_name = 'New profile'
-    profiles.append(profile)
 
 
 def init_database():
@@ -800,9 +1118,8 @@ def init_database():
 
 @app.before_first_request
 def before_first_request():
-    move_old_profile()
-    list_profiles()
     init_database()
+    db.create_all()
 
 
 ####################
@@ -829,37 +1146,31 @@ def auth_rb():
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
-        return render_template("embed-noauto.html", profiles=profiles, ghosts=os.path.exists(ENABLEGHOSTS_FILE))
+        return render_template("login_form.html")
     else:
         return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_token():
-    # select profile on Android
-    global selected_profile
-    profile_id = None
+    # Android client login
     username = request.form.get('username')
+    password = request.form.get('password')
+
     if username:
-        try:
-            profile_id = int(username)
-        except ValueError:
-            pass
-        if profile_id:
-            selected_profile = profile_id
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.pass_hash, password):
+            temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
+        else:
+            return '', 401
+
     return FAKE_JWT, 200
 
 
 @app.route("/start-zwift" , methods=['POST'])
 def start_zwift():
-    global selected_profile
-    selected_profile = int(request.form['id'])
-    if request.form.get('ghosts'):
-        if not os.path.exists(ENABLEGHOSTS_FILE):
-            f = open(ENABLEGHOSTS_FILE, 'w')
-            f.close()
-    elif os.path.exists(ENABLEGHOSTS_FILE):
-        os.remove(ENABLEGHOSTS_FILE)
+    temporaryLoginValues[request.remote_addr + ":enableghosts"] = 'enableghosts' in request.form.keys()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
@@ -877,13 +1188,43 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
-def run_standalone():
-    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR),
-            port=443,
-            threaded=True,
-            host='0.0.0.0')
-#            debug=True, use_reload=False)
+def check_columns():
+    time.sleep(3)
+    result = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
+    should_have_columns = User.metadata.tables['user'].columns
+    current_columns = list()
+    for row in result:
+        current_columns.append(row[1])
+    for column in should_have_columns:
+        if not column.name in current_columns:
+            nulltext = None
+            if column.nullable:
+                nulltext = "NULL"
+            else:
+                nulltext = "NOT NULL"
+            defaulttext = None
+            if column.default == None:
+                defaulttext = ""
+            else:
+                defaulttext = " DEFAULT %s" % column.default.arg
+            db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
+
+
+def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedRideOnQueue, passedMessageQueue):
+    global online
+    global ghostsEnabled
+    global saveGhost
+    global rideOnQueue
+    global messageQueue
+    online = passedOnline
+    ghostsEnabled = passedGhostsEnabled
+    saveGhost = passedSaveGhost
+    rideOnQueue = passedRideOnQueue
+    messageQueue = passedMessageQueue
+    thread = threading.Thread(target=check_columns)
+    thread.start()
+    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
 
 if __name__ == "__main__":
-    run_standalone()
+    run_standalone({}, {}, None)

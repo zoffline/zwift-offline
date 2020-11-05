@@ -1,3 +1,4 @@
+syntax = "proto2";
 /* XXX: This is a first approximation of login response. Not looked into or verified. */
 
 message UDPNode {
