@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x1cprotobuf/udp-node-msgs.proto\"\xd3\x03\n\x0bPlayerState\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x11\n\tworldTime\x18\x02 \x01(\x03\x12\x10\n\x08\x64istance\x18\x03 \x01(\x05\x12\x10\n\x08roadTime\x18\x04 \x02(\x05\x12\x0c\n\x04laps\x18\x05 \x01(\x05\x12\r\n\x05speed\x18\x06 \x01(\x05\x12\x14\n\x0croadPosition\x18\x08 \x01(\x05\x12\x12\n\ncadenceUHz\x18\t \x01(\x05\x12\x11\n\theartrate\x18\x0b \x01(\x05\x12\r\n\x05power\x18\x0c \x01(\x05\x12\x0f\n\x07heading\x18\r \x01(\x03\x12\x0c\n\x04lean\x18\x0e \x01(\x05\x12\x10\n\x08\x63limbing\x18\x0f \x01(\x05\x12\x0c\n\x04time\x18\x10 \x01(\x05\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\x05\x12\x0b\n\x03\x66\x32\x30\x18\x14 \x01(\x05\x12\x10\n\x08progress\x18\x15 \x01(\x05\x12\x17\n\x0f\x63ustomisationId\x18\x16 \x01(\x03\x12\x14\n\x0cjustWatching\x18\x17 \x01(\x05\x12\x10\n\x08\x63\x61lories\x18\x18 \x01(\x05\x12\t\n\x01x\x18\x19 \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x1a \x01(\x02\x12\t\n\x01y\x18\x1b \x01(\x02\x12\x17\n\x0fwatchingRiderId\x18\x1c \x01(\x05\x12\x0f\n\x07groupId\x18\x1d \x01(\x05\x12\r\n\x05sport\x18\x1f \x01(\x03\x12\x0b\n\x03\x66\x33\x34\x18\" \x01(\x02\"\xcc\x01\n\x0e\x43lientToServer\x12\x11\n\tconnected\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\x12\n\nworld_time\x18\x03 \x02(\x03\x12\r\n\x05seqno\x18\x04 \x02(\x05\x12\x1b\n\x05state\x18\x07 \x02(\x0b\x32\x0c.PlayerState\x12\n\n\x02\x66\x38\x18\x08 \x02(\x03\x12\n\n\x02\x66\x39\x18\t \x02(\x03\x12\x13\n\x0blast_update\x18\n \x02(\x03\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x02(\x03\x12\x1a\n\x12last_player_update\x18\x0c \x02(\x03\"\xab\x01\n\x0eServerToClient\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\x12\n\nworld_time\x18\x03 \x02(\x03\x12\r\n\x05seqno\x18\x04 \x02(\x05\x12\n\n\x02\x66\x35\x18\x05 \x02(\x05\x12\x1c\n\x06states\x18\x08 \x03(\x0b\x32\x0c.PlayerState\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x02(\x03\x12\x10\n\x08num_msgs\x18\x12 \x02(\x05\x12\x0e\n\x06msgnum\x18\x13 \x02(\x05\"8\n\x05Ghost\x12\x11\n\tplayer_id\x18\x01 \x02(\x05\x12\x1c\n\x06states\x18\x02 \x03(\x0b\x32\x0c.PlayerState\" \n\x06Ghosts\x12\x16\n\x06ghosts\x18\x01 \x03(\x0b\x32\x06.Ghost'
+  serialized_pb=b'\n\x1cprotobuf/udp-node-msgs.proto\"\xd3\x03\n\x0bPlayerState\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x11\n\tworldTime\x18\x02 \x01(\x03\x12\x10\n\x08\x64istance\x18\x03 \x01(\x05\x12\x10\n\x08roadTime\x18\x04 \x02(\x05\x12\x0c\n\x04laps\x18\x05 \x01(\x05\x12\r\n\x05speed\x18\x06 \x01(\x05\x12\x14\n\x0croadPosition\x18\x08 \x01(\x05\x12\x12\n\ncadenceUHz\x18\t \x01(\x05\x12\x11\n\theartrate\x18\x0b \x01(\x05\x12\r\n\x05power\x18\x0c \x01(\x05\x12\x0f\n\x07heading\x18\r \x01(\x03\x12\x0c\n\x04lean\x18\x0e \x01(\x05\x12\x10\n\x08\x63limbing\x18\x0f \x01(\x05\x12\x0c\n\x04time\x18\x10 \x01(\x05\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\x05\x12\x0b\n\x03\x66\x32\x30\x18\x14 \x01(\x05\x12\x10\n\x08progress\x18\x15 \x01(\x05\x12\x17\n\x0f\x63ustomisationId\x18\x16 \x01(\x03\x12\x14\n\x0cjustWatching\x18\x17 \x01(\x05\x12\x10\n\x08\x63\x61lories\x18\x18 \x01(\x05\x12\t\n\x01x\x18\x19 \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x1a \x01(\x02\x12\t\n\x01y\x18\x1b \x01(\x02\x12\x17\n\x0fwatchingRiderId\x18\x1c \x01(\x05\x12\x0f\n\x07groupId\x18\x1d \x01(\x05\x12\r\n\x05sport\x18\x1f \x01(\x03\x12\x0b\n\x03\x66\x33\x34\x18\" \x01(\x02\"\xcc\x01\n\x0e\x43lientToServer\x12\x11\n\tconnected\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\x12\n\nworld_time\x18\x03 \x02(\x03\x12\r\n\x05seqno\x18\x04 \x02(\x05\x12\x1b\n\x05state\x18\x07 \x02(\x0b\x32\x0c.PlayerState\x12\n\n\x02\x66\x38\x18\x08 \x02(\x03\x12\n\n\x02\x66\x39\x18\t \x02(\x03\x12\x13\n\x0blast_update\x18\n \x02(\x03\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x02(\x03\x12\x1a\n\x12last_player_update\x18\x0c \x02(\x03\"\xcb\x01\n\x0eServerToClient\x12\n\n\x02\x66\x31\x18\x01 \x02(\x05\x12\x11\n\tplayer_id\x18\x02 \x02(\x05\x12\x12\n\nworld_time\x18\x03 \x02(\x03\x12\r\n\x05seqno\x18\x04 \x01(\x05\x12\n\n\x02\x66\x35\x18\x05 \x01(\x05\x12\x1c\n\x06states\x18\x08 \x03(\x0b\x32\x0c.PlayerState\x12\x1e\n\x07updates\x18\t \x03(\x0b\x32\r.PlayerUpdate\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x03\x12\x10\n\x08num_msgs\x18\x12 \x01(\x05\x12\x0e\n\x06msgnum\x18\x13 \x01(\x05\"8\n\x05Ghost\x12\x11\n\tplayer_id\x18\x01 \x02(\x05\x12\x1c\n\x06states\x18\x02 \x03(\x0b\x32\x0c.PlayerState\" \n\x06Ghosts\x12\x16\n\x06ghosts\x18\x01 \x03(\x0b\x32\x06.Ghost\"\xcb\x01\n\x0cPlayerUpdate\x12\n\n\x02\x66\x31\x18\x01 \x01(\x03\x12\n\n\x02\x66\x32\x18\x02 \x01(\x05\x12\x0c\n\x04type\x18\x03 \x02(\x05\x12\x0f\n\x07payload\x18\x04 \x02(\x0c\x12\x13\n\x0bworld_time1\x18\x05 \x01(\x03\x12\t\n\x01x\x18\x06 \x01(\x03\x12\x10\n\x08\x61ltitude\x18\x07 \x01(\x03\x12\t\n\x01y\x18\x08 \x01(\x03\x12\x13\n\x0bworld_time2\x18\t \x01(\x03\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x03\x12\x0b\n\x03\x66\x31\x32\x18\x0c \x01(\x03\x12\x0b\n\x03\x66\x31\x34\x18\x0e \x01(\x03\x12\x0b\n\x03\x66\x31\x35\x18\x0f \x01(\x03\"\xb2\x01\n\x0b\x43hatMessage\x12\x10\n\x08rider_id\x18\x01 \x02(\x05\x12\x13\n\x0bto_rider_id\x18\x02 \x02(\x05\x12\n\n\x02\x66\x33\x18\x03 \x02(\x05\x12\x11\n\tfirstName\x18\x04 \x02(\t\x12\x10\n\x08lastName\x18\x05 \x02(\t\x12\x0f\n\x07message\x18\x06 \x02(\t\x12\x0e\n\x06\x61vatar\x18\x07 \x01(\t\x12\x13\n\x0b\x63ountryCode\x18\x08 \x02(\x05\x12\x15\n\reventSubgroup\x18\x0b \x01(\x05\"i\n\x06RideOn\x12\x10\n\x08rider_id\x18\x01 \x02(\x05\x12\x13\n\x0bto_rider_id\x18\x02 \x02(\x05\x12\x11\n\tfirstName\x18\x03 \x02(\t\x12\x10\n\x08lastName\x18\x04 \x02(\t\x12\x13\n\x0b\x63ountryCode\x18\x05 \x02(\x05'
 )
 
 
@@ -365,14 +365,14 @@ _SERVERTOCLIENT = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='seqno', full_name='ServerToClient.seqno', index=3,
-      number=4, type=5, cpp_type=1, label=2,
+      number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='f5', full_name='ServerToClient.f5', index=4,
-      number=5, type=5, cpp_type=1, label=2,
+      number=5, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -385,22 +385,29 @@ _SERVERTOCLIENT = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f11', full_name='ServerToClient.f11', index=6,
-      number=11, type=3, cpp_type=2, label=2,
+      name='updates', full_name='ServerToClient.updates', index=6,
+      number=9, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f11', full_name='ServerToClient.f11', index=7,
+      number=11, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='num_msgs', full_name='ServerToClient.num_msgs', index=7,
-      number=18, type=5, cpp_type=1, label=2,
+      name='num_msgs', full_name='ServerToClient.num_msgs', index=8,
+      number=18, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='msgnum', full_name='ServerToClient.msgnum', index=8,
-      number=19, type=5, cpp_type=1, label=2,
+      name='msgnum', full_name='ServerToClient.msgnum', index=9,
+      number=19, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -418,7 +425,7 @@ _SERVERTOCLIENT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=710,
-  serialized_end=881,
+  serialized_end=913,
 )
 
 
@@ -456,8 +463,8 @@ _GHOST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=883,
-  serialized_end=939,
+  serialized_start=915,
+  serialized_end=971,
 )
 
 
@@ -488,12 +495,277 @@ _GHOSTS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=941,
-  serialized_end=973,
+  serialized_start=973,
+  serialized_end=1005,
+)
+
+
+_PLAYERUPDATE = _descriptor.Descriptor(
+  name='PlayerUpdate',
+  full_name='PlayerUpdate',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='f1', full_name='PlayerUpdate.f1', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f2', full_name='PlayerUpdate.f2', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='PlayerUpdate.type', index=2,
+      number=3, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='payload', full_name='PlayerUpdate.payload', index=3,
+      number=4, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='world_time1', full_name='PlayerUpdate.world_time1', index=4,
+      number=5, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='x', full_name='PlayerUpdate.x', index=5,
+      number=6, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='altitude', full_name='PlayerUpdate.altitude', index=6,
+      number=7, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='y', full_name='PlayerUpdate.y', index=7,
+      number=8, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='world_time2', full_name='PlayerUpdate.world_time2', index=8,
+      number=9, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f11', full_name='PlayerUpdate.f11', index=9,
+      number=11, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f12', full_name='PlayerUpdate.f12', index=10,
+      number=12, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f14', full_name='PlayerUpdate.f14', index=11,
+      number=14, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f15', full_name='PlayerUpdate.f15', index=12,
+      number=15, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1008,
+  serialized_end=1211,
+)
+
+
+_CHATMESSAGE = _descriptor.Descriptor(
+  name='ChatMessage',
+  full_name='ChatMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rider_id', full_name='ChatMessage.rider_id', index=0,
+      number=1, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='to_rider_id', full_name='ChatMessage.to_rider_id', index=1,
+      number=2, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f3', full_name='ChatMessage.f3', index=2,
+      number=3, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='firstName', full_name='ChatMessage.firstName', index=3,
+      number=4, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lastName', full_name='ChatMessage.lastName', index=4,
+      number=5, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='message', full_name='ChatMessage.message', index=5,
+      number=6, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='avatar', full_name='ChatMessage.avatar', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='countryCode', full_name='ChatMessage.countryCode', index=7,
+      number=8, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='eventSubgroup', full_name='ChatMessage.eventSubgroup', index=8,
+      number=11, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1214,
+  serialized_end=1392,
+)
+
+
+_RIDEON = _descriptor.Descriptor(
+  name='RideOn',
+  full_name='RideOn',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rider_id', full_name='RideOn.rider_id', index=0,
+      number=1, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='to_rider_id', full_name='RideOn.to_rider_id', index=1,
+      number=2, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='firstName', full_name='RideOn.firstName', index=2,
+      number=3, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lastName', full_name='RideOn.lastName', index=3,
+      number=4, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='countryCode', full_name='RideOn.countryCode', index=4,
+      number=5, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1394,
+  serialized_end=1499,
 )
 
 _CLIENTTOSERVER.fields_by_name['state'].message_type = _PLAYERSTATE
 _SERVERTOCLIENT.fields_by_name['states'].message_type = _PLAYERSTATE
+_SERVERTOCLIENT.fields_by_name['updates'].message_type = _PLAYERUPDATE
 _GHOST.fields_by_name['states'].message_type = _PLAYERSTATE
 _GHOSTS.fields_by_name['ghosts'].message_type = _GHOST
 DESCRIPTOR.message_types_by_name['PlayerState'] = _PLAYERSTATE
@@ -501,6 +773,9 @@ DESCRIPTOR.message_types_by_name['ClientToServer'] = _CLIENTTOSERVER
 DESCRIPTOR.message_types_by_name['ServerToClient'] = _SERVERTOCLIENT
 DESCRIPTOR.message_types_by_name['Ghost'] = _GHOST
 DESCRIPTOR.message_types_by_name['Ghosts'] = _GHOSTS
+DESCRIPTOR.message_types_by_name['PlayerUpdate'] = _PLAYERUPDATE
+DESCRIPTOR.message_types_by_name['ChatMessage'] = _CHATMESSAGE
+DESCRIPTOR.message_types_by_name['RideOn'] = _RIDEON
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 PlayerState = _reflection.GeneratedProtocolMessageType('PlayerState', (_message.Message,), {
@@ -537,6 +812,27 @@ Ghosts = _reflection.GeneratedProtocolMessageType('Ghosts', (_message.Message,),
   # @@protoc_insertion_point(class_scope:Ghosts)
   })
 _sym_db.RegisterMessage(Ghosts)
+
+PlayerUpdate = _reflection.GeneratedProtocolMessageType('PlayerUpdate', (_message.Message,), {
+  'DESCRIPTOR' : _PLAYERUPDATE,
+  '__module__' : 'protobuf.udp_node_msgs_pb2'
+  # @@protoc_insertion_point(class_scope:PlayerUpdate)
+  })
+_sym_db.RegisterMessage(PlayerUpdate)
+
+ChatMessage = _reflection.GeneratedProtocolMessageType('ChatMessage', (_message.Message,), {
+  'DESCRIPTOR' : _CHATMESSAGE,
+  '__module__' : 'protobuf.udp_node_msgs_pb2'
+  # @@protoc_insertion_point(class_scope:ChatMessage)
+  })
+_sym_db.RegisterMessage(ChatMessage)
+
+RideOn = _reflection.GeneratedProtocolMessageType('RideOn', (_message.Message,), {
+  'DESCRIPTOR' : _RIDEON,
+  '__module__' : 'protobuf.udp_node_msgs_pb2'
+  # @@protoc_insertion_point(class_scope:RideOn)
+  })
+_sym_db.RegisterMessage(RideOn)
 
 
 # @@protoc_insertion_point(module_scope)

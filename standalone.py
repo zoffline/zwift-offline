@@ -41,6 +41,8 @@ update_freq = 3
 globalGhosts = {}
 ghostsEnabled = {}
 online = {}
+sentRideOn = False
+sentMessage = False
 
 def roadID(state):
     return (state.f20 & 0xff00) >> 8
@@ -186,6 +188,9 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        global sentMessage
+        global sentRideOn
+
         self.data = self.request.recv(1024)
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
@@ -234,8 +239,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(struct.pack('!h', len(payload)))
         self.request.sendall(payload)
 
+        player_id = hello.player_id
         msg = tcp_node_msgs_pb2.RecurringTCPResponse()
-        msg.player_id = hello.player_id
+        msg.player_id = player_id
         msg.f3 = 0
         msg.f11 = 1
         payload = msg.SerializeToString()
@@ -244,7 +250,116 @@ class TCPHandler(socketserver.BaseRequestHandler):
             try:
                 self.request.sendall(struct.pack('!h', len(payload)))
                 self.request.sendall(payload)
-            except:
+
+                #RideOn Test
+                #sentRideOn = True
+                if not sentRideOn and '1001' in online and '1003' in online:#not player_id == 1003 and not sentRideOn and str(1003) in online:
+                    sentRideOn = True
+
+                    message = udp_node_msgs_pb2.ServerToClient()
+                    message.f1 = 1
+                    message.player_id = player_id
+                    message.world_time = zwift_offline.world_time()
+
+                    ride_on = udp_node_msgs_pb2.RideOn()
+                    if player_id == 1001:
+                        ride_on.rider_id = 1003
+                        ride_on.to_rider_id = player_id
+                        ride_on.firstName = 'Fanny'
+                        ride_on.lastName = 'Astrand'
+                        ride_on.countryCode = 752
+                    else:
+                        ride_on.rider_id = 1001
+                        ride_on.to_rider_id = player_id
+                        ride_on.firstName = 'Per'
+                        ride_on.lastName = 'Astrand'
+                        ride_on.countryCode = 752
+
+                    update = message.updates.add()
+                    #update.f1 = 587845624533328784
+                    update.f2 = 1
+                    update.type = 4 #ride on type
+                    update.world_time1 = message.world_time - 1000#recv.world_time#recv.world_time
+                    update.world_time2 = message.world_time + 8890#recv.world_time + 9890#message.world_time#recv.world_time + 6000
+                    update.f14 = int(time.time() * 1000000)#t#1604516817408239 #some kind of time?
+                    update.payload = ride_on.SerializeToString()
+
+                    ride_on_payload = message.SerializeToString()
+                    self.request.sendall(struct.pack('!h', len(ride_on_payload)))
+                    self.request.sendall(ride_on_payload)
+
+                #Message
+                #sentMessage = True
+                if not sentMessage and '1001' in online and '1003' in online:
+                    #sentMessage = True
+
+                    message = udp_node_msgs_pb2.ServerToClient()
+                    message.f1 = 1
+                    message.player_id = player_id
+                    message.seqno = 1
+                    message.f5 = 1
+                    message.f11 = 1
+                    message.world_time = zwift_offline.world_time()
+                    message.msgnum = 2
+                    message.num_msgs = 2
+                    
+                    chat_message1 = udp_node_msgs_pb2.ChatMessage()
+                    chat_message1.avatar = ''
+                    chat_message1.countryCode = 752
+                    chat_message1.eventSubgroup = 0
+                    chat_message1.f3 = 1
+                    chat_message1.firstName = 'Fanny'
+                    chat_message1.lastName = 'Astrand'
+                    chat_message1.message = 'Comon!'
+                    chat_message1.rider_id = 1003
+                    chat_message1.to_rider_id = 0
+
+                    chat_message2 = udp_node_msgs_pb2.ChatMessage()
+                    chat_message2.avatar = ''
+                    chat_message2.countryCode = 752
+                    chat_message2.eventSubgroup = 0
+                    chat_message2.f3 = 1
+                    chat_message2.firstName = 'Per'
+                    chat_message2.lastName = 'Astrand'
+                    chat_message2.message = 'Ride on!'
+                    chat_message2.rider_id = 1001
+                    chat_message2.to_rider_id = 0
+                    
+                    update1 = message.updates.add()
+                    update1.f2 = 1
+                    update1.type = 5 #chat message type
+                    update1.world_time1 = message.world_time - 1000
+                    state = online.get(str(player_id))
+                    if not state == None:
+                        update1.x = int(state.x)
+                        update1.altitude = int(state.altitude)
+                        update1.y = int(state.y)
+                    update1.world_time2 = message.world_time + 59000
+                    update1.f11 = 75000
+                    update1.f12 = 1
+                    update1.f14 = int(str(int(time.time()*1000000)))
+                    update1.payload = chat_message1.SerializeToString()
+
+                    update2 = message.updates.add()
+                    update2.f2 = 1
+                    update2.type = 5 #chat message type
+                    update2.world_time1 = message.world_time - 1000
+                    state = online.get(str(player_id))
+                    if not state == None:
+                        update2.x = int(state.x)
+                        update2.altitude = int(state.altitude)
+                        update2.y = int(state.y)
+                    update2.world_time2 = message.world_time + 59000
+                    update2.f11 = 75000
+                    update2.f12 = 1
+                    update2.f14 = int(str(int(time.time()*1000000)))
+                    update2.payload = chat_message2.SerializeToString()
+
+                    chat_message_payload = message.SerializeToString()
+                    self.request.sendall(struct.pack('!h', len(chat_message_payload)))
+                    self.request.sendall(chat_message_payload)
+            except Exception as e:
+                print(e)
                 break
 
 class GhostsVariables:
@@ -278,7 +393,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         ghosts = globalGhosts[player_id]
 
-        if recv.seqno == 1:
+        if recv.seqno == 1 or ghosts.rec == None:
             ghosts.rec = udp_node_msgs_pb2.Ghost()
             ghosts.play = udp_node_msgs_pb2.Ghosts()
             ghosts.last_rt = 0
@@ -399,7 +514,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), client_address)
-
+  
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)

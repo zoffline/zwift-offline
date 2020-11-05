@@ -299,7 +299,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int(time.time()-1414016075)*1000
+    return int((time.time()-1414016075)*1000)
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -560,8 +560,8 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     player_id = getPlayerId(request)
-    if ghostsEnabled[player_id]:
-        saveGhost(activity.name, player_id)
+    if ghostsEnabled.get(player_id):
+        saveGhost(activity.name, int(player_id))
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).
@@ -736,7 +736,7 @@ def relay_worlds_generic(world_id=None):
             for p_id in online.keys():
                 player = online[p_id]
                 courseId = (player.f19 & 0xff0000) >> 16
-                if course == courseId and player.justWatching == 0:
+                if course == courseId:
                     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player.id)
                     if os.path.isfile(profile_file):
                         with open(profile_file, 'rb') as fd:
