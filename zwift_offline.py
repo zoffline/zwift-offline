@@ -24,6 +24,7 @@ from http import cookies
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
 import protobuf.login_response_pb2 as login_response_pb2
@@ -84,6 +85,8 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 db = SQLAlchemy(app)
 online = {}
 ghostsEnabled = {}
+rideOnQueue = {}
+messageQueue = {}
 playerIds = {}
 temporaryLoginValues = {}
 saveGhost = None
@@ -572,6 +575,22 @@ def api_profiles_activities_id(player_id, activity_id):
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
 def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
+    ride_on = udp_node_msgs_pb2.RideOn()
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, sending_player_id)
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            ride_on.rider_id = int(sending_player_id)
+            ride_on.to_rider_id = int(recieving_player_id)
+            ride_on.firstName = profile.first_name
+            ride_on.lastName = profile.last_name
+            ride_on.countryCode = profile.country_code
+            recieving_player_id_str = str(recieving_player_id)
+            sending_player_id_str = str(sending_player_id)
+            if not recieving_player_id_str in rideOnQueue:
+                rideOnQueue[recieving_player_id_str] = {}
+            rideOnQueue[recieving_player_id_str][sending_player_id_str] = ride_on
     return '{}', 200
 
 
@@ -705,25 +724,48 @@ def api_tcp_config():
 
 
 def relay_worlds_generic(world_id=None):
+    courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
-        world = { 'currentDateTime': int(time.time()),
-                  'currentWorldTime': world_time(),
-                  'friendsInWorld': [],
-                  'mapId': 1,
-                  'name': 'Public Watopia',
-                  'playerCount': 0,
-                  'worldId': 1
-                }
-        if world_id:
-            world['mapId'] = world_id
-            return jsonify(world)
-        else:
-            return jsonify([ world ])
+        if request.content_type == 'application/x-protobuf-lite':
+            chat_message = udp_node_msgs_pb2.ChatMessage()
+            serializedMessage = None
+            try:
+                chat_message.ParseFromString(request.data[6:])
+                serializedMessage = chat_message.SerializeToString()
+            except:
+                #Not chat message    
+                world = { 'currentDateTime': int(time.time()),
+                        'currentWorldTime': world_time(),
+                        'friendsInWorld': [],
+                        'mapId': 1,
+                        'name': 'Public Watopia',
+                        'playerCount': 0,
+                        'worldId': 1
+                        }
+                if world_id:
+                    world['mapId'] = world_id
+                    return jsonify(world)
+                else:
+                    return jsonify([ world ])
+            #Chat message
+            sending_player_id_str = str(chat_message.rider_id)
+            if sending_player_id_str in online:
+                sending_player = online[sending_player_id_str]
+                sending_player_course = (sending_player.f19 & 0xff0000) >> 16
+                for p_id in online.keys():
+                    player = online[p_id]
+                    receiving_player_course = (player.f19 & 0xff0000) >> 16
+                    #TODO: Check distance between players
+                    if sending_player_course == receiving_player_course:
+                        recieving_player_id_str = p_id
+                        if not recieving_player_id_str in messageQueue:
+                            messageQueue[recieving_player_id_str] = {}
+                        messageQueue[recieving_player_id_str][sending_player_id_str] = serializedMessage
+            return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
         world = None
-        courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
 
         for course in courses:
             world = worlds.worlds.add()
@@ -1062,13 +1104,17 @@ def check_columns():
             db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
 
 
-def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost):
+def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedRideOnQueue, passedMessageQueue):
     global online
     global ghostsEnabled
     global saveGhost
+    global rideOnQueue
+    global messageQueue
     online = passedOnline
     ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
+    rideOnQueue = passedRideOnQueue
+    messageQueue = passedMessageQueue
     thread = threading.Thread(target=check_columns)
     thread.start()
     app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
