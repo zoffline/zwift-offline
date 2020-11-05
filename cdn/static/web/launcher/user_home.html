@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-4 top-buffer">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" checked="true" id="enableghosts" name="enableghosts">
+            <input class="form-check-input" type="checkbox" {{'checked' if enable_ghosts else ''}} id="enableghosts" name="enableghosts">
             <label class="form-check-label" for="enableghosts">
               Enable ghosts
             </label>

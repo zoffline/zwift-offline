@@ -436,16 +436,19 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.f5 = 1
             message.f11 = 1
             msgnum = 1
-            players = len(online)
-            for p_id in online.keys():
-                player = online[p_id]
-                if player.id == player_id:
-                    players -= 1
-            message.num_msgs = players // 10
-            if players % 10: message.num_msgs += 1
+            nearby = list()
             for p_id in online.keys():
                 player = online[p_id]
                 if player.id != player_id:
+                    #Check if players are close in world
+                    if zwift_offline.isNearby(recv.state, player):
+                        nearby.append(p_id)
+            players = len(nearby)
+            message.num_msgs = players // 10
+            if players % 10: message.num_msgs += 1
+            for p_id in nearby:
+                if p_id in online.keys():
+                    player = online[p_id]
                     if len(message.states) < 10:
                         state = message.states.add()
                         state.CopyFrom(player)
@@ -457,6 +460,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         del message.states[:]
                         state = message.states.add()
                         state.CopyFrom(player)
+                else: message.num_msgs -= 1
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), client_address)

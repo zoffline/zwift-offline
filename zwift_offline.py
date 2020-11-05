@@ -88,6 +88,7 @@ ghostsEnabled = {}
 rideOnQueue = {}
 messageQueue = {}
 playerIds = {}
+playerPartialProfiles = {}
 temporaryLoginValues = {}
 saveGhost = None
 
@@ -102,6 +103,11 @@ class User(db.Model):
 
     def __repr__(self):
         return '' % self.username
+
+class PartialProfile:
+    first_name: str
+    last_name: str
+    country_code: int
 
 def setMachineIdAndGhostsEnabled(request, player_id, ghosts_enabled):
     machine_id = request.headers.get('X_MACHINE_ID')
@@ -128,6 +134,49 @@ def getPlayerId(request):
     if not player_id in ghostsEnabled:
         ghostsEnabled[player_id] = ghosts_enabled
     return player_id
+
+def getPartialProfile(player_id):
+    player_id_str = str(player_id)
+    if not player_id_str in playerPartialProfiles:
+        #Read from disk
+        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id_str)
+        if os.path.isfile(profile_file):
+            try:
+                with open(profile_file, 'rb') as fd:
+                    profile = profile_pb2.Profile()
+                    profile.ParseFromString(fd.read())
+                    partialProfile = PartialProfile()
+                    partialProfile.first_name = profile.first_name
+                    partialProfile.last_name = profile.last_name
+                    partialProfile.country_code = profile.country_code
+                    playerPartialProfiles[player_id_str] = partialProfile
+            except:
+                return None
+        else: return None
+    return playerPartialProfiles[player_id_str]
+
+def getCourse(state):
+    return (state.f19 & 0xff0000) >> 16
+
+def isNearby(player_state1, player_state2, range = 1000):
+    try:
+        course1 = getCourse(player_state1)
+        course2 = getCourse(player_state2)
+        if course1 == course2:
+            x1 = int(player_state1.x)
+            x2 = int(player_state2.x)
+            if x1 - range <= x2 or x1 + range >= x2:
+                y1 = int(player_state1.y)
+                y2 = int(player_state2.y)
+                if y1 - range <= y2 or y1 + range >= y2:
+                    a1 = int(player_state1.altitude)
+                    a2 = int(player_state2.altitude)
+                    if a1 - range <= a2 or a1 + range >= a2:
+                        return True
+    except:
+        pass
+    return False
+                
 
 @app.route("/signup/", methods=["GET", "POST"])
 def signup():
@@ -173,7 +222,7 @@ def login():
         if user and check_password_hash(user.pass_hash, password):
             session[username] = True
             temporaryLoginValues[request.remote_addr + ":player_id"] = user.uid + 1000
-            return redirect(url_for("user_home", username=username))
+            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts)))
         else:
             flash("Invalid username or password.")
 
@@ -185,7 +234,8 @@ def user_home(username):
     if not session.get(username):
         abort(401)
 
-    return render_template("user_home.html", username=username)
+    user = User.query.filter_by(username=username).first()
+    return render_template("user_home.html", username=username, enable_ghosts=bool(user.enable_ghosts))
 
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])
@@ -331,6 +381,12 @@ def api_users_login():
 
 @app.route('/api/users/logout', methods=['POST'])
 def api_users_logout():
+    #Remove player from online when leaving game/world
+    player_id = getPlayerId(request)
+    if player_id in online:
+        online.pop(player_id)
+    if player_id in playerPartialProfiles:
+        playerPartialProfiles.pop(player_id)
     return '', 204
 
 
@@ -576,21 +632,18 @@ def api_profiles_activities_id(player_id, activity_id):
 def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
     ride_on = udp_node_msgs_pb2.RideOn()
-    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, sending_player_id)
-    if os.path.isfile(profile_file):
-        with open(profile_file, 'rb') as fd:
-            profile = profile_pb2.Profile()
-            profile.ParseFromString(fd.read())
-            ride_on.rider_id = int(sending_player_id)
-            ride_on.to_rider_id = int(recieving_player_id)
-            ride_on.firstName = profile.first_name
-            ride_on.lastName = profile.last_name
-            ride_on.countryCode = profile.country_code
-            recieving_player_id_str = str(recieving_player_id)
-            sending_player_id_str = str(sending_player_id)
-            if not recieving_player_id_str in rideOnQueue:
-                rideOnQueue[recieving_player_id_str] = {}
-            rideOnQueue[recieving_player_id_str][sending_player_id_str] = ride_on
+    profile = getPartialProfile(sending_player_id)
+    if not profile == None:
+        ride_on.rider_id = int(sending_player_id)
+        ride_on.to_rider_id = int(recieving_player_id)
+        ride_on.firstName = profile.first_name
+        ride_on.lastName = profile.last_name
+        ride_on.countryCode = profile.country_code
+        recieving_player_id_str = str(recieving_player_id)
+        sending_player_id_str = str(sending_player_id)
+        if not recieving_player_id_str in rideOnQueue:
+            rideOnQueue[recieving_player_id_str] = {}
+        rideOnQueue[recieving_player_id_str][sending_player_id_str] = ride_on
     return '{}', 200
 
 
@@ -752,12 +805,10 @@ def relay_worlds_generic(world_id=None):
             sending_player_id_str = str(chat_message.rider_id)
             if sending_player_id_str in online:
                 sending_player = online[sending_player_id_str]
-                sending_player_course = (sending_player.f19 & 0xff0000) >> 16
                 for p_id in online.keys():
                     player = online[p_id]
-                    receiving_player_course = (player.f19 & 0xff0000) >> 16
-                    #TODO: Check distance between players
-                    if sending_player_course == receiving_player_course:
+                    #Check that players are on same course and close to each other
+                    if isNearby(sending_player, player):
                         recieving_player_id_str = p_id
                         if not recieving_player_id_str in messageQueue:
                             messageQueue[recieving_player_id_str] = {}
@@ -777,30 +828,27 @@ def relay_worlds_generic(world_id=None):
             playersInRegion = 0
             for p_id in online.keys():
                 player = online[p_id]
-                courseId = (player.f19 & 0xff0000) >> 16
+                courseId = getCourse(player)
                 if course == courseId:
-                    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player.id)
-                    if os.path.isfile(profile_file):
-                        with open(profile_file, 'rb') as fd:
-                            profile = profile_pb2.Profile()
-                            profile.ParseFromString(fd.read())
-                            onlinePlayer = world.player_states.add()
-                            onlinePlayer.id = player.id
-                            onlinePlayer.firstName = profile.first_name
-                            onlinePlayer.lastName = profile.last_name
-                            onlinePlayer.distance = player.distance
-                            onlinePlayer.time = player.time
-                            onlinePlayer.f6 = 840#0
-                            onlinePlayer.f8 = 0
-                            onlinePlayer.f9 = 0
-                            onlinePlayer.f10 = 0
-                            onlinePlayer.f11 = 0
-                            onlinePlayer.power = 250#player.power
-                            onlinePlayer.f13 = 2355
-                            onlinePlayer.x = player.x
-                            onlinePlayer.altitude = player.altitude
-                            onlinePlayer.y = player.y
-                            playersInRegion = playersInRegion + 1
+                    partialProfile = getPartialProfile(player.id)
+                    if not partialProfile == None:
+                        onlinePlayer = world.player_states.add()
+                        onlinePlayer.id = player.id
+                        onlinePlayer.firstName = partialProfile.first_name
+                        onlinePlayer.lastName = partialProfile.last_name
+                        onlinePlayer.distance = player.distance
+                        onlinePlayer.time = player.time
+                        onlinePlayer.f6 = 840#0
+                        onlinePlayer.f8 = 0
+                        onlinePlayer.f9 = 0
+                        onlinePlayer.f10 = 0
+                        onlinePlayer.f11 = 0
+                        onlinePlayer.power = 250#player.power
+                        onlinePlayer.f13 = 2355
+                        onlinePlayer.x = player.x
+                        onlinePlayer.altitude = player.altitude
+                        onlinePlayer.y = player.y
+                        playersInRegion += 1
             world.f5 = playersInRegion
         if world_id:
             world.id = world_id
@@ -942,10 +990,6 @@ def api_segment_results():
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
-    #Remove player from online when leaving game/world
-    player_id = getPlayerId(request)
-    if player_id in online:
-        online.pop(player_id)
     return '{"worldtime":%ld}' % world_time()
 
 
