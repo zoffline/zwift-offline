@@ -526,8 +526,15 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+    stream = request.stream.read()
     with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
-        f.write(request.stream.read())
+        f.write(stream)
+    profile = profile_pb2.Profile()
+    profile.ParseFromString(stream)
+    user = User.query.filter_by(uid=(player_id-1000)).first()
+    user.first_name = profile.first_name
+    user.last_name = profile.last_name
+    db.session.commit()
     return '', 204
 
 
