@@ -29,19 +29,17 @@ To install zoffline on Windows:
 <details><summary>Linux, Windows, or Mac OS X (from source)</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
-* Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
-* Install dependencies: flask, python-protobuf, protobuf3_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install flask protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf3_to_dict stravalib``
-    * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
+* Install Python 3 (3.8.3 verified) (https://www.python.org/downloads/) if not already installed
+* Install dependencies: flask, flask_sqlalchemy, python-protobuf, protobuf3_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy protobuf protobuf3_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32\Scripts\pip.exe install flask flask_sqlalchemy protobuf protobuf3_to_dict stravalib``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
-    * If using Python 3, but Python 3 is not your system default run ``sudo python3 standalone.py``
-  * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
-    * For Python 3 the command will likely be ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32\python.exe standalone.py``
+    * If Python 3 is not your system default run ``sudo python3 standalone.py``
+  * e.g., on Windows in command prompt: ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32\python.exe standalone.py``
 * Start Zwift with standalone.py running (__after completing step 2__)
 * Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
@@ -211,6 +209,11 @@ To obtain your current profile:
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
 
+## Discord and zoffline (online) server
+
+Please join the [Discord](https://discord.gg/GMdn8F8) and our enhanced version of zoffline, hosted Online!
+
+Follow the guide in #instructions to create your account and join other Zwifters.
 
 ## Dependencies
 
