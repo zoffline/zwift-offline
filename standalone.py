@@ -244,7 +244,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
         payload = msg.SerializeToString()
 
         lastAliveCheck = int(time.time())
-        sentMessage = False
         while True:
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
@@ -255,9 +254,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.world_time = zwift_offline.world_time()
 
                 player_id_str = str(player_id)
+
                 #PlayerUpdate
                 if not sentMessage and player_id_str in playerUpdateQueue and len(playerUpdateQueue[player_id_str]) > 0 and player_id_str in online:
-                    #sentMessage = True
                     added_player_updates = list()
                     for player_update_proto in playerUpdateQueue[player_id_str]:
                         player_update = message.updates.add()
