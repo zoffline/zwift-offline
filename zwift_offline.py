@@ -20,7 +20,6 @@ from shutil import copyfile
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
-from http import cookies
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -104,20 +103,20 @@ class User(db.Model):
         return '' % self.username
 
 class PartialProfile:
-    first_name: str
-    last_name: str
-    country_code: int
+    first_name = ''
+    last_name = ''
+    country_code = 0
 
 class Online:
-    total: int = 0
-    richmond: int = 0
-    watopia: int = 0
-    london: int = 0
-    newyork: int = 0
-    innsbruck: int = 0
-    yorkshire: int = 0
-    france: int = 0
-    paris: int = 0
+    total = 0
+    richmond = 0
+    watopia = 0
+    london = 0
+    newyork = 0
+    innsbruck = 0
+    yorkshire = 0
+    france = 0
+    paris = 0
 
 coursesLookup = {
     2: 'Richmond',
