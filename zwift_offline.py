@@ -20,7 +20,6 @@ from shutil import copyfile
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
-from http import cookies
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
