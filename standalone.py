@@ -256,7 +256,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 player_id_str = str(player_id)
 
                 #PlayerUpdate
-                if not sentMessage and player_id_str in playerUpdateQueue and len(playerUpdateQueue[player_id_str]) > 0 and player_id_str in online:
+                if player_id_str in playerUpdateQueue and len(playerUpdateQueue[player_id_str]) > 0 and player_id_str in online:
                     added_player_updates = list()
                     for player_update_proto in playerUpdateQueue[player_id_str]:
                         player_update = message.updates.add()
