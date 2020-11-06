@@ -107,7 +107,6 @@ class PartialProfile:
     first_name: str
     last_name: str
     country_code: int
-    activity_id: int
 
 class Online:
     total: int = 0
