@@ -84,8 +84,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 db = SQLAlchemy(app)
 online = {}
 ghostsEnabled = {}
-rideOnQueue = {}
-messageQueue = {}
+playerUpdateQueue = {}
 playerIds = {}
 playerPartialProfiles = {}
 temporaryLoginValues = {}
@@ -558,6 +557,14 @@ def api_profiles_activities(player_id):
     for row in cur.fetchall():
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
+        a = activity
+        #If all values for saved activity is 0, remove it from DB and results
+        #if (a.avg_cadence == 0 and a.avg_heart_rate == 0 and a.avg_speed == 0 and
+        #a.avg_watts == 0 and a.calories == 0 and a.distance == 0 and a.max_cadence == 0 and
+        #a.max_heart_rate == 0 and a.max_speed == 0 and a.max_watts == 0):
+        if a.distance == 0:
+            cur.executescript("DELETE FROM activity WHERE id = %s" % a.id)
+            activities.activities.remove(a)
 
     return activities.SerializeToString(), 200
 
@@ -692,19 +699,29 @@ def api_profiles_activities_id(player_id, activity_id):
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
 def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
-    ride_on = udp_node_msgs_pb2.RideOn()
     profile = getPartialProfile(sending_player_id)
     if not profile == None:
+        player_update = udp_node_msgs_pb2.PlayerUpdate()
+        player_update.f2 = 1
+        player_update.type = 4 #ride on type
+        player_update.world_time1 = world_time()
+        player_update.world_time2 = player_update.world_time1 + 9890
+        player_update.f14 = int(time.time() * 1000000)
+
+        ride_on = udp_node_msgs_pb2.RideOn()
         ride_on.rider_id = int(sending_player_id)
         ride_on.to_rider_id = int(recieving_player_id)
         ride_on.firstName = profile.first_name
         ride_on.lastName = profile.last_name
         ride_on.countryCode = profile.country_code
+
+        player_update.payload = ride_on.SerializeToString()
+
         recieving_player_id_str = str(recieving_player_id)
         sending_player_id_str = str(sending_player_id)
-        if not recieving_player_id_str in rideOnQueue:
-            rideOnQueue[recieving_player_id_str] = {}
-        rideOnQueue[recieving_player_id_str][sending_player_id_str] = ride_on
+        if not recieving_player_id_str in playerUpdateQueue:
+            playerUpdateQueue[recieving_player_id_str] = list()
+        playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
     return '{}', 200
 
 
@@ -842,13 +859,15 @@ def relay_worlds_generic(world_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
-            chat_message = udp_node_msgs_pb2.ChatMessage()
-            serializedMessage = None
+            #chat_message = udp_node_msgs_pb2.ChatMessage()
+            #serializedMessage = None
             try:
-                chat_message.ParseFromString(request.data[6:])
-                serializedMessage = chat_message.SerializeToString()
+                player_update = udp_node_msgs_pb2.PlayerUpdate()
+                player_update.ParseFromString(request.data)
+                #chat_message.ParseFromString(request.data[6:])
+                #serializedMessage = chat_message.SerializeToString()
             except:
-                #Not chat message    
+                #Not able to decode as playerupdate, send dummy response
                 world = { 'currentDateTime': int(time.time()),
                         'currentWorldTime': world_time(),
                         'friendsInWorld': [],
@@ -862,18 +881,42 @@ def relay_worlds_generic(world_id=None):
                     return jsonify(world)
                 else:
                     return jsonify([ world ])
-            #Chat message
-            sending_player_id_str = str(chat_message.rider_id)
-            if sending_player_id_str in online:
-                sending_player = online[sending_player_id_str]
-                for p_id in online.keys():
-                    player = online[p_id]
-                    #Check that players are on same course and close to each other
-                    if isNearby(sending_player, player):
-                        recieving_player_id_str = p_id
-                        if not recieving_player_id_str in messageQueue:
-                            messageQueue[recieving_player_id_str] = {}
-                        messageQueue[recieving_player_id_str][sending_player_id_str] = serializedMessage
+
+            #PlayerUpdate
+            player_update.world_time2 = world_time() + 60000
+            player_update.f12 = 1
+            player_update.f14 = int(str(int(time.time()*1000000)))
+            for recieving_player_id_str in online.keys():
+                should_receive = False
+                if player_update.type == 5 or player_update.type == 105:
+                    recieving_player = online[recieving_player_id_str]
+                    #Chat message
+                    if player_update.type == 5:
+                        chat_message = udp_node_msgs_pb2.ChatMessage()
+                        chat_message.ParseFromString(player_update.payload)
+                        sending_player_id_str = str(chat_message.rider_id)
+                        if sending_player_id_str in online:
+                            sending_player = online[sending_player_id_str]
+                            #Check that players are on same course and close to each other
+                            if isNearby(sending_player, recieving_player):
+                                should_receive = True
+                    #Segment complete
+                    else:
+                        segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                        segment_complete.ParseFromString(player_update.payload)
+                        sending_player_id_str = str(segment_complete.rider_id)
+                        if sending_player_id_str in online:
+                            sending_player = online[sending_player_id_str]
+                            #Check that players are on same course and close to each other
+                            if getCourse(sending_player) == getCourse(recieving_player):
+                                should_receive = True
+                #Other PlayerUpdate, send to all
+                else:
+                    should_receive = True
+                if should_receive:
+                    if not recieving_player_id_str in playerUpdateQueue:
+                        playerUpdateQueue[recieving_player_id_str] = list()
+                    playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
@@ -986,6 +1029,29 @@ def relay_periodic_info():
     return infos.SerializeToString(), 200
 
 
+def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, only_own):
+    cur = g.db.cursor()
+    where_stmt = "WHERE segment_id = ?"
+    where_args = [str(segment_id)]
+    if only_own and player_id:
+        where_stmt += " AND player_id = ?"
+        where_args.append(player_id)
+    elif not only_own and player_id:
+        where_stmt += " AND player_id != ?"
+        where_args.append(player_id)
+    if from_date:
+        where_stmt += " AND strftime('%s', finish_time_str) > strftime('%s', ?)"
+        where_args.append(from_date)
+    if to_date:
+        where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
+        where_args.append(to_date)
+    if only_best:
+        where_stmt += " ORDER BY elapsed_ms LIMIT 1"
+    cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
+    for row in cur.fetchall():
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
+
 def handle_segment_results(request):
     if request.method == 'POST':
         if not request.stream:
@@ -1015,24 +1081,14 @@ def handle_segment_results(request):
     results.world_id = 1
     results.segment_id = segment_id
 
-    cur = g.db.cursor()
-    where_stmt = "WHERE segment_id = ?"
-    where_args = [str(segment_id)]
     if player_id:
-        where_stmt += " AND player_id = ?"
-        where_args.append(player_id)
-    if from_date:
-        where_stmt += " AND strftime('%s', finish_time_str) > strftime('%s', ?)"
-        where_args.append(from_date)
-    if to_date:
-        where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
-        where_args.append(to_date)
-    if only_best:
-        where_stmt += " ORDER BY elapsed_ms LIMIT 1"
-    cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
-    for row in cur.fetchall():
-        result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
+        #Add players results
+        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, True)
+        #Add top 100 other players results
+        #add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, False)
+    else:
+        #Jersey, only 1 result, player_id = None
+        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, False)
 
     return results.SerializeToString(), 200
 
@@ -1209,17 +1265,15 @@ def check_columns():
             db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
 
 
-def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedRideOnQueue, passedMessageQueue):
+def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
     global online
     global ghostsEnabled
     global saveGhost
-    global rideOnQueue
-    global messageQueue
+    global playerUpdateQueue
     online = passedOnline
     ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
-    rideOnQueue = passedRideOnQueue
-    messageQueue = passedMessageQueue
+    playerUpdateQueue = passedPlayerUpdateQueue
     thread = threading.Thread(target=check_columns)
     thread.start()
     app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)

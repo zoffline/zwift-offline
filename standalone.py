@@ -41,8 +41,7 @@ update_freq = 3
 globalGhosts = {}
 ghostsEnabled = {}
 online = {}
-rideOnQueue = {}
-messageQueue = {}
+playerUpdateQueue = {}
 
 def roadID(state):
     return (state.f20 & 0xff00) >> 8
@@ -254,44 +253,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.player_id = player_id
                 message.world_time = zwift_offline.world_time()
 
-                #RideOn
                 player_id_str = str(player_id)
-                if player_id_str in rideOnQueue and len(rideOnQueue[player_id_str].keys()) > 0 and player_id_str in online:
-                    added_ride_ons = list()
-                    for sending_player_id_str in rideOnQueue[player_id_str].keys():
-                        ride_on = rideOnQueue[player_id_str][sending_player_id_str]
-                        update = message.updates.add()
-                        update.f2 = 1
-                        update.type = 4 #ride on type
-                        update.world_time1 = message.world_time - 1000
-                        update.world_time2 = message.world_time + 8890
-                        update.f14 = int(time.time() * 1000000)
-                        update.payload = ride_on.SerializeToString()
-                        added_ride_ons.append(sending_player_id_str)
-                    for key in added_ride_ons:
-                        rideOnQueue[player_id_str].pop(key)
 
-                #Chat message
-                if player_id_str in messageQueue and len(messageQueue[player_id_str].keys()) > 0 and player_id_str in online:
-                    added_chat_messages = list()
-                    for sending_player_id_str in messageQueue[player_id_str].keys():
-                        if sending_player_id_str in online:
-                            sending_player = online[sending_player_id_str]
-                            chat_message = messageQueue[player_id_str][sending_player_id_str]
-                            update = message.updates.add()
-                            update.f2 = 1
-                            update.type = 5 #chat message type
-                            update.world_time1 = message.world_time - 1000
-                            update.x = int(sending_player.x)
-                            update.altitude = int(sending_player.altitude)
-                            update.y = int(sending_player.y)
-                            update.world_time2 = message.world_time + 59000
-                            update.f12 = 1
-                            update.f14 = int(str(int(time.time()*1000000)))
-                            update.payload = chat_message
-                            added_chat_messages.append(sending_player_id_str)
-                    for key in added_chat_messages:
-                        messageQueue[player_id_str].pop(key)
+                #PlayerUpdate
+                if not sentMessage and player_id_str in playerUpdateQueue and len(playerUpdateQueue[player_id_str]) > 0 and player_id_str in online:
+                    added_player_updates = list()
+                    for player_update_proto in playerUpdateQueue[player_id_str]:
+                        player_update = message.updates.add()
+                        player_update.ParseFromString(player_update_proto)
+                        added_player_updates.append(player_update_proto)
+                    for player_update_proto in added_player_updates:
+                        playerUpdateQueue[player_id_str].remove(player_update_proto)
 
                 t = int(time.time())
 
@@ -334,6 +306,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         client_address = self.client_address
         player_id = recv.player_id
+        state = recv.state
+
         #Add handling of ghosts for player if it's missing
         if not player_id in globalGhosts.keys():
             globalGhosts[player_id] = GhostsVariables()
@@ -354,22 +328,22 @@ class UDPHandler(socketserver.BaseRequestHandler):
         ghosts.lastPackageTime = t
 
         if str(player_id) in ghostsEnabled and ghostsEnabled[str(player_id)]:
-            if not ghosts.loaded and recv.state.roadTime > 0:
+            if not ghosts.loaded and state.roadTime > 0:
                 ghosts.loaded = True
-                loadGhosts(player_id, recv.state, ghosts)
-            if recv.state.roadTime and ghosts.last_rt and recv.state.roadTime != ghosts.last_rt:
+                loadGhosts(player_id, state, ghosts)
+            if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
                 if t >= ghosts.last_rec + update_freq:
                     state = ghosts.rec.states.add()
-                    state.CopyFrom(recv.state)
+                    state.CopyFrom(state)
                     ghosts.last_rec = t
-                if not ghosts.started and ghosts.play.ghosts and roadID(recv.state) == ghosts.start_road:
-                    if isForward(recv.state):
-                        if recv.state.roadTime >= ghosts.start_rt >= ghosts.last_rt:
+                if not ghosts.started and ghosts.play.ghosts and roadID(state) == ghosts.start_road:
+                    if isForward(state):
+                        if state.roadTime >= ghosts.start_rt >= ghosts.last_rt:
                             ghosts.started = True
                     else:
-                        if recv.state.roadTime <= ghosts.start_rt <= ghosts.last_rt:
+                        if state.roadTime <= ghosts.start_rt <= ghosts.last_rt:
                             ghosts.started = True
-            ghosts.last_rt = recv.state.roadTime
+            ghosts.last_rt = state.roadTime
 
         keys = online.keys()
         removePlayers = list()
@@ -378,8 +352,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 removePlayers.insert(0, p_id)
         for p_id in removePlayers:
             online.pop(p_id)
-        if recv.state.roadTime:
-            online[str(player_id)] = recv.state
+        if state.roadTime:
+            online[str(player_id)] = state
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = globalGhosts.keys()
@@ -442,7 +416,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 player = online[p_id]
                 if player.id != player_id:
                     #Check if players are close in world
-                    if zwift_offline.isNearby(recv.state, player):
+                    if zwift_offline.isNearby(state, player):
                         nearby.append(p_id)
             players = len(nearby)
             message.num_msgs = players // 10
@@ -484,4 +458,4 @@ udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
 udpserver_thread.start()
 
-zwift_offline.run_standalone(online, ghostsEnabled, saveGhost, rideOnQueue, messageQueue)
+zwift_offline.run_standalone(online, ghostsEnabled, saveGhost, playerUpdateQueue)
