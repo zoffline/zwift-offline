@@ -37,6 +37,7 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
 
@@ -1243,6 +1244,10 @@ def static_web_launcher(filename):
     return render_template(filename)
 
 
+def check_player_profiles():
+    
+
+
 def check_columns():
     time.sleep(3)
     result = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
@@ -1263,6 +1268,7 @@ def check_columns():
             else:
                 defaulttext = " DEFAULT %s" % column.default.arg
             db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
+    check_player_profiles()
 
 
 def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
