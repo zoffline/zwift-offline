@@ -992,18 +992,10 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    try:
-        own_player_id = getPlayerId(request)
-        for p_id in online.keys():
-            player = online[p_id]
-            if player.id == player_id:
-                ride_with_player_state = udp_node_msgs_pb2.PlayerState()
-                ride_with_player_state.CopyFrom(player)
-                ride_with_player_state.id = own_player_id
-                return ride_with_player_state.SerializeToString()
-    except Exception as e:
-        print('Exception (Ride with): %s' % e)
-    return None
+    for p_id in online.keys():
+        player = online[p_id]
+        if player.id == player_id:
+            return player.SerializeToString()
 
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
