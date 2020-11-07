@@ -35,8 +35,6 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 
-
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
@@ -527,15 +525,30 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+
     stream = request.stream.read()
-    with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
-        f.write(stream)
     profile = profile_pb2.Profile()
     profile.ParseFromString(stream)
-    user = User.query.filter_by(uid=(player_id-1000)).first()
-    user.first_name = profile.first_name
-    user.last_name = profile.last_name
-    db.session.commit()
+
+    verify_player_id1 = getPlayerId(request)
+    verify_player_id2 = profile.id
+
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(player_id))
+    profile_mismatch = False
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            stored_profile = profile_pb2.Profile()
+            stored_profile.ParseFromString(fd.read())
+            profile_mismatch = stored_profile.first_name != profile.first_name or stored_profile.last_name != profile.last_name
+
+    if not profile_mismatch and str(player_id) == str(verify_player_id1) and str(player_id) == str(verify_player_id2):
+        with open(profile_file, 'wb') as f:
+            f.write(stream)
+    else:
+        #Player tried to update someone else's profile
+        print('Exception: not matching player_ids when trying to update profile. ID1 %s, ID2 %s, ID3 %s. IPAdress %s' % (player_id, verify_player_id1, verify_player_id2, request.remote_addr))
+        #Send forbidden to client for debugging
+        return '', 403
     return '', 204
 
 
@@ -922,7 +935,6 @@ def relay_worlds_generic(world_id=None):
     else:  # protobuf request
         worlds = world_pb2.Worlds()
         world = None
-
         for course in courses:
             world = worlds.worlds.add()
             world.id = 1
@@ -980,10 +992,17 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    for p_id in online.keys():
-        player = online[p_id]
-        if player.id == player_id:
-            return player.SerializeToString()
+    try:
+        own_player_id = getPlayerId(request)
+        for p_id in online.keys():
+            player = online[p_id]
+            if player.id == player_id:
+                ride_with_player_state = udp_node_msgs_pb2.PlayerState()
+                ride_with_player_state.CopyFrom(player)
+                ride_with_player_state.id = own_player_id
+                return ride_with_player_state.SerializeToString()
+    except Exception as e:
+        print('Exception (Ride with): %s' % e)
     return None
 
 
@@ -1245,7 +1264,7 @@ def static_web_launcher(filename):
 
 
 def check_player_profiles():
-    
+    return ''
 
 
 def check_columns():

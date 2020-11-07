@@ -278,7 +278,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except Exception as e:
-                print('Exception: %s' % e)
+                print('Exception TCP: %s' % e)
                 break
 
 class GhostsVariables:
