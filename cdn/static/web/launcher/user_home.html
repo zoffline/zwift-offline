@@ -11,6 +11,7 @@
 <body>
   <div class="container-fluid">
     <h1>Zwift Launcher</h1>
+    {% if username %}
     <h2>Logged in as {{ username }}</h2>
     <div class="row">
       <div class="col-md-12">
@@ -18,6 +19,9 @@
         <a href="{{ url_for('logout', username=username) }}" class="btn btn-outline-secondary">Logout</a>
       </div>
     </div>
+    {% else %}
+        <a href="{{ url_for('upload', username=username) }}" class="btn btn-outline-success">Upload</a>
+    {% endif %}
     <form method="POST" action="/start-zwift">
       <div class="row">
         <div class="col-md-4 top-buffer">
