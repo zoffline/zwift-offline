@@ -566,6 +566,8 @@ def api_profiles_id(player_id):
     if current_user.player_id != player_id:
         return '', 401
     stream = request.stream.read()
+    with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
+        f.write(stream)
     profile = profile_pb2.Profile()
     profile.ParseFromString(stream)
     if MULTIPLAYER:
