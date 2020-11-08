@@ -298,11 +298,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
-        
+
         try:
             recv.ParseFromString(data[:-4])
         except:
-            recv.ParseFromString(data[3:-4])
+            try:
+                recv.ParseFromString(data[3:-4])
+            except:
+                return
 
         client_address = self.client_address
         player_id = recv.player_id

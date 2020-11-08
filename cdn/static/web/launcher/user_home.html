@@ -19,8 +19,6 @@
         <a href="{{ url_for('logout', username=username) }}" class="btn btn-outline-secondary">Logout</a>
       </div>
     </div>
-    {% else %}
-        <a href="{{ url_for('upload', username=username) }}" class="btn btn-outline-success">Upload</a>
     {% endif %}
     <form method="POST" action="/start-zwift">
       <div class="row">
