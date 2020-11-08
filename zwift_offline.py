@@ -551,6 +551,7 @@ def api_profiles_me():
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
             AnonUser.player_id = profile.id
+            ghostsEnabled[profile.id] = AnonUser.enable_ghosts
         if not profile.email:
             profile.email = 'user@email.com'
         if profile.f60:
@@ -1320,7 +1321,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-        ghostsEnabled[str(current_user.player_id)] = current_user.enable_ghosts
+        ghostsEnabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
     db.session.commit()
