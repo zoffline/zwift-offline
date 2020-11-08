@@ -442,7 +442,7 @@ def api_users_login():
 @login_required
 def api_users_logout():
     #Remove player from online when leaving game/world
-    player_id = current_user.player_id
+    player_id = str(current_user.player_id)
     if player_id in online:
         online.pop(player_id)
     if player_id in playerPartialProfiles:
@@ -550,6 +550,7 @@ def api_profiles_me():
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
             AnonUser.player_id = profile.id
+            ghostsEnabled[str(profile.id)] = AnonUser.enable_ghosts
         if not profile.email:
             profile.email = 'user@email.com'
         if profile.f60:
@@ -803,7 +804,7 @@ def unix_time_millis(dt):
 
 def fill_in_goal_progress(goal, player_id):
     cur = g.db.cursor()
-    now = datetime.datetime.now()
+    now = datetime.datetime.utcnow()
     if goal.periodicity == 0:  # weekly
         first_dt, last_dt = get_week_range(now)
     else:  # monthly
@@ -859,7 +860,7 @@ def api_profiles_goals(player_id):
         goal = goal_pb2.Goal()
         goal.ParseFromString(request.stream.read())
         goal.id = get_id('goal')
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         goal.created_on = unix_time_millis(now)
         set_goal_end_date(goal, now)
         fill_in_goal_progress(goal, player_id)
@@ -876,7 +877,7 @@ def api_profiles_goals(player_id):
         goal = goals.goals.add()
         row_to_protobuf(row, goal)
         end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         if end_dt < now:
             set_goal_end_date(goal, now)
             update_protobuf_in_db('goal', goal, goal.id)
@@ -1115,7 +1116,7 @@ def handle_segment_results(request):
         result.ParseFromString(request.stream.read())
         result.id = get_id('segment_result')
         result.world_time = world_time()
-        result.finish_time_str = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        result.finish_time_str = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
         return '{"id": %ld}' % result.id, 200
