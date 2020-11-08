@@ -536,17 +536,17 @@ def api_profiles_me():
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
         if MULTIPLAYER:
-	    # For newly added existing profiles, User's player id likely differs from profile's player id.
+            # For newly added existing profiles, User's player id likely differs from profile's player id.
             # If there's existing data in db for this profile, update it for the newly assigned player id.
             # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
             #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
             # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
-	    if profile.id != profile_id:
-		cur = g.db.cursor()
-		cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-		cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-		cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-		g.db.commit()
+            if profile.id != profile_id:
+                cur = g.db.cursor()
+                cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                g.db.commit()
             profile.id = profile_id
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
