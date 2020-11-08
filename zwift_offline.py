@@ -16,10 +16,6 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
-if sys.version_info[0] > 2:
-    from urllib.parse import quote, unquote
-else:
-    from urllib import quote, unquote
 
 import jwt
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
@@ -1270,9 +1266,16 @@ def launch_zwift():
             return render_template("user_home.html", username="", enable_ghosts=False, online=getOnline())
     else:
         if MULTIPLAYER:
-            return redirect("http://zwift/?code=%s" % quote(request.cookies.get('remember_token')), 302)
+            return redirect("http://zwift/?code=zwift_refresh_token%s" % fake_refresh_token_with_session_cookie(request.cookies.get('remember_token')), 302)
         else:
             return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
+
+
+def fake_refresh_token_with_session_cookie(session_cookie):
+    refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
+    refresh_token['session_cookie'] = session_cookie
+    refresh_token = jwt.encode(refresh_token, 'nosecret').decode('utf-8')
+    return refresh_token
 
 
 def fake_jwt_with_session_cookie(session_cookie):
@@ -1280,9 +1283,7 @@ def fake_jwt_with_session_cookie(session_cookie):
     access_token['session_cookie'] = session_cookie
     access_token = jwt.encode(access_token, 'nosecret').decode('utf-8')
 
-    refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
-    refresh_token['session_cookie'] = session_cookie
-    refresh_token = jwt.encode(refresh_token, 'nosecret').decode('utf-8')
+    refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
     return """{"access_token":"%s","expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":"%s","token_type":"bearer","id_token":"%s","not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}""" % (access_token, refresh_token, ID_TOKEN)
 
@@ -1305,7 +1306,8 @@ def auth_realms_zwift_protocol_openid_connect_token():
         # This is called once with ?code= in URL and once again with the refresh token
         if "code" in request.form:
             # Original code argument is replaced with session cookie from launcher
-            session_cookie = unquote(request.form['code'])
+            refresh_token = jwt.decode(request.form['code'][19:], options=({'verify_signature': False, 'verify_aud': False}))
+            session_cookie = refresh_token['session_cookie']
             return fake_jwt_with_session_cookie(session_cookie), 200
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
