@@ -75,6 +75,7 @@ DATABASE_CUR_VER = 2
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
@@ -86,7 +87,11 @@ AUTH_PATH = "%s/auth.db" % STORAGE_DIR
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=AUTH_PATH)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'zoffline'
+if not os.path.exists(SECRET_KEY_FILE):
+    with open(SECRET_KEY_FILE, 'wb') as f:
+        f.write(os.urandom(16))
+with open(SECRET_KEY_FILE, 'rb') as f:
+    app.config['SECRET_KEY'] = f.read()
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
@@ -239,11 +244,15 @@ def signup():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
         first_name = request.form['first_name']
         last_name = request.form['last_name']
 
-        if not (username and password and first_name and last_name):
+        if not (username and password and confirm_password and first_name and last_name):
             flash("All fields are required.")
+            return redirect(url_for('signup'))
+        if password != confirm_password:
+            flash("Passwords did not match.")
             return redirect(url_for('signup'))
 
         hashed_pwd = generate_password_hash(password, 'sha256')
@@ -300,7 +309,7 @@ def upload(username):
             os.makedirs(profile_dir)
     except IOError as e:
         logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        sys.exit(1)
+        return '', 500
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
@@ -326,7 +335,7 @@ def upload(username):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
-    return render_template("upload.html", username=username, profile=profile, name=name, token=token)
+    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token)
 
 
 @app.route("/logout/<username>")
@@ -513,7 +522,7 @@ def api_profiles_me():
             os.makedirs(profile_dir)
     except IOError as e:
         logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        sys.exit(1)
+        return '', 500
     profile = profile_pb2.Profile()
     profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
@@ -526,6 +535,17 @@ def api_profiles_me():
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
         if MULTIPLAYER:
+            # For newly added existing profiles, User's player id likely differs from profile's player id.
+            # If there's existing data in db for this profile, update it for the newly assigned player id.
+            # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
+            #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
+            # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
+            if profile.id != profile_id:
+                cur = g.db.cursor()
+                cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                g.db.commit()
             profile.id = profile_id
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
@@ -1322,11 +1342,7 @@ def auth_realms_zwift_tokens_access_codes():
 def static_web_launcher(filename):
     return render_template(filename)
 
-
-def check_player_profiles():
-    return ''
-
-
+    
 def check_columns():
     time.sleep(3)
     result = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
@@ -1363,11 +1379,11 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None
-    db.create_all(app=app)
-    db.session.commit()
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
+    db.create_all(app=app)
+    db.session.commit()
 
     @login_manager.user_loader
     def load_user(uid):
