@@ -1309,6 +1309,10 @@ def auth_realms_zwift_protocol_openid_connect_token():
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
             return fake_jwt_with_session_cookie(token['session_cookie'])
+        else:  # android login
+            from flask_login import encode_cookie
+            # cookie is not set in request since we just logged in so create it.
+            return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
     else:
         return FAKE_JWT, 200
 

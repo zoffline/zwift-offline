@@ -32,7 +32,7 @@ To install zoffline on Linux, Windows, or Mac OS X:
 * Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
 * Install dependencies: flask, flask_sqlalchemy, python-protobuf, protobuf3_to_dict, stravalib (optional)
   * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy protobuf protobuf3_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy flask-login pyjwt protobuf protobuf3_to_dict stravalib``
     * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
