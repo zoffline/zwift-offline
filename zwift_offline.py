@@ -140,11 +140,14 @@ class Online:
 
 coursesLookup = {
     2: 'Richmond',
+    4: 'Unknown1',  # event specific?
     6: 'Watopia',
     7: 'London',
     8: 'New York',
     9: 'Innsbruck',
+    10: 'Unknown2',  # event specific?
     11: 'Yorkshire',
+    12: 'Unknown3',  # event specific?
     14: 'France',
     15: 'Paris'
 }
@@ -176,10 +179,9 @@ def getOnline():
 
 
 def getPartialProfile(player_id):
-    player_id_str = str(player_id)
-    if not player_id_str in playerPartialProfiles:
+    if not player_id in playerPartialProfiles:
         #Read from disk
-        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id_str)
+        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
         if os.path.isfile(profile_file):
             try:
                 with open(profile_file, 'rb') as fd:
@@ -189,11 +191,11 @@ def getPartialProfile(player_id):
                     partialProfile.first_name = profile.first_name
                     partialProfile.last_name = profile.last_name
                     partialProfile.country_code = profile.country_code
-                    playerPartialProfiles[player_id_str] = partialProfile
+                    playerPartialProfiles[player_id] = partialProfile
             except:
                 return None
         else: return None
-    return playerPartialProfiles[player_id_str]
+    return playerPartialProfiles[player_id]
 
 def getCourse(state):
     return (state.f19 & 0xff0000) >> 16
@@ -764,11 +766,9 @@ def api_profiles_activities_rideon(recieving_player_id):
 
         player_update.payload = ride_on.SerializeToString()
 
-        recieving_player_id_str = str(recieving_player_id)
-        sending_player_id_str = str(sending_player_id)
-        if not recieving_player_id_str in playerUpdateQueue:
-            playerUpdateQueue[recieving_player_id_str] = list()
-        playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
+        if not recieving_player_id in playerUpdateQueue:
+            playerUpdateQueue[recieving_player_id] = list()
+        playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
     return '{}', 200
 
 
@@ -910,7 +910,7 @@ def api_tcp_config():
 
 
 def relay_worlds_generic(world_id=None):
-    courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
+    courses = coursesLookup.keys()
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
@@ -941,17 +941,17 @@ def relay_worlds_generic(world_id=None):
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
             player_update.f14 = int(str(int(time.time()*1000000)))
-            for recieving_player_id_str in online.keys():
+            for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
-                    recieving_player = online[recieving_player_id_str]
+                    recieving_player = online[recieving_player_id]
                     #Chat message
                     if player_update.type == 5:
                         chat_message = udp_node_msgs_pb2.ChatMessage()
                         chat_message.ParseFromString(player_update.payload)
-                        sending_player_id_str = str(chat_message.rider_id)
-                        if sending_player_id_str in online:
-                            sending_player = online[sending_player_id_str]
+                        sending_player_id = chat_message.rider_id
+                        if sending_player_id in online:
+                            sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
                             if isNearby(sending_player, recieving_player):
                                 should_receive = True
@@ -959,9 +959,9 @@ def relay_worlds_generic(world_id=None):
                     else:
                         segment_complete = udp_node_msgs_pb2.SegmentComplete()
                         segment_complete.ParseFromString(player_update.payload)
-                        sending_player_id_str = str(segment_complete.rider_id)
-                        if sending_player_id_str in online:
-                            sending_player = online[sending_player_id_str]
+                        sending_player_id = segment_complete.rider_id
+                        if sending_player_id in online:
+                            sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
                             if getCourse(sending_player) == getCourse(recieving_player):
                                 should_receive = True
@@ -969,9 +969,9 @@ def relay_worlds_generic(world_id=None):
                 else:
                     should_receive = True
                 if should_receive:
-                    if not recieving_player_id_str in playerUpdateQueue:
-                        playerUpdateQueue[recieving_player_id_str] = list()
-                    playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
+                    if not recieving_player_id in playerUpdateQueue:
+                        playerUpdateQueue[recieving_player_id] = list()
+                    playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()

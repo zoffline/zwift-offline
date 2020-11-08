@@ -253,17 +253,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.player_id = player_id
                 message.world_time = zwift_offline.world_time()
 
-                player_id_str = str(player_id)
-
                 #PlayerUpdate
-                if player_id_str in playerUpdateQueue and len(playerUpdateQueue[player_id_str]) > 0 and player_id_str in online:
+                if player_id in playerUpdateQueue and len(playerUpdateQueue[player_id]) > 0 and player_id in online:
                     added_player_updates = list()
-                    for player_update_proto in playerUpdateQueue[player_id_str]:
+                    for player_update_proto in playerUpdateQueue[player_id]:
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
-                        playerUpdateQueue[player_id_str].remove(player_update_proto)
+                        playerUpdateQueue[player_id].remove(player_update_proto)
 
                 t = int(time.time())
 
@@ -356,7 +354,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         for p_id in removePlayers:
             online.pop(p_id)
         if state.roadTime:
-            online[str(player_id)] = state
+            online[player_id] = state
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = globalGhosts.keys()
