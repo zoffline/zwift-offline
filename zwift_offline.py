@@ -440,7 +440,7 @@ def api_users_login():
 @login_required
 def api_users_logout():
     #Remove player from online when leaving game/world
-    player_id = str(current_user.player_id)
+    player_id = current_user.player_id
     if player_id in online:
         online.pop(player_id)
     if player_id in playerPartialProfiles:
