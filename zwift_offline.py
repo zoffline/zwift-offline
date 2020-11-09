@@ -16,10 +16,6 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
-if sys.version_info[0] > 2:
-    from urllib.parse import quote, unquote
-else:
-    from urllib import quote, unquote
 
 import jwt
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
@@ -143,11 +139,14 @@ class Online:
 
 coursesLookup = {
     2: 'Richmond',
+    4: 'Unknown1',  # event specific?
     6: 'Watopia',
     7: 'London',
     8: 'New York',
     9: 'Innsbruck',
+    10: 'Unknown2',  # event specific?
     11: 'Yorkshire',
+    12: 'Unknown3',  # event specific?
     14: 'France',
     15: 'Paris'
 }
@@ -179,10 +178,9 @@ def getOnline():
 
 
 def getPartialProfile(player_id):
-    player_id_str = str(player_id)
-    if not player_id_str in playerPartialProfiles:
+    if not player_id in playerPartialProfiles:
         #Read from disk
-        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id_str)
+        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
         if os.path.isfile(profile_file):
             try:
                 with open(profile_file, 'rb') as fd:
@@ -192,11 +190,11 @@ def getPartialProfile(player_id):
                     partialProfile.first_name = profile.first_name
                     partialProfile.last_name = profile.last_name
                     partialProfile.country_code = profile.country_code
-                    playerPartialProfiles[player_id_str] = partialProfile
+                    playerPartialProfiles[player_id] = partialProfile
             except:
                 return None
         else: return None
-    return playerPartialProfiles[player_id_str]
+    return playerPartialProfiles[player_id]
 
 def getCourse(state):
     return (state.f19 & 0xff0000) >> 16
@@ -550,6 +548,7 @@ def api_profiles_me():
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
             AnonUser.player_id = profile.id
+            ghostsEnabled[profile.id] = AnonUser.enable_ghosts
         if not profile.email:
             profile.email = 'user@email.com'
         if profile.f60:
@@ -764,11 +763,9 @@ def api_profiles_activities_rideon(recieving_player_id):
 
         player_update.payload = ride_on.SerializeToString()
 
-        recieving_player_id_str = str(recieving_player_id)
-        sending_player_id_str = str(sending_player_id)
-        if not recieving_player_id_str in playerUpdateQueue:
-            playerUpdateQueue[recieving_player_id_str] = list()
-        playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
+        if not recieving_player_id in playerUpdateQueue:
+            playerUpdateQueue[recieving_player_id] = list()
+        playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
     return '{}', 200
 
 
@@ -910,7 +907,7 @@ def api_tcp_config():
 
 
 def relay_worlds_generic(world_id=None):
-    courses = [6, 9, 2, 8, 7, 11, 14, 15, 12, 10, 4]
+    courses = coursesLookup.keys()
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
@@ -941,17 +938,17 @@ def relay_worlds_generic(world_id=None):
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
             player_update.f14 = int(str(int(time.time()*1000000)))
-            for recieving_player_id_str in online.keys():
+            for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
-                    recieving_player = online[recieving_player_id_str]
+                    recieving_player = online[recieving_player_id]
                     #Chat message
                     if player_update.type == 5:
                         chat_message = udp_node_msgs_pb2.ChatMessage()
                         chat_message.ParseFromString(player_update.payload)
-                        sending_player_id_str = str(chat_message.rider_id)
-                        if sending_player_id_str in online:
-                            sending_player = online[sending_player_id_str]
+                        sending_player_id = chat_message.rider_id
+                        if sending_player_id in online:
+                            sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
                             if isNearby(sending_player, recieving_player):
                                 should_receive = True
@@ -959,9 +956,9 @@ def relay_worlds_generic(world_id=None):
                     else:
                         segment_complete = udp_node_msgs_pb2.SegmentComplete()
                         segment_complete.ParseFromString(player_update.payload)
-                        sending_player_id_str = str(segment_complete.rider_id)
-                        if sending_player_id_str in online:
-                            sending_player = online[sending_player_id_str]
+                        sending_player_id = segment_complete.rider_id
+                        if sending_player_id in online:
+                            sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
                             if getCourse(sending_player) == getCourse(recieving_player):
                                 should_receive = True
@@ -969,9 +966,9 @@ def relay_worlds_generic(world_id=None):
                 else:
                     should_receive = True
                 if should_receive:
-                    if not recieving_player_id_str in playerUpdateQueue:
-                        playerUpdateQueue[recieving_player_id_str] = list()
-                    playerUpdateQueue[recieving_player_id_str].append(player_update.SerializeToString())
+                    if not recieving_player_id in playerUpdateQueue:
+                        playerUpdateQueue[recieving_player_id] = list()
+                    playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
@@ -1264,9 +1261,16 @@ def launch_zwift():
             return render_template("user_home.html", username="", enable_ghosts=False, online=getOnline())
     else:
         if MULTIPLAYER:
-            return redirect("http://zwift/?code=%s" % quote(request.cookies.get('remember_token')), 302)
+            return redirect("http://zwift/?code=zwift_refresh_token%s" % fake_refresh_token_with_session_cookie(request.cookies.get('remember_token')), 302)
         else:
             return redirect("http://zwift/?code=zwift_refresh_token%s" % REFRESH_TOKEN, 302)
+
+
+def fake_refresh_token_with_session_cookie(session_cookie):
+    refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
+    refresh_token['session_cookie'] = session_cookie
+    refresh_token = jwt.encode(refresh_token, 'nosecret').decode('utf-8')
+    return refresh_token
 
 
 def fake_jwt_with_session_cookie(session_cookie):
@@ -1274,9 +1278,7 @@ def fake_jwt_with_session_cookie(session_cookie):
     access_token['session_cookie'] = session_cookie
     access_token = jwt.encode(access_token, 'nosecret').decode('utf-8')
 
-    refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
-    refresh_token['session_cookie'] = session_cookie
-    refresh_token = jwt.encode(refresh_token, 'nosecret').decode('utf-8')
+    refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
     return """{"access_token":"%s","expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":"%s","token_type":"bearer","id_token":"%s","not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}""" % (access_token, refresh_token, ID_TOKEN)
 
@@ -1299,11 +1301,16 @@ def auth_realms_zwift_protocol_openid_connect_token():
         # This is called once with ?code= in URL and once again with the refresh token
         if "code" in request.form:
             # Original code argument is replaced with session cookie from launcher
-            session_cookie = unquote(request.form['code'])
+            refresh_token = jwt.decode(request.form['code'][19:], options=({'verify_signature': False, 'verify_aud': False}))
+            session_cookie = refresh_token['session_cookie']
             return fake_jwt_with_session_cookie(session_cookie), 200
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
             return fake_jwt_with_session_cookie(token['session_cookie'])
+        else:  # android login
+            from flask_login import encode_cookie
+            # cookie is not set in request since we just logged in so create it.
+            return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
     else:
         return FAKE_JWT, 200
 
@@ -1311,7 +1318,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-        ghostsEnabled[str(current_user.player_id)] = current_user.enable_ghosts
+        ghostsEnabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
     db.session.commit()
