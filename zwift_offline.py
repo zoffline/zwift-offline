@@ -975,6 +975,7 @@ def relay_worlds_generic(world_id=None):
     else:  # protobuf request
         worlds = world_pb2.Worlds()
         world = None
+
         for course in courses:
             world = worlds.worlds.add()
             world.id = 1
@@ -1036,6 +1037,7 @@ def relay_worlds_id_players_id(world_id, player_id):
         player = online[p_id]
         if player.id == player_id:
             return player.SerializeToString()
+    return None
 
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
