@@ -77,11 +77,9 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
 from tokens import *
 
-AUTH_PATH = "%s/auth.db" % STORAGE_DIR
-
 # Android uses https for cdn
 app = Flask(__name__, static_folder='%s/cdn/gameassets' % SCRIPT_DIR, static_url_path='/gameassets', template_folder='%s/cdn/static/web/launcher' % SCRIPT_DIR)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=AUTH_PATH)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{db}'.format(db=DATABASE_PATH)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 if not os.path.exists(SECRET_KEY_FILE):
     with open(SECRET_KEY_FILE, 'wb') as f:
@@ -352,13 +350,11 @@ type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 
 
 def insert_protobuf_into_db(table_name, msg):
-    cur = g.db.cursor()
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
     columns = ', '.join(list(msg_dict.keys()))
     placeholders = ':'+', :'.join(list(msg_dict.keys()))
     query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
-    cur.execute(query, msg_dict)
-    g.db.commit()
+    db.engine.execute(query, msg_dict)
 
 
 # XXX: can't be used to 'nullify' a column value
@@ -370,14 +366,12 @@ def update_protobuf_in_db(table_name, msg, id):
             id = str(id)
     except AttributeError:
         pass
-    cur = g.db.cursor()
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
     columns = ', '.join(list(msg_dict.keys()))
     placeholders = ':'+', :'.join(list(msg_dict.keys()))
     setters = ', '.join('{}=:{}'.format(key, key) for key in msg_dict)
     query = 'UPDATE %s SET %s WHERE id=%s' % (table_name, setters, id)
-    cur.execute(query, msg_dict)
-    g.db.commit()
+    db.engine.execute(query, msg_dict)
 
 
 def row_to_protobuf(row, msg, exclude_fields=[]):
@@ -396,13 +390,12 @@ def row_to_protobuf(row, msg, exclude_fields=[]):
 
 # FIXME: I should really do this properly...
 def get_id(table_name):
-    cur = g.db.cursor()
     while True:
         # I think activity id is actually only uint32. On the off chance it's
         # int32, stick with 31 bits.
         ident = int(random.getrandbits(31))
-        cur.execute("SELECT id FROM %s WHERE id = ?" % table_name, (str(ident),))
-        if not cur.fetchall():
+        row = db.engine.execute("SELECT id FROM %s WHERE id = %s" % (table_name, ident)).first()
+        if not row:
             break
     return ident
 
@@ -539,11 +532,9 @@ def api_profiles_me():
             #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
             # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
             if profile.id != profile_id:
-                cur = g.db.cursor()
-                cur.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-                cur.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-                cur.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
-                g.db.commit()
+                db.engine.execute('UPDATE activity SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                db.engine.execute('UPDATE goal SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
+                db.engine.execute('UPDATE segment_result SET player_id = ? WHERE player_id = ?', (str(profile_id), str(profile.id)))
             profile.id = profile_id
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
@@ -593,10 +584,9 @@ def api_profiles_activities(player_id):
 
     # request.method == 'GET'
     activities = activity_pb2.Activities()
-    cur = g.db.cursor()
     # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
-    cur.execute("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = ?", (str(player_id),))
-    for row in cur.fetchall():
+    rows = db.engine.execute("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = ?", (str(player_id),))
+    for row in rows:
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
         a = activity
@@ -605,7 +595,7 @@ def api_profiles_activities(player_id):
         #a.avg_watts == 0 and a.calories == 0 and a.distance == 0 and a.max_cadence == 0 and
         #a.max_heart_rate == 0 and a.max_speed == 0 and a.max_watts == 0):
         if a.distance == 0:
-            cur.executescript("DELETE FROM activity WHERE id = %s" % a.id)
+            db.engine.execute("DELETE FROM activity WHERE id = %s" % a.id)
             activities.activities.remove(a)
 
     return activities.SerializeToString(), 200
@@ -795,24 +785,22 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(dt.strftime('%s')) * 1000
+    return int(dt.timestamp()*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
-    cur = g.db.cursor()
     now = datetime.datetime.utcnow()
     if goal.periodicity == 0:  # weekly
         first_dt, last_dt = get_week_range(now)
     else:  # monthly
         first_dt, last_dt = get_month_range(now)
     if goal.type == 0:  # distance
-        cur.execute("""SELECT SUM(distance) FROM activity
+        distance = db.engine.execute("""SELECT SUM(distance) FROM activity
                        WHERE player_id = ?
                        AND strftime('%s', start_date) >= strftime('%s', ?)
                        AND strftime('%s', start_date) <= strftime('%s', ?)
                        AND end_date IS NOT NULL""",
-                       (str(player_id), first_dt, last_dt))
-        distance = cur.fetchall()[0][0]
+                       (str(player_id), first_dt, last_dt)).first()[0]
         if distance:
             goal.actual_distance = distance
             goal.actual_duration = distance
@@ -821,14 +809,13 @@ def fill_in_goal_progress(goal, player_id):
             goal.actual_duration = 0.0
 
     else:  # duration
-        cur.execute("""SELECT SUM(julianday(end_date) - julianday(start_date))
+        duration = db.engine.execute("""SELECT SUM(julianday(end_date) - julianday(start_date))
                        FROM activity
                        WHERE player_id = ?
                        AND strftime('%s', start_date) >= strftime('%s', ?)
                        AND strftime('%s', start_date) <= strftime('%s', ?)
                        AND end_date IS NOT NULL""",
-                       (str(player_id), first_dt, last_dt))
-        duration = cur.fetchall()[0][0]
+                       (str(player_id), first_dt, last_dt)).first()[0]
         if duration:
             goal.actual_duration = duration*1440  # convert from days to minutes
             goal.actual_distance = duration*1440
@@ -866,9 +853,7 @@ def api_profiles_goals(player_id):
 
     # request.method == 'GET'
     goals = goal_pb2.Goals()
-    cur = g.db.cursor()
-    cur.execute("SELECT * FROM goal WHERE player_id = ?", (str(player_id),))
-    rows = cur.fetchall()
+    rows = db.engine.execute("SELECT * FROM goal WHERE player_id = ?", (str(player_id),))
     for row in rows:
         goal = goals.goals.add()
         row_to_protobuf(row, goal)
@@ -889,9 +874,7 @@ def api_profiles_goals_id(player_id, goal_id):
     if player_id != current_user.player_id:
         return '', 401
     goal_id = int(goal_id) & 0xffffffffffffffff
-    cur = g.db.cursor()
-    cur.execute("DELETE FROM goal WHERE id = ?", (str(goal_id),))
-    g.db.commit()
+    db.engine.execute("DELETE FROM goal WHERE id = ?", (str(goal_id),))
     return '', 200
 
 
@@ -1084,7 +1067,6 @@ def relay_periodic_info():
 
 
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, only_own):
-    cur = g.db.cursor()
     where_stmt = "WHERE segment_id = ?"
     where_args = [str(segment_id)]
     if only_own and player_id:
@@ -1101,8 +1083,8 @@ def add_segment_results(segment_id, player_id, only_best, from_date, to_date, re
         where_args.append(to_date)
     if only_best:
         where_stmt += " ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 1"
-    cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
-    for row in cur.fetchall():
+    rows = db.engine.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
+    for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
 
@@ -1175,35 +1157,25 @@ def connect_db():
     return conn
 
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
-
-
 @app.teardown_request
 def teardown_request(exception):
-    if hasattr(g, 'db'):
-        g.db.close()
+    if exception != None:
+        print('Exception: %s' % exception)
 
 
 def init_database():
-    conn = connect_db()
-    cur = conn.cursor()
     if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
         # Create a new database
         with open(DATABASE_INIT_SQL, 'r') as f:
-            cur.executescript(f.read())
-            cur.execute('INSERT INTO version VALUES (?)', (DATABASE_CUR_VER,))
-        conn.close()
+            db.engine.execute(f.read())
+            db.engine.execute('INSERT INTO version VALUES (?)', (DATABASE_CUR_VER,))
         return
     # Migrate database if necessary
     if not os.access(DATABASE_PATH, os.W_OK):
         logging.error("zwift-offline.db is not writable. Unable to upgrade database!")
         return
-    cur_version = cur.execute('SELECT version FROM version')
-    version = cur.fetchall()[0][0]
+    version = db.engine.execute('SELECT version FROM version').first()[0]
     if version == DATABASE_CUR_VER:
-        conn.close()
         return
     # Database needs to be upgraded, try to back it up first
     try:  # Try writing to storage dir
@@ -1217,21 +1189,41 @@ def init_database():
     if version < 1:
         # Adjust old world_time values in segment results to new rough estimate of Zwift's
         logging.info("Upgrading zwift-offline.db to version 2")
-        cur.execute('UPDATE segment_result SET world_time = world_time-1414016075000')
-        cur.execute('UPDATE version SET version = 2')
+        db.engine.execute('UPDATE segment_result SET world_time = world_time-1414016075000')
+        db.engine.execute('UPDATE version SET version = 2')
 
     if version == 1:
         logging.info("Upgrading zwift-offline.db to version 2")
-        cur.execute('UPDATE segment_result SET world_time = cast(world_time/64.4131403573055-1414016075 as int)*1000')
-        cur.execute('UPDATE version SET version = 2')
+        db.engine.execute('UPDATE segment_result SET world_time = cast(world_time/64.4131403573055-1414016075 as int)*1000')
+        db.engine.execute('UPDATE version SET version = 2')
 
-    conn.commit()
-    conn.close()
+
+def check_columns():
+    time.sleep(3)
+    rows = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
+    should_have_columns = User.metadata.tables['user'].columns
+    current_columns = list()
+    for row in rows:
+        current_columns.append(row[1])
+    for column in should_have_columns:
+        if not column.name in current_columns:
+            nulltext = None
+            if column.nullable:
+                nulltext = "NULL"
+            else:
+                nulltext = "NOT NULL"
+            defaulttext = None
+            if column.default == None:
+                defaulttext = ""
+            else:
+                defaulttext = " DEFAULT %s" % column.default.arg
+            db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
 
 
 @app.before_first_request
 def before_first_request():
     init_database()
+    check_columns()
     db.create_all()
 
 
@@ -1352,29 +1344,6 @@ def auth_realms_zwift_tokens_access_codes():
 @app.route('/static/web/launcher/<filename>', methods=['GET'])
 def static_web_launcher(filename):
     return render_template(filename)
-
-    
-def check_columns():
-    time.sleep(3)
-    result = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
-    should_have_columns = User.metadata.tables['user'].columns
-    current_columns = list()
-    for row in result:
-        current_columns.append(row[1])
-    for column in should_have_columns:
-        if not column.name in current_columns:
-            nulltext = None
-            if column.nullable:
-                nulltext = "NULL"
-            else:
-                nulltext = "NOT NULL"
-            defaulttext = None
-            if column.default == None:
-                defaulttext = ""
-            else:
-                defaulttext = " DEFAULT %s" % column.default.arg
-            db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
-    check_player_profiles()
 
 
 def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
