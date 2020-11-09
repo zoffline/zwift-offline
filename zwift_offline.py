@@ -1100,7 +1100,7 @@ def add_segment_results(segment_id, player_id, only_best, from_date, to_date, re
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
         where_args.append(to_date)
     if only_best:
-        where_stmt += " ORDER BY elapsed_ms LIMIT 1"
+        where_stmt += " ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 1"
     cur.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in cur.fetchall():
         result = results.segment_results.add()
