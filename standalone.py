@@ -259,6 +259,18 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for player_update_proto in playerUpdateQueue[player_id]:
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
+
+                        #Send if 10 updates has already been added and start a new message
+                        if len(message.updates) > 9:
+                            message_payload = message.SerializeToString()
+                            self.request.sendall(struct.pack('!h', len(message_payload)))
+                            self.request.sendall(message_payload)
+                            
+                            message = udp_node_msgs_pb2.ServerToClient()
+                            message.f1 = 1
+                            message.player_id = player_id
+                            message.world_time = zwift_offline.world_time()
+
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
                         playerUpdateQueue[player_id].remove(player_update_proto)
