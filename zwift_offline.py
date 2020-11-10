@@ -18,7 +18,7 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -1320,6 +1320,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
         return FAKE_JWT, 200
 
 @app.route("/start-zwift" , methods=['POST'])
+@login_required
 def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
@@ -1331,7 +1332,9 @@ def start_zwift():
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
     else:
-        return redirect("http://cdn.zwift.com/%s" % selected_map, 302)
+        response = make_response(redirect("http://cdn.zwift.com/%s" % selected_map, 302))
+        response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
+        return response
 
 
 # Called by Mac, but not Windows
