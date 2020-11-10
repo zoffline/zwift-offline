@@ -18,7 +18,7 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -338,6 +338,16 @@ def upload(username):
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
     return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token)
+
+
+@app.route("/download/profile.bin", methods=["GET"])
+@login_required
+def download():
+    player_id = current_user.player_id
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
+    profile_file = os.path.join(profile_dir, 'profile.bin')
+    if os.path.isfile(profile_file):
+        return send_file(profile_file, attachment_filename='profile.bin')
 
 
 @app.route("/logout/<username>")
