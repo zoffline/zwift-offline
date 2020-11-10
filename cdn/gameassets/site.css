@@ -1,0 +1,17 @@
+body {
+    background-image: url('https://cdn.zwift.com/gameassets/background.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    overflow: hidden;
+}
+.list-group {
+    color: black;
+}
+.btn {
+    margin-right: 5px;
+}
+.top-buffer {
+    margin-top: 10px;
+}

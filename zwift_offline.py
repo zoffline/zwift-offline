@@ -1236,13 +1236,6 @@ def relay_worlds_leave(world_id):
     return '{"worldtime":%ld}' % world_time()
 
 
-def connect_db():
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.text_factory = str
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 @app.teardown_request
 def teardown_request(exception):
     if exception != None:
