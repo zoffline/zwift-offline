@@ -176,22 +176,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
-        if self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
-            # PROXYPASS_FILE existence indicates we know what we're doing and
-            # we can try to obtain the official map schedule. This can only work
-            # if we're running on a different machine than the Zwift client.
-            try:
-                import urllib3
-                http = urllib3.PoolManager()
-                r = http.request('GET', 'http://cdn.zwift.com/gameassets/MapSchedule_v2.xml')
-                self.send_response(200)
-                self.send_header('Content-type', 'text/xml')
-                self.end_headers()
-                self.wfile.write(r.data)
-                return
-            except:
-                pass  # fallthrough to return zoffline version
-        elif self.path == '/gameassets/MapSchedule_v2.xml':
+        if self.path == '/gameassets/MapSchedule_v2.xml':
             # Check if client requested the map be overridden
             for override in MAP_OVERRIDE:
                 if override[0] == self.client_address[0]:
@@ -202,9 +187,10 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(output.encode())
                     MAP_OVERRIDE.remove(override)
                     return
-        elif os.path.exists(PROXYPASS_FILE):
-            # proxy pass
-            # should add exception for /gameassets/Zwift_Updates_Root above
+        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not self.path in [
+            '/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml',
+            '/gameassets/Zwift_Updates_Root/ZwiftMac_ver_cur.xml']:
+
             sent = False
             try:
 
