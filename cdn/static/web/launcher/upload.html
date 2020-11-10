@@ -20,8 +20,7 @@
           <div class="col-md-3">
             {% if profile %}
               <a href="/download/profile.bin">{{ profile }}</a>
-            {% endif %}
-            {% if not profile %}
+            {% else %}
               {{ profile }}
             {% endif %}
           </div>
