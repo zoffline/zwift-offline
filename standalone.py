@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 import csv
+import requests
 from collections import deque
 from datetime import datetime
 from shutil import copyfile
@@ -144,6 +145,19 @@ def sigint_handler(num, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
+hostname = 'cdn.zwift.com'
+
+def merge_two_dicts(x, y):
+    z = x.copy()   # start with x's keys and values
+    z.update(y)    # modifies z with y's keys and values & returns None
+    return z
+
+def set_header():
+    headers = {
+        'Host': hostname
+    }
+
+    return headers
 
 class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -162,22 +176,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
-        if self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
-            # PROXYPASS_FILE existence indicates we know what we're doing and
-            # we can try to obtain the official map schedule. This can only work
-            # if we're running on a different machine than the Zwift client.
-            try:
-                import urllib3
-                http = urllib3.PoolManager()
-                r = http.request('GET', 'http://cdn.zwift.com/gameassets/MapSchedule_v2.xml')
-                self.send_response(200)
-                self.send_header('Content-type', 'text/xml')
-                self.end_headers()
-                self.wfile.write(r.data)
-                return
-            except:
-                pass  # fallthrough to return zoffline version
-        elif self.path == '/gameassets/MapSchedule_v2.xml':
+        if self.path == '/gameassets/MapSchedule_v2.xml':
             # Check if client requested the map be overridden
             for override in MAP_OVERRIDE:
                 if override[0] == self.client_address[0]:
@@ -188,8 +187,45 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(output.encode())
                     MAP_OVERRIDE.remove(override)
                     return
+        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not self.path in [
+            '/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml',
+            '/gameassets/Zwift_Updates_Root/ZwiftMac_ver_cur.xml']:
+
+            sent = False
+            try:
+
+                url = 'http://{}{}'.format(hostname, self.path)
+                req_header = self.parse_headers()
+
+                resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
+                sent = True
+
+                self.send_response(resp.status_code)
+                self.send_resp_headers(resp)
+                self.wfile.write(resp.content)
+                return
+            finally:
+                if not sent:
+                    self.send_error(404, 'error trying to proxy')
 
         SimpleHTTPRequestHandler.do_GET(self)
+
+    def parse_headers(self):
+        req_header = {}
+        for line in self.headers:
+            line_parts = [o.strip() for o in line.split(':', 1)]
+            if len(line_parts) == 2:
+                req_header[line_parts[0]] = line_parts[1]
+        return req_header
+
+    def send_resp_headers(self, resp):
+        respheaders = resp.headers
+        for key in respheaders:
+            if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
+                self.send_header(key, respheaders[key])
+        self.send_header('Content-Length', len(resp.content))
+        self.end_headers()
+
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
