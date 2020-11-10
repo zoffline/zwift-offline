@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 import csv
+from collections import deque
 from datetime import datetime
 from shutil import copyfile
 if sys.version_info[0] > 2:
@@ -35,7 +36,7 @@ else:
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-MAP_OVERRIDE = None
+MAP_OVERRIDE = deque(maxlen=16)
 
 update_freq = 3
 globalGhosts = {}
@@ -152,23 +153,16 @@ class CDNHandler(SimpleHTTPRequestHandler):
         return fullpath
 
     def do_GET(self):
-        global MAP_OVERRIDE
         path_end = self.path.rsplit('/', 1)[1]
         if path_end in ['FRANCE', 'INNSBRUCK', 'LONDON', 'NEWYORK', 'PARIS', 'RICHMOND', 'WATOPIA', 'YORKSHIRE']:
-            MAP_OVERRIDE = path_end
+            # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
+            MAP_OVERRIDE.append((self.client_address[0], path_end))
             self.send_response(302)
+            self.send_header('Cookie', self.headers.get('Cookie') + "; map=%s" % path_end)
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
-        if MAP_OVERRIDE and self.path == '/gameassets/MapSchedule_v2.xml':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/xml')
-            self.end_headers()
-            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (MAP_OVERRIDE, datetime.now().strftime("%Y-%m-%dT00:01-04"))
-            self.wfile.write(output.encode())
-            MAP_OVERRIDE = None
-            return
-        elif self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
+        if self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
             # PROXYPASS_FILE existence indicates we know what we're doing and
             # we can try to obtain the official map schedule. This can only work
             # if we're running on a different machine than the Zwift client.
@@ -183,6 +177,17 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 return
             except:
                 pass  # fallthrough to return zoffline version
+        elif self.path == '/gameassets/MapSchedule_v2.xml':
+            # Check if client requested the map be overridden
+            for override in MAP_OVERRIDE:
+                if override[0] == self.client_address[0]:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/xml')
+                    self.end_headers()
+                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], datetime.now().strftime("%Y-%m-%dT00:01-04"))
+                    self.wfile.write(output.encode())
+                    MAP_OVERRIDE.remove(override)
+                    return
 
         SimpleHTTPRequestHandler.do_GET(self)
 
