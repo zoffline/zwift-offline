@@ -1085,6 +1085,7 @@ def relay_periodic_info():
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
     where_stmt = "WHERE segment_id = ?"
     where_args = [str(segment_id)]
+    rows = None
     if player_id:
         where_stmt += " AND player_id = ?"
         where_args.append(player_id)
@@ -1095,10 +1096,17 @@ def add_segment_results(segment_id, player_id, only_best, from_date, to_date, re
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
         where_args.append(to_date)
     if only_best:
-        where_stmt += " AND world_time > ? ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 1000"
+        where_stmt += " AND world_time > ?"
         #Only include results from max 1 hour ago
         where_args.append(world_time()-(60*60*1000))
-    rows = db.engine.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
+        rows = db.engine.execute("""SELECT s1.* FROM segment_result s1
+                        JOIN (SELECT s.player_id, MIN(Cast(s.elapsed_ms AS INTEGER)) AS min_time
+                            FROM segment_result s %s GROUP BY s.player_id) s2 ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+                        GROUP BY s1.player_id, s1.elapsed_ms
+                        ORDER BY CAST(s1.elapsed_ms AS INTEGER)
+                        LIMIT 1000""" % where_stmt, where_args)
+    else:
+        rows = db.engine.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
