@@ -18,7 +18,12 @@
             profile.bin
           </div>
           <div class="col-md-3">
-            <a href="/download/profile.bin">{{ profile }}</a>
+            {% if profile %}
+              <a href="/download/profile.bin">{{ profile }}</a>
+            {% endif %}
+            {% if not profile %}
+              {{ profile }}
+            {% endif %}
           </div>
         </div>
       </li>
