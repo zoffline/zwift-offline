@@ -12,13 +12,21 @@
   <div class="container-fluid">
     <h1>Zwift Launcher</h1>
     {% if username %}
-    <h2>Logged in as {{ username }}</h2>
-    <div class="row">
-      <div class="col-md-12">
-        <a href="{{ url_for('upload', username=username) }}" class="btn btn-outline-success">Upload</a>
-        <a href="{{ url_for('logout', username=username) }}" class="btn btn-outline-secondary">Logout</a>
+      <h2>Logged in as {{ username }}</h2>
+        {% if restarting %}
+          <p class="alert alert-danger">Server is restarting in {{ restarting_in_minutes }} minutes</p>
+        {% endif %}
+      <div class="row">
+        <div class="col-md-12">
+          <a href="{{ url_for('upload', username=username) }}" class="btn btn-outline-success">Upload</a>
+          <a href="{{ url_for('logout', username=username) }}" class="btn btn-outline-secondary">Logout</a>
+          {% if is_admin and not restarting %}
+            <a href="/restart" class="btn btn-outline-danger">Restart server</a>
+          {% elif is_admin %}
+            <a href="/cancelrestart" class="btn btn-outline-danger">Cancel server restart</a>
+          {% endif %}
+        </div>
       </div>
-    </div>
     {% endif %}
     <form method="POST" action="/start-zwift">
       <div class="row">
@@ -54,5 +62,10 @@
       </div>
     </form>
   </div>
+  <script>
+    setTimeout(function() {
+      window.location.reload();
+    }, 20000);
+  </script>
 </body>
 </html>

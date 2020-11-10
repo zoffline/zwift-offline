@@ -4,6 +4,7 @@ import calendar
 import datetime
 import logging
 import os
+import signal
 import platform
 import random
 import sqlite3
@@ -11,6 +12,7 @@ import sys
 import tempfile
 import time
 import math
+import threading
 from copy import copy
 from datetime import timedelta
 from functools import wraps
@@ -95,6 +97,8 @@ playerUpdateQueue = {}
 playerIds = {}
 playerPartialProfiles = {}
 saveGhost = None
+restarting = False
+restarting_in_minutes = 0
 
 class User(UserMixin, db.Model):
     player_id = db.Column(db.Integer, primary_key=True)
@@ -103,6 +107,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     pass_hash = db.Column(db.String(100), nullable=False)
     enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
+    is_admin = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return self.username
@@ -298,8 +303,68 @@ def login():
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
-    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=getOnline())
+    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
+        online=getOnline(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
+def send_message_to_all_online(message):
+    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    player_update.f2 = 1
+    player_update.type = 5 #chat message type
+    player_update.world_time1 = world_time()
+    player_update.world_time2 = world_time() + 60000
+    player_update.f12 = 1
+    player_update.f14 = int(str(int(getUTCTime()*1000000)))
+
+    chat_message = udp_node_msgs_pb2.ChatMessage()
+    chat_message.rider_id = 0
+    chat_message.to_rider_id = 0
+    chat_message.f3 = 1
+    chat_message.firstName = 'Server'
+    chat_message.lastName = ''
+    chat_message.message = message
+    chat_message.countryCode = 0
+
+    player_update.payload = chat_message.SerializeToString()
+
+    for recieving_player_id in online.keys():
+        if not recieving_player_id in playerUpdateQueue:
+            playerUpdateQueue[recieving_player_id] = list()
+        playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
+
+def send_restarting_message():
+    global restarting
+    global restarting_in_minutes
+    while restarting:
+        send_message_to_all_online('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        time.sleep(60)
+        restarting_in_minutes -= 1
+        if restarting and restarting_in_minutes == 0:
+            send_message_to_all_online('See you later! Look for the back online message.')
+            time.sleep(6)
+            os.kill(os.getpid(), signal.SIGINT)
+
+@app.route("/restart")
+@login_required
+def restart_server():
+    global restarting
+    global restarting_in_minutes
+    if bool(current_user.is_admin):
+        restarting = True
+        restarting_in_minutes = 10
+        send_restarting_message_thread = threading.Thread(target=send_restarting_message)
+        send_restarting_message_thread.start()
+    return redirect('/user/%s/' % current_user.username)
+
+@app.route("/cancelrestart")
+@login_required
+def cancel_restart_server():
+    global restarting
+    global restarting_in_minutes
+    if bool(current_user.is_admin):
+        restarting = False
+        restarting_in_minutes = 0
+        send_message_to_all_online('Restart of the server has been cancelled. Ride on!')
+    return redirect('/user/%s/' % current_user.username)
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
@@ -1241,11 +1306,19 @@ def check_columns():
             db.engine.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
 
 
+def send_server_back_online_message():
+    time.sleep(30)
+    send_message_to_all_online("We're back online. Ride on!")
+
+
 @app.before_first_request
 def before_first_request():
     init_database()
-    check_columns()
     db.create_all()
+    check_columns_thread = threading.Thread(target=check_columns)
+    check_columns_thread.start()
+    send_message_thread = threading.Thread(target=send_server_back_online_message)
+    send_message_thread.start()
 
 
 ####################
@@ -1275,7 +1348,8 @@ def launch_zwift():
         if MULTIPLAYER:
             return render_template("login_form.html")
         else:
-            return render_template("user_home.html", username="", enable_ghosts=False, online=getOnline())
+            return render_template("user_home.html", username="", enable_ghosts=False, online=getOnline(),
+                is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
             return redirect("http://zwift/?code=zwift_refresh_token%s" % fake_refresh_token_with_session_cookie(request.cookies.get('remember_token')), 302)
