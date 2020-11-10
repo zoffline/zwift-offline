@@ -1085,9 +1085,9 @@ def add_segment_results(segment_id, player_id, only_best, from_date, to_date, re
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
         where_args.append(to_date)
     if only_best:
-        where_stmt += " AND world_time > ? ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 100"
-        #Only include results from max 2 hours ago
-        where_args.append(world_time()-(60*60*1000 * 2))
+        where_stmt += " AND world_time > ? ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 1000"
+        #Only include results from max 1 hour ago
+        where_args.append(world_time()-(60*60*1000))
     rows = db.engine.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in rows:
         result = results.segment_results.add()
