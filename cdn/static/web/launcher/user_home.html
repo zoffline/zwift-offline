@@ -11,53 +11,61 @@
     {% if username %}
       <h2>Logged in as {{ username }}</h2>
         {% if restarting %}
-          <p class="alert alert-danger">Server is restarting in {{ restarting_in_minutes }} minutes</p>
+        <div class="row">
+          <div class="col-md-5">
+            <p class="alert alert-info">Server is restarting in {{ restarting_in_minutes }} minutes</p>
+          </div>
+        </div>
         {% endif %}
       <div class="row">
         <div class="col-md-12">
-          <a href="{{ url_for('upload', username=username) }}" class="btn btn-success">Upload</a>
-          <a href="{{ url_for('logout', username=username) }}" class="btn btn-secondary">Logout</a>
+          <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-success">Upload</a>
+          <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
           {% if is_admin and not restarting %}
-            <a href="/restart" class="btn btn-danger">Restart server</a>
+            <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
           {% elif is_admin %}
-            <a href="/cancelrestart" class="btn btn-danger">Cancel server restart</a>
+            <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
           {% endif %}
         </div>
       </div>
     {% endif %}
-    <form method="POST" action="/start-zwift">
-      <div class="row">
-        <div class="col-md-4 top-buffer">
-          <label>Select map (optional)</label>
-          <select name="map" class="form-control">
-            <option value="CALENDAR">Calendar ({{online.total}} online total)</option>
-            <option value="FRANCE">France ({{online.france}} online)</option>
-            <option value="INNSBRUCK">Innsbruck ({{online.innsbruck}} online)</option>
-            <option value="LONDON">London ({{online.london}} online)</option>
-            <option value="NEWYORK">New York ({{online.newyork}} online)</option>
-            <option value="PARIS">Paris ({{online.paris}} online)</option>
-            <option value="RICHMOND">Richmond ({{online.richmond}} online)</option>
-            <option value="WATOPIA">Watopia ({{online.watopia}} online)</option>
-            <option value="YORKSHIRE">Yorkshire ({{online.yorkshire}} online)</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4 top-buffer">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" {{'checked' if enable_ghosts else ''}} id="enableghosts" name="enableghosts">
-            <label class="form-check-label" for="enableghosts">
-              Enable ghosts
-            </label>
+    <div class="row">
+      <div class="col-md-5">
+        <form method="POST" action="/start-zwift" class="top-buffer">
+          <div class="row">
+            <div class="col-md-12">
+              <label>Select map (optional)</label>
+              <select name="map" class="form-control form-control-sm">
+                <option value="CALENDAR">Calendar ({{online.total}} online total)</option>
+                <option value="FRANCE">France ({{online.france}} online)</option>
+                <option value="INNSBRUCK">Innsbruck ({{online.innsbruck}} online)</option>
+                <option value="LONDON">London ({{online.london}} online)</option>
+                <option value="NEWYORK">New York ({{online.newyork}} online)</option>
+                <option value="PARIS">Paris ({{online.paris}} online)</option>
+                <option value="RICHMOND">Richmond ({{online.richmond}} online)</option>
+                <option value="WATOPIA">Watopia ({{online.watopia}} online)</option>
+                <option value="YORKSHIRE">Yorkshire ({{online.yorkshire}} online)</option>
+              </select>
+            </div>
           </div>
-        </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" {{'checked' if enable_ghosts else ''}} id="enableghosts" name="enableghosts">
+                <label class="form-check-label" for="enableghosts">
+                  Enable ghosts
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <input type="submit" value="Start Zwift" class="btn btn-sm btn-light">
+            </div>
+          </div>
+        </form>
       </div>
-      <div class="row">
-        <div class="col-md-12 top-buffer">
-          <input type="submit" value="Start Zwift" class="btn btn-primary">
-        </div>
-      </div>
-    </form>
+    </div>
   </div>
   <script>
     setTimeout(function() {

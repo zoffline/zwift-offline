@@ -7,51 +7,55 @@
 </head>
 <body>
   <div class="container-fluid">
-    <h3>Sign up</h2>
-    <form id="signup" action="{{ url_for('signup') }}" method="post">
-      <div class="row">
-        <div class="col-md-4">
-          <label>Username</label>
-          <input type="text" id="username" name="username" class="form-control form-control-sm">
-        </div>
+    <h1>Sign up</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form id="signup" action="{{ url_for('signup') }}" method="post">
+          <div class="row">
+            <div class="col-md-12">
+              <label class="col-form-label col-form-label-sm">Username</label>
+              <input type="text" id="username" name="username" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label class="col-form-label col-form-label-sm">Password</label>
+              <input type="password" id="password" name="password" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-12">
+              <label class="col-form-label col-form-label-sm">Confirm Password</label>
+              <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label class="col-form-label col-form-label-sm">First name</label>
+              <input type="text" id="first_name" name="first_name" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label class="col-form-label col-form-label-sm">Last name</label>
+              <input type="text" id="last_name" name="last_name" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <input type="submit" value="Sign up" class="btn btn-sm btn-light"><a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Back</a>
+            </div>
+          </div>
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="list-group top-buffer">
+            {% for message in messages %}
+              <li class="list-group-item py-2">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
       </div>
-      <div class="row">
-        <div class="col-xs-4 col-sm-4 col-md-4">
-          <label>Password</label>
-          <input type="password" id="password" name="password" class="form-control form-control-sm">
-        </div>
-        <div class="col-xs-4 col-sm-4 col-md-4">
-          <label>Confirm Password</label>
-          <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-sm">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4">
-          <label>First name</label>
-          <input type="text" id="first_name" name="first_name" class="form-control form-control-sm">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4">
-          <label>Last name</label>
-          <input type="text" id="last_name" name="last_name" class="form-control form-control-sm">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12 top-buffer">
-          <input type="submit" value="Sign up" class="btn btn-sm btn-primary"><a href="{{ url_for('login') }}" class="btn btn-sm btn-danger">Back</a>
-        </div>
-      </div>
-    </form>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="list-group top-buffer">
-        {% for message in messages %}
-          <li class="list-group-item py-2">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    </div>
   </div>
 </body>
 </html>

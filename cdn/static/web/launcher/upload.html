@@ -8,55 +8,63 @@
 <body>
   <div class="container-fluid">
     <h1>Logged in as {{ username }} ({{ name }})</h1>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <div class="row">
-          <div class="col-md-3">
-            profile.bin
-          </div>
-          <div class="col-md-3">
-            {% if profile %}
-              <a href="/download/profile.bin">{{ profile }}</a>
-            {% else %}
-              {{ profile }}
-            {% endif %}
-          </div>
-        </div>
-      </li>
-      <li class="list-group-item">
-        <div class="row">
-          <div class="col-md-3">
-            strava_token.txt
-          </div>
-          <div class="col-md-3">
-            {{ token }}
-          </div>
-        </div>
-      </li>
-    </ul>
-    <h3 class="top-buffer">Upload file</h3>
-    <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data">
-      <div class="row">
-        <div class="col-md-4">
-          <input type="file" name="file" class="form-control-file" /> (profile.bin / strava_token.txt)
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4 top-buffer">
-          <input type="submit" value="Upload" class="btn btn-success"/>
-          <a href="{{ url_for('user_home', username=username) }}" class="btn btn-danger">Back</a>
-        </div>
-      </div>
-    </form>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="list-group top-buffer">
-        {% for message in messages %}
-          <li class="list-group-item">{{ message }}</li>
-        {% endfor %}
+    <div class="row">
+      <div class="col-md-5">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                profile.bin
+              </div>
+              <div class="col-md-12">
+                {% if profile %}
+                  <a href="/download/profile.bin">{{ profile }} (download)</a>
+                {% else %}
+                  {{ profile }}
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                strava_token.txt
+              </div>
+              <div class="col-md-12">
+                {{ token }}
+              </div>
+            </div>
+          </li>
         </ul>
-      {% endif %}
-    {% endwith %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
+          <h3>Upload file</h3>
+          <div class="row">
+            <div class="col-md-12">
+              <input type="file" name="file" class="form-control-file" /> (profile.bin / strava_token.txt)
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <input type="submit" value="Upload" class="btn btn-sm btn-light"/>
+              <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+            </div>
+          </div>
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="list-group top-buffer">
+            {% for message in messages %}
+              <li class="list-group-item">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
   </div>
 </body>
 </html>

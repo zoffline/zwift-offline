@@ -8,36 +8,40 @@
 <body>
   <div class="container-fluid">
     <h1>Zwift Launcher</h1>
-    <p><a href="/signup" class="btn btn-success">Sign up</a></p>
     <h2>Login</h2>
-    <form id="login" action="{{ url_for('login') }}" method="post">
-      <div class="row">
-        <div class="col-md-4">
-          <label>Username</label>
-          <input type="text" id="username" name="username" class="form-control">
-        </div>
+    <a href="/signup" class="btn btn-sm btn-success">Sign up</a>
+    <div class="row">
+      <div class="col-md-5">
+        <form id="login" action="{{ url_for('login') }}" method="post" class="top-buffer">
+          <div class="row">
+            <div class="col-md-12">
+              <label>Username</label>
+              <input type="text" id="username" name="username" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Password</label>
+              <input type="password" id="password" name="password" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <input type="submit" value="Login" class="btn btn-sm btn-light">
+            </div>
+          </div>
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="list-group top-buffer">
+            {% for message in messages %}
+              <li class="list-group-item">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <label>Password</label>
-          <input type="password" id="password" name="password" class="form-control">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12 top-buffer">
-          <input type="submit" value="Login" class="btn btn-primary">
-        </div>
-      </div>
-    </form>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="list-group top-buffer">
-        {% for message in messages %}
-          <li class="list-group-item">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    </div>
   </div>
 </body>
 </html>
