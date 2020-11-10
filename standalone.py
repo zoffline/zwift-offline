@@ -69,7 +69,7 @@ def saveGhost(name, player_id):
                 os.makedirs(folder)
         except:
             return
-        f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name)
+        f = '%s/%s-%s.bin' % (folder, zwift_offline.getUTCDateTime().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
@@ -243,7 +243,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg.f11 = 1
         payload = msg.SerializeToString()
 
-        lastAliveCheck = int(time.time())
+        lastAliveCheck = int(zwift_offline.getUTCTime())
         while True:
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
@@ -275,7 +275,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for player_update_proto in added_player_updates:
                         playerUpdateQueue[player_id].remove(player_update_proto)
 
-                t = int(time.time())
+                t = int(zwift_offline.getUTCTime())
 
                 #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
                 if len(message.updates) > 0:
@@ -337,7 +337,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.rec.player_id = player_id
             organizeGhosts(player_id)
 
-        t = int(time.time())
+        t = int(zwift_offline.getUTCTime())
         ghosts.lastPackageTime = t
 
         if player_id in ghostsEnabled and ghostsEnabled[player_id]:

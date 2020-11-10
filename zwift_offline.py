@@ -149,6 +149,12 @@ coursesLookup = {
     15: 'Paris'
 }
 
+def getUTCDateTime():
+    return datetime.datetime.utcnow()
+
+def getUTCTime():
+    return getUTCDateTime().timestamp()
+
 def getOnline():
     onlineInRegion = Online()
     for p_id in online:
@@ -401,7 +407,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int((time.time()-1414016075)*1000)
+    return int((getUTCTime()-1414016075)*1000)
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -417,7 +423,7 @@ def api_users_login():
     response.info.relay_url = "https://us-or-rly101.zwift.com/relay"
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
-    response.info.time = int(time.time())
+    response.info.time = int(getUTCTime())
     udp_node = response.info.nodes.node.add()
     if os.path.exists(SERVER_IP_FILE):
         with open(SERVER_IP_FILE, 'r') as f:
@@ -465,7 +471,7 @@ def api_zfiles():
     zfile.id = int(random.getrandbits(31))
     zfile.folder = "logfiles"
     zfile.filename = "yep_took_good_care_of_that_file.txt"
-    zfile.timestamp = int(time.time())
+    zfile.timestamp = int(getUTCTime())
     return zfile.SerializeToString(), 200
 
 
@@ -654,7 +660,7 @@ def strava_upload(player_id, activity):
         logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
         return
     try:
-        if time.time() > int(expires_at):
+        if getUTCTime() > int(expires_at):
             refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
                                                            refresh_token=refresh_token)
             with open('%s/strava_token.txt' % profile_dir, 'w') as f:
@@ -744,7 +750,7 @@ def api_profiles_activities_rideon(recieving_player_id):
         player_update.type = 4 #ride on type
         player_update.world_time1 = world_time()
         player_update.world_time2 = player_update.world_time1 + 9890
-        player_update.f14 = int(time.time() * 1000000)
+        player_update.f14 = int(getUTCTime() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
         ride_on.rider_id = int(sending_player_id)
@@ -789,7 +795,7 @@ def unix_time_millis(dt):
 
 
 def fill_in_goal_progress(goal, player_id):
-    now = datetime.datetime.utcnow()
+    now = getUTCDateTime()
     if goal.periodicity == 0:  # weekly
         first_dt, last_dt = get_week_range(now)
     else:  # monthly
@@ -843,7 +849,7 @@ def api_profiles_goals(player_id):
         goal = goal_pb2.Goal()
         goal.ParseFromString(request.stream.read())
         goal.id = get_id('goal')
-        now = datetime.datetime.utcnow()
+        now = getUTCDateTime()
         goal.created_on = unix_time_millis(now)
         set_goal_end_date(goal, now)
         fill_in_goal_progress(goal, player_id)
@@ -858,7 +864,7 @@ def api_profiles_goals(player_id):
         goal = goals.goals.add()
         row_to_protobuf(row, goal)
         end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-        now = datetime.datetime.utcnow()
+        now = getUTCDateTime()
         if end_dt < now:
             set_goal_end_date(goal, now)
             update_protobuf_in_db('goal', goal, goal.id)
@@ -905,7 +911,7 @@ def relay_worlds_generic(world_id=None):
                 #serializedMessage = chat_message.SerializeToString()
             except:
                 #Not able to decode as playerupdate, send dummy response
-                world = { 'currentDateTime': int(time.time()),
+                world = { 'currentDateTime': int(getUTCTime()),
                         'currentWorldTime': world_time(),
                         'friendsInWorld': [],
                         'mapId': 1,
@@ -922,7 +928,7 @@ def relay_worlds_generic(world_id=None):
             #PlayerUpdate
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
-            player_update.f14 = int(str(int(time.time()*1000000)))
+            player_update.f14 = int(str(int(getUTCTime()*1000000)))
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
@@ -965,7 +971,7 @@ def relay_worlds_generic(world_id=None):
             world.name = 'Public Watopia'
             world.f3 = course
             world.world_time = world_time()
-            world.real_time = int(time.time())
+            world.real_time = int(getUTCTime())
             playersInRegion = 0
             for p_id in online.keys():
                 player = online[p_id]
@@ -1066,14 +1072,11 @@ def relay_periodic_info():
     return infos.SerializeToString(), 200
 
 
-def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, only_own):
+def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
     where_stmt = "WHERE segment_id = ?"
     where_args = [str(segment_id)]
-    if only_own and player_id:
+    if player_id:
         where_stmt += " AND player_id = ?"
-        where_args.append(player_id)
-    elif not only_own and player_id:
-        where_stmt += " AND player_id != ?"
         where_args.append(player_id)
     if from_date:
         where_stmt += " AND strftime('%s', finish_time_str) > strftime('%s', ?)"
@@ -1082,7 +1085,9 @@ def add_segment_results(segment_id, player_id, only_best, from_date, to_date, re
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', ?)"
         where_args.append(to_date)
     if only_best:
-        where_stmt += " ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 1"
+        where_stmt += " AND world_time > ? ORDER BY CAST(elapsed_ms as INTEGER) LIMIT 100"
+        #Only include results from max 2 hours ago
+        where_args.append(world_time()-(60*60*1000 * 2))
     rows = db.engine.execute("SELECT * FROM segment_result %s" % where_stmt, where_args)
     for row in rows:
         result = results.segment_results.add()
@@ -1096,7 +1101,7 @@ def handle_segment_results(request):
         result.ParseFromString(request.stream.read())
         result.id = get_id('segment_result')
         result.world_time = world_time()
-        result.finish_time_str = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        result.finish_time_str = getUTCDateTime().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
         return '{"id": %ld}' % result.id, 200
@@ -1119,12 +1124,10 @@ def handle_segment_results(request):
 
     if player_id:
         #Add players results
-        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, True)
-        #Add top 100 other players results
-        #add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, False)
+        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results)
     else:
-        #Jersey, only 1 result, player_id = None
-        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results, False)
+        #Top 100 results, player_id = None
+        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results)
 
     return results.SerializeToString(), 200
 
@@ -1179,10 +1182,10 @@ def init_database():
         return
     # Database needs to be upgraded, try to back it up first
     try:  # Try writing to storage dir
-        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(time.time())))
+        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(getUTCTime())))
     except:
         try:  # Fall back to a temporary dir
-            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
+            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(getUTCTime())))
         except:
             logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
 
