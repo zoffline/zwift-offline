@@ -9,9 +9,11 @@ body {
 .text-shadow {
     text-shadow: 1px 1px 2px black;
 }
-.list-group-item, form {
+.list-group-item, form, h1 {
     background-color: #fc6719;
     border: 2px solid white;
+}
+.list-group-item, form {
     padding: 10px;
 }
 .list-group-item a {
@@ -33,8 +35,6 @@ body {
     margin-top: 5px;
 }
 h1 {
-    background-color: #fc6719;
-    border: 2px solid white;
     text-align: center;
     border-radius: 5px;
     margin-top: 5px;
