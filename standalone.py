@@ -148,15 +148,14 @@ signal.signal(signal.SIGINT, sigint_handler)
 hostname = 'cdn.zwift.com'
 
 def merge_two_dicts(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
+    z = x.copy()
+    z.update(y)
     return z
 
 def set_header():
     headers = {
         'Host': hostname
     }
-
     return headers
 
 class CDNHandler(SimpleHTTPRequestHandler):
@@ -167,7 +166,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
         return fullpath
 
     def do_GET(self):
-        path_end = self.path.rsplit('/', 1)[1]
+        path_end = self.path.split('/')[-1]
         if path_end in ['FRANCE', 'INNSBRUCK', 'LONDON', 'NEWYORK', 'PARIS', 'RICHMOND', 'WATOPIA', 'YORKSHIRE']:
             # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
             MAP_OVERRIDE.append((self.client_address[0], path_end))
@@ -187,10 +186,13 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(output.encode())
                     MAP_OVERRIDE.remove(override)
                     return
-        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not self.path in [
-            '/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml',
-            '/gameassets/Zwift_Updates_Root/ZwiftMac_ver_cur.xml']:
-
+        exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
+                      'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
+                      'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
+        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not path_end in exceptions:
+            # PROXYPASS_FILE existence indicates we know what we're doing and
+            # we can try to obtain the official map schedule and update files.
+            # This can only work if we're running on a different machine than the Zwift client.
             sent = False
             try:
 
@@ -225,7 +227,6 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(resp.content))
         self.end_headers()
-
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
