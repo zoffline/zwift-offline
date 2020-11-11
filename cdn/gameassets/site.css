@@ -6,7 +6,7 @@ body {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
-.text-shadow {
+.text-shadow, .text-shadow-not-ie {
     text-shadow: 1px 1px 2px black;
 }
 .list-group-item, form, h1 {

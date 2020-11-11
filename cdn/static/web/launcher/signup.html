@@ -9,8 +9,9 @@
       .text-shadow {
         color: black !important;
         position: relative;
-        left: 1px;
-        top: 2px;
+        left: 0px;
+        top: 0px;
+        filter:progid:DXImageTransform.Microsoft.Blur(pixelradius=2.25);
       }
       .text-shadow:before {
         color: white;
@@ -18,21 +19,18 @@
         position: absolute;
         content: attr(data-innertext);
 
-        top: -4px;
-        left: -1px;
+        top: 2px;
+        left: 1px;
       }
-      div > h1 span.text-shadow:before, div h2.text-shadow:before {
-        top: -2px;
-      }
-      form .text-shadow:before, .list-group-item div.text-shadow:before {
-        top: -1px;
+      a .text-shadow {
+        text-decoration: none !important;
       }
     </style>
   <![endif]-->
 </head>
 <body>
   <div class="container-fluid">
-    <h1><span class="text-shadow">Sign up</span></h1>
+    <h1><div class="text-shadow">Sign up</div></h1>
     <div class="row">
       <div class="col-sm-6 col-md-5">
         <form id="signup" action="{{ url_for('signup') }}" method="post">
