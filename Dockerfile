@@ -4,7 +4,7 @@ MAINTAINER zoffline <zoffline@tutanota.com>
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache git
-RUN pip install flask protobuf protobuf3_to_dict stravalib garmin-uploader
+RUN pip install flask flask_sqlalchemy flask-login pyjwt protobuf protobuf3_to_dict stravalib
 
 RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
 RUN chmod 777 zwift-offline/storage
