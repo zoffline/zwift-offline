@@ -1,102 +1,63 @@
-<!doctype html5>
-<html>
-<head>
-  <title>Zwift Launcher</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-  <link rel="stylesheet" href="/gameassets/site.css"/>
-  <!--[if lte IE 9]>
-    <style>
-      .text-shadow {
-        color: black !important;
-        position: relative;
-        left: 0px;
-        top: 0px;
-        filter:progid:DXImageTransform.Microsoft.Blur(pixelradius=2.25);
-      }
-      .text-shadow:before {
-        color: white;
-        width: 100%;
-        position: absolute;
-        content: attr(data-innertext);
-
-        top: 2px;
-        left: 1px;
-      }
-      a .text-shadow {
-        text-decoration: none !important;
-      }
-    </style>
-  <![endif]-->
-</head>
-<body>
-  <div class="container-fluid">
-    <h1><div class="text-shadow">Logged in as {{ username }} ({{ name }})</div></h1>
-    <div class="row">
-      <div class="col-sm-6 col-md-5">
-        <ul class="list-group">
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col-md-12">
-                <label class="text-shadow">profile.bin</label>
-              </div>
-              <div class="col-md-12">
-                {% if profile %}
-                  <a href="/download/profile.bin"><div class="text-shadow">{{ profile }} (download)</div></a>
-                {% else %}
-                  <label class="text-shadow">{{ profile }}</label>
-                {% endif %}
-              </div>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col-md-12">
-                <label class="text-shadow">strava_token.txt</label>
-              </div>
-              <div class="col-md-12">
-                <label class="text-shadow">{{ token }}</label>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-6 col-md-5">
-        <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
-          <h3 class="text-shadow">Upload file</h3>
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Logged in as {{ username }} ({{ name }})</div></h1>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <ul class="list-group">
+        <li class="list-group-item">
           <div class="row">
             <div class="col-md-12">
-              <input type="file" name="file" class="form-control-file text-shadow-not-ie" /> <label class="text-shadow">(profile.bin / strava_token.txt)</label>
+              <label class="text-shadow">profile.bin</label>
+            </div>
+            <div class="col-md-12">
+              {% if profile %}
+                <a href="/download/profile.bin"><div class="text-shadow">{{ profile }} (download)</div></a>
+              {% else %}
+                <label class="text-shadow">{{ profile }}</label>
+              {% endif %}
             </div>
           </div>
+        </li>
+        <li class="list-group-item">
           <div class="row">
-            <div class="col-md-12 top-buffer">
-              <input type="submit" value="Upload" class="btn btn-sm btn-light"/>
-              <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+            <div class="col-md-12">
+              <label class="text-shadow">strava_token.txt</label>
+            </div>
+            <div class="col-md-12">
+              <label class="text-shadow">{{ token }}</label>
             </div>
           </div>
-        </form>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class="list-group top-buffer">
-            {% for message in messages %}
-              <li class="list-group-item">
-                <div class="text-shadow">{{ message }}</div>
-              </li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
-  <script>
-    var elements = document.getElementsByClassName('text-shadow');
-    for(var i = 0; i < elements.length; i++) {
-      var el = elements[i];
-      el.setAttribute('data-innertext', el.textContent);
-    }
-  </script>
-</body>
-</html>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
+        <h3 class="text-shadow">Upload file</h3>
+        <div class="row">
+          <div class="col-md-12">
+            <input type="file" name="file" class="form-control-file text-shadow-not-ie" /> <label class="text-shadow">(profile.bin / strava_token.txt)</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Upload" class="btn btn-sm btn-light"/>
+            <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}
