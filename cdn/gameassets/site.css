@@ -10,7 +10,7 @@ body {
     text-shadow: 1px 1px 2px black;
 }
 .list-group-item, form, h1 {
-    background-color: #fc6719;
+    background-color: rgba(242, 103, 34, 0.7);
     border: 2px solid white;
 }
 .list-group-item, form {
