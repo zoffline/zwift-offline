@@ -7,6 +7,8 @@ import sys
 import threading
 import time
 import csv
+import requests
+from collections import deque
 from datetime import datetime
 from shutil import copyfile
 if sys.version_info[0] > 2:
@@ -35,7 +37,7 @@ else:
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-MAP_OVERRIDE = None
+MAP_OVERRIDE = deque(maxlen=16)
 
 update_freq = 3
 globalGhosts = {}
@@ -69,7 +71,7 @@ def saveGhost(name, player_id):
                 os.makedirs(folder)
         except:
             return
-        f = '%s/%s-%s.bin' % (folder, time.strftime("%Y-%m-%d-%H-%M-%S"), name)
+        f = '%s/%s-%s.bin' % (folder, zwift_offline.getUTCDateTime().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
@@ -143,6 +145,18 @@ def sigint_handler(num, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
+hostname = 'cdn.zwift.com'
+
+def merge_two_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+def set_header():
+    headers = {
+        'Host': hostname
+    }
+    return headers
 
 class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -152,39 +166,67 @@ class CDNHandler(SimpleHTTPRequestHandler):
         return fullpath
 
     def do_GET(self):
-        global MAP_OVERRIDE
-        path_end = self.path.rsplit('/', 1)[1]
+        path_end = self.path.split('/')[-1]
         if path_end in ['FRANCE', 'INNSBRUCK', 'LONDON', 'NEWYORK', 'PARIS', 'RICHMOND', 'WATOPIA', 'YORKSHIRE']:
-            MAP_OVERRIDE = path_end
+            # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
+            MAP_OVERRIDE.append((self.client_address[0], path_end))
             self.send_response(302)
+            self.send_header('Cookie', self.headers.get('Cookie') + "; map=%s" % path_end)
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
-        if MAP_OVERRIDE and self.path == '/gameassets/MapSchedule_v2.xml':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/xml')
-            self.end_headers()
-            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (MAP_OVERRIDE, datetime.now().strftime("%Y-%m-%dT00:01-04"))
-            self.wfile.write(output.encode())
-            MAP_OVERRIDE = None
-            return
-        elif self.path == '/gameassets/MapSchedule_v2.xml' and os.path.exists(PROXYPASS_FILE):
+        if self.path == '/gameassets/MapSchedule_v2.xml':
+            # Check if client requested the map be overridden
+            for override in MAP_OVERRIDE:
+                if override[0] == self.client_address[0]:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/xml')
+                    self.end_headers()
+                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], datetime.now().strftime("%Y-%m-%dT00:01-04"))
+                    self.wfile.write(output.encode())
+                    MAP_OVERRIDE.remove(override)
+                    return
+        exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
+                      'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
+                      'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
+        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not path_end in exceptions:
             # PROXYPASS_FILE existence indicates we know what we're doing and
-            # we can try to obtain the official map schedule. This can only work
-            # if we're running on a different machine than the Zwift client.
+            # we can try to obtain the official map schedule and update files.
+            # This can only work if we're running on a different machine than the Zwift client.
+            sent = False
             try:
-                import urllib3
-                http = urllib3.PoolManager()
-                r = http.request('GET', 'http://cdn.zwift.com/gameassets/MapSchedule_v2.xml')
-                self.send_response(200)
-                self.send_header('Content-type', 'text/xml')
-                self.end_headers()
-                self.wfile.write(r.data)
+
+                url = 'http://{}{}'.format(hostname, self.path)
+                req_header = self.parse_headers()
+
+                resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
+                sent = True
+
+                self.send_response(resp.status_code)
+                self.send_resp_headers(resp)
+                self.wfile.write(resp.content)
                 return
-            except:
-                pass  # fallthrough to return zoffline version
+            finally:
+                if not sent:
+                    self.send_error(404, 'error trying to proxy')
 
         SimpleHTTPRequestHandler.do_GET(self)
+
+    def parse_headers(self):
+        req_header = {}
+        for line in self.headers:
+            line_parts = [o.strip() for o in line.split(':', 1)]
+            if len(line_parts) == 2:
+                req_header[line_parts[0]] = line_parts[1]
+        return req_header
+
+    def send_resp_headers(self, resp):
+        respheaders = resp.headers
+        for key in respheaders:
+            if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
+                self.send_header(key, respheaders[key])
+        self.send_header('Content-Length', len(resp.content))
+        self.end_headers()
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -243,7 +285,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg.f11 = 1
         payload = msg.SerializeToString()
 
-        lastAliveCheck = int(time.time())
+        lastAliveCheck = int(zwift_offline.getUTCTime())
         while True:
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
@@ -259,11 +301,23 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for player_update_proto in playerUpdateQueue[player_id]:
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
+
+                        #Send if 10 updates has already been added and start a new message
+                        if len(message.updates) > 9:
+                            message_payload = message.SerializeToString()
+                            self.request.sendall(struct.pack('!h', len(message_payload)))
+                            self.request.sendall(message_payload)
+                            
+                            message = udp_node_msgs_pb2.ServerToClient()
+                            message.f1 = 1
+                            message.player_id = player_id
+                            message.world_time = zwift_offline.world_time()
+
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
                         playerUpdateQueue[player_id].remove(player_update_proto)
 
-                t = int(time.time())
+                t = int(zwift_offline.getUTCTime())
 
                 #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
                 if len(message.updates) > 0:
@@ -276,7 +330,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except Exception as e:
-                print('Exception: %s' % e)
+                print('Exception TCP: %s' % e)
                 break
 
 class GhostsVariables:
@@ -325,7 +379,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.rec.player_id = player_id
             organizeGhosts(player_id)
 
-        t = int(time.time())
+        t = int(zwift_offline.getUTCTime())
         ghosts.lastPackageTime = t
 
         if player_id in ghostsEnabled and ghostsEnabled[player_id]:
