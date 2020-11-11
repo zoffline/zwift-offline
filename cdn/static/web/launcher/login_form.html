@@ -4,24 +4,49 @@
   <title>Zwift Launcher</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   <link rel="stylesheet" href="/gameassets/site.css"/>
+  <!--[if lte IE 9]>
+    <style>
+      .text-shadow {
+        color: black !important;
+        position: relative;
+        left: 1px;
+        top: 2px;
+      }
+      .text-shadow:before {
+        color: white;
+        width: 100%;
+        position: absolute;
+        content: attr(data-innertext);
+
+        top: -4px;
+        left: -1px;
+      }
+      div > h1 span.text-shadow:before, div h2.text-shadow:before {
+        top: -2px;
+      }
+      form .text-shadow:before, .list-group-item div.text-shadow:before {
+        top: -1px;
+      }
+    </style>
+  <![endif]-->
 </head>
 <body>
   <div class="container-fluid">
-    <h1>Zwift Launcher</h1>
-    <h2>Login</h2>
+    <h1><span class="text-shadow">Zwift Launcher</span></h1>
+    <h2 class="text-shadow">Login</h2>
     <a href="/signup" class="btn btn-sm btn-success">Sign up</a>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-sm-6 col-md-5">
         <form id="login" action="{{ url_for('login') }}" method="post" class="top-buffer">
           <div class="row">
             <div class="col-md-12">
-              <label>Username</label>
+              <label class="text-shadow">Username</label>
               <input type="text" id="username" name="username" class="form-control form-control-sm">
             </div>
           </div>
           <div class="row">
             <div class="col-md-12">
-              <label>Password</label>
+              <label class="text-shadow">Password</label>
               <input type="password" id="password" name="password" class="form-control form-control-sm">
             </div>
           </div>
@@ -35,7 +60,9 @@
           {% if messages %}
             <ul class="list-group top-buffer">
             {% for message in messages %}
-              <li class="list-group-item">{{ message }}</li>
+              <li class="list-group-item">
+                <div class="text-shadow">{{ message }}</div>
+              </li>
             {% endfor %}
             </ul>
           {% endif %}
@@ -43,5 +70,12 @@
       </div>
     </div>
   </div>
+  <script>
+    var elements = document.getElementsByClassName('text-shadow');
+    for(var i = 0; i < elements.length; i++) {
+      var el = elements[i];
+      el.setAttribute('data-innertext', el.textContent);
+    }
+  </script>
 </body>
 </html>

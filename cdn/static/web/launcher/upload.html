@@ -4,23 +4,48 @@
   <title>Zwift Launcher</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   <link rel="stylesheet" href="/gameassets/site.css"/>
+  <!--[if lte IE 9]>
+    <style>
+      .text-shadow {
+        color: black !important;
+        position: relative;
+        left: 1px;
+        top: 2px;
+      }
+      .text-shadow:before {
+        color: white;
+        width: 100%;
+        position: absolute;
+        content: attr(data-innertext);
+
+        top: -4px;
+        left: -1px;
+      }
+      div > h1 span.text-shadow:before, div h2.text-shadow:before {
+        top: -2px;
+      }
+      form .text-shadow:before, .list-group-item div.text-shadow:before {
+        top: -1px;
+      }
+    </style>
+  <![endif]-->
 </head>
 <body>
   <div class="container-fluid">
-    <h1>Logged in as {{ username }} ({{ name }})</h1>
+    <h1><span class="text-shadow">Logged in as {{ username }} ({{ name }})</span></h1>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-sm-6 col-md-5">
         <ul class="list-group">
           <li class="list-group-item">
             <div class="row">
               <div class="col-md-12">
-                profile.bin
+                <span class="text-shadow">profile.bin</span>
               </div>
               <div class="col-md-12">
                 {% if profile %}
-                  <a href="/download/profile.bin">{{ profile }} (download)</a>
+                  <a href="/download/profile.bin" class="text-shadow">{{ profile }} (download)</a>
                 {% else %}
-                  {{ profile }}
+                  <span class="text-shadow">{{ profile }}</span>
                 {% endif %}
               </div>
             </div>
@@ -28,10 +53,10 @@
           <li class="list-group-item">
             <div class="row">
               <div class="col-md-12">
-                strava_token.txt
+                <span class="text-shadow">strava_token.txt</span>
               </div>
               <div class="col-md-12">
-                {{ token }}
+                <span class="text-shadow">{{ token }}</span>
               </div>
             </div>
           </li>
@@ -39,12 +64,12 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-sm-6 col-md-5">
         <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
-          <h3>Upload file</h3>
+          <h3 class="text-shadow">Upload file</h3>
           <div class="row">
             <div class="col-md-12">
-              <input type="file" name="file" class="form-control-file" /> (profile.bin / strava_token.txt)
+              <input type="file" name="file" class="form-control-file text-shadow" /> <label class="text-shadow">(profile.bin / strava_token.txt)</label>
             </div>
           </div>
           <div class="row">
@@ -58,7 +83,9 @@
           {% if messages %}
             <ul class="list-group top-buffer">
             {% for message in messages %}
-              <li class="list-group-item">{{ message }}</li>
+              <li class="list-group-item">
+                <div class="text-shadow">{{ message }}</div>
+              </li>
             {% endfor %}
             </ul>
           {% endif %}
@@ -66,5 +93,12 @@
       </div>
     </div>
   </div>
+  <script>
+    var elements = document.getElementsByClassName('text-shadow');
+    for(var i = 0; i < elements.length; i++) {
+      var el = elements[i];
+      el.setAttribute('data-innertext', el.textContent);
+    }
+  </script>
 </body>
 </html>

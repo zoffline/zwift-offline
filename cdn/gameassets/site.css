@@ -2,22 +2,27 @@ body {
     background-image: url('https://cdn.zwift.com/gameassets/background.jpg');
     background-repeat: no-repeat;
     background-size: cover;
-    text-shadow: 1px 1px 2px black;
     overflow: hidden;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
+.text-shadow {
+    text-shadow: 1px 1px 2px black;
+}
 .list-group-item, form {
     background-color: #fc6719;
+    border: 2px solid white;
+    padding: 10px;
 }
 .list-group-item a {
     color: white;
 }
 .btn {
     margin-right: 5px;
+    border: 1px solid #fff;
 }
 .top-buffer {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 .upload-text {
     background-color: white;
@@ -29,6 +34,7 @@ body {
 }
 h1 {
     background-color: #fc6719;
+    border: 2px solid white;
     text-align: center;
     border-radius: 5px;
     margin-top: 5px;
@@ -39,7 +45,6 @@ label {
     margin-bottom: 2px;
 }
 form {
-    padding: 10px;
     border-radius: 5px;
 }
 .col-form-label-sm {
