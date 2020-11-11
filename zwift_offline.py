@@ -157,8 +157,12 @@ coursesLookup = {
 def getUTCDateTime():
     return datetime.datetime.utcnow()
 
+def getUTCSecondsFromDateTime(dt):
+    return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
+
 def getUTCTime():
-    return getUTCDateTime().timestamp()
+    dt = getUTCDateTime()
+    return getUTCSecondsFromDateTime(dt)
 
 def getOnline():
     onlineInRegion = Online()
@@ -866,7 +870,7 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(dt.timestamp()*1000)
+    return int(getUTCSecondsFromDateTime(dt)*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
