@@ -1246,7 +1246,9 @@ def init_database():
     if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
         # Create a new database
         with open(DATABASE_INIT_SQL, 'r') as f:
-            db.engine.execute(f.read())
+            sql_statements = f.read().split('\n\n')
+            for sql_statement in sql_statements:
+                db.engine.execute(sql_statement)
             db.engine.execute('INSERT INTO version VALUES (?)', (DATABASE_CUR_VER,))
         return
     # Migrate database if necessary
@@ -1307,7 +1309,8 @@ def send_server_back_online_message():
 @app.before_first_request
 def before_first_request():
     init_database()
-    db.create_all()
+    db.create_all(app=app)
+    db.session.commit()
     check_columns_thread = threading.Thread(target=check_columns)
     check_columns_thread.start()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
@@ -1453,8 +1456,6 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
-    db.create_all(app=app)
-    db.session.commit()
 
     @login_manager.user_loader
     def load_user(uid):
