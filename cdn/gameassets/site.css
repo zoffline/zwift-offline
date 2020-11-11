@@ -12,7 +12,6 @@ body {
 .list-group-item, form, h1 {
     background-color: #f26722;
     background-color: rgba(242, 103, 34, 0.7);
-    border: 2px solid white;
 }
 .list-group-item, form {
     padding: 10px;
@@ -22,7 +21,6 @@ body {
 }
 .btn {
     margin-right: 5px;
-    border: 1px solid #fff;
 }
 .top-buffer {
     margin-top: 8px;
