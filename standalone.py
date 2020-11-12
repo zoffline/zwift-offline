@@ -366,7 +366,7 @@ def playPacePartners():
         keys = globalPacePartners.keys()
         for pp_id in keys:
             pp = globalPacePartners[pp_id]
-            if pp.position < len(pp.route.states): pp.position += 1
+            if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
         ppthreadevent.wait(timeout=3)
 
