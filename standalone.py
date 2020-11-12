@@ -370,7 +370,7 @@ def playPacePartners():
             state.id = int(pp_id)
             state.worldTime = zwift_offline.world_time()
             online[pp_id] = state
-            if pp.position < len(pp.route.states): pp.position += 1
+            if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
         ppthreadevent.wait(timeout=3)
 
