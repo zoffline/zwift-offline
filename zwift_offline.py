@@ -42,6 +42,7 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
     # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
@@ -1239,6 +1240,7 @@ def relay_worlds_leave(world_id):
 def teardown_request(exception):
     db.close_all_sessions()
     db.session.close()
+    db.engine.dispose()
     if exception != None:
         print('Exception: %s' % exception)
 
@@ -1456,6 +1458,7 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
     db.close_all_sessions()
+    db.engine.dispose()
 
     @login_manager.user_loader
     def load_user(uid):
