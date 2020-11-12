@@ -188,7 +188,8 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     return
         exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
                       'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
-                      'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
+                      'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml',
+                      'site.css', 'MapSchedule_v2.xml', 'background.jpg']
         if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not path_end in exceptions:
             # PROXYPASS_FILE existence indicates we know what we're doing and
             # we can try to obtain the official map schedule and update files.

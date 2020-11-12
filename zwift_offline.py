@@ -852,14 +852,9 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,1,1)
-     if (d.weekday()<= 3):
-         d = d - timedelta(d.weekday())
-     else:
-         d = d + timedelta(7-d.weekday())
-     dlt = timedelta(days = (int(dt.strftime('%W'))-1)*7)
-     first = d + dlt
-     last = d + dlt + timedelta(days=6, hours=23, minutes=59, seconds=59)
+     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     first = d
+     last = d + timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
 
 def get_month_range(dt):
