@@ -20,7 +20,7 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -42,6 +42,7 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
     # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
@@ -554,6 +555,12 @@ def api_zfiles():
     return zfile.SerializeToString(), 200
 
 
+# Custom static data
+@app.route('/style/<path:filename>')
+def custom_style(filename):
+    return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
+
+
 # Probably don't need, haven't investigated
 @app.route('/api/zfiles/list', methods=['GET', 'POST'])
 def api_zfiles_list():
@@ -852,14 +859,9 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,1,1)
-     if (d.weekday()<= 3):
-         d = d - timedelta(d.weekday())
-     else:
-         d = d + timedelta(7-d.weekday())
-     dlt = timedelta(days = (int(dt.strftime('%W'))-1)*7)
-     first = d + dlt
-     last = d + dlt + timedelta(days=6, hours=23, minutes=59, seconds=59)
+     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     first = d
+     last = d + timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
 
 def get_month_range(dt):
@@ -1242,6 +1244,9 @@ def relay_worlds_leave(world_id):
 
 @app.teardown_request
 def teardown_request(exception):
+    db.close_all_sessions()
+    db.session.close()
+    db.engine.dispose()
     if exception != None:
         print('Exception: %s' % exception)
 
@@ -1284,7 +1289,6 @@ def init_database():
 
 
 def check_columns():
-    time.sleep(3)
     rows = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
     should_have_columns = User.metadata.tables['user'].columns
     current_columns = list()
@@ -1315,8 +1319,7 @@ def before_first_request():
     init_database()
     db.create_all(app=app)
     db.session.commit()
-    check_columns_thread = threading.Thread(target=check_columns)
-    check_columns_thread.start()
+    check_columns()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
 
@@ -1439,11 +1442,6 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-@app.route('/static/web/launcher/<filename>', methods=['GET'])
-def static_web_launcher(filename):
-    return render_template(filename)
-
-
 def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
     global online
     global ghostsEnabled
@@ -1460,6 +1458,8 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
+    db.close_all_sessions()
+    db.engine.dispose()
 
     @login_manager.user_loader
     def load_user(uid):
