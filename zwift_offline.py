@@ -1442,11 +1442,6 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-@app.route('/static/web/launcher/<filename>', methods=['GET'])
-def static_web_launcher(filename):
-    return render_template(filename)
-
-
 def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
     global online
     global ghostsEnabled
