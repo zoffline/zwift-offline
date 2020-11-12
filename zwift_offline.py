@@ -1242,6 +1242,8 @@ def relay_worlds_leave(world_id):
 
 @app.teardown_request
 def teardown_request(exception):
+    db.close_all_sessions()
+    db.session.close()
     if exception != None:
         print('Exception: %s' % exception)
 
@@ -1284,7 +1286,6 @@ def init_database():
 
 
 def check_columns():
-    time.sleep(3)
     rows = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
     should_have_columns = User.metadata.tables['user'].columns
     current_columns = list()
@@ -1315,8 +1316,7 @@ def before_first_request():
     init_database()
     db.create_all(app=app)
     db.session.commit()
-    check_columns_thread = threading.Thread(target=check_columns)
-    check_columns_thread.start()
+    check_columns()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
 
@@ -1460,6 +1460,7 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
+    db.close_all_sessions()
 
     @login_manager.user_loader
     def load_user(uid):
