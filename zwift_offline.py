@@ -20,7 +20,7 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -553,6 +553,12 @@ def api_zfiles():
     zfile.filename = "yep_took_good_care_of_that_file.txt"
     zfile.timestamp = int(getUTCTime())
     return zfile.SerializeToString(), 200
+
+
+# Custom static data
+@app.route('/style/<path:filename>')
+def custom_style(filename):
+    return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
 
 
 # Probably don't need, haven't investigated
