@@ -366,10 +366,6 @@ def playPacePartners():
         keys = globalPacePartners.keys()
         for pp_id in keys:
             pp = globalPacePartners[pp_id]
-            state = pp.route.states[pp.position]
-            state.id = int(pp_id)
-            state.worldTime = zwift_offline.world_time()
-            online[pp_id] = state
             if pp.position < len(pp.route.states): pp.position += 1
             else: pp.position = 0
         ppthreadevent.wait(timeout=3)
@@ -502,12 +498,26 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     #Check if players are close in world
                     if zwift_offline.isNearby(state, player):
                         nearby.append(p_id)
+            for p_id in globalPacePartners.keys():
+                pace_partner_variables = globalPacePartners[p_id]
+                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                #Check if pacepartner is close to player in world
+                if zwift_offline.isNearby(state, pace_partner):
+                    nearby.append(p_id)
             players = len(nearby)
             message.num_msgs = players // 10
             if players % 10: message.num_msgs += 1
             for p_id in nearby:
+                player = None
                 if p_id in online.keys():
                     player = online[p_id]
+                elif p_id in globalPacePartners.keys():
+                    pace_partner_variables = globalPacePartners[p_id]
+                    player = pace_partner_variables.route.states[pace_partner_variables.position]
+                    player.id = int(p_id)
+                    player.watchingRiderId = player.id
+                    player.worldTime = zwift_offline.world_time()
+                if player != None:
                     if len(message.states) < 10:
                         state = message.states.add()
                         state.CopyFrom(player)
@@ -547,4 +557,4 @@ ppthreadevent = threading.Event()
 pp = threading.Thread(target=playPacePartners)
 pp.start()
 
-zwift_offline.run_standalone(online, ghostsEnabled, saveGhost, playerUpdateQueue)
+zwift_offline.run_standalone(online, globalPacePartners, ghostsEnabled, saveGhost, playerUpdateQueue)

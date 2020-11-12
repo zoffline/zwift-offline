@@ -93,6 +93,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 online = {}
+globalPacePartners = {}
 ghostsEnabled = {}
 playerUpdateQueue = {}
 playerIds = {}
@@ -1077,6 +1078,31 @@ def relay_worlds_generic(world_id=None):
                         onlinePlayer.altitude = player.altitude
                         onlinePlayer.y = player.y
                         playersInRegion += 1
+            for p_id in globalPacePartners.keys():
+                pace_partner_variables = globalPacePartners[p_id]
+                pace_partner_id = int(p_id)
+                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                courseId = getCourse(pace_partner)
+                if course == courseId:
+                    partialProfile = getPartialProfile(pace_partner_id)
+                    if not partialProfile == None:
+                        online_pace_partner = world.pace_partner_states.add()
+                        online_pace_partner.id = pace_partner_id
+                        online_pace_partner.firstName = partialProfile.first_name
+                        online_pace_partner.lastName = partialProfile.last_name
+                        online_pace_partner.distance = pace_partner.distance
+                        online_pace_partner.time = pace_partner.time
+                        online_pace_partner.f6 = 840#0
+                        online_pace_partner.f8 = 0
+                        online_pace_partner.f9 = 0
+                        online_pace_partner.f10 = 0
+                        online_pace_partner.f11 = 0
+                        online_pace_partner.power = pace_partner.power
+                        online_pace_partner.f13 = 2355
+                        online_pace_partner.x = pace_partner.x
+                        online_pace_partner.altitude = pace_partner.altitude
+                        online_pace_partner.y = pace_partner.y
+                        playersInRegion += 1
             world.f5 = playersInRegion
         if world_id:
             world.id = world_id
@@ -1103,10 +1129,12 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    for p_id in online.keys():
-        player = online[p_id]
-        if player.id == player_id:
-            return player.SerializeToString()
+    if player_id in online.keys():
+        player = online[player_id]
+        return player.SerializeToString()
+    if str(player_id) in globalPacePartners.keys():
+        pace_partner = globalPacePartners[str(player_id)]
+        return pace_partner.route.states[pace_partner.position].SerializeToString()
     return None
 
 
@@ -1442,13 +1470,15 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
+def run_standalone(passedOnline, passedGlobalPacePartners, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
     global online
+    global globalPacePartners
     global ghostsEnabled
     global saveGhost
     global playerUpdateQueue
     global login_manager
     online = passedOnline
+    globalPacePartners = passedGlobalPacePartners
     ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
     playerUpdateQueue = passedPlayerUpdateQueue
