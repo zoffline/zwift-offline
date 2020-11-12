@@ -814,7 +814,7 @@ def api_profiles_activities_id(player_id, activity_id):
     player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
-            saveGhost(activity.name, int(player_id))
+            saveGhost(activity.name, player_id)
         except:
             pass
     # Unconditionally *try* and upload to strava and garmin since profile may
