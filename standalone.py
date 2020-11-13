@@ -536,9 +536,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     del message.states[:]
                     state = message.states.add()
                     state.CopyFrom(player)
-            message.world_time = zwift_offline.world_time()
-            message.msgnum = msgnum
-            socket.sendto(message.SerializeToString(), client_address)
+        message.world_time = zwift_offline.world_time()
+        message.msgnum = msgnum
+        socket.sendto(message.SerializeToString(), client_address)
   
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
