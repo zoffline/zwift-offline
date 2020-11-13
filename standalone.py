@@ -370,6 +370,10 @@ def play_pace_partners():
             pp = global_pace_partners[pp_id]
             if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
+            state = pp.route.states[pp.position]
+            state.id = pp_id
+            state.watchingRiderId = pp_id
+            state.worldTime = zwift_offline.world_time()
         ppthreadevent.wait(timeout=update_freq)
 
 class UDPHandler(socketserver.BaseRequestHandler):
@@ -524,9 +528,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 elif p_id in global_pace_partners.keys():
                     pace_partner_variables = global_pace_partners[p_id]
                     player = pace_partner_variables.route.states[pace_partner_variables.position]
-                    player.id = p_id
-                    player.watchingRiderId = player.id
-                    player.worldTime = zwift_offline.world_time()
                 if player != None:
                     if len(message.states) < 10:
                         state = message.states.add()
