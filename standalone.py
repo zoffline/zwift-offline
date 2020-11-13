@@ -21,6 +21,7 @@ else:
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
+import protobuf.profile_pb2 as profile_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -404,6 +405,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
         player_id = recv.player_id
         state = recv.state
 
+        nearby_state = state
+        if state.watchingRiderId in online.keys():
+            nearby_state = online[state.watchingRiderId]
+        elif state.watchingRiderId in global_pace_partners.keys():
+            pp = global_pace_partners[state.watchingRiderId]
+            nearby_state = pp.route.states[pp.position]
+
         #Add handling of ghosts for player if it's missing
         if not player_id in global_ghosts.keys():
             global_ghosts[player_id] = GhostsVariables()
@@ -503,7 +511,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             player = online[p_id]
             if player.id != player_id:
                 #Check if players are close in world
-                if zwift_offline.is_nearby(state, player):
+                if zwift_offline.is_nearby(nearby_state, player):
                     nearby.append(p_id)
         if t >= last_pp_update + update_freq:
             last_pp_updates[player_id] = t
@@ -511,7 +519,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 pace_partner_variables = global_pace_partners[p_id]
                 pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
                 #Check if pacepartner is close to player in world
-                if zwift_offline.is_nearby(state, pace_partner):
+                if zwift_offline.is_nearby(nearby_state, pace_partner):
                     nearby.append(p_id)
         players = len(nearby)
         message.num_msgs = players // 10

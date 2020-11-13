@@ -1062,8 +1062,8 @@ def relay_worlds_generic(world_id=None):
                         sending_player_id = segment_complete.rider_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
-                            #Check that players are on same course and close to each other
-                            if get_course(sending_player) == get_course(recieving_player):
+                            #Check that players are on same course
+                            if get_course(sending_player) == get_course(recieving_player) or recieving_player.watchingRiderId == sending_player_id:
                                 should_receive = True
                 #Other PlayerUpdate, send to all
                 else:
