@@ -383,7 +383,6 @@ def get_empty_message(player_id):
     message.seqno = 1
     message.f5 = 1
     message.f11 = 1
-    msgnum = 1
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -467,6 +466,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         if ghosts.started and t >= ghosts.last_play + update_freq:
             message = get_empty_message(player_id)
+            msgnum = 1
             active_ghosts = 0
             for g in ghosts.play.ghosts:
                 if len(g.states) > ghosts.play_count: active_ghosts += 1
@@ -499,6 +499,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.play_count += 1
             ghosts.last_play = t
         message = get_empty_message(player_id)
+        msgnum = 1
         nearby = list()
         for p_id in online.keys():
             player = online[p_id]
