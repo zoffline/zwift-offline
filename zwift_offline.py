@@ -216,6 +216,8 @@ def get_course(state):
 
 def is_nearby(player_state1, player_state2, range = 100000):
     try:
+        if player_state1.watchingRiderId == player_state2.id or player_state2.watchingRiderId == player_state1.id:
+            return True
         course1 = get_course(player_state1)
         course2 = get_course(player_state2)
         if course1 == course2:
