@@ -384,6 +384,7 @@ def get_empty_message(player_id):
     message.f5 = 1
     message.f11 = 1
     message.msgnum = 1
+    return message
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
