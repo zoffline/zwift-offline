@@ -376,6 +376,15 @@ def play_pace_partners():
             state.worldTime = zwift_offline.world_time()
         ppthreadevent.wait(timeout=update_freq)
 
+def get_empty_message(player_id):
+    message = udp_node_msgs_pb2.ServerToClient()
+    message.f1 = 1
+    message.player_id = player_id
+    message.seqno = 1
+    message.f5 = 1
+    message.f11 = 1
+    msgnum = 1
+
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
@@ -457,13 +466,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             global_ghosts.pop(p_id)
 
         if ghosts.started and t >= ghosts.last_play + update_freq:
-            message = udp_node_msgs_pb2.ServerToClient()
-            message.f1 = 1
-            message.player_id = player_id
-            message.seqno = 1
-            message.f5 = 1
-            message.f11 = 1
-            msgnum = 1
+            message = get_empty_message(player_id)
             active_ghosts = 0
             for g in ghosts.play.ghosts:
                 if len(g.states) > ghosts.play_count: active_ghosts += 1
@@ -495,52 +498,44 @@ class UDPHandler(socketserver.BaseRequestHandler):
             socket.sendto(message.SerializeToString(), client_address)
             ghosts.play_count += 1
             ghosts.last_play = t
-        else:
-            message = udp_node_msgs_pb2.ServerToClient()
-            message.f1 = 1
-            message.player_id = player_id
-            message.seqno = 1
-            message.f5 = 1
-            message.f11 = 1
-            msgnum = 1
-            nearby = list()
-            for p_id in online.keys():
+        message = get_empty_message(player_id)
+        nearby = list()
+        for p_id in online.keys():
+            player = online[p_id]
+            if player.id != player_id:
+                #Check if players are close in world
+                if zwift_offline.is_nearby(state, player):
+                    nearby.append(p_id)
+        if t >= last_pp_update + update_freq:
+            last_pp_updates[player_id] = t
+            for p_id in global_pace_partners.keys():
+                pace_partner_variables = global_pace_partners[p_id]
+                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                #Check if pacepartner is close to player in world
+                if zwift_offline.is_nearby(state, pace_partner):
+                    nearby.append(p_id)
+        players = len(nearby)
+        message.num_msgs = players // 10
+        if players % 10: message.num_msgs += 1
+        for p_id in nearby:
+            player = None
+            if p_id in online.keys():
                 player = online[p_id]
-                if player.id != player_id:
-                    #Check if players are close in world
-                    if zwift_offline.is_nearby(state, player):
-                        nearby.append(p_id)
-            if t >= last_pp_update + update_freq:
-                last_pp_updates[player_id] = t
-                for p_id in global_pace_partners.keys():
-                    pace_partner_variables = global_pace_partners[p_id]
-                    pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
-                    #Check if pacepartner is close to player in world
-                    if zwift_offline.is_nearby(state, pace_partner):
-                        nearby.append(p_id)
-            players = len(nearby)
-            message.num_msgs = players // 10
-            if players % 10: message.num_msgs += 1
-            for p_id in nearby:
-                player = None
-                if p_id in online.keys():
-                    player = online[p_id]
-                elif p_id in global_pace_partners.keys():
-                    pace_partner_variables = global_pace_partners[p_id]
-                    player = pace_partner_variables.route.states[pace_partner_variables.position]
-                if player != None:
-                    if len(message.states) < 10:
-                        state = message.states.add()
-                        state.CopyFrom(player)
-                    else:
-                        message.world_time = zwift_offline.world_time()
-                        message.msgnum = msgnum
-                        socket.sendto(message.SerializeToString(), client_address)
-                        msgnum += 1
-                        del message.states[:]
-                        state = message.states.add()
-                        state.CopyFrom(player)
-                else: message.num_msgs -= 1
+            elif p_id in global_pace_partners.keys():
+                pace_partner_variables = global_pace_partners[p_id]
+                player = pace_partner_variables.route.states[pace_partner_variables.position]
+            if player != None:
+                if len(message.states) < 10:
+                    state = message.states.add()
+                    state.CopyFrom(player)
+                else:
+                    message.world_time = zwift_offline.world_time()
+                    message.msgnum = msgnum
+                    socket.sendto(message.SerializeToString(), client_address)
+                    msgnum += 1
+                    del message.states[:]
+                    state = message.states.add()
+                    state.CopyFrom(player)
             message.world_time = zwift_offline.world_time()
             message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), client_address)
