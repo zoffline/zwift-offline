@@ -20,7 +20,7 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -42,6 +42,7 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
     # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
@@ -92,6 +93,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 online = {}
+globalPacePartners = {}
 ghostsEnabled = {}
 playerUpdateQueue = {}
 playerIds = {}
@@ -554,6 +556,12 @@ def api_zfiles():
     return zfile.SerializeToString(), 200
 
 
+# Custom static data
+@app.route('/style/<path:filename>')
+def custom_style(filename):
+    return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
+
+
 # Probably don't need, haven't investigated
 @app.route('/api/zfiles/list', methods=['GET', 'POST'])
 def api_zfiles_list():
@@ -807,7 +815,7 @@ def api_profiles_activities_id(player_id, activity_id):
     player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
-            saveGhost(activity.name, int(player_id))
+            saveGhost(activity.name, player_id)
         except:
             pass
     # Unconditionally *try* and upload to strava and garmin since profile may
@@ -852,14 +860,9 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,1,1)
-     if (d.weekday()<= 3):
-         d = d - timedelta(d.weekday())
-     else:
-         d = d + timedelta(7-d.weekday())
-     dlt = timedelta(days = (int(dt.strftime('%W'))-1)*7)
-     first = d + dlt
-     last = d + dlt + timedelta(days=6, hours=23, minutes=59, seconds=59)
+     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     first = d
+     last = d + timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
 
 def get_month_range(dt):
@@ -1075,6 +1078,31 @@ def relay_worlds_generic(world_id=None):
                         onlinePlayer.altitude = player.altitude
                         onlinePlayer.y = player.y
                         playersInRegion += 1
+            for p_id in globalPacePartners.keys():
+                pace_partner_variables = globalPacePartners[p_id]
+                pace_partner_id = int(p_id)
+                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                courseId = getCourse(pace_partner)
+                if course == courseId:
+                    partialProfile = getPartialProfile(pace_partner_id)
+                    if not partialProfile == None:
+                        online_pace_partner = world.pace_partner_states.add()
+                        online_pace_partner.id = pace_partner_id
+                        online_pace_partner.firstName = partialProfile.first_name
+                        online_pace_partner.lastName = partialProfile.last_name
+                        online_pace_partner.distance = pace_partner.distance
+                        online_pace_partner.time = pace_partner.time
+                        online_pace_partner.f6 = 840#0
+                        online_pace_partner.f8 = 0
+                        online_pace_partner.f9 = 0
+                        online_pace_partner.f10 = 0
+                        online_pace_partner.f11 = 0
+                        online_pace_partner.power = pace_partner.power
+                        online_pace_partner.f13 = 2355
+                        online_pace_partner.x = pace_partner.x
+                        online_pace_partner.altitude = pace_partner.altitude
+                        online_pace_partner.y = pace_partner.y
+                        playersInRegion += 1
             world.f5 = playersInRegion
         if world_id:
             world.id = world_id
@@ -1101,10 +1129,12 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    for p_id in online.keys():
-        player = online[p_id]
-        if player.id == player_id:
-            return player.SerializeToString()
+    if player_id in online.keys():
+        player = online[player_id]
+        return player.SerializeToString()
+    if str(player_id) in globalPacePartners.keys():
+        pace_partner = globalPacePartners[str(player_id)]
+        return pace_partner.route.states[pace_partner.position].SerializeToString()
     return None
 
 
@@ -1242,6 +1272,9 @@ def relay_worlds_leave(world_id):
 
 @app.teardown_request
 def teardown_request(exception):
+    db.close_all_sessions()
+    db.session.close()
+    db.engine.dispose()
     if exception != None:
         print('Exception: %s' % exception)
 
@@ -1284,7 +1317,6 @@ def init_database():
 
 
 def check_columns():
-    time.sleep(3)
     rows = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
     should_have_columns = User.metadata.tables['user'].columns
     current_columns = list()
@@ -1315,8 +1347,7 @@ def before_first_request():
     init_database()
     db.create_all(app=app)
     db.session.commit()
-    check_columns_thread = threading.Thread(target=check_columns)
-    check_columns_thread.start()
+    check_columns()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
 
@@ -1439,18 +1470,15 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-@app.route('/static/web/launcher/<filename>', methods=['GET'])
-def static_web_launcher(filename):
-    return render_template(filename)
-
-
-def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
+def run_standalone(passedOnline, passedGlobalPacePartners, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
     global online
+    global globalPacePartners
     global ghostsEnabled
     global saveGhost
     global playerUpdateQueue
     global login_manager
     online = passedOnline
+    globalPacePartners = passedGlobalPacePartners
     ghostsEnabled = passedGhostsEnabled
     saveGhost = passedSaveGhost
     playerUpdateQueue = passedPlayerUpdateQueue
@@ -1460,6 +1488,8 @@ def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPla
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
+    db.close_all_sessions()
+    db.engine.dispose()
 
     @login_manager.user_loader
     def load_user(uid):
