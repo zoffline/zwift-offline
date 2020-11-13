@@ -54,9 +54,11 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
+    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
 
 try:
     # Ensure storage dir exists
@@ -195,7 +197,10 @@ def get_online():
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
         #Read from disk
-        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
+        if player_id in [2462261, 2466327, 2466331, 2466341]:
+            profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, player_id)
+        else:
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
         if os.path.isfile(profile_file):
             try:
                 with open(profile_file, 'rb') as fd:
@@ -721,12 +726,15 @@ def api_profiles():
             p.country_code = 0
         else:
             profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
+            if i in ['2462261', '2466327', '2466331', '2466341']:
+                profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
+            else:
+                profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
-            p = profiles.profiles.add()
-            p.CopyFrom(profile)
+                    p = profiles.profiles.add()
+                    p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
 
