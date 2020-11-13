@@ -507,7 +507,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if zwift_offline.is_nearby(state, player):
                         nearby.append(p_id)
             if t >= last_pp_update + update_freq:
-                print('player_id: %s' % player_id)
                 last_pp_updates[player_id] = t
                 for p_id in global_pace_partners.keys():
                     pace_partner_variables = global_pace_partners[p_id]
