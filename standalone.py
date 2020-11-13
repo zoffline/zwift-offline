@@ -40,6 +40,7 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
 update_freq = 3
+last_pp_updates = {}
 global_ghosts = {}
 ghosts_enabled = {}
 online = {}
@@ -369,7 +370,7 @@ def play_pace_partners():
             pp = global_pace_partners[pp_id]
             if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
-        ppthreadevent.wait(timeout=3)
+        ppthreadevent.wait(timeout=update_freq)
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -394,6 +395,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             global_ghosts[player_id] = GhostsVariables()
 
         ghosts = global_ghosts[player_id]
+
+        #Add pace partner last update for player if it's missing
+        if not player_id in last_pp_updates.keys():
+            last_pp_updates[player_id] = 0
+
+        last_pp_update = last_pp_updates[player_id]
 
         if recv.seqno == 1 or ghosts.rec == None:
             ghosts.rec = udp_node_msgs_pb2.Ghost()
@@ -499,12 +506,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     #Check if players are close in world
                     if zwift_offline.is_nearby(state, player):
                         nearby.append(p_id)
-            for p_id in global_pace_partners.keys():
-                pace_partner_variables = global_pace_partners[p_id]
-                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
-                #Check if pacepartner is close to player in world
-                if zwift_offline.is_nearby(state, pace_partner):
-                    nearby.append(p_id)
+            if t >= last_pp_update + update_freq:
+                print('player_id: %s' % player_id)
+                last_pp_updates[player_id] = t
+                for p_id in global_pace_partners.keys():
+                    pace_partner_variables = global_pace_partners[p_id]
+                    pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                    #Check if pacepartner is close to player in world
+                    if zwift_offline.is_nearby(state, pace_partner):
+                        nearby.append(p_id)
             players = len(nearby)
             message.num_msgs = players // 10
             if players % 10: message.num_msgs += 1
