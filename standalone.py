@@ -30,11 +30,13 @@ if getattr(sys, 'frozen', False):
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % sys._MEIPASS, START_LINES_FILE)
+    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     CDN_DIR = "%s/cdn" % SCRIPT_DIR
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -351,12 +353,11 @@ class PacePartnerVariables:
     position = 0
 
 def load_pace_partners():
-    folder = '%s/pace_partners' % STORAGE_DIR
-    if not os.path.isdir(folder): return
-    for (root, dirs, files) in os.walk(folder):
+    if not os.path.isdir(PACE_PARTNERS_DIR): return
+    for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
         for pp_id in dirs:
             p_id = int(pp_id)
-            route = '%s/%s/route.bin' % (folder, pp_id)
+            route = '%s/%s/route.bin' % (PACE_PARTNERS_DIR, pp_id)
             if os.path.isfile(route):
                 with open(route, 'rb') as fd:
                     global_pace_partners[p_id] = PacePartnerVariables()
