@@ -56,10 +56,12 @@ if getattr(sys, 'frozen', False):
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
     PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
+    BOTS_DIR = '%s/bots' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+    BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 try:
     # Ensure storage dir exists
@@ -198,8 +200,10 @@ def get_online():
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
         #Read from disk
-        if player_id in [2462261, 2466327, 2466331, 2466341]:
+        if player_id > 2000000 and player_id < 3000000:
             profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, player_id)
+        elif player_id > 3000000  and player_id < 4000000:
+            profile_file = '%s/%s/profile.bin' % (BOTS_DIR, player_id)
         else:
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
         if os.path.isfile(profile_file):
@@ -707,33 +711,35 @@ def api_profiles():
     args = request.args.getlist('id')
     profiles = profile_pb2.Profiles()
     for i in args:
-        if int(i) > 10000000:
-            # For ghosts
-            ghostId = math.floor(int(i) / 10000000)
-            player_id = int(i) - ghostId * 10000000
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(player_id))
+        p_id = int(i)
+        profile = profile_pb2.Profile()
+        if p_id > 10000000:
+            ghostId = math.floor(p_id / 10000000)
+            player_id = p_id - ghostId * 10000000
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
-            p = profiles.profiles.add()
-            p.CopyFrom(profile)
-            p.id = int(i)
-            p.first_name = 'zoffline'
-            p.last_name = 'ghost %s' % ghostId
-            p.f20 = 3761002195 # basic 4 jersey
-            p.f24 = 1456463855 # tron bike
-            p.f27 = 125 # blue
-            p.country_code = 0
+                    p = profiles.profiles.add()
+                    p.CopyFrom(profile)
+                    p.id = p_id
+                    p.first_name = 'zoffline'
+                    p.last_name = 'ghost %s' % ghostId
+                    p.f20 = 3761002195 # basic 4 jersey
+                    p.f24 = 1456463855 # tron bike
+                    p.f27 = 125 # blue
+                    p.country_code = 0
         else:
-            profile = profile_pb2.Profile()
-            if i in ['2462261', '2466327', '2466331', '2466341']:
+            if p_id > 2000000 and p_id < 3000000:
                 profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
+            elif p_id > 3000000 and p_id < 4000000:
+                profile_file = '%s/%s/profile.bin' % (BOTS_DIR, i)
             else:
                 profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
+                    profile.id = p_id
                     p = profiles.profiles.add()
                     p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
@@ -1103,6 +1109,10 @@ def relay_worlds_generic(world_id=None):
             pace_partner_variables = global_pace_partners[p_id]
             pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
             add_player_to_world(pace_partner, course_world, True)
+        for p_id in global_bots.keys():
+            bot_variables = global_bots[p_id]
+            bot = bot_variables.route.states[bot_variables.position]
+            add_player_to_world(bot, course_world, False)
         if world_id:
             world.id = world_id
             return world.SerializeToString()
@@ -1134,6 +1144,9 @@ def relay_worlds_id_players_id(world_id, player_id):
     if player_id in global_pace_partners.keys():
         pace_partner = global_pace_partners[player_id]
         return pace_partner.route.states[pace_partner.position].SerializeToString()
+    if player_id in global_bots.keys():
+        bot = global_bots[player_id]
+        return bot.route.states[bot.position].SerializeToString()
     return None
 
 
@@ -1469,15 +1482,17 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue):
     global online
     global global_pace_partners
+    global global_bots
     global ghosts_enabled
     global save_ghost
     global player_update_queue
     global login_manager
     online = passed_online
     global_pace_partners = passed_global_pace_partners
+    global_bots = passed_global_bots
     ghosts_enabled = passed_ghosts_enabled
     save_ghost = passed_save_ghost
     player_update_queue = passed_player_update_queue
