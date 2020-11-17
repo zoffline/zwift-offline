@@ -20,8 +20,9 @@ from io import BytesIO
 from shutil import copyfile
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file
+from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
+from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
@@ -42,6 +43,7 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.WARN)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
     # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
@@ -53,9 +55,13 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
+    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
+    BOTS_DIR = '%s/bots' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+    BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 try:
     # Ensure storage dir exists
@@ -92,11 +98,12 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 db = SQLAlchemy(app)
 online = {}
-ghostsEnabled = {}
-playerUpdateQueue = {}
-playerIds = {}
-playerPartialProfiles = {}
-saveGhost = None
+global_pace_partners = {}
+ghosts_enabled = {}
+player_update_queue = {}
+player_ids = {}
+player_partial_profiles = {}
+save_ghost = None
 restarting = False
 restarting_in_minutes = 0
 
@@ -140,7 +147,7 @@ class Online:
     france = 0
     paris = 0
 
-coursesLookup = {
+courses_lookup = {
     2: 'Richmond',
     4: 'Unknown1',  # event specific?
     6: 'Watopia',
@@ -154,68 +161,75 @@ coursesLookup = {
     15: 'Paris'
 }
 
-def getUTCDateTime():
+def get_utc_date_time():
     return datetime.datetime.utcnow()
 
-def getUTCSecondsFromDateTime(dt):
+def get_utc_seconds_from_date_time(dt):
     return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
 
-def getUTCTime():
-    dt = getUTCDateTime()
-    return getUTCSecondsFromDateTime(dt)
+def get_utc_time():
+    dt = get_utc_date_time()
+    return get_utc_seconds_from_date_time(dt)
 
-def getOnline():
-    onlineInRegion = Online()
+def get_online():
+    online_in_region = Online()
     for p_id in online:
         player_state = online[p_id]
-        course = getCourse(player_state)
-        course_name = coursesLookup[course]
+        course = get_course(player_state)
+        course_name = courses_lookup[course]
         if course_name == 'Richmond':
-            onlineInRegion.richmond += 1
+            online_in_region.richmond += 1
         elif course_name == 'Watopia':
-            onlineInRegion.watopia += 1
+            online_in_region.watopia += 1
         elif course_name == 'London':
-            onlineInRegion.london += 1
+            online_in_region.london += 1
         elif course_name == 'New York':
-            onlineInRegion.newyork += 1
+            online_in_region.newyork += 1
         elif course_name == 'Innsbruck':
-            onlineInRegion.innsbruck += 1
+            online_in_region.innsbruck += 1
         elif course_name == 'Yorkshire':
-            onlineInRegion.yorkshire += 1
+            online_in_region.yorkshire += 1
         elif course_name == 'France':
-            onlineInRegion.france += 1
+            online_in_region.france += 1
         elif course_name == 'Paris':
-            onlineInRegion.paris += 1
-        onlineInRegion.total += 1
-    return onlineInRegion
+            online_in_region.paris += 1
+        online_in_region.total += 1
+    return online_in_region
 
 
-def getPartialProfile(player_id):
-    if not player_id in playerPartialProfiles:
+def get_partial_profile(player_id):
+    if not player_id in player_partial_profiles:
         #Read from disk
-        profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
+        if player_id > 2000000 and player_id < 3000000:
+            profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, player_id)
+        elif player_id > 3000000  and player_id < 4000000:
+            profile_file = '%s/%s/profile.bin' % (BOTS_DIR, player_id)
+        else:
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
         if os.path.isfile(profile_file):
             try:
                 with open(profile_file, 'rb') as fd:
                     profile = profile_pb2.Profile()
                     profile.ParseFromString(fd.read())
-                    partialProfile = PartialProfile()
-                    partialProfile.first_name = profile.first_name
-                    partialProfile.last_name = profile.last_name
-                    partialProfile.country_code = profile.country_code
-                    playerPartialProfiles[player_id] = partialProfile
+                    partial_profile = PartialProfile()
+                    partial_profile.first_name = profile.first_name
+                    partial_profile.last_name = profile.last_name
+                    partial_profile.country_code = profile.country_code
+                    player_partial_profiles[player_id] = partial_profile
             except:
                 return None
         else: return None
-    return playerPartialProfiles[player_id]
+    return player_partial_profiles[player_id]
 
-def getCourse(state):
+def get_course(state):
     return (state.f19 & 0xff0000) >> 16
 
-def isNearby(player_state1, player_state2, range = 100000):
+def is_nearby(player_state1, player_state2, range = 100000):
     try:
-        course1 = getCourse(player_state1)
-        course2 = getCourse(player_state2)
+        if player_state1.watchingRiderId == player_state2.id or player_state2.watchingRiderId == player_state1.id:
+            return True
+        course1 = get_course(player_state1)
+        course2 = get_course(player_state2)
         if course1 == course2:
             x1 = int(player_state1.x)
             x2 = int(player_state2.x)
@@ -297,7 +311,7 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
-            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=getOnline()))
+            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
 
@@ -308,7 +322,7 @@ def login():
 @login_required
 def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
-        online=getOnline(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
+        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
 def send_message_to_all_online(message):
     player_update = udp_node_msgs_pb2.PlayerUpdate()
@@ -317,7 +331,7 @@ def send_message_to_all_online(message):
     player_update.world_time1 = world_time()
     player_update.world_time2 = world_time() + 60000
     player_update.f12 = 1
-    player_update.f14 = int(str(int(getUTCTime()*1000000)))
+    player_update.f14 = int(str(int(get_utc_time()*1000000)))
 
     chat_message = udp_node_msgs_pb2.ChatMessage()
     chat_message.rider_id = 0
@@ -331,9 +345,9 @@ def send_message_to_all_online(message):
     player_update.payload = chat_message.SerializeToString()
 
     for recieving_player_id in online.keys():
-        if not recieving_player_id in playerUpdateQueue:
-            playerUpdateQueue[recieving_player_id] = list()
-        playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
+        if not recieving_player_id in player_update_queue:
+            player_update_queue[recieving_player_id] = list()
+        player_update_queue[recieving_player_id].append(player_update.SerializeToString())
 
 def send_restarting_message():
     global restarting
@@ -486,7 +500,7 @@ def get_id(table_name):
 
 
 def world_time():
-    return int((getUTCTime()-1414016075)*1000)
+    return int((get_utc_time()-1414016075)*1000)
 
 
 @app.route('/api/auth', methods=['GET'])
@@ -502,7 +516,7 @@ def api_users_login():
     response.info.relay_url = "https://us-or-rly101.zwift.com/relay"
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
-    response.info.time = int(getUTCTime())
+    response.info.time = int(get_utc_time())
     udp_node = response.info.nodes.node.add()
     if os.path.exists(SERVER_IP_FILE):
         with open(SERVER_IP_FILE, 'r') as f:
@@ -521,8 +535,8 @@ def api_users_logout():
     player_id = current_user.player_id
     if player_id in online:
         online.pop(player_id)
-    if player_id in playerPartialProfiles:
-        playerPartialProfiles.pop(player_id)
+    if player_id in player_partial_profiles:
+        player_partial_profiles.pop(player_id)
     return '', 204
 
 
@@ -550,8 +564,14 @@ def api_zfiles():
     zfile.id = int(random.getrandbits(31))
     zfile.folder = "logfiles"
     zfile.filename = "yep_took_good_care_of_that_file.txt"
-    zfile.timestamp = int(getUTCTime())
+    zfile.timestamp = int(get_utc_time())
     return zfile.SerializeToString(), 200
+
+
+# Custom static data
+@app.route('/style/<path:filename>')
+def custom_style(filename):
+    return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
 
 
 # Probably don't need, haven't investigated
@@ -624,7 +644,7 @@ def api_profiles_me():
         elif current_user.player_id != profile.id:
             # Update AnonUser's player_id to match
             AnonUser.player_id = profile.id
-            ghostsEnabled[profile.id] = AnonUser.enable_ghosts
+            ghosts_enabled[profile.id] = AnonUser.enable_ghosts
         if not profile.email:
             profile.email = 'user@email.com'
         if profile.f60:
@@ -691,32 +711,37 @@ def api_profiles():
     args = request.args.getlist('id')
     profiles = profile_pb2.Profiles()
     for i in args:
-        if int(i) > 10000000:
-            # For ghosts
-            ghostId = math.floor(int(i) / 10000000)
-            player_id = int(i) - ghostId * 10000000
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, str(player_id))
+        p_id = int(i)
+        profile = profile_pb2.Profile()
+        if p_id > 10000000:
+            ghostId = math.floor(p_id / 10000000)
+            player_id = p_id - ghostId * 10000000
+            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
-            p = profiles.profiles.add()
-            p.CopyFrom(profile)
-            p.id = int(i)
-            p.first_name = 'zoffline'
-            p.last_name = 'ghost %s' % ghostId
-            p.f20 = 3761002195 # basic 4 jersey
-            p.f24 = 1456463855 # tron bike
-            p.f27 = 125 # blue
-            p.country_code = 0
+                    p = profiles.profiles.add()
+                    p.CopyFrom(profile)
+                    p.id = p_id
+                    p.first_name = 'zoffline'
+                    p.last_name = 'ghost %s' % ghostId
+                    p.f20 = 3761002195 # basic 4 jersey
+                    p.f24 = 1456463855 # tron bike
+                    p.f27 = 125 # blue
+                    p.country_code = 0
         else:
-            profile = profile_pb2.Profile()
-            profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
+            if p_id > 2000000 and p_id < 3000000:
+                profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
+            elif p_id > 3000000 and p_id < 4000000:
+                profile_file = '%s/%s/profile.bin' % (BOTS_DIR, i)
+            else:
+                profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
-            p = profiles.profiles.add()
-            p.CopyFrom(profile)
+                    profile.id = p_id
+                    p = profiles.profiles.add()
+                    p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
 
@@ -739,7 +764,7 @@ def strava_upload(player_id, activity):
         logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
         return
     try:
-        if getUTCTime() > int(expires_at):
+        if get_utc_time() > int(expires_at):
             refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
                                                            refresh_token=refresh_token)
             with open('%s/strava_token.txt' % profile_dir, 'w') as f:
@@ -807,7 +832,7 @@ def api_profiles_activities_id(player_id, activity_id):
     player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
-            saveGhost(activity.name, int(player_id))
+            save_ghost(activity.name, player_id)
         except:
             pass
     # Unconditionally *try* and upload to strava and garmin since profile may
@@ -822,14 +847,14 @@ def api_profiles_activities_id(player_id, activity_id):
 @login_required
 def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
-    profile = getPartialProfile(sending_player_id)
+    profile = get_partial_profile(sending_player_id)
     if not profile == None:
         player_update = udp_node_msgs_pb2.PlayerUpdate()
         player_update.f2 = 1
         player_update.type = 4 #ride on type
         player_update.world_time1 = world_time()
         player_update.world_time2 = player_update.world_time1 + 9890
-        player_update.f14 = int(getUTCTime() * 1000000)
+        player_update.f14 = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
         ride_on.rider_id = int(sending_player_id)
@@ -840,9 +865,9 @@ def api_profiles_activities_rideon(recieving_player_id):
 
         player_update.payload = ride_on.SerializeToString()
 
-        if not recieving_player_id in playerUpdateQueue:
-            playerUpdateQueue[recieving_player_id] = list()
-        playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
+        if not recieving_player_id in player_update_queue:
+            player_update_queue[recieving_player_id] = list()
+        player_update_queue[recieving_player_id].append(player_update.SerializeToString())
     return '{}', 200
 
 
@@ -852,14 +877,9 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,1,1)
-     if (d.weekday()<= 3):
-         d = d - timedelta(d.weekday())
-     else:
-         d = d + timedelta(7-d.weekday())
-     dlt = timedelta(days = (int(dt.strftime('%W'))-1)*7)
-     first = d + dlt
-     last = d + dlt + timedelta(days=6, hours=23, minutes=59, seconds=59)
+     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     first = d
+     last = d + timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
 
 def get_month_range(dt):
@@ -870,11 +890,11 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(getUTCSecondsFromDateTime(dt)*1000)
+    return int(get_utc_seconds_from_date_time(dt)*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
-    now = getUTCDateTime()
+    now = get_utc_date_time()
     if goal.periodicity == 0:  # weekly
         first_dt, last_dt = get_week_range(now)
     else:  # monthly
@@ -928,7 +948,7 @@ def api_profiles_goals(player_id):
         goal = goal_pb2.Goal()
         goal.ParseFromString(request.stream.read())
         goal.id = get_id('goal')
-        now = getUTCDateTime()
+        now = get_utc_date_time()
         goal.created_on = unix_time_millis(now)
         set_goal_end_date(goal, now)
         fill_in_goal_progress(goal, player_id)
@@ -943,7 +963,7 @@ def api_profiles_goals(player_id):
         goal = goals.goals.add()
         row_to_protobuf(row, goal)
         end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-        now = getUTCDateTime()
+        now = get_utc_date_time()
         if end_dt < now:
             set_goal_end_date(goal, now)
             update_protobuf_in_db('goal', goal, goal.id)
@@ -976,8 +996,36 @@ def api_tcp_config():
     return infos.SerializeToString(), 200
 
 
+def add_player_to_world(player, course_world, is_pace_partner):
+    course_id = get_course(player)
+    if course_id in course_world.keys():
+        partial_profile = get_partial_profile(player.id)
+        if not partial_profile == None:
+            online_player = None
+            if is_pace_partner:
+                online_player = course_world[course_id].pace_partner_states.add()
+            else:
+                online_player = course_world[course_id].player_states.add()
+            online_player.id = player.id
+            online_player.firstName = partial_profile.first_name
+            online_player.lastName = partial_profile.last_name
+            online_player.distance = player.distance
+            online_player.time = player.time
+            online_player.f6 = 840#0
+            online_player.f8 = 0
+            online_player.f9 = 0
+            online_player.f10 = 0
+            online_player.f11 = 0
+            online_player.power = player.power
+            online_player.f13 = 2355
+            online_player.x = player.x
+            online_player.altitude = player.altitude
+            online_player.y = player.y
+            course_world[course_id].f5 += 1
+
+
 def relay_worlds_generic(world_id=None):
-    courses = coursesLookup.keys()
+    courses = courses_lookup.keys()
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
@@ -990,7 +1038,7 @@ def relay_worlds_generic(world_id=None):
                 #serializedMessage = chat_message.SerializeToString()
             except:
                 #Not able to decode as playerupdate, send dummy response
-                world = { 'currentDateTime': int(getUTCTime()),
+                world = { 'currentDateTime': int(get_utc_time()),
                         'currentWorldTime': world_time(),
                         'friendsInWorld': [],
                         'mapId': 1,
@@ -1007,7 +1055,7 @@ def relay_worlds_generic(world_id=None):
             #PlayerUpdate
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
-            player_update.f14 = int(str(int(getUTCTime()*1000000)))
+            player_update.f14 = int(str(int(get_utc_time()*1000000)))
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
@@ -1020,7 +1068,7 @@ def relay_worlds_generic(world_id=None):
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
-                            if isNearby(sending_player, recieving_player):
+                            if is_nearby(sending_player, recieving_player):
                                 should_receive = True
                     #Segment complete
                     else:
@@ -1029,20 +1077,21 @@ def relay_worlds_generic(world_id=None):
                         sending_player_id = segment_complete.rider_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
-                            #Check that players are on same course and close to each other
-                            if getCourse(sending_player) == getCourse(recieving_player):
+                            #Check that players are on same course
+                            if get_course(sending_player) == get_course(recieving_player) or recieving_player.watchingRiderId == sending_player_id:
                                 should_receive = True
                 #Other PlayerUpdate, send to all
                 else:
                     should_receive = True
                 if should_receive:
-                    if not recieving_player_id in playerUpdateQueue:
-                        playerUpdateQueue[recieving_player_id] = list()
-                    playerUpdateQueue[recieving_player_id].append(player_update.SerializeToString())
+                    if not recieving_player_id in player_update_queue:
+                        player_update_queue[recieving_player_id] = list()
+                    player_update_queue[recieving_player_id].append(player_update.SerializeToString())
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
         world = None
+        course_world = {}
 
         for course in courses:
             world = worlds.worlds.add()
@@ -1050,32 +1099,20 @@ def relay_worlds_generic(world_id=None):
             world.name = 'Public Watopia'
             world.f3 = course
             world.world_time = world_time()
-            world.real_time = int(getUTCTime())
-            playersInRegion = 0
-            for p_id in online.keys():
-                player = online[p_id]
-                courseId = getCourse(player)
-                if course == courseId:
-                    partialProfile = getPartialProfile(player.id)
-                    if not partialProfile == None:
-                        onlinePlayer = world.player_states.add()
-                        onlinePlayer.id = player.id
-                        onlinePlayer.firstName = partialProfile.first_name
-                        onlinePlayer.lastName = partialProfile.last_name
-                        onlinePlayer.distance = player.distance
-                        onlinePlayer.time = player.time
-                        onlinePlayer.f6 = 840#0
-                        onlinePlayer.f8 = 0
-                        onlinePlayer.f9 = 0
-                        onlinePlayer.f10 = 0
-                        onlinePlayer.f11 = 0
-                        onlinePlayer.power = 250#player.power
-                        onlinePlayer.f13 = 2355
-                        onlinePlayer.x = player.x
-                        onlinePlayer.altitude = player.altitude
-                        onlinePlayer.y = player.y
-                        playersInRegion += 1
-            world.f5 = playersInRegion
+            world.real_time = int(get_utc_time())
+            world.f5 = 0
+            course_world[course] = world
+        for p_id in online.keys():
+            player = online[p_id]
+            add_player_to_world(player, course_world, False)
+        for p_id in global_pace_partners.keys():
+            pace_partner_variables = global_pace_partners[p_id]
+            pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+            add_player_to_world(pace_partner, course_world, True)
+        for p_id in global_bots.keys():
+            bot_variables = global_bots[p_id]
+            bot = bot_variables.route.states[bot_variables.position]
+            add_player_to_world(bot, course_world, False)
         if world_id:
             world.id = world_id
             return world.SerializeToString()
@@ -1101,10 +1138,15 @@ def relay_worlds_id_join(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
 def relay_worlds_id_players_id(world_id, player_id):
-    for p_id in online.keys():
-        player = online[p_id]
-        if player.id == player_id:
-            return player.SerializeToString()
+    if player_id in online.keys():
+        player = online[player_id]
+        return player.SerializeToString()
+    if player_id in global_pace_partners.keys():
+        pace_partner = global_pace_partners[player_id]
+        return pace_partner.route.states[pace_partner.position].SerializeToString()
+    if player_id in global_bots.keys():
+        bot = global_bots[player_id]
+        return bot.route.states[bot.position].SerializeToString()
     return None
 
 
@@ -1188,7 +1230,7 @@ def handle_segment_results(request):
         result.ParseFromString(request.stream.read())
         result.id = get_id('segment_result')
         result.world_time = world_time()
-        result.finish_time_str = getUTCDateTime().strftime("%Y-%m-%dT%H:%M:%SZ")
+        result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
         return '{"id": %ld}' % result.id, 200
@@ -1242,6 +1284,9 @@ def relay_worlds_leave(world_id):
 
 @app.teardown_request
 def teardown_request(exception):
+    db.close_all_sessions()
+    db.session.close()
+    db.engine.dispose()
     if exception != None:
         print('Exception: %s' % exception)
 
@@ -1264,10 +1309,10 @@ def init_database():
         return
     # Database needs to be upgraded, try to back it up first
     try:  # Try writing to storage dir
-        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(getUTCTime())))
+        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(get_utc_time())))
     except:
         try:  # Fall back to a temporary dir
-            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(getUTCTime())))
+            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(get_utc_time())))
         except:
             logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
 
@@ -1284,7 +1329,6 @@ def init_database():
 
 
 def check_columns():
-    time.sleep(3)
     rows = db.engine.execute(sqlalchemy.text("PRAGMA table_info(user)"))
     should_have_columns = User.metadata.tables['user'].columns
     current_columns = list()
@@ -1315,8 +1359,7 @@ def before_first_request():
     init_database()
     db.create_all(app=app)
     db.session.commit()
-    check_columns_thread = threading.Thread(target=check_columns)
-    check_columns_thread.start()
+    check_columns()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
 
@@ -1348,7 +1391,7 @@ def launch_zwift():
         if MULTIPLAYER:
             return render_template("login_form.html")
         else:
-            return render_template("user_home.html", username="", enable_ghosts=False, online=getOnline(),
+            return render_template("user_home.html", username="", enable_ghosts=False, online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -1410,7 +1453,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-        ghostsEnabled[current_user.player_id] = current_user.enable_ghosts
+        ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
     db.session.commit()
@@ -1439,33 +1482,36 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-@app.route('/static/web/launcher/<filename>', methods=['GET'])
-def static_web_launcher(filename):
-    return render_template(filename)
-
-
-def run_standalone(passedOnline, passedGhostsEnabled, passedSaveGhost, passedPlayerUpdateQueue):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue):
     global online
-    global ghostsEnabled
-    global saveGhost
-    global playerUpdateQueue
+    global global_pace_partners
+    global global_bots
+    global ghosts_enabled
+    global save_ghost
+    global player_update_queue
     global login_manager
-    online = passedOnline
-    ghostsEnabled = passedGhostsEnabled
-    saveGhost = passedSaveGhost
-    playerUpdateQueue = passedPlayerUpdateQueue
+    online = passed_online
+    global_pace_partners = passed_global_pace_partners
+    global_bots = passed_global_bots
+    ghosts_enabled = passed_ghosts_enabled
+    save_ghost = passed_save_ghost
+    player_update_queue = passed_player_update_queue
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None
     if not MULTIPLAYER:
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
+    db.close_all_sessions()
+    db.engine.dispose()
 
     @login_manager.user_loader
     def load_user(uid):
         return User.query.get(int(uid))
 
-    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
+    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=app.logger)
+    server.serve_forever()
+#    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ else:
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
+import protobuf.profile_pb2 as profile_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -29,29 +30,39 @@ if getattr(sys, 'frozen', False):
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % sys._MEIPASS, START_LINES_FILE)
+    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
+    BOTS_DIR = '%s/bots' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     CDN_DIR = "%s/cdn" % SCRIPT_DIR
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+    BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
-update_freq = 3
-globalGhosts = {}
-ghostsEnabled = {}
+ghost_update_freq = 3
+pacer_update_freq = 1
+bot_update_freq = 3
+last_pp_updates = {}
+last_bot_updates = {}
+global_ghosts = {}
+ghosts_enabled = {}
 online = {}
-playerUpdateQueue = {}
+player_update_queue = {}
+global_pace_partners = {}
+global_bots = {}
 
-def roadID(state):
+def road_id(state):
     return (state.f20 & 0xff00) >> 8
 
-def isForward(state):
+def is_forward(state):
     return (state.f19 & 4) != 0
 
-def getCourse(state):
+def get_course(state):
     return (state.f19 & 0xff0000) >> 16
 
 def boolean(s):
@@ -59,24 +70,24 @@ def boolean(s):
     if s.lower() in ['false', 'no', '0']: return False
     return None
 
-def saveGhost(name, player_id):
-    global globalGhosts
-    if not player_id in globalGhosts.keys(): return
-    ghosts = globalGhosts[player_id]
+def save_ghost(name, player_id):
+    global global_ghosts
+    if not player_id in global_ghosts.keys(): return
+    ghosts = global_ghosts[player_id]
     if len(ghosts.rec.states) > 0:
-        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(ghosts.rec.states[0]), roadID(ghosts.rec.states[0]))
-        if not isForward(ghosts.rec.states[0]): folder += '/reverse'
+        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, get_course(ghosts.rec.states[0]), road_id(ghosts.rec.states[0]))
+        if not is_forward(ghosts.rec.states[0]): folder += '/reverse'
         try:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
         except:
             return
-        f = '%s/%s-%s.bin' % (folder, zwift_offline.getUTCDateTime().strftime("%Y-%m-%d-%H-%M-%S"), name)
+        f = '%s/%s-%s.bin' % (folder, zwift_offline.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
-def organizeGhosts(player_id):
-    # organize ghosts in course/roadID directory structure
+def organize_ghosts(player_id):
+    # organize ghosts in course/road_id directory structure
     # previously they were saved directly in player_id/ghosts
     folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
     if not os.path.isdir(folder): return
@@ -86,8 +97,8 @@ def organizeGhosts(player_id):
             with open(file, 'rb') as fd:
                 g = udp_node_msgs_pb2.Ghost()
                 g.ParseFromString(fd.read())
-                dest = '%s/%s/%s' % (folder, getCourse(g.states[0]), roadID(g.states[0]))
-                if not isForward(g.states[0]): dest += '/reverse'
+                dest = '%s/%s/%s' % (folder, get_course(g.states[0]), road_id(g.states[0]))
+                if not is_forward(g.states[0]): dest += '/reverse'
                 try:
                     if not os.path.isdir(dest):
                         os.makedirs(dest)
@@ -95,9 +106,9 @@ def organizeGhosts(player_id):
                     return
             os.rename(file, os.path.join(dest, f))
 
-def loadGhosts(player_id, state, ghosts):
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, getCourse(state), roadID(state))
-    if not isForward(state): folder += '/reverse'
+def load_ghosts(player_id, state, ghosts):
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, get_course(state), road_id(state))
+    if not is_forward(state): folder += '/reverse'
     if not os.path.isdir(folder): return
     s = list()
     for f in os.listdir(folder):
@@ -106,24 +117,24 @@ def loadGhosts(player_id, state, ghosts):
                 g = ghosts.play.ghosts.add()
                 g.ParseFromString(fd.read())
                 s.append(g.states[0].roadTime)
-    ghosts.start_road = roadID(state)
+    ghosts.start_road = road_id(state)
     ghosts.start_rt = 0
     if os.path.isfile(START_LINES_FILE):
         with open(START_LINES_FILE, 'r') as fd:
             sl = [tuple(line) for line in csv.reader(fd)]
-            rt = [t for t in sl if t[0] == str(getCourse(state)) and t[1] == str(roadID(state)) and (boolean(t[2]) == isForward(state) or not t[2])]
+            rt = [t for t in sl if t[0] == str(get_course(state)) and t[1] == str(road_id(state)) and (boolean(t[2]) == is_forward(state) or not t[2])]
             if rt:
                 ghosts.start_road = int(rt[0][3])
                 ghosts.start_rt = int(rt[0][4])
     if not ghosts.start_rt:
         s.append(state.roadTime)
-        if isForward(state): ghosts.start_rt = max(s)
+        if is_forward(state): ghosts.start_rt = max(s)
         else: ghosts.start_rt = min(s)
     for g in ghosts.play.ghosts:
         try:
-            while roadID(g.states[0]) != ghosts.start_road:
+            while road_id(g.states[0]) != ghosts.start_road:
                 del g.states[0]
-            if isForward(g.states[0]):
+            if is_forward(g.states[0]):
                 while not (g.states[0].roadTime <= ghosts.start_rt <= g.states[1].roadTime):
                     del g.states[0]
             else:
@@ -195,13 +206,10 @@ class CDNHandler(SimpleHTTPRequestHandler):
             # This can only work if we're running on a different machine than the Zwift client.
             sent = False
             try:
-
                 url = 'http://{}{}'.format(hostname, self.path)
                 req_header = self.parse_headers()
-
                 resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
                 sent = True
-
                 self.send_response(resp.status_code)
                 self.send_resp_headers(resp)
                 self.wfile.write(resp.content)
@@ -285,7 +293,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg.f11 = 1
         payload = msg.SerializeToString()
 
-        lastAliveCheck = int(zwift_offline.getUTCTime())
+        last_alive_check = int(zwift_offline.get_utc_time())
         while True:
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
@@ -296,9 +304,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.world_time = zwift_offline.world_time()
 
                 #PlayerUpdate
-                if player_id in playerUpdateQueue and len(playerUpdateQueue[player_id]) > 0 and player_id in online:
+                if player_id in player_update_queue and len(player_update_queue[player_id]) > 0 and player_id in online:
                     added_player_updates = list()
-                    for player_update_proto in playerUpdateQueue[player_id]:
+                    for player_update_proto in player_update_queue[player_id]:
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
 
@@ -315,18 +323,18 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
-                        playerUpdateQueue[player_id].remove(player_update_proto)
+                        player_update_queue[player_id].remove(player_update_proto)
 
-                t = int(zwift_offline.getUTCTime())
+                t = int(zwift_offline.get_utc_time())
 
                 #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
                 if len(message.updates) > 0:
-                    lastAliveCheck = t
+                    last_alive_check = t
                     message_payload = message.SerializeToString()
                     self.request.sendall(struct.pack('!h', len(message_payload)))
                     self.request.sendall(message_payload)
-                elif lastAliveCheck < t - 25:
-                    lastAliveCheck = t
+                elif last_alive_check < t - 25:
+                    last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except Exception as e:
@@ -344,6 +352,76 @@ class GhostsVariables:
     last_rt = 0
     start_road = 0
     start_rt = 0
+
+class PacePartnerVariables:
+    route = None
+    position = 0
+
+class BotVariables:
+    route = None
+    position = 0
+
+def load_pace_partners():
+    if not os.path.isdir(PACE_PARTNERS_DIR): return
+    for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
+        for pp_id in dirs:
+            p_id = int(pp_id)
+            route = '%s/%s/route.bin' % (PACE_PARTNERS_DIR, pp_id)
+            if os.path.isfile(route):
+                with open(route, 'rb') as fd:
+                    global_pace_partners[p_id] = PacePartnerVariables()
+                    pp = global_pace_partners[p_id]
+                    pp.route = udp_node_msgs_pb2.Ghost()
+                    pp.route.ParseFromString(fd.read())
+                    pp.position = 0
+
+def play_pace_partners():
+    while True:
+        for pp_id in global_pace_partners.keys():
+            pp = global_pace_partners[pp_id]
+            if pp.position < len(pp.route.states) - 1: pp.position += 1
+            else: pp.position = 0
+            state = pp.route.states[pp.position]
+            state.id = pp_id
+            state.watchingRiderId = pp_id
+            state.worldTime = zwift_offline.world_time()
+        ppthreadevent.wait(timeout=pacer_update_freq)
+
+def load_bots():
+    if not os.path.isdir(BOTS_DIR): return
+    for (root, dirs, files) in os.walk(BOTS_DIR):
+        for bot_id in dirs:
+            p_id = int(bot_id)
+            route = '%s/%s/route.bin' % (BOTS_DIR, bot_id)
+            if os.path.isfile(route):
+                with open(route, 'rb') as fd:
+                    global_bots[p_id] = BotVariables()
+                    bot = global_bots[p_id]
+                    bot.route = udp_node_msgs_pb2.Ghost()
+                    bot.route.ParseFromString(fd.read())
+                    bot.position = 0
+
+def play_bots():
+    while True:
+        for bot_id in global_bots.keys():
+            bot = global_bots[bot_id]
+            if bot.position < len(bot.route.states) - 1: bot.position += 1
+            else: bot.position = 0
+            state = bot.route.states[bot.position]
+            state.id = bot_id
+            state.watchingRiderId = bot_id
+            state.worldTime = zwift_offline.world_time()
+        botthreadevent.wait(timeout=bot_update_freq)
+
+def get_empty_message(player_id):
+    message = udp_node_msgs_pb2.ServerToClient()
+    message.f1 = 1
+    message.player_id = player_id
+    message.seqno = 1
+    message.f5 = 1
+    message.f11 = 1
+    message.msgnum = 1
+    return message
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -363,11 +441,30 @@ class UDPHandler(socketserver.BaseRequestHandler):
         player_id = recv.player_id
         state = recv.state
 
-        #Add handling of ghosts for player if it's missing
-        if not player_id in globalGhosts.keys():
-            globalGhosts[player_id] = GhostsVariables()
+        nearby_state = state
+        if state.watchingRiderId in online.keys():
+            nearby_state = online[state.watchingRiderId]
+        elif state.watchingRiderId in global_pace_partners.keys():
+            pp = global_pace_partners[state.watchingRiderId]
+            nearby_state = pp.route.states[pp.position]
 
-        ghosts = globalGhosts[player_id]
+        #Add handling of ghosts for player if it's missing
+        if not player_id in global_ghosts.keys():
+            global_ghosts[player_id] = GhostsVariables()
+
+        ghosts = global_ghosts[player_id]
+
+        #Add pace partner last update for player if it's missing
+        if not player_id in last_pp_updates.keys():
+            last_pp_updates[player_id] = 0
+
+        last_pp_update = last_pp_updates[player_id]
+
+        #Add bot last update for player if it's missing
+        if not player_id in last_bot_updates.keys():
+            last_bot_updates[player_id] = 0
+
+        last_bot_update = last_bot_updates[player_id]
 
         if recv.seqno == 1 or ghosts.rec == None:
             ghosts.rec = udp_node_msgs_pb2.Ghost()
@@ -377,56 +474,51 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.loaded = False
             ghosts.started = False
             ghosts.rec.player_id = player_id
-            organizeGhosts(player_id)
+            organize_ghosts(player_id)
 
-        t = int(zwift_offline.getUTCTime())
-        ghosts.lastPackageTime = t
+        t = int(zwift_offline.get_utc_time())
+        ghosts.last_package_time = t
 
-        if player_id in ghostsEnabled and ghostsEnabled[player_id]:
-            if not ghosts.loaded and state.roadTime > 0:
+        if player_id in ghosts_enabled and ghosts_enabled[player_id]:
+            if not ghosts.loaded and get_course(state):
                 ghosts.loaded = True
-                loadGhosts(player_id, state, ghosts)
+                load_ghosts(player_id, state, ghosts)
             if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
-                if t >= ghosts.last_rec + update_freq:
-                    state = ghosts.rec.states.add()
-                    state.CopyFrom(state)
+                if t >= ghosts.last_rec + ghost_update_freq:
+                    s = ghosts.rec.states.add()
+                    s.CopyFrom(state)
                     ghosts.last_rec = t
-                if not ghosts.started and ghosts.play.ghosts and roadID(state) == ghosts.start_road:
-                    if isForward(state):
+                if not ghosts.started and ghosts.play.ghosts and road_id(state) == ghosts.start_road:
+                    if is_forward(state):
                         if state.roadTime >= ghosts.start_rt >= ghosts.last_rt:
                             ghosts.started = True
                     else:
                         if state.roadTime <= ghosts.start_rt <= ghosts.last_rt:
                             ghosts.started = True
+#            else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
 
         keys = online.keys()
-        removePlayers = list()
+        remove_players = list()
         for p_id in keys:
             if zwift_offline.world_time() > online[p_id].worldTime + 10000:
-                removePlayers.insert(0, p_id)
-        for p_id in removePlayers:
+                remove_players.insert(0, p_id)
+        for p_id in remove_players:
             online.pop(p_id)
         if state.roadTime:
             online[player_id] = state
 
         #Remove ghosts entries for inactive players (disconnected?)
-        keys = globalGhosts.keys()
-        removePlayers = list()
+        keys = global_ghosts.keys()
+        remove_players = list()
         for p_id in keys:
-            if globalGhosts[p_id].lastPackageTime < t - 10:
-                removePlayers.insert(0, p_id)
-        for p_id in removePlayers:
-            globalGhosts.pop(p_id)
+            if global_ghosts[p_id].last_package_time < t - 10:
+                remove_players.insert(0, p_id)
+        for p_id in remove_players:
+            global_ghosts.pop(p_id)
 
-        if ghosts.started and t >= ghosts.last_play + update_freq:
-            message = udp_node_msgs_pb2.ServerToClient()
-            message.f1 = 1
-            message.player_id = player_id
-            message.seqno = 1
-            message.f5 = 1
-            message.f11 = 1
-            msgnum = 1
+        if ghosts.started and t >= ghosts.last_play + ghost_update_freq:
+            message = get_empty_message(player_id)
             active_ghosts = 0
             for g in ghosts.play.ghosts:
                 if len(g.states) > ghosts.play_count: active_ghosts += 1
@@ -443,9 +535,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                             state.worldTime = zwift_offline.world_time()
                         else:
                             message.world_time = zwift_offline.world_time()
-                            message.msgnum = msgnum
                             socket.sendto(message.SerializeToString(), client_address)
-                            msgnum += 1
+                            message.msgnum += 1
                             del message.states[:]
                             state = message.states.add()
                             state.CopyFrom(g.states[ghosts.play_count])
@@ -454,46 +545,59 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghost_id += 1
             else: message.num_msgs = 1
             message.world_time = zwift_offline.world_time()
-            message.msgnum = msgnum
             socket.sendto(message.SerializeToString(), client_address)
             ghosts.play_count += 1
             ghosts.last_play = t
-        else:
-            message = udp_node_msgs_pb2.ServerToClient()
-            message.f1 = 1
-            message.player_id = player_id
-            message.seqno = 1
-            message.f5 = 1
-            message.f11 = 1
-            msgnum = 1
-            nearby = list()
-            for p_id in online.keys():
+        message = get_empty_message(player_id)
+        nearby = list()
+        for p_id in online.keys():
+            player = online[p_id]
+            if player.id != player_id:
+                #Check if players are close in world
+                if zwift_offline.is_nearby(nearby_state, player):
+                    nearby.append(p_id)
+        if t >= last_pp_update + pacer_update_freq:
+            last_pp_updates[player_id] = t
+            for p_id in global_pace_partners.keys():
+                pace_partner_variables = global_pace_partners[p_id]
+                pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
+                #Check if pacepartner is close to player in world
+                if zwift_offline.is_nearby(nearby_state, pace_partner):
+                    nearby.append(p_id)
+        if t >= last_bot_update + bot_update_freq:
+            last_bot_updates[player_id] = t
+            for p_id in global_bots.keys():
+                bot_variables = global_bots[p_id]
+                bot = bot_variables.route.states[bot_variables.position]
+                #Check if bot is close to player in world
+                if zwift_offline.is_nearby(nearby_state, bot):
+                    nearby.append(p_id)
+        players = len(nearby)
+        message.num_msgs = players // 10
+        if players % 10: message.num_msgs += 1
+        for p_id in nearby:
+            player = None
+            if p_id in online.keys():
                 player = online[p_id]
-                if player.id != player_id:
-                    #Check if players are close in world
-                    if zwift_offline.isNearby(state, player):
-                        nearby.append(p_id)
-            players = len(nearby)
-            message.num_msgs = players // 10
-            if players % 10: message.num_msgs += 1
-            for p_id in nearby:
-                if p_id in online.keys():
-                    player = online[p_id]
-                    if len(message.states) < 10:
-                        state = message.states.add()
-                        state.CopyFrom(player)
-                    else:
-                        message.world_time = zwift_offline.world_time()
-                        message.msgnum = msgnum
-                        socket.sendto(message.SerializeToString(), client_address)
-                        msgnum += 1
-                        del message.states[:]
-                        state = message.states.add()
-                        state.CopyFrom(player)
-                else: message.num_msgs -= 1
-            message.world_time = zwift_offline.world_time()
-            message.msgnum = msgnum
-            socket.sendto(message.SerializeToString(), client_address)
+            elif p_id in global_pace_partners.keys():
+                pace_partner_variables = global_pace_partners[p_id]
+                player = pace_partner_variables.route.states[pace_partner_variables.position]
+            elif p_id in global_bots.keys():
+                bot_variables = global_bots[p_id]
+                player = bot_variables.route.states[bot_variables.position]
+            if player != None:
+                if len(message.states) < 10:
+                    state = message.states.add()
+                    state.CopyFrom(player)
+                else:
+                    message.world_time = zwift_offline.world_time()
+                    socket.sendto(message.SerializeToString(), client_address)
+                    message.msgnum += 1
+                    del message.states[:]
+                    state = message.states.add()
+                    state.CopyFrom(player)
+        message.world_time = zwift_offline.world_time()
+        socket.sendto(message.SerializeToString(), client_address)
   
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
@@ -513,4 +617,14 @@ udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
 udpserver_thread.start()
 
-zwift_offline.run_standalone(online, ghostsEnabled, saveGhost, playerUpdateQueue)
+load_pace_partners()
+ppthreadevent = threading.Event()
+pp = threading.Thread(target=play_pace_partners)
+pp.start()
+
+load_bots()
+botthreadevent = threading.Event()
+bot = threading.Thread(target=play_bots)
+bot.start()
+
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue)
