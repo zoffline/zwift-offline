@@ -31,12 +31,14 @@ if getattr(sys, 'frozen', False):
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % sys._MEIPASS, START_LINES_FILE)
     PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
+    BOTS_DIR = '%s/bots' % sys._MEIPASS
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     CDN_DIR = "%s/cdn" % SCRIPT_DIR
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+    BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -44,12 +46,15 @@ MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
 pacer_update_freq = 1
+bot_update_freq = 3
 last_pp_updates = {}
+last_bot_updates = {}
 global_ghosts = {}
 ghosts_enabled = {}
 online = {}
 player_update_queue = {}
 global_pace_partners = {}
+global_bots = {}
 
 def road_id(state):
     return (state.f20 & 0xff00) >> 8
@@ -352,6 +357,10 @@ class PacePartnerVariables:
     route = None
     position = 0
 
+class BotVariables:
+    route = None
+    position = 0
+
 def load_pace_partners():
     if not os.path.isdir(PACE_PARTNERS_DIR): return
     for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
@@ -368,8 +377,7 @@ def load_pace_partners():
 
 def play_pace_partners():
     while True:
-        keys = global_pace_partners.keys()
-        for pp_id in keys:
+        for pp_id in global_pace_partners.keys():
             pp = global_pace_partners[pp_id]
             if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
@@ -378,6 +386,32 @@ def play_pace_partners():
             state.watchingRiderId = pp_id
             state.worldTime = zwift_offline.world_time()
         ppthreadevent.wait(timeout=pacer_update_freq)
+
+def load_bots():
+    if not os.path.isdir(BOTS_DIR): return
+    for (root, dirs, files) in os.walk(BOTS_DIR):
+        for bot_id in dirs:
+            p_id = int(bot_id)
+            route = '%s/%s/route.bin' % (BOTS_DIR, bot_id)
+            if os.path.isfile(route):
+                with open(route, 'rb') as fd:
+                    global_bots[p_id] = BotVariables()
+                    bot = global_bots[p_id]
+                    bot.route = udp_node_msgs_pb2.Ghost()
+                    bot.route.ParseFromString(fd.read())
+                    bot.position = 0
+
+def play_bots():
+    while True:
+        for bot_id in global_bots.keys():
+            bot = global_bots[bot_id]
+            if bot.position < len(bot.route.states) - 1: bot.position += 1
+            else: bot.position = 0
+            state = bot.route.states[bot.position]
+            state.id = bot_id
+            state.watchingRiderId = bot_id
+            state.worldTime = zwift_offline.world_time()
+        botthreadevent.wait(timeout=bot_update_freq)
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
@@ -426,6 +460,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         last_pp_update = last_pp_updates[player_id]
 
+        #Add bot last update for player if it's missing
+        if not player_id in last_bot_updates.keys():
+            last_bot_updates[player_id] = 0
+
+        last_bot_update = last_bot_updates[player_id]
+
         if recv.seqno == 1 or ghosts.rec == None:
             ghosts.rec = udp_node_msgs_pb2.Ghost()
             ghosts.play = udp_node_msgs_pb2.Ghosts()
@@ -455,6 +495,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     else:
                         if state.roadTime <= ghosts.start_rt <= ghosts.last_rt:
                             ghosts.started = True
+#            else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
 
         keys = online.keys()
@@ -523,6 +564,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 #Check if pacepartner is close to player in world
                 if zwift_offline.is_nearby(nearby_state, pace_partner):
                     nearby.append(p_id)
+        if t >= last_bot_update + bot_update_freq:
+            last_bot_updates[player_id] = t
+            for p_id in global_bots.keys():
+                bot_variables = global_bots[p_id]
+                bot = bot_variables.route.states[bot_variables.position]
+                #Check if bot is close to player in world
+                if zwift_offline.is_nearby(nearby_state, bot):
+                    nearby.append(p_id)
         players = len(nearby)
         message.num_msgs = players // 10
         if players % 10: message.num_msgs += 1
@@ -533,6 +582,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             elif p_id in global_pace_partners.keys():
                 pace_partner_variables = global_pace_partners[p_id]
                 player = pace_partner_variables.route.states[pace_partner_variables.position]
+            elif p_id in global_bots.keys():
+                bot_variables = global_bots[p_id]
+                player = bot_variables.route.states[bot_variables.position]
             if player != None:
                 if len(message.states) < 10:
                     state = message.states.add()
@@ -570,4 +622,9 @@ ppthreadevent = threading.Event()
 pp = threading.Thread(target=play_pace_partners)
 pp.start()
 
-zwift_offline.run_standalone(online, global_pace_partners, ghosts_enabled, save_ghost, player_update_queue)
+load_bots()
+botthreadevent = threading.Event()
+bot = threading.Thread(target=play_bots)
+bot.start()
+
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue)
