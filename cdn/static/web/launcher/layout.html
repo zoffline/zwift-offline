@@ -33,10 +33,12 @@
       {% block content %}{% endblock %}
   </div>
   <script>
-    var elements = document.getElementsByClassName('text-shadow');
-    for(var i = 0; i < elements.length; i++) {
-      var el = elements[i];
-      el.setAttribute('data-innertext', el.textContent);
+    if(document.getElementsByClassName) {
+      var elements = document.getElementsByClassName('text-shadow');
+      for(var i = 0; i < elements.length; i++) {
+        var el = elements[i];
+        el.setAttribute('data-innertext', el.textContent);
+      }
     }
   </script>
   {% block scripts %}{% endblock %}
