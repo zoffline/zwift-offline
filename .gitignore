@@ -4,3 +4,4 @@ storage/*
 example-requests/*
 zoffline.log
 migrate_auth.sql
+bots
