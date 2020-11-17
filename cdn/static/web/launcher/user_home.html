@@ -20,6 +20,9 @@
         {% elif is_admin %}
           <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
         {% endif %}
+        {% if is_admin %}
+          <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
+        {% endif %}
       </div>
     </div>
   {% endif %}

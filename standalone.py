@@ -402,7 +402,12 @@ def load_bots():
                     bot.position = 0
 
 def play_bots():
+    global global_bots
     while True:
+        if zwift_offline.reload_pacer_bots:
+            zwift_offline.reload_pacer_bots = False
+            global_bots.clear()
+            load_bots()
         for bot_id in global_bots.keys():
             bot = global_bots[bot_id]
             if bot.position < len(bot.route.states) - 1: bot.position += 1

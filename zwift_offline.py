@@ -99,6 +99,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 db = SQLAlchemy(app)
 online = {}
 global_pace_partners = {}
+global_bots = {}
 ghosts_enabled = {}
 player_update_queue = {}
 player_ids = {}
@@ -106,6 +107,7 @@ player_partial_profiles = {}
 save_ghost = None
 restarting = False
 restarting_in_minutes = 0
+reload_pacer_bots = False
 
 class User(UserMixin, db.Model):
     player_id = db.Column(db.Integer, primary_key=True)
@@ -382,6 +384,14 @@ def cancel_restart_server():
         restarting = False
         restarting_in_minutes = 0
         send_message_to_all_online('Restart of the server has been cancelled. Ride on!')
+    return redirect('/user/%s/' % current_user.username)
+
+@app.route("/reloadbots")
+@login_required
+def reload_bots():
+    global reload_pacer_bots
+    if bool(current_user.is_admin):
+        reload_pacer_bots = True
     return redirect('/user/%s/' % current_user.username)
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])
