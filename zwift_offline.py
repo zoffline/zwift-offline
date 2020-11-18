@@ -967,15 +967,18 @@ def api_profiles_goals(player_id):
     # request.method == 'GET'
     goals = goal_pb2.Goals()
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM goal WHERE player_id = %s" % player_id))
+    need_update = list()
     for row in rows:
         goal = goals.goals.add()
         row_to_protobuf(row, goal)
         end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
         now = get_utc_date_time()
         if end_dt < now:
-            set_goal_end_date(goal, now)
-            update_protobuf_in_db('goal', goal, goal.id)
+            need_update.append(goal)
         fill_in_goal_progress(goal, player_id)
+    for goal in need_update:
+        set_goal_end_date(goal, now)
+        update_protobuf_in_db('goal', goal, goal.id)
 
     return goals.SerializeToString(), 200
 
