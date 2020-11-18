@@ -3,36 +3,38 @@
 #
 # Adapted from https://github.com/jlemon/zlogger/blob/master/get_riders.py
 #
-#The MIT License (MIT)
+# The MIT License (MIT)
 #
-#Copyright (c) 2016 Jonathan Lemon
+# Copyright (c) 2016 Jonathan Lemon
 #
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-#The above copyright notice and this permission notice shall be included in all
-#copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-import sys, argparse, getpass
-import requests
+import argparse
+import getpass
 import json
-import os, time, stat
-from collections import namedtuple
+import os
+import requests
+import sys
+
 
 if getattr(sys, 'frozen', False):
-    # If we're running as a pyinstaller bundle
+    # If we're running as a py installer bundle
     SCRIPT_DIR = os.path.dirname(sys.executable)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -44,6 +46,7 @@ except NameError:
 
 global args
 global dbh
+
 
 def post_credentials(session, username, password):
     # Credentials POSTing and tokens retrieval
@@ -67,8 +70,8 @@ def post_credentials(session, username, password):
                 "password": password,
                 "grant_type": "password",
             },
-            allow_redirects = False,
-            verify = args.verifyCert,
+            allow_redirects=False,
+            verify=args.verifyCert,
         )
 
         if args.verbose:
@@ -83,6 +86,11 @@ def post_credentials(session, username, password):
 
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
+
+    except KeyError as e:
+        print('Invalid uname and/or password')
+        exit(-1)
+
 
 def query_player_profile(session, access_token):
     # Query Player Profile
@@ -99,7 +107,7 @@ def query_player_profile(session, access_token):
                 "Authorization": "Bearer %s" % access_token,
                 "Accept-Language": "en-us",
             },
-            verify = args.verifyCert,
+            verify=args.verifyCert,
         )
 
         if args.verbose:
@@ -131,7 +139,7 @@ def logout(session, refresh_token):
                 "client_id": "Zwift_Mobile_Link",
                 "refresh_token": refresh_token,
             },
-            verify = args.verifyCert,
+            verify=args.verifyCert,
         )
         if args.verbose:
             print('Response HTTP Status Code: {status_code}'.format(
@@ -141,9 +149,11 @@ def logout(session, refresh_token):
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
 
+
 def login(session, user, password):
     access_token, refresh_token, expired_in = post_credentials(session, user, password)
     return access_token, refresh_token
+
 
 def main(argv):
     global args
@@ -152,32 +162,39 @@ def main(argv):
     access_token = None
     cookies = None
 
-    parser = argparse.ArgumentParser(description = 'Zwift Profile Fetcher')
+    parser = argparse.ArgumentParser(description='Zwift Profile Fetcher')
     parser.add_argument('-v', '--verbose', action='store_true',
-            help='Verbose output')
+                        help='Verbose output')
     parser.add_argument('--dont-check-certificates', action='store_false',
-            dest='verifyCert', default=True)
+                        dest='verifyCert', default=True)
     parser.add_argument('-u', '--user', help='Zwift user name')
     args = parser.parse_args()
 
-#    if args.user:
-#        password = getpass.getpass("Password for %s? " % args.user)
-#    else:
-#        file = os.environ['HOME'] + '/.zwift_cred.json'
-#        with open(file) as f:
-#            try:
-#                cred = json.load(f)
-#            except ValueError, se:
-#                sys.exit('"%s": %s' % (args.output, se))
-#        f.close
-#        args.user = cred['user']
-#        password = cred['pass']
+    #    if args.user:
+    #        password = getpass.getpass("Password for %s? " % args.user)
+    #    else:
+    #        file = os.environ['HOME'] + '/.zwift_cred.json'
+    #        with open(file) as f:
+    #            try:
+    #                cred = json.load(f)
+    #            except ValueError, se:
+    #                sys.exit('"%s": %s' % (args.output, se))
+    #        f.close
+    #        args.user = cred['user']
+    #        password = cred['pass']
 
     if args.user:
         username = args.user
     else:
         username = input("Enter Zwift login (e-mail): ")
-    password = getpass.getpass("Enter password: ")
+    if not sys.stdin.isatty():  # This terminal cannot support input without displaying text
+        print(f'*WARNING* The current shell ({os.name}) cannot support hidden text entry.')
+        print(f'Your password entry WILL BE VISIBLE.')
+        print(f'If you are running a bash shell under windows, try executing this program via winpty:')
+        print(f'>winpty python {argv[0]}')
+        password = input("Enter password (will be shown):")
+    else:
+        password = getpass.getpass("Enter password: ")
 
     session = requests.session()
 
@@ -188,10 +205,11 @@ def main(argv):
 
     logout(session, refresh_token)
 
+
 if __name__ == '__main__':
     try:
         main(sys.argv)
     except KeyboardInterrupt:
         pass
     except SystemExit as se:
-        print("ERROR:",se)
+        print("ERROR:", se)
