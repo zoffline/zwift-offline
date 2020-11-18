@@ -17,7 +17,6 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
-from logging.handlers import RotatingFileHandler
 
 import jwt
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
@@ -43,8 +42,6 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
-logHandler = RotatingFileHandler('zoffline.log', maxBytes=1000000, backupCount=10)
-logger.addHandler(logHandler)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
@@ -85,6 +82,9 @@ SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
+    from logging.handlers import RotatingFileHandler
+    logHandler = RotatingFileHandler('zoffline.log', maxBytes=1000000, backupCount=10)
+    logger.addHandler(logHandler)
 from tokens import *
 
 # Android uses https for cdn
