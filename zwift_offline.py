@@ -7,7 +7,6 @@ import os
 import signal
 import platform
 import random
-import sqlite3
 import sys
 import tempfile
 import time
@@ -18,9 +17,10 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
+from logging.handlers import RotatingFileHandler
 
 import jwt
-from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
+from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
@@ -40,9 +40,11 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 
-logging.basicConfig(filename='zoffline.log', level=os.environ.get("LOGLEVEL", "INFO"))
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
-logger.setLevel(logging.WARN)
+logger.setLevel(logging.DEBUG)
+logHandler = RotatingFileHandler('zoffline.log', maxBytes=1000000, backupCount=10)
+logger.addHandler(logHandler)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
@@ -1517,7 +1519,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     def load_user(uid):
         return User.query.get(int(uid))
 
-    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=app.logger)
+    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
     server.serve_forever()
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
