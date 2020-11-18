@@ -20,7 +20,17 @@
         </div>
         <div class="row">
           <div class="col-md-12 top-buffer">
-            <input type="submit" value="Login" class="btn btn-sm btn-light">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberlogin" name="rememberlogin">
+              <label class="form-check-label text-shadow" for="rememberlogin">
+                Remember login
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Login" class="btn btn-sm btn-light" onclick="rememberLogin()">
           </div>
         </div>
       </form>
@@ -37,4 +47,30 @@
       {% endwith %}
     </div>
   </div>
+{% endblock %}
+{% block scripts %}
+  <script>
+    var checkbox = document.getElementById('rememberlogin');
+    var username = document.getElementById('username');
+    var password = document.getElementById('password');
+    function rememberLogin() {
+      if(checkbox.checked && username.value !== '' && password.value !== '') {
+        localStorage.setItem('username', username.value);
+        localStorage.setItem('password', password.value);
+      }
+      else if(!checkbox.checked) {
+        localStorage.removeItem('username')
+        localStorage.removeItem('password');
+      }
+    }
+
+    var usernameVal = localStorage.getItem('username');
+    var passwordVal = localStorage.getItem('password');
+    if(usernameVal !== undefined && usernameVal !== null && usernameVal !== '' &&
+    passwordVal !== undefined && passwordVal !== null && passwordVal !== '') {
+      checkbox.checked = true;
+      username.value = usernameVal;
+      password.value = passwordVal;
+    }
+  </script>
 {% endblock %}
