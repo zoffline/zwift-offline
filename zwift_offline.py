@@ -704,19 +704,18 @@ def api_profiles_activities(player_id):
     activities = activity_pb2.Activities()
     # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
     rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s" % str(player_id)))
+    should_remove = list()
     for row in rows:
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
         a = activity
-        #If all values for saved activity is 0, remove it from DB and results
-        #if (a.avg_cadence == 0 and a.avg_heart_rate == 0 and a.avg_speed == 0 and
-        #a.avg_watts == 0 and a.calories == 0 and a.distance == 0 and a.max_cadence == 0 and
-        #a.max_heart_rate == 0 and a.max_speed == 0 and a.max_watts == 0):
-        if a.distance == 0:
-            db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % a.id))
-            db.session.commit()
-            activities.activities.remove(a)
-
+        #Remove activities with less than 100m distance
+        if a.distance < 100:
+            should_remove.append(a)
+    for a in should_remove:
+        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % a.id))
+        db.session.commit()
+        activities.activities.remove(a)
     return activities.SerializeToString(), 200
 
 
@@ -913,12 +912,14 @@ def fill_in_goal_progress(goal, player_id):
         first_dt, last_dt = get_week_range(now)
     else:  # monthly
         first_dt, last_dt = get_month_range(now)
+
+    common_sql = ("""FROM activity
+                    WHERE player_id = %s
+                    AND strftime('%s', start_date) >= strftime('%s', '%s')
+                    AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
+                    (player_id, '%s', '%s', first_dt, '%s', '%s', last_dt))
     if goal.type == 0:  # distance
-        distance = db.session.execute(sqlalchemy.text("""SELECT SUM(distance) FROM activity
-                       WHERE player_id = %s
-                       AND strftime('%s', start_date) >= strftime('%s', '%s')
-                       AND strftime('%s', start_date) <= strftime('%s', '%s')
-                       AND end_date IS NOT NULL""" % (player_id, '%s', '%s', first_dt, '%s', '%s', last_dt))).first()[0]
+        distance = db.session.execute(sqlalchemy.text('SELECT SUM(distance) %s' % common_sql)).first()[0]
         if distance:
             goal.actual_distance = distance
             goal.actual_duration = distance
@@ -927,12 +928,7 @@ def fill_in_goal_progress(goal, player_id):
             goal.actual_duration = 0.0
 
     else:  # duration
-        duration = db.session.execute(sqlalchemy.text("""SELECT SUM(julianday(end_date) - julianday(start_date))
-                       FROM activity
-                       WHERE player_id = %s
-                       AND strftime('%s', start_date) >= strftime('%s', '%s')
-                       AND strftime('%s', start_date) <= strftime('%s', '%s')
-                       AND end_date IS NOT NULL""" % (player_id, '%s', '%s', first_dt, '%s', '%s', last_dt))).first()[0]
+        duration = db.session.execute(sqlalchemy.text('SELECT SUM(julianday(end_date) - julianday(start_date)) %s' % common_sql)).first()[0]
         if duration:
             goal.actual_duration = duration*1440  # convert from days to minutes
             goal.actual_distance = duration*1440
@@ -1370,6 +1366,7 @@ def before_first_request():
     init_database()
     db.create_all(app=app)
     check_columns()
+    db.session.close()
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
 
