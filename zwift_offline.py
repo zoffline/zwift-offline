@@ -82,8 +82,15 @@ SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
+    LOGS_DIR = "%s/logs" % SCRIPT_DIR
+    try:
+        if not os.path.isdir(LOGS_DIR):
+            os.makedirs(LOGS_DIR)
+    except IOError as e:
+        logger.error("failed to create logs dir (%s):  %s", LOGS_DIR, str(e))
+        sys.exit(1)
     from logging.handlers import RotatingFileHandler
-    logHandler = RotatingFileHandler('zoffline.log', maxBytes=1000000, backupCount=10)
+    logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
 from tokens import *
 
