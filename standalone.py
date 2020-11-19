@@ -25,20 +25,19 @@ import protobuf.profile_pb2 as profile_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
-    CDN_DIR = "%s/cdn" % sys._MEIPASS
+    SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
-        copyfile('%s/start_lines.csv' % sys._MEIPASS, START_LINES_FILE)
-    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
-    BOTS_DIR = '%s/bots' % sys._MEIPASS
+        copyfile('%s/start_lines.csv' % SCRIPT_DIR, START_LINES_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-    CDN_DIR = "%s/cdn" % SCRIPT_DIR
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
-    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-    BOTS_DIR = '%s/bots' % SCRIPT_DIR
+
+CDN_DIR = "%s/cdn" % SCRIPT_DIR
+PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
