@@ -54,13 +54,11 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
-    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
-    BOTS_DIR = '%s/bots' % sys._MEIPASS
+    LOGS_DIR = "%s/logs" % os.path.dirname(sys.executable)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
-    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-    BOTS_DIR = '%s/bots' % SCRIPT_DIR
+    LOGS_DIR = "%s/logs" % SCRIPT_DIR
 
 try:
     # Ensure storage dir exists
@@ -75,6 +73,9 @@ DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 2
 
+PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
+BOTS_DIR = "%s/bots" % SCRIPT_DIR
+
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -83,7 +84,6 @@ ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
-    LOGS_DIR = "%s/logs" % SCRIPT_DIR
     try:
         if not os.path.isdir(LOGS_DIR):
             os.makedirs(LOGS_DIR)
