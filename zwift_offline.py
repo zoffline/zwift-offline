@@ -79,6 +79,7 @@ DATABASE_CUR_VER = 2
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
+ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
@@ -1410,7 +1411,7 @@ def launch_zwift():
         if MULTIPLAYER:
             return render_template("login_form.html")
         else:
-            return render_template("user_home.html", username="", enable_ghosts=False, online=get_online(),
+            return render_template("user_home.html", username="", enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -1475,6 +1476,12 @@ def start_zwift():
         ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
+        if AnonUser.enable_ghosts:
+            if not os.path.exists(ENABLEGHOSTS_FILE):
+                f = open(ENABLEGHOSTS_FILE, 'w')
+                f.close()
+        elif os.path.exists(ENABLEGHOSTS_FILE):
+            os.remove(ENABLEGHOSTS_FILE)
     db.session.commit()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
