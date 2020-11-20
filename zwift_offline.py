@@ -18,6 +18,7 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
+from cryptography.fernet import Fernet
 
 import jwt
 from flask import Flask, request, jsonify, g, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
@@ -80,6 +81,7 @@ DATABASE_CUR_VER = 2
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
+GARMIN_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
@@ -95,6 +97,12 @@ if not os.path.exists(SECRET_KEY_FILE):
 with open(SECRET_KEY_FILE, 'rb') as f:
     app.config['SECRET_KEY'] = f.read()
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+
+if not os.path.exists(GARMIN_KEY_FILE):
+    with open(GARMIN_KEY_FILE, 'wb') as f:
+        f.write(Fernet.generate_key())
+with open(GARMIN_KEY_FILE, 'rb') as f:
+    garmin_key = f.read()
 
 db = SQLAlchemy(app)
 online = {}
@@ -397,6 +405,7 @@ def reload_bots():
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
 def upload(username):
+    global garmin_key
     player_id = current_user.player_id
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     try:
@@ -408,8 +417,16 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'strava_token.txt']:
-            uploaded_file.save(os.path.join(profile_dir, uploaded_file.filename))
+        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt']:
+            file_path = os.path.join(profile_dir, uploaded_file.filename)
+            uploaded_file.save(file_path)
+            if uploaded_file.filename == 'garmin_credentials.txt':
+                with open(file_path, 'rb') as fr:
+                    garmin_credentials = fr.read()
+                    cipher_suite = Fernet(garmin_key)
+                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
+                    with open(file_path, 'wb') as fw:
+                        fw.write(ciphered_text)
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
@@ -806,8 +823,13 @@ def garmin_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
         with open('%s/garmin_credentials.txt' % profile_dir, 'r') as f:
-            username = f.readline().rstrip('\r\n')
-            password = f.readline().rstrip('\r\n')
+            cipher_suite = Fernet(garmin_key)
+            ciphered_text = f.read()
+            unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
+            unciphered_text = unciphered_text.decode(encoding='UTF-8')
+            split_credentials = unciphered_text.split('\r\n')
+            username = split_credentials[0]
+            password = split_credentials[1]
     except:
         logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt." % profile_dir)
         return
