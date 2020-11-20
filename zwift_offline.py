@@ -44,8 +44,6 @@ import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
-logHandler = RotatingFileHandler('zoffline.log', maxBytes=1000000, backupCount=10)
-logger.addHandler(logHandler)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
 if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
@@ -58,13 +56,11 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
-    PACE_PARTNERS_DIR = '%s/pace_partners' % sys._MEIPASS
-    BOTS_DIR = '%s/bots' % sys._MEIPASS
+    LOGS_DIR = "%s/logs" % os.path.dirname(sys.executable)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
-    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-    BOTS_DIR = '%s/bots' % SCRIPT_DIR
+    LOGS_DIR = "%s/logs" % SCRIPT_DIR
 
 try:
     # Ensure storage dir exists
@@ -79,14 +75,27 @@ DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 2
 
+PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
+BOTS_DIR = "%s/bots" % SCRIPT_DIR
+
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 GARMIN_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
+ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
+    try:
+        if not os.path.isdir(LOGS_DIR):
+            os.makedirs(LOGS_DIR)
+    except IOError as e:
+        logger.error("failed to create logs dir (%s):  %s", LOGS_DIR, str(e))
+        sys.exit(1)
+    from logging.handlers import RotatingFileHandler
+    logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
+    logger.addHandler(logHandler)
 from tokens import *
 
 # Android uses https for cdn
@@ -1425,7 +1434,7 @@ def launch_zwift():
         if MULTIPLAYER:
             return render_template("login_form.html")
         else:
-            return render_template("user_home.html", username="", enable_ghosts=False, online=get_online(),
+            return render_template("user_home.html", username="", enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -1490,6 +1499,12 @@ def start_zwift():
         ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
+        if AnonUser.enable_ghosts:
+            if not os.path.exists(ENABLEGHOSTS_FILE):
+                f = open(ENABLEGHOSTS_FILE, 'w')
+                f.close()
+        elif os.path.exists(ENABLEGHOSTS_FILE):
+            os.remove(ENABLEGHOSTS_FILE)
     db.session.commit()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
