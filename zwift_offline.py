@@ -1557,7 +1557,10 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
         return User.query.get(int(uid))
 
     server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
-    server.serve_forever()
+    thread = threading.Thread(target=server.serve_forever)
+    thread.start()
+    logger.info("Server running...")
+
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
 
