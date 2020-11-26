@@ -200,21 +200,30 @@ To obtain your current profile:
 
 ### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
 
-* Install dependencies: garmin-uploader
-  * e.g., on Linux/Mac: ``pip install garmin-uploader``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader``
+* Install dependencies: garmin-uploader, cryptography (optional)
+  * e.g., on Linux/Mac: ``pip install garmin-uploader cryptography``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader cryptography``
 * Create a file garmin_credentials.txt in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
+* If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
+
+
+### Step 6 [OPTIONAL]: Enable multiplayer
+
+* Create a multiplayer.txt file in the ``storage`` directory.
+* Create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
+
 
 ## Discord and zoffline (online) server
 
 Please join the [Discord](https://discord.gg/GMdn8F8) and our enhanced version of zoffline, hosted Online!
 
 Follow the guide in #instructions to create your account and join other Zwifters.
+
 
 ## Dependencies
 
