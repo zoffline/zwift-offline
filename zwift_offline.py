@@ -463,8 +463,13 @@ def upload(username):
     if os.path.isfile(token_file):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+    garmin = None
+    garmin_file = os.path.join(profile_dir, 'garmin_credentials.txt')
+    if os.path.isfile(garmin_file):
+        stat = os.stat(garmin_file)
+        garmin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
-    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token)
+    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token, garmin=garmin)
 
 
 @app.route("/download/profile.bin", methods=["GET"])
