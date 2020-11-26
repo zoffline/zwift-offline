@@ -2,6 +2,5 @@
 storage/*
 !storage/force_dir_in_git.txt
 example-requests/*
-zoffline.log
+logs
 migrate_auth.sql
-bots
