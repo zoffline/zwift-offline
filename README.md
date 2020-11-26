@@ -1,8 +1,7 @@
 # zoffline
 
 zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation
-of a Zwift server. Currently it's designed for only a single user at a time and the UDP
-game node is minimally implemented.
+of a Zwift server.
 
 zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
 
@@ -30,9 +29,9 @@ To install zoffline on Windows:
 To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
-* Install dependencies: flask, flask_sqlalchemy, python-protobuf, protobuf3_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy flask-login pyjwt protobuf protobuf3_to_dict stravalib``
+* Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
     * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
@@ -236,10 +235,14 @@ Docker
   * ``pip install flask-login``
 * FlaskSQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
   * ``pip install flask_sqlalchemy``
+* gevent (http://www.gevent.org/)
+  * ``pip install gevent``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
   * ``pip install garmin-uploader``
+* OPTIONAL: cryptography (https://cryptography.io/en/latest/)
+  * ``pip install cryptography``
 
 
 ## Note
