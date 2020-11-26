@@ -17,7 +17,6 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
-from cryptography.fernet import Fernet
 from logging.handlers import RotatingFileHandler
 
 import jwt
@@ -82,9 +81,9 @@ BOTS_DIR = "%s/bots" % SCRIPT_DIR
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
-GARMIN_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
+garmin_key = None
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
     try:
@@ -96,6 +95,20 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
+    try:
+        from cryptography.fernet import Fernet
+        encrypt = True
+    except ImportError:
+        logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
+        encrypt = False
+    if encrypt:
+        GARMIN_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
+        if not os.path.exists(GARMIN_KEY_FILE):
+            with open(GARMIN_KEY_FILE, 'wb') as f:
+                f.write(Fernet.generate_key())
+        with open(GARMIN_KEY_FILE, 'rb') as f:
+            garmin_key = f.read()
+
 from tokens import *
 
 # Android uses https for cdn
@@ -108,12 +121,6 @@ if not os.path.exists(SECRET_KEY_FILE):
 with open(SECRET_KEY_FILE, 'rb') as f:
     app.config['SECRET_KEY'] = f.read()
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
-
-if not os.path.exists(GARMIN_KEY_FILE):
-    with open(GARMIN_KEY_FILE, 'wb') as f:
-        f.write(Fernet.generate_key())
-with open(GARMIN_KEY_FILE, 'rb') as f:
-    garmin_key = f.read()
 
 db = SQLAlchemy(app)
 online = {}
@@ -416,7 +423,6 @@ def reload_bots():
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
 def upload(username):
-    global garmin_key
     player_id = current_user.player_id
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     try:
@@ -431,7 +437,7 @@ def upload(username):
         if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
-            if uploaded_file.filename == 'garmin_credentials.txt':
+            if uploaded_file.filename == 'garmin_credentials.txt' and garmin_key is not None:
                 with open(file_path, 'rb') as fr:
                     garmin_credentials = fr.read()
                     cipher_suite = Fernet(garmin_key)
@@ -834,13 +840,17 @@ def garmin_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
         with open('%s/garmin_credentials.txt' % profile_dir, 'r') as f:
-            cipher_suite = Fernet(garmin_key)
-            ciphered_text = f.read()
-            unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
-            unciphered_text = unciphered_text.decode(encoding='UTF-8')
-            split_credentials = unciphered_text.split('\r\n')
-            username = split_credentials[0]
-            password = split_credentials[1]
+            if garmin_key is not None:
+                cipher_suite = Fernet(garmin_key)
+                ciphered_text = f.read()
+                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
+                unciphered_text = unciphered_text.decode(encoding='UTF-8')
+                split_credentials = unciphered_text.split('\r\n')
+                username = split_credentials[0]
+                password = split_credentials[1]
+            else:
+                username = f.readline().rstrip('\r\n')
+                password = f.readline().rstrip('\r\n')
     except:
         logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt." % profile_dir)
         return
@@ -1559,7 +1569,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
     thread = threading.Thread(target=server.serve_forever)
     thread.start()
-    logger.info("Server running...")
+    logger.info("Server is running.")
 
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
