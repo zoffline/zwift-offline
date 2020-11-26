@@ -1344,6 +1344,28 @@ def teardown_request(exception):
         print('Exception: %s' % exception)
 
 
+def move_old_profile():
+    # Before multi profile support only a single profile located in storage
+    # named profile.bin existed. If upgrading from this, convert to
+    # multi profile file structure.
+    profile_file = '%s/profile.bin' % STORAGE_DIR
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile = profile_pb2.Profile()
+            profile.ParseFromString(fd.read())
+            profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError as e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
+        os.rename(profile_file, '%s/profile.bin' % profile_dir)
+        strava_file = '%s/strava_token.txt' % STORAGE_DIR
+        if os.path.isfile(strava_file):
+            os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
+
+
 def init_database():
     if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
         # Create a new database
@@ -1414,6 +1436,7 @@ def send_server_back_online_message():
 
 @app.before_first_request
 def before_first_request():
+    move_old_profile()
     init_database()
     db.create_all(app=app)
     check_columns()
