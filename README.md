@@ -216,14 +216,13 @@ To obtain your current profile:
 
 * Create a multiplayer.txt file in the ``storage`` directory.
 * Create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
-
+* Sign up as a new user and use the upload button in the launcher window to import your files.
 
 ## Discord and zoffline (online) server
 
 Please join the [Discord](https://discord.gg/GMdn8F8) and our enhanced version of zoffline, hosted Online!
 
 Follow the guide in #instructions to create your account and join other Zwifters.
-
 
 ## Dependencies
 
