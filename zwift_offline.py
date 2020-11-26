@@ -625,6 +625,12 @@ def custom_style(filename):
     return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
 
 
+# Launcher files are requested over https on macOS
+@app.route('/static/web/launcher/<path:filename>')
+def static_web_launcher(filename):
+    return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
+
+
 # Probably don't need, haven't investigated
 @app.route('/api/zfiles/list', methods=['GET', 'POST'])
 def api_zfiles_list():
