@@ -138,7 +138,7 @@ to generate your own certificates and do the same.
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
 * Start Zwift and sign in using any email/password
-  * If multiplayer is enabled, access https://localhost/signup/ to sign up and import your files.
+  * If multiplayer is enabled, access https://secure.zwift.com/signup/ to sign up and import your files.
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
