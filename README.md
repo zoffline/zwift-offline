@@ -201,7 +201,7 @@ To obtain your current profile:
 ### Step 6 [OPTIONAL]: Enable multiplayer
 
 * Create a multiplayer.txt file in the ``storage`` directory.
-* If multiple clients are going to connect to the same server, create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 ## Discord and zoffline (online) server
 
