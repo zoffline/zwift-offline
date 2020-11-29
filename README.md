@@ -201,8 +201,7 @@ To obtain your current profile:
 ### Step 6 [OPTIONAL]: Enable multiplayer
 
 * Create a multiplayer.txt file in the ``storage`` directory.
-* Create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
-* Sign up as a new user and use the upload button in the launcher window to import your files.
+* If multiple clients are going to connect to the same server, create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 ## Discord and zoffline (online) server
 
