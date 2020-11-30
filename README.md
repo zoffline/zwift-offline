@@ -94,7 +94,7 @@ to generate your own certificates and do the same.
 
 </details>
 
-<details><summary>Mac OS X Instructions (Thanks @oldnapalm!)</summary>
+<details><summary>Mac OS X Instructions</summary>
 
 * Install Zwift
   * If your Zwift version is 1.0.58982, you're all set.
@@ -109,23 +109,6 @@ to generate your own certificates and do the same.
     * If you're prompted for a password, just leave it blank. There is no password.
 * In a terminal within the directory ``ssl/cert-zwift-com.pem`` was copied to, run ``cat cert-zwift-com.pem >> ~/Library/Application\ Support/Zwift/data/cacert.pem``
   * Note: Appending the contents of ``ssl/cert-zwift-com.pem`` with a text editor doesn't work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
-* Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
-  * Append these keys:
-    ```
-    <key>NSAppTransportSecurity</key>
-   	<dict>
-	       <key>NSExceptionDomains</key>
-	       <dict>
-	           <key>zwift.com</key>
-	           <dict>
-	               <key>NSExceptionAllowsInsecureHTTPLoads</key>
-	               <true/>
-	               <key>NSIncludesSubdomains</key>
-	               <true/>
-	           </dict>
-	       </dict>
-   	</dict>
-    ```
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -193,8 +176,9 @@ To obtain your current profile:
   * e.g., on Linux/Mac: ``pip install stravalib``
   * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib``
   * Or, if using the Windows zoffline.exe version without Python installed you can run strava_auth.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
-* Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
+* [OPTIONAL] Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
+  * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<player_id>`` directory.
 
