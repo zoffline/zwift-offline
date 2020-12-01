@@ -13,7 +13,7 @@ import time
 import math
 import threading
 import re
-import smtplib, socket
+import smtplib, ssl
 from copy import copy
 from datetime import timedelta
 from functools import wraps
@@ -29,7 +29,8 @@ from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
@@ -390,18 +391,21 @@ def forgot():
         user = User.query.filter_by(username=username).first()
         if user:
             try:
-                msg = EmailMessage()
-                content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
-                msg.set_content(content)
-                msg['Subject'] = "Password reset"
-                msg['From'] = "zoffline@%s" % server_ip
-                msg['To'] = username
-                server = smtplib.SMTP('localhost', 25)
-                server.send_message(msg)
-                server.quit()
-                flash("E-mail sent.")
-            except socket.error as e:
-                logger.error(e)
+                with open('%s/gmail_credentials.txt' % STORAGE_DIR, 'r') as f:
+                    sender_email = f.readline().rstrip('\r\n')
+                    password = f.readline().rstrip('\r\n')
+                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
+                        server.login(sender_email, password)
+                        message = MIMEMultipart()
+                        message['From'] = sender_email
+                        message['To'] = username
+                        message['Subject'] = "Password reset"
+                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
+                        message.attach(MIMEText(content, 'plain'))
+                        server.sendmail(sender_email, username, message.as_string())
+                        server.close()
+                        flash("E-mail sent.")
+            except:
                 flash("Could not send e-mail.")
         else:
             flash("Invalid username.")
