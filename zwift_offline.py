@@ -12,6 +12,8 @@ import tempfile
 import time
 import math
 import threading
+import re
+import smtplib, socket
 from copy import copy
 from datetime import timedelta
 from functools import wraps
@@ -27,6 +29,8 @@ from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from email.message import EmailMessage
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
@@ -80,6 +84,11 @@ BOTS_DIR = "%s/bots" % SCRIPT_DIR
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+if os.path.exists(SERVER_IP_FILE):
+    with open(SERVER_IP_FILE, 'r') as f:
+        server_ip = f.read().rstrip('\r\n')
+else:
+    server_ip = '127.0.0.1'
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
@@ -149,6 +158,22 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return self.player_id
+
+    def get_token(self, expiration=1800):
+        s = Serializer(app.config['SECRET_KEY'], expiration)
+        return s.dumps({'user': self.player_id}).decode('utf-8')
+
+    @staticmethod
+    def verify_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        id = data.get('user')
+        if id:
+            return User.query.get(id)
+        return None
 
 class AnonUser(User, AnonymousUserMixin, db.Model):
     username = "zoffline"
@@ -343,7 +368,67 @@ def login():
         else:
             flash("Invalid username or password.")
 
+    user = User.verify_token(request.args.get('token'))
+    if user:
+        login_user(user, remember=True)
+        return redirect(url_for("reset", username=user.username))
+
     return render_template("login_form.html")
+
+
+@app.route("/forgot/", methods=["GET", "POST"])
+def forgot():
+    if request.method == "POST":
+        username = request.form['username']
+        if not username:
+            flash("Username cannot be empty.")
+            return redirect(url_for('forgot'))
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", username):
+            flash("Username is not a valid e-mail address.")
+            return redirect(url_for('forgot'))
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            try:
+                msg = EmailMessage()
+                content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
+                msg.set_content(content)
+                msg['Subject'] = "Password reset"
+                msg['From'] = "zoffline@%s" % server_ip
+                msg['To'] = username
+                server = smtplib.SMTP('localhost', 25)
+                server.send_message(msg)
+                server.quit()
+                flash("E-mail sent.")
+            except socket.error as e:
+                logger.error(e)
+                flash("Could not send e-mail.")
+        else:
+            flash("Invalid username.")
+
+    return render_template("forgot.html")
+
+
+@app.route("/reset/<username>/", methods=["GET", "POST"])
+@login_required
+def reset(username):
+    if request.method == "POST":
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if not (password and confirm_password):
+            flash("All fields are required.")
+            return redirect(url_for('reset', username=current_user.username))
+        if password != confirm_password:
+            flash("Passwords did not match.")
+            return redirect(url_for('reset', username=current_user.username))
+
+        hashed_pwd = generate_password_hash(password, 'sha256')
+        current_user.pass_hash = hashed_pwd
+        db.session.commit()
+        flash("Password changed.")
+
+    return render_template("reset.html", username=current_user.username)
 
 
 @app.route("/user/<username>/")
@@ -569,11 +654,7 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(get_utc_time())
     udp_node = response.info.nodes.node.add()
-    if os.path.exists(SERVER_IP_FILE):
-        with open(SERVER_IP_FILE, 'r') as f:
-            udp_node.ip = f.read().rstrip('\r\n')
-    else:
-        udp_node.ip = "127.0.0.1"  # TCP telemetry server
+    udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     return response.SerializeToString(), 200
 
@@ -1053,11 +1134,7 @@ def api_profiles_goals_id(player_id, goal_id):
 def api_tcp_config():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
-    if os.path.exists(SERVER_IP_FILE):
-        with open(SERVER_IP_FILE, 'r') as f:
-            info.game_server_ip = f.read().rstrip('\r\n')
-    else:
-        info.game_server_ip = '127.0.0.1'
+    info.game_server_ip = server_ip
     info.f2 = 3023
     return infos.SerializeToString(), 200
 
@@ -1246,11 +1323,7 @@ def relay_worlds_attributes(world_id):
 def relay_periodic_info():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
-    if os.path.exists(SERVER_IP_FILE):
-        with open(SERVER_IP_FILE, 'r') as f:
-            info.game_server_ip = f.read().rstrip('\r\n')
-    else:
-        info.game_server_ip = '127.0.0.1'
+    info.game_server_ip = server_ip
     info.f2 = 3022
     info.f3 = 10
     info.f4 = 60
