@@ -330,6 +330,9 @@ def signup():
         if not (username and password and confirm_password and first_name and last_name):
             flash("All fields are required.")
             return redirect(url_for('signup'))
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", username):
+            flash("Username is not a valid e-mail address.")
+            return redirect(url_for('signup'))
         if password != confirm_password:
             flash("Passwords did not match.")
             return redirect(url_for('signup'))
