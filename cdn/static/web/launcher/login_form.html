@@ -22,16 +22,14 @@
         <div class="row">
           <div class="col-md-12 top-buffer">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="rememberlogin" name="rememberlogin">
-              <label class="form-check-label text-shadow" for="rememberlogin">
-                Remember login
-              </label>
+              <input class="form-check-input" type="checkbox" id="remember" name="remember">
+              <label class="form-check-label text-shadow" for="remember">Remember me</label>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-md-12 top-buffer">
-            <input type="submit" value="Login" class="btn btn-sm btn-light" onclick="rememberLogin()">
+            <input type="submit" value="Login" class="btn btn-sm btn-light">
           </div>
         </div>
       </form>
@@ -48,53 +46,4 @@
       {% endwith %}
     </div>
   </div>
-{% endblock %}
-{% block scripts %}
-  <script>
-    function getCookie(cname) {
-      var name = cname + "=";
-      var decodedCookie = decodeURIComponent(document.cookie);
-      var ca = decodedCookie.split(';');
-      for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-          c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-          return c.substring(name.length, c.length);
-        }
-      }
-      return "";
-    }
-
-    function setCookie(cname, cvalue, exdays) {
-      var d = new Date();
-      d.setTime(d.getTime() + (exdays*24*60*60*1000));
-      var expires = "expires=" + d.toUTCString();
-      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-
-    var checkbox = document.getElementById('rememberlogin');
-    var username = document.getElementById('username');
-    var password = document.getElementById('password');
-    function rememberLogin() {
-      if(checkbox.checked && username.value !== '' && password.value !== '') {
-        setCookie('username', username.value, 365);
-        setCookie('password', password.value, 365);
-      }
-      else if(!checkbox.checked) {
-        setCookie('username', '', 0);
-        setCookie('password', '', 0);
-      }
-    }
-
-    var usernameVal = getCookie('username');
-    var passwordVal = getCookie('password');
-    if(usernameVal !== undefined && usernameVal !== null && usernameVal !== '' &&
-    passwordVal !== undefined && passwordVal !== null && passwordVal !== '') {
-      checkbox.checked = true;
-      username.value = usernameVal;
-      password.value = passwordVal;
-    }
-  </script>
 {% endblock %}

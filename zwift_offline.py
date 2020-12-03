@@ -23,7 +23,7 @@ from logging.handlers import RotatingFileHandler
 
 import jwt
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
-from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required
+from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
@@ -359,6 +359,7 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
+        remember = bool(request.form.get('remember'))
 
         if not (username and password):
             flash("Username and password cannot be empty.")
@@ -367,14 +368,17 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
-            login_user(user, remember=True)
+            login_user(user, remember=remember)
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
 
+    if current_user.is_authenticated:
+        return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
+
     user = User.verify_token(request.args.get('token'))
     if user:
-        login_user(user, remember=True)
+        login_user(user, remember=False)
         return redirect(url_for("reset", username=user.username))
 
     return render_template("login_form.html")
@@ -575,7 +579,9 @@ def download():
 
 
 @app.route("/logout/<username>")
+@login_required
 def logout(username):
+    logout_user()
     flash("Successfully logged out.")
     return redirect(url_for('login'))
 
@@ -1556,7 +1562,7 @@ def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
     if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
         if MULTIPLAYER:
-            return render_template("login_form.html")
+            return redirect(url_for('login'))
         else:
             return render_template("user_home.html", username="", enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
