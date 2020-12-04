@@ -1,9 +1,0 @@
-{
-    "version": "1.0.0",
-    "name": "zoffline",
-    "description": "zoffline",
-    "scripts": {
-      "protobuf:build": "protoc --python_out=. ./protobuf/*.proto"
-    }
-}
-  

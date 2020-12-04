@@ -1,6 +1,7 @@
 *.pyc
 storage/*
 !storage/force_dir_in_git.txt
-example-requests/*
-logs
-migrate_auth.sql
+__pycache__/
+build/
+dist/
+logs/
