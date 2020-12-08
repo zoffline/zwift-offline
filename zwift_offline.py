@@ -15,7 +15,6 @@ import threading
 import re
 import smtplib, ssl
 from copy import copy
-from datetime import timedelta
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
@@ -31,7 +30,6 @@ from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
@@ -160,15 +158,14 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self.player_id
 
-    def get_token(self, expiration=1800):
-        s = Serializer(app.config['SECRET_KEY'], expiration)
-        return s.dumps({'user': self.player_id}).decode('utf-8')
+    def get_token(self):
+        dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+        return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
         except:
             return None
         id = data.get('user')
@@ -1040,7 +1037,7 @@ def api_profiles_followees(player_id):
 def get_week_range(dt):
      d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
      first = d
-     last = d + timedelta(days=6, hours=23, minutes=59, seconds=59)
+     last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
 
 def get_month_range(dt):
