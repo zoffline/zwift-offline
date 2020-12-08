@@ -356,7 +356,6 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        remember = bool(request.form.get('remember'))
 
         if not (username and password):
             flash("Username and password cannot be empty.")
@@ -365,7 +364,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
-            login_user(user, remember=remember)
+            login_user(user, remember=True)
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
