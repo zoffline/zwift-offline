@@ -1,7 +1,6 @@
 # zoffline
 
-zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation
-of a Zwift server.
+zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server.
 
 zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
 
@@ -201,7 +200,7 @@ To obtain your current profile:
 ### Step 6 [OPTIONAL]: Enable multiplayer
 
 * Create a multiplayer.txt file in the ``storage`` directory.
-* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+* If you are not running zoffline on the same PC that Zwift is running: create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 <details><summary>Extra optional steps</summary>
 
