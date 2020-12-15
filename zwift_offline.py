@@ -1637,7 +1637,8 @@ def start_zwift():
         return redirect("/ride", 302)
     else:
         response = make_response(redirect("http://cdn.zwift.com/%s" % selected_map, 302))
-        response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
+        if MULTIPLAYER:
+            response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
         return response
 
 
