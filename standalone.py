@@ -183,7 +183,9 @@ class CDNHandler(SimpleHTTPRequestHandler):
             # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
             MAP_OVERRIDE.append((self.client_address[0], path_end))
             self.send_response(302)
-            self.send_header('Cookie', self.headers.get('Cookie') + "; map=%s" % path_end)
+            cookie = self.headers.get('Cookie')
+            if cookie:
+                self.send_header('Cookie', cookie + "; map=%s" % path_end)
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
