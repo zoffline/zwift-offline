@@ -138,10 +138,10 @@ def load_ghosts(player_id, state, ghosts):
             while road_id(g.states[0]) != ghosts.start_road:
                 del g.states[0]
             if is_forward(g.states[0]):
-                while not (g.states[0].roadTime <= ghosts.start_rt <= g.states[1].roadTime):
+                while g.states[0].roadTime < ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
                     del g.states[0]
             else:
-                while not (g.states[0].roadTime >= ghosts.start_rt >= g.states[1].roadTime):
+                while g.states[0].roadTime > ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
                     del g.states[0]
         except IndexError:
             pass
@@ -257,7 +257,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg.player_id = hello.player_id
         msg.f3 = 0
         servers = msg.servers.add()
-        if os.path.exists(SERVER_IP_FILE):
+        if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
+            udp_node_ip = "127.0.0.1"
+        elif os.path.exists(SERVER_IP_FILE):
             with open(SERVER_IP_FILE, 'r') as f:
                 udp_node_ip = f.read().rstrip('\r\n')
         else:
@@ -501,10 +503,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghosts.last_rec = t
                 if not ghosts.started and ghosts.play.ghosts and road_id(state) == ghosts.start_road:
                     if is_forward(state):
-                        if state.roadTime >= ghosts.start_rt >= ghosts.last_rt:
+                        if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
                             ghosts.started = True
                     else:
-                        if state.roadTime <= ghosts.start_rt <= ghosts.last_rt:
+                        if state.roadTime < ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
                             ghosts.started = True
 #            else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
