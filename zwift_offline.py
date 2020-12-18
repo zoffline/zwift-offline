@@ -1640,7 +1640,8 @@ def start_zwift():
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
     else:
-        response = make_response(redirect("http://cdn.zwift.com/%s" % selected_map, 302))
+        response = make_response(redirect("http://cdn.zwift.com/map_override", 302))
+        response.set_cookie('selected_map', selected_map, domain=".zwift.com")
         if MULTIPLAYER:
             response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
         return response

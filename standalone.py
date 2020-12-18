@@ -16,9 +16,11 @@ from shutil import copyfile
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
+    from http.cookies import SimpleCookie
 else:
     import SocketServer as socketserver
     from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from Cookie import SimpleCookie
 
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
@@ -179,13 +181,14 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path_end = self.path.split('/')[-1]
-        if path_end in ['FRANCE', 'INNSBRUCK', 'LONDON', 'NEWYORK', 'PARIS', 'RICHMOND', 'WATOPIA', 'YORKSHIRE']:
+        if path_end == 'map_override':
+            cookies_string = self.headers.get('Cookie')
+            cookies = SimpleCookie()
+            cookies.load(cookies_string)
             # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
-            MAP_OVERRIDE.append((self.client_address[0], path_end))
+            MAP_OVERRIDE.append((self.client_address[0], cookies['selected_map'].value))
             self.send_response(302)
-            cookie = self.headers.get('Cookie')
-            if cookie:
-                self.send_header('Cookie', cookie + "; map=%s" % path_end)
+            self.send_header('Cookie', cookies_string)
             self.send_header('Location', 'https://secure.zwift.com/ride')
             self.end_headers()
             return
