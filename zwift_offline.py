@@ -151,6 +151,7 @@ class User(UserMixin, db.Model):
     pass_hash = db.Column(db.String(100), nullable=False)
     enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
     is_admin = db.Column(db.Integer, nullable=False, default=0)
+    remember = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return self.username
@@ -356,6 +357,7 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
+        remember = bool(request.form.get('remember'))
 
         if not (username and password):
             flash("Username and password cannot be empty.")
@@ -365,11 +367,13 @@ def login():
 
         if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
+            user.remember = remember
+            db.session.commit()
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
 
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.remember:
         return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
 
     user = User.verify_token(request.args.get('token'))
