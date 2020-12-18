@@ -667,21 +667,27 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(get_utc_time())
     udp_node = response.info.nodes.node.add()
-    udp_node.ip = server_ip  # TCP telemetry server
+    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
+        udp_node.ip = "127.0.0.1"
+    else:
+        udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     return response.SerializeToString(), 200
+
+
+def logout(player_id):
+    #Remove player from online when leaving game/world
+    if player_id in online:
+        online.pop(player_id)
+    if player_id in player_partial_profiles:
+        player_partial_profiles.pop(player_id)
 
 
 @app.route('/api/users/logout', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def api_users_logout():
-    #Remove player from online when leaving game/world
-    player_id = current_user.player_id
-    if player_id in online:
-        online.pop(player_id)
-    if player_id in player_partial_profiles:
-        player_partial_profiles.pop(player_id)
+    logout(current_user.player_id)
     return '', 204
 
 
@@ -810,6 +816,10 @@ def api_profiles_me():
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+    if player_id == 0:
+        # Zwift client 1.0.60239 calls /api/profiles/0 instead of /api/users/logout
+        logout(current_user.player_id)
+        return '', 204
     if current_user.player_id != player_id:
         return '', 401
     stream = request.stream.read()
@@ -1147,7 +1157,10 @@ def api_profiles_goals_id(player_id, goal_id):
 def api_tcp_config():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
-    info.game_server_ip = server_ip
+    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
+        info.game_server_ip = "127.0.0.1"
+    else:
+        info.game_server_ip = server_ip
     info.f2 = 3023
     return infos.SerializeToString(), 200
 
@@ -1336,7 +1349,10 @@ def relay_worlds_attributes(world_id):
 def relay_periodic_info():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
-    info.game_server_ip = server_ip
+    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
+        info.game_server_ip = "127.0.0.1"
+    else:
+        info.game_server_ip = server_ip
     info.f2 = 3022
     info.f3 = 10
     info.f4 = 60
