@@ -206,7 +206,7 @@ To obtain your current profile:
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
   * If multiplayer is enabled, use the upload button in the launcher window to import your file.
 
-  </details>
+</details>
 
 ### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
 
@@ -224,7 +224,7 @@ To obtain your current profile:
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
   * If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
 
-  </details>
+</details>
 
 ### Step 6 [OPTIONAL]: Enable multiplayer
 
@@ -238,7 +238,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 * Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_credentials.txt``, and/or ``garmin_credentials.txt`` if you have them.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
-  </details>
+</details>
 
 ### Extra optional steps
 <details><summary>Expand</summary>
