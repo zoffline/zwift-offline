@@ -1,8 +1,6 @@
 # zoffline
 
-zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation
-of a Zwift server. Currently it's designed for only a single user at a time and the UDP
-game node is minimally implemented.
+zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server.
 
 zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
 
@@ -30,9 +28,9 @@ To install zoffline on Windows:
 To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
-* Install dependencies: flask, python-protobuf, protobuf3_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install flask protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask protobuf protobuf3_to_dict stravalib``
+* Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
+  * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
     * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
@@ -156,7 +154,7 @@ to generate your own certificates and do the same.
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
 * Start Zwift and sign in using any email/password
-  * To change profile, sign in using ``player_id`` (numeric, default is 1000) and any password (Thanks @kienkhuat!)
+  * If multiplayer is enabled, access https://secure.zwift.com/signup/ to sign up and import your files.
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
@@ -184,6 +182,7 @@ To obtain your current profile:
   * Or, if using the Windows zoffline.exe version without Python installed you can run get_profile.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
 * Move the resulting profile.bin (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
   * If using zoffline.exe on Windows, create the ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
+  * If multiplayer is enabled, use the upload button in the launcher window to import your file.
   * If using Docker, move profile.bin into the path you passed to ``-v``
 
 
@@ -198,20 +197,45 @@ To obtain your current profile:
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<player_id>`` directory.
+  * If multiplayer is enabled, use the upload button in the launcher window to import your file.
 
 
 ### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
 
-* Install dependencies: garmin-uploader
-  * e.g., on Linux/Mac: ``pip install garmin-uploader``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader``
+* Install dependencies: garmin-uploader, cryptography (optional)
+  * e.g., on Linux/Mac: ``pip install garmin-uploader cryptography``
+  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader cryptography``
 * Create a file garmin_credentials.txt in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
+  * If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
 
+
+### Step 6 [OPTIONAL]: Enable multiplayer
+
+* Create a multiplayer.txt file in the ``storage`` directory.
+* If you are not running zoffline on the same PC that Zwift is running: create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
+
+<details><summary>Extra optional steps</summary>
+
+* To obtain the official map schedule and update files from Zwift server: create a cdn-proxy.txt file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
+* To enable the password reset feature: create a gmail_credentials.txt file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* If the Zwift client is having issues connecting to the Linux server ("The request was aborted: Could not create SSL/TLS secure channel." or "The underlying connection was closed: An unexpected error occurred on a send. Received an unexpected EOF or 0 bytes from the transport stream."): change MinProtocol in /etc/ssl/openssl.cnf to TLSv1.0
+  ```
+  [system_default_sect]
+  MinProtocol = TLSv1.0
+  CipherString = DEFAULT@SECLEVEL=1
+  ```
+</details>
+
+## Discord and zoffline (online) server
+
+Please join the [Discord](https://discord.gg/GMdn8F8) and our enhanced version of zoffline, hosted Online!
+
+Follow the guide in #instructions to create your account and join other Zwifters.
 
 ## Dependencies
 
@@ -226,10 +250,20 @@ Docker
   * ``pip install protobuf``
 * protobuf3_to_dict (https://github.com/kaporzhu/protobuf-to-dict)
   * ``pip install protobuf3_to_dict``
+* pyJWT (https://pyjwt.readthedocs.io/)
+  * ``pip install pyjwt``
+* flask-login (https://flask-login.readthedocs.io/en/latest/)
+  * ``pip install flask-login``
+* FlaskSQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
+  * ``pip install flask_sqlalchemy``
+* gevent (http://www.gevent.org/)
+  * ``pip install gevent``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
   * ``pip install garmin-uploader``
+* OPTIONAL: cryptography (https://cryptography.io/en/latest/)
+  * ``pip install cryptography``
 
 
 ## Note

@@ -1,3 +1,4 @@
+syntax = "proto2";
 message SegmentResult {
     optional uint64 id = 1;
     required uint64 player_id = 2;
@@ -11,9 +12,9 @@ message SegmentResult {
     optional string finish_time_str = 10;
     required uint64 elapsed_ms = 11;
     optional bool f12 = 12;
-    optional uint32 f13 = 13;
+    optional uint32 f13 = 13; //weight_in_grams
     optional uint32 f14 = 14;
-    optional uint32 f15 = 15;
+    optional uint32 f15 = 15; //avg_power
     optional bool f16 = 16;
     optional string f17 = 17;
     optional uint64 f18 = 18;

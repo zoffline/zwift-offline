@@ -1,3 +1,4 @@
+syntax = "proto2";
 message World {
 	required uint32 id = 1;
 	required string name = 2;
@@ -6,6 +7,8 @@ message World {
 	required uint64 f5 = 5;
 	required uint64 world_time = 6;
 	required uint64 real_time = 7;
+	repeated Player player_states = 8;
+	repeated Player pace_partner_states = 12;
 }
 
 message Worlds {
@@ -15,4 +18,22 @@ message Worlds {
 message WorldAttributes {
 	/* repeated RiderAttributes riders = 1; */
 	required int64 world_time = 2;
+}
+
+message Player {
+	required uint32 id = 1;
+	required string firstName = 2;
+	required string lastName = 3;
+	optional uint32 distance = 4;
+	optional uint32 time = 5;
+	optional uint32 f6 = 6;
+	optional uint32 f8 = 8;
+	optional uint32 f9 = 9;
+	optional uint32 f10 = 10;
+	optional uint32 f11 = 11;
+	optional uint32 power = 12;
+	optional uint32 f13 = 13;
+	optional float x = 14;
+	optional float altitude = 15;
+	optional float y = 16;
 }

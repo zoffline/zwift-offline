@@ -1,3 +1,4 @@
+syntax = "proto2";
 message PlayerState {
 	optional int32 id = 1;
 	optional int64 worldTime = 2;
@@ -45,12 +46,13 @@ message ServerToClient {
 	required int32 f1 = 1;
 	required int32 player_id = 2;
 	required int64 world_time = 3;
-	required int32 seqno = 4;
-	required int32 f5 = 5;
+	optional int32 seqno = 4;
+	optional int32 f5 = 5;
 	repeated PlayerState states = 8;
-	required int64 f11 = 11;
-	required int32 num_msgs = 18;
-	required int32 msgnum = 19;
+	repeated PlayerUpdate updates = 9;
+	optional int64 f11 = 11;
+	optional int32 num_msgs = 18;
+	optional int32 msgnum = 19;
 }
 
 message Ghost {
@@ -60,4 +62,60 @@ message Ghost {
 
 message Ghosts {
 	repeated Ghost ghosts = 1;
+}
+
+message PlayerUpdate {
+    optional int64 f1 = 1; // 587645624533328784, later 5876456 85771834256
+    optional int32 f2 = 2; // 1
+    required int32 type = 3; // 105 entered world, 5 chat message, 4 ride on
+    required bytes payload = 4; // protobuf
+    optional int64 world_time1 = 5;
+    optional int64 x = 6;
+    optional int64 altitude = 7;
+    optional int64 y = 8;
+    optional int64 world_time2 = 9;
+    optional int64 f11 = 11; // 75000 ?
+    optional int64 f12 = 12; //Not in package when testing
+    optional int64 f14 = 14; // '1604516817408239', later '1604516824709874'
+    optional int64 f15 = 15; //6, might be course
+}
+
+message ChatMessage {
+    required int32 rider_id = 1;
+    required int32 to_rider_id = 2; // 0 if public message
+    required int32 f3 = 3; // always value 1 ?
+    required string firstName = 4;
+    required string lastName = 5;
+    required string message = 6;
+    optional string avatar = 7;
+    required int32 countryCode = 8;
+    optional int32 eventSubgroup = 11;
+}
+
+message RideOn {
+    required int32 rider_id = 1;
+    required int32 to_rider_id = 2;
+    required string firstName = 3;
+    required string lastName = 4;
+    required int32 countryCode = 5;
+}
+
+message SegmentComplete {
+    optional int64 f1 = 1;
+    required int32 rider_id = 2;
+    optional int32 f3 = 3;
+    optional int64 f4 = 4;
+    optional int64 segment_id = 5; 
+    optional int64 f6 = 6;
+    optional string first_name = 7;
+    optional string last_name = 8;
+    optional int64 world_time = 9;
+    optional int64 milliseconds = 11;
+    optional int32 f12 = 12;
+    optional int32 weight_in_grams = 13;
+    optional int32 f14 = 14;
+    optional int32 avg_power = 15;
+    optional int32 f16 = 16;
+    optional string f7date = 17;
+    optional int32 f19 = 19;
 }

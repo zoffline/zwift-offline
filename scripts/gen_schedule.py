@@ -16,7 +16,7 @@ MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'NEWYORK' ] * 2 + [
 dom = minidom.parseString('<MapSchedule><appointments></appointments><VERSION>1</VERSION></MapSchedule>')
 appts = dom.getElementsByTagName('appointments')[0]
 
-now = datetime.datetime.now()
+now = datetime.datetime.utcnow()
 prev_map = None
 for i in range(0, 500):
     map_choice = random.choice(MAPS)
