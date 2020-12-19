@@ -1,0 +1,51 @@
+body {
+    background-image: url('https://cdn.zwift.com/style/background.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.text-shadow, .text-shadow-not-ie {
+    text-shadow: 1px 1px 2px black;
+}
+.list-group-item, form, h1 {
+    background-color: #f26722;
+    background-color: rgba(242, 103, 34, 0.7);
+}
+.list-group-item, form {
+    padding: 10px;
+}
+.list-group-item a {
+    color: white;
+}
+.btn {
+    margin-right: 5px;
+}
+.top-buffer {
+    margin-top: 8px;
+}
+.upload-text {
+    background-color: white;
+    color: black;
+    padding: 5px;
+    padding-top: 0;
+    border-radius: 3px; 
+    margin-top: 5px;
+}
+h1 {
+    text-align: center;
+    border-radius: 5px;
+    margin-top: 5px;
+    font-size: 25px;
+    padding: 5px;
+}
+label {
+    margin-bottom: 2px;
+}
+form {
+    border-radius: 5px;
+}
+.col-form-label-sm {
+    padding: 0;
+}

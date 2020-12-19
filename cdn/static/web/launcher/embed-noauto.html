@@ -3,7 +3,7 @@
     <title>Loading Zwift</title>
 </head>
 <body>
-<h1>zoffline Launcher</h1>
+<h1>Zwift Launcher</h1>
 
 <form method="POST" action="/start-zwift">
     <table border=0 cellpadding=15>
@@ -24,18 +24,10 @@
         <option value="RICHMOND">Richmond</option>
         <option value="WATOPIA">Watopia</option>
         <option value="YORKSHIRE">Yorkshire</option>
-    </select></td>
-    <td><input type="checkbox" name="ghosts" {% if ghosts %} checked {% endif %}>
-    <label for="ghosts">Enable ghosts</label>
-    <p>To change the start line for some routes edit the file "start_lines.csv"</p></td></tr>
+    </select></td></tr>
     <tr><td><button type="submit">Start Zwift</button></td></tr>
     </table>
 </form>
-
-</br>
-To automatically launch Zwift and skip this step create a file called "auto_launch.txt" inside zoffline's storage directory.
-</br>
-<b>Warning:</b> If there's a pending Zwift update that zoffline supports, auto launching will prevent that update from being installed and Zwift will not behave nicely. Always ensure zoffline is disabled to apply updates in advance if auto launching.
 
 </body>
 </html>

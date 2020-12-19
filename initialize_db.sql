@@ -1,7 +1,5 @@
 CREATE TABLE version ( version INTEGER );
 
-INSERT INTO version VALUES (2);
-
 /* column names must match protobuf field names */
 
 CREATE TABLE activity (

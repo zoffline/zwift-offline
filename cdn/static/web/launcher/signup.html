@@ -1,0 +1,54 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Sign up</div></h1>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form id="signup" action="{{ url_for('signup') }}" method="post">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Username (e-mail)</label>
+            <input type="text" id="username" name="username" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Password</label>
+            <input type="password" id="password" name="password" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Confirm password</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">First name</label>
+            <input type="text" id="first_name" name="first_name" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Last name</label>
+            <input type="text" id="last_name" name="last_name" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Sign up" class="btn btn-sm btn-light"><a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Back</a>
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item py-2">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ZFile {
     required uint64 id = 1;
     required string folder = 2;

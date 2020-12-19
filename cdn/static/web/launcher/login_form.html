@@ -1,0 +1,49 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Zwift Launcher</div></h1>
+  <h2 class="text-shadow">Login</h2>
+  <a href="/signup" class="btn btn-sm btn-success">Sign up</a>
+  <a href="/forgot" class="btn btn-sm btn-secondary">Forgot password</a>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form id="login" action="{{ url_for('login') }}" method="post" class="top-buffer">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="text-shadow">Username</label>
+            <input type="text" id="username" name="username" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="text-shadow">Password</label>
+            <input type="password" id="password" name="password" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember" name="remember">
+              <label class="form-check-label text-shadow" for="remember">Remember me</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Login" class="btn btn-sm btn-light">
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,3 +1,4 @@
+syntax = "proto2";
 message Profile {
     optional int64 id = 1;
     optional int32 is_connected_to_strava = 2;
@@ -144,6 +145,13 @@ message Profile {
     optional string launched_game_client = 108;
     optional int64 f109 = 109;
     optional bool f110 = 110;
+    repeated PacerSetting f114 = 114;
+    optional int32 f117 = 117;
+    optional int32 f118 = 118;
+    optional int32 f119 = 119;
+    optional int32 f120 = 120;
+    optional int32 f121 = 121;
+    optional int32 f125 = 125;
 }
 
 message Profiles {
@@ -222,4 +230,11 @@ message Subscription {
         STATUS5 = 5;
         STATUS6 = 6;
     }
+}
+
+message PacerSetting {
+    required int64 id = 1;
+    optional int64 number_value = 2;
+    optional fixed32 hex_value = 3;
+    optional string string_value = 5;
 }

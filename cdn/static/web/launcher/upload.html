@@ -1,0 +1,68 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Logged in as {{ username }} ({{ name }})</div></h1>
+  <div class="row">
+    <div class="col-sm-6 col-md-6">
+      <ul class="list-group">
+        {% if profile %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-shadow">profile.bin - {{ profile }}</label>
+                &nbsp;&nbsp;<a href="/download/profile.bin"><div class="btn btn-sm btn-light">Download</div></a>
+              </div>
+            </div>
+          </li>
+        {% endif %}
+        {% if token %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-shadow">strava_token.txt - {{ token }}</label>
+              </div>
+            </div>
+          </li>
+        {% endif %}
+        {% if garmin %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-shadow">garmin_credentials.txt - {{ garmin }}</label>
+              </div>
+            </div>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
+        <h3 class="text-shadow">Upload file</h3>
+        <div class="row">
+          <div class="col-md-12">
+            <input type="file" name="file" class="form-control-file text-shadow-not-ie" />
+            <label class="text-shadow">(profile.bin / strava_token.txt / garmin_credentials.txt)</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Upload" class="btn btn-sm btn-light"/>
+            <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}
