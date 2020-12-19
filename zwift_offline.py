@@ -1547,6 +1547,7 @@ def before_first_request():
     move_old_profile()
     init_database()
     db.create_all(app=app)
+    db.session.commit()  # in case create_all created a table
     check_columns()
     db.session.close()
     send_message_thread = threading.Thread(target=send_server_back_online_message)

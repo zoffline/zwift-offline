@@ -1,6 +1,6 @@
 # zoffline
 
-zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server.
+zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server. By default zoffline is only for a single player. See [Step 6: Enable Multiplayer](#step-6-optional-enable-multiplayer) for how to enable support for multiple users/profiles.
 
 zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
 
@@ -27,19 +27,20 @@ To install zoffline on Windows:
 <details><summary>Linux, Windows, or Mac OS X (from source)</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
-* Install Python 2 or 3 (https://www.python.org/downloads/) if not already installed
+* Install Python 3 if not already installed
+  * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
 * Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
   * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
-    * Python 3 is installed by default in ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32`` instead of ``C:\Python27``
+  * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
     * If using Python 3, but Python 3 is not your system default run ``sudo python3 standalone.py``
-  * e.g., on Windows in command prompt: ``C:\Python27\python.exe standalone.py``
-    * For Python 3 the command will likely be ``C:\Users\<username>\AppData\Local\Programs\Python\Python38-32\python.exe standalone.py``
+  * e.g., on Windows in command prompt: ``python standalone.py``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\python.exe`` instead of just ``python``
 * Start Zwift with standalone.py running (__after completing step 2__)
 * Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
@@ -171,6 +172,8 @@ the Zwift system tray icon and exit) and restart Zwift.
 
 ### Step 3 [OPTIONAL]: Obtain current Zwift profile
 
+<details><summary>Expand</summary>
+
 If you don't obtain your current Zwift profile before first starting Zwift with
 zoffline enabled, you will be prompted to create a new profile (height, weight,
 gender). Your profile can be further customized and changed via the in game
@@ -185,27 +188,35 @@ To obtain your current profile:
   * If multiplayer is enabled, use the upload button in the launcher window to import your file.
   * If using Docker, move profile.bin into the path you passed to ``-v``
 
+</details>
 
-### Step 4 [OPTIONAL]: Obtain Strava API token
+### Step 4 [OPTIONAL]: Upload activities to Strava
+
+<details><summary>Expand</summary>
 
 * Install dependencies: stravalib
   * e.g., on Linux/Mac: ``pip install stravalib``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install stravalib``
-  * Or, if using the Windows zoffline.exe version without Python installed you can run strava_auth.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
+  * e.g., on Windows in command prompt: ``pip install stravalib``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
+  * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
 * [OPTIONAL] Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
-* Move the resulting strava_token.txt (saved in whatever directory you ran strava_auth.py in) into the ``storage/<player_id>`` directory.
+* Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
   * If multiplayer is enabled, use the upload button in the launcher window to import your file.
 
+</details>
 
 ### Step 5 [OPTIONAL]: Upload activities to Garmin Connect
 
+<details><summary>Expand</summary>
+
 * Install dependencies: garmin-uploader, cryptography (optional)
   * e.g., on Linux/Mac: ``pip install garmin-uploader cryptography``
-  * e.g., on Windows in command prompt: ``C:\Python27\Scripts\pip.exe install garmin-uploader cryptography``
-* Create a file garmin_credentials.txt in the ``storage/<player_id>`` directory containing your login credentials
+  * e.g., on Windows in command prompt: ``pip install garmin-uploader cryptography``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
+* Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
   <password>
@@ -213,16 +224,27 @@ To obtain your current profile:
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
   * If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
 
+</details>
 
 ### Step 6 [OPTIONAL]: Enable multiplayer
 
-* Create a multiplayer.txt file in the ``storage`` directory.
-* If you are not running zoffline on the same PC that Zwift is running: create a server-ip.txt file in the ``storage`` directory containing the IP address of the PC running zoffline.
+<details><summary>Expand</summary>
 
-<details><summary>Extra optional steps</summary>
+To enable support for multiple users perform the steps below. zoffline's previous multi-profile support has been superceded by full multiplayer support. If you were previously using multiple profiles with zoffline you will need to enable multiplayer to continue supporting multiple users.
 
-* To obtain the official map schedule and update files from Zwift server: create a cdn-proxy.txt file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
-* To enable the password reset feature: create a gmail_credentials.txt file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* Create a ``multiplayer.txt`` file in the ``storage`` directory.
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+  * TCP ports 80, 443, 3023 and UDP port 3022 will need to be open on the PC running zoffline if its running remotely.
+* Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_credentials.txt``, and/or ``garmin_credentials.txt`` if you have them.
+  * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
+
+</details>
+
+### Extra optional steps
+<details><summary>Expand</summary>
+
+* To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
+* To enable the password reset feature when multiplayer is enabled: create a gmail_credentials.txt file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
 * If the Zwift client is having issues connecting to the Linux server ("The request was aborted: Could not create SSL/TLS secure channel." or "The underlying connection was closed: An unexpected error occurred on a send. Received an unexpected EOF or 0 bytes from the transport stream."): change MinProtocol in /etc/ssl/openssl.cnf to TLSv1.0
   ```
   [system_default_sect]
@@ -231,9 +253,9 @@ To obtain your current profile:
   ```
 </details>
 
-## Discord and zoffline (online) server
+## Community Discord and zoffline (online) server
 
-Please join the [Discord](https://discord.gg/GMdn8F8) and our enhanced version of zoffline, hosted Online!
+Please join the community supported [Discord](https://discord.gg/GMdn8F8) and their enhanced version of zoffline, hosted Online!
 
 Follow the guide in #instructions to create your account and join other Zwifters.
 
@@ -243,7 +265,8 @@ Docker
 
 -or-
 
-* Python 2 or 3 (https://www.python.org/downloads/)
+* Python 3 (https://www.python.org/downloads/)
+  * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
 * Flask (http://flask.pocoo.org/)
   * ``pip install flask``
 * python-protobuf (https://pypi.org/project/protobuf/)
@@ -269,7 +292,8 @@ Docker
 ## Note
 
 Future Zwift updates may break zoffline until it's updated. While zoffline is
-enabled Zwift updates will not be installed.
+enabled Zwift updates will not be installed. If a zoffline update broke
+something, check the ``CHANGELOG`` for possible changes that need to be made.
 
 Don't expose zoffline to the internet, it was not designed with that in mind.
 
