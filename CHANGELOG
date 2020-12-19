@@ -1,0 +1,21 @@
+# Only breaking changes in releases will be documented here.
+
+Update to Zwift_1.0.60239:
+  * With the update to this Zwift release, zoffline has included significant changes
+    to fully support a multiplayer mode, pace partners, and more.
+  * New dependencies required if running from source: pyJWT, flask-login, FlaskSQLAlchemy, gevent
+    * Install these with ``pip install pyjwt flask-login flask_sqlalchemy gevent``
+  * Multi-profile support has been deprecated in favor of full multiplayer support.
+    * See Step 6 in README.md for how to enable multiplayer support.
+      * Create an account for each profile you had and upload their profile.bin
+        and credential files via the new Zwift launcher.
+  * Do not "upgrade" from an existing single player installation to multiplayer and then
+    "downgrade" back to single player without backing up your original storage directory.
+    You will lose your activities, segment results, and goals if you do this and don't
+    have a backup to restore from.
+
+
+Update to Zwift_1.0.51959:
+  * Changes were made to Zwift's cacert.pem. You will likely need to re-append
+    cert-zwift-com.pem to Zwift's cacert.pem in a specific way.
+    See https://github.com/zoffline/zwift-offline/issues/62 for details.
