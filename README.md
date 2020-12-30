@@ -27,10 +27,11 @@ To install zoffline on Windows:
 <details><summary>Linux, Windows, or Mac OS X (from source)</summary>
 To install zoffline on Linux, Windows, or Mac OS X:
 
-* Install Python 3 if not already installed
+* Install Python 3 (https://www.python.org/downloads/) if not already installed
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
+  * Python 2 remains supported for now, but it is not recommended.
 * Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
+  * e.g., on Linux/Mac: ``pip3 install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
   * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
 * Clone or download this repo
@@ -68,10 +69,10 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 <details><summary>Windows Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.60239, you're all set.
+  * If your Zwift version is 1.0.60474, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.60239 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.60239 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.60474 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.60474 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
@@ -96,9 +97,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.60239, you're all set.
+  * If your Zwift version is 1.0.60474, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.60239: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.60474: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -182,11 +183,11 @@ menu (e.g. name, nationality, weight change, etc).
 To obtain your current profile:
 * Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
-  * Or, if using the Windows zoffline.exe version without Python installed you can run get_profile.exe obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
-* Move the resulting profile.bin (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
-  * If using zoffline.exe on Windows, create the ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
+  * Or, if using the Windows zoffline.exe version without Python installed you can run ``get_profile.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
+* Move the resulting ``profile.bin`` (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
+  * If using zoffline.exe on Windows, create a ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
   * If multiplayer is enabled, use the upload button in the launcher window to import your file.
-  * If using Docker, move profile.bin into the path you passed to ``-v``
+  * If using Docker, move ``profile.bin`` into the path you passed to ``-v``
 
 </details>
 
@@ -195,7 +196,7 @@ To obtain your current profile:
 <details><summary>Expand</summary>
 
 * Install dependencies: stravalib
-  * e.g., on Linux/Mac: ``pip install stravalib``
+  * e.g., on Linux/Mac: ``pip3 install stravalib``
   * e.g., on Windows in command prompt: ``pip install stravalib``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
@@ -213,7 +214,7 @@ To obtain your current profile:
 <details><summary>Expand</summary>
 
 * Install dependencies: garmin-uploader, cryptography (optional)
-  * e.g., on Linux/Mac: ``pip install garmin-uploader cryptography``
+  * e.g., on Linux/Mac: ``pip3 install garmin-uploader cryptography``
   * e.g., on Windows in command prompt: ``pip install garmin-uploader cryptography``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
 * Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
@@ -235,7 +236,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 * Create a ``multiplayer.txt`` file in the ``storage`` directory.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
   * TCP ports 80, 443, 3023 and UDP port 3022 will need to be open on the PC running zoffline if its running remotely.
-* Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_credentials.txt``, and/or ``garmin_credentials.txt`` if you have them.
+* Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
 </details>
@@ -244,7 +245,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 <details><summary>Expand</summary>
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
-* To enable the password reset feature when multiplayer is enabled: create a gmail_credentials.txt file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
 * If the Zwift client is having issues connecting to the Linux server ("The request was aborted: Could not create SSL/TLS secure channel." or "The underlying connection was closed: An unexpected error occurred on a send. Received an unexpected EOF or 0 bytes from the transport stream."): change MinProtocol in /etc/ssl/openssl.cnf to TLSv1.0
   ```
   [system_default_sect]
@@ -267,26 +268,27 @@ Docker
 
 * Python 3 (https://www.python.org/downloads/)
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
+  * Python 2 remains supported for now, but it is not recommended.
 * Flask (http://flask.pocoo.org/)
-  * ``pip install flask``
+  * ``pip3 install flask``
 * python-protobuf (https://pypi.org/project/protobuf/)
-  * ``pip install protobuf``
+  * ``pip3 install protobuf``
 * protobuf3_to_dict (https://github.com/kaporzhu/protobuf-to-dict)
-  * ``pip install protobuf3_to_dict``
+  * ``pip3 install protobuf3_to_dict``
 * pyJWT (https://pyjwt.readthedocs.io/)
-  * ``pip install pyjwt``
+  * ``pip3 install pyjwt``
 * flask-login (https://flask-login.readthedocs.io/en/latest/)
-  * ``pip install flask-login``
+  * ``pip3 install flask-login``
 * FlaskSQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
-  * ``pip install flask_sqlalchemy``
+  * ``pip3 install flask_sqlalchemy``
 * gevent (http://www.gevent.org/)
-  * ``pip install gevent``
+  * ``pip3 install gevent``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
-  * ``pip install stravalib``
+  * ``pip3 install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
-  * ``pip install garmin-uploader``
+  * ``pip3 install garmin-uploader``
 * OPTIONAL: cryptography (https://cryptography.io/en/latest/)
-  * ``pip install cryptography``
+  * ``pip3 install cryptography``
 
 
 ## Note
