@@ -161,7 +161,7 @@ class User(UserMixin, db.Model):
 
     def get_token(self):
         dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-        return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+        return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
     def verify_token(token):
@@ -1593,14 +1593,14 @@ def launch_zwift():
 def fake_refresh_token_with_session_cookie(session_cookie):
     refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     refresh_token['session_cookie'] = session_cookie
-    refresh_token = jwt.encode(refresh_token, 'nosecret').decode('utf-8')
+    refresh_token = jwt.encode(refresh_token, 'nosecret')
     return refresh_token
 
 
 def fake_jwt_with_session_cookie(session_cookie):
     access_token = jwt.decode(ACCESS_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     access_token['session_cookie'] = session_cookie
-    access_token = jwt.encode(access_token, 'nosecret').decode('utf-8')
+    access_token = jwt.encode(access_token, 'nosecret')
 
     refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
