@@ -161,7 +161,7 @@ class User(UserMixin, db.Model):
 
     def get_token(self):
         dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-        return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
+        return jwt_encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
     def verify_token(token):
@@ -213,15 +213,27 @@ courses_lookup = {
     15: 'Paris'
 }
 
+
+def jwt_encode(payload, key, **kwargs):
+    # For pyjwt >= 2.0.0 compatibility (Issue #108)
+    if jwt.__version__[0] == '1':
+        return jwt.encode(payload, key, **kwargs).decode('utf-8')
+    else:
+        return jwt.encode(payload, key, **kwargs)
+
+
 def get_utc_date_time():
     return datetime.datetime.utcnow()
+
 
 def get_utc_seconds_from_date_time(dt):
     return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
 
+
 def get_utc_time():
     dt = get_utc_date_time()
     return get_utc_seconds_from_date_time(dt)
+
 
 def get_online():
     online_in_region = Online()
@@ -273,8 +285,10 @@ def get_partial_profile(player_id):
         else: return None
     return player_partial_profiles[player_id]
 
+
 def get_course(state):
     return (state.f19 & 0xff0000) >> 16
+
 
 def is_nearby(player_state1, player_state2, range = 100000):
     try:
@@ -1593,14 +1607,14 @@ def launch_zwift():
 def fake_refresh_token_with_session_cookie(session_cookie):
     refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     refresh_token['session_cookie'] = session_cookie
-    refresh_token = jwt.encode(refresh_token, 'nosecret')
+    refresh_token = jwt_encode(refresh_token, 'nosecret')
     return refresh_token
 
 
 def fake_jwt_with_session_cookie(session_cookie):
     access_token = jwt.decode(ACCESS_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     access_token['session_cookie'] = session_cookie
-    access_token = jwt.encode(access_token, 'nosecret')
+    access_token = jwt_encode(access_token, 'nosecret')
 
     refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
