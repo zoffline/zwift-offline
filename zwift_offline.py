@@ -142,6 +142,7 @@ save_ghost = None
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
+discord_webhook = None
 
 class User(UserMixin, db.Model):
     player_id = db.Column(db.Integer, primary_key=True)
@@ -462,7 +463,7 @@ def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
-def send_message_to_all_online(message):
+def send_message_to_all_online(message, sender='Server'):
     player_update = udp_node_msgs_pb2.PlayerUpdate()
     player_update.f2 = 1
     player_update.type = 5 #chat message type
@@ -475,7 +476,7 @@ def send_message_to_all_online(message):
     chat_message.rider_id = 0
     chat_message.to_rider_id = 0
     chat_message.f3 = 1
-    chat_message.firstName = 'Server'
+    chat_message.firstName = sender
     chat_message.lastName = ''
     chat_message.message = message
     chat_message.countryCode = 0
@@ -495,7 +496,9 @@ def send_restarting_message():
         time.sleep(60)
         restarting_in_minutes -= 1
         if restarting and restarting_in_minutes == 0:
-            send_message_to_all_online('See you later! Look for the back online message.')
+            message = 'See you later! Look for the back online message.'
+            send_message_to_all_online(message)
+            send_message_to_discord(message)
             time.sleep(6)
             os.kill(os.getpid(), signal.SIGINT)
 
@@ -509,6 +512,7 @@ def restart_server():
         restarting_in_minutes = 10
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
+        send_message_to_discord('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
     return redirect('/user/%s/' % current_user.username)
 
 @app.route("/cancelrestart")
@@ -519,7 +523,9 @@ def cancel_restart_server():
     if bool(current_user.is_admin):
         restarting = False
         restarting_in_minutes = 0
-        send_message_to_all_online('Restart of the server has been cancelled. Ride on!')
+        message = 'Restart of the server has been cancelled. Ride on!'
+        send_message_to_all_online(message)
+        send_message_to_discord(message)
     return redirect('/user/%s/' % current_user.username)
 
 @app.route("/reloadbots")
@@ -695,6 +701,7 @@ def logout(player_id):
         online.pop(player_id)
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
+    send_message_to_discord('%s riders online' % len(online))
 
 
 @app.route('/api/users/logout', methods=['POST'])
@@ -1053,6 +1060,10 @@ def api_profiles_activities_rideon(recieving_player_id):
         if not recieving_player_id in player_update_queue:
             player_update_queue[recieving_player_id] = list()
         player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+
+        receiver = get_partial_profile(recieving_player_id)
+        message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
+        send_message_to_discord(message, sending_player_id)
     return '{}', 200
 
 
@@ -1207,6 +1218,21 @@ def add_player_to_world(player, course_world, is_pace_partner):
             course_world[course_id].f5 += 1
 
 
+import requests
+import json
+
+def send_message_to_discord(message, sender_id=None):
+    if not discord_webhook: return
+    if sender_id is not None:
+        profile = get_partial_profile(sender_id)
+        sender = profile.first_name + ' ' + profile.last_name
+    else: sender = 'Server'
+    data = {}
+    data["content"] = message
+    data["username"] = sender
+    requests.post(discord_webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})
+
+
 def relay_worlds_generic(world_id=None):
     courses = courses_lookup.keys()
     # Android client also requests a JSON version
@@ -1270,6 +1296,10 @@ def relay_worlds_generic(world_id=None):
                     if not recieving_player_id in player_update_queue:
                         player_update_queue[recieving_player_id] = list()
                     player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+            if player_update.type == 5:
+                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message.ParseFromString(player_update.payload)
+                send_message_to_discord(chat_message.message, chat_message.rider_id)
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
@@ -1553,7 +1583,9 @@ def check_columns():
 
 def send_server_back_online_message():
     time.sleep(30)
-    send_message_to_all_online("We're back online. Ride on!")
+    message = "We're back online. Ride on!"
+    send_message_to_all_online(message)
+    send_message_to_discord(message)
 
 
 @app.before_first_request
@@ -1564,8 +1596,6 @@ def before_first_request():
     db.session.commit()  # in case create_all created a table
     check_columns()
     db.session.close()
-    send_message_thread = threading.Thread(target=send_server_back_online_message)
-    send_message_thread.start()
 
 
 ####################
@@ -1694,13 +1724,14 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord_webhook):
     global online
     global global_pace_partners
     global global_bots
     global ghosts_enabled
     global save_ghost
     global player_update_queue
+    global discord_webhook
     global login_manager
     online = passed_online
     global_pace_partners = passed_global_pace_partners
@@ -1708,6 +1739,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     ghosts_enabled = passed_ghosts_enabled
     save_ghost = passed_save_ghost
     player_update_queue = passed_player_update_queue
+    discord_webhook = passed_discord_webhook
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None
@@ -1719,10 +1751,11 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     def load_user(uid):
         return User.query.get(int(uid))
 
-    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
-    thread = threading.Thread(target=server.serve_forever)
-    thread.start()
+    send_message_thread = threading.Thread(target=send_server_back_online_message)
+    send_message_thread.start()
     logger.info("Server is running.")
+    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
+    server.serve_forever()
 
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 
