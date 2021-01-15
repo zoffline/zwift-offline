@@ -1,7 +1,7 @@
 <Zwift
-version="1.0.60474"
+version="1.0.60640"
 GAME_URL="https://us-or-rly101.zwift.com"
-manifest="ZwiftMac_1.0.60474_3c6a7a8f_manifest.xml"
-manifest_checksum="-2069780632"
+manifest="ZwiftMac_1.0.60640_13ae393b_manifest.xml"
+manifest_checksum="378639121"
 mandatory_version="0.0.0"
-ver_cur_checksum="1203727100"/>
+ver_cur_checksum="-1259418626"/>
