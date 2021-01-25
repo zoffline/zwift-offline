@@ -974,7 +974,7 @@ def garmin_upload(player_id, activity):
                 ciphered_text = f.read()
                 unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
                 unciphered_text = unciphered_text.decode(encoding='UTF-8')
-                split_credentials = unciphered_text.split('\r\n')
+                split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
             else:
