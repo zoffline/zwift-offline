@@ -246,6 +246,15 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
 * To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* To enable the Discord bridge bot: ``pip3 install discord``` and create a ``discord.cfg`` file in the ``storage`` directory containing
+  ```
+  [discord]
+  token = 
+  webhook = 
+  channel = 
+  welcome_message = 
+  help_message = 
+  ```
 * If the Zwift client is having issues connecting to the Linux server ("The request was aborted: Could not create SSL/TLS secure channel." or "The underlying connection was closed: An unexpected error occurred on a send. Received an unexpected EOF or 0 bytes from the transport stream."): change MinProtocol in /etc/ssl/openssl.cnf to TLSv1.0
   ```
   [system_default_sect]

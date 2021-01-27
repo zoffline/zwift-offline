@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from gevent import monkey
-monkey.patch_all()
 import os
 import signal
 import struct
@@ -17,10 +15,12 @@ if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
     from http.cookies import SimpleCookie
+    from configparser import ConfigParser
 else:
     import SocketServer as socketserver
     from SimpleHTTPServer import SimpleHTTPRequestHandler
     from Cookie import SimpleCookie
+    from ConfigParser import ConfigParser
 
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
@@ -45,6 +45,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
@@ -519,7 +520,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
         for p_id in remove_players:
             online.pop(p_id)
         if state.roadTime:
-            online[player_id] = state
+            if player_id in online.keys():
+                online[player_id] = state
+            else:
+                online[player_id] = state
+                zdiscord.send_message('%s riders online' % len(online))
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = global_ghosts.keys()
@@ -640,4 +645,13 @@ botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
 
-zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue)
+if os.path.isfile(DISCORD_CONFIG_FILE):
+    from discord_bot import DiscordThread
+    discord = DiscordThread(DISCORD_CONFIG_FILE)
+else:
+    class DummyDiscord():
+        def send_message(msg, sender_id=None):
+            pass
+    discord = DummyDiscord()
+
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue, discord)
