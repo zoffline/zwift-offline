@@ -1,5 +1,6 @@
 # Python 3 only (asyncio)
 
+import asyncio
 import json
 import os
 import threading
@@ -8,8 +9,8 @@ import time
 from configparser import ConfigParser
 from urllib import request
 
-import asyncio
 import discord
+import requests
 
 import zwift_offline
 
@@ -81,7 +82,4 @@ class DiscordThread(threading.Thread):
         data = {}
         data["content"] = message
         data["username"] = sender
-
-        req = request.Request(self.webhook, data=json.dumps(data).encode('UTF-8'),
-                              headers={"Content-Type": "application/json"})
-        request.urlopen(req).read()
+        requests.post(self.webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})

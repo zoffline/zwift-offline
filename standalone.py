@@ -7,7 +7,6 @@ import sys
 import threading
 import time
 import csv
-import requests
 from collections import deque
 from datetime import datetime
 from shutil import copyfile
@@ -209,19 +208,18 @@ class CDNHandler(SimpleHTTPRequestHandler):
             # PROXYPASS_FILE existence indicates we know what we're doing and
             # we can try to obtain the official map schedule and update files.
             # This can only work if we're running on a different machine than the Zwift client.
-            sent = False
+            import requests
             try:
                 url = 'http://{}{}'.format(hostname, self.path)
                 req_header = self.parse_headers()
                 resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-                sent = True
-                self.send_response(resp.status_code)
-                self.send_resp_headers(resp)
-                self.wfile.write(resp.content)
-                return
-            finally:
-                if not sent:
+            except:
                     self.send_error(404, 'error trying to proxy')
+                    return
+            self.send_response(resp.status_code)
+            self.send_resp_headers(resp)
+            self.wfile.write(resp.content)
+            return
 
         SimpleHTTPRequestHandler.do_GET(self)
 
@@ -322,7 +320,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message_payload = message.SerializeToString()
                             self.request.sendall(struct.pack('!h', len(message_payload)))
                             self.request.sendall(message_payload)
-                            
+
                             message = udp_node_msgs_pb2.ServerToClient()
                             message.f1 = 1
                             message.player_id = player_id
