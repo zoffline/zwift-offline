@@ -33,7 +33,7 @@ class DiscordBot(discord.Client):
         if message.author.id == self.user.id:
             return
         if message.content == '!online':
-            await message.channel.send('%s riders online' % len(online))
+            await message.channel.send('%s riders online' % len(zwift_offline.online))
         elif message.content == '!help' and self.help_msg:
             await message.channel.send(self.help_msg)
         elif message.content == '!ping':
