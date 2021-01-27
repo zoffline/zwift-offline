@@ -524,7 +524,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 online[player_id] = state
             else:
                 online[player_id] = state
-                zdiscord.send_message('%s riders online' % len(online))
+                discord.send_message('%s riders online' % len(online))
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = global_ghosts.keys()
@@ -616,7 +616,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     state.CopyFrom(player)
         message.world_time = zwift_offline.world_time()
         socket.sendto(message.SerializeToString(), client_address)
-  
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
