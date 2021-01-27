@@ -15,12 +15,10 @@ if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
     from http.cookies import SimpleCookie
-    from configparser import ConfigParser
 else:
     import SocketServer as socketserver
     from SimpleHTTPServer import SimpleHTTPRequestHandler
     from Cookie import SimpleCookie
-    from ConfigParser import ConfigParser
 
 import zwift_offline
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
