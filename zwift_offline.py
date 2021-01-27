@@ -981,7 +981,7 @@ def garmin_upload(player_id, activity):
                 ciphered_text = f.read()
                 unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
                 unciphered_text = unciphered_text.decode(encoding='UTF-8')
-                split_credentials = unciphered_text.split('\r\n')
+                split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
             else:
@@ -1676,10 +1676,13 @@ def auth_realms_zwift_protocol_openid_connect_token():
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
             return fake_jwt_with_session_cookie(token['session_cookie'])
         else:  # android login
+            current_user.enable_ghosts = user.enable_ghosts
+            ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
             return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
     else:
+        AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
         return FAKE_JWT, 200
 
 @app.route("/start-zwift" , methods=['POST'])
