@@ -45,6 +45,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
@@ -523,7 +524,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 online[player_id] = state
             else:
                 online[player_id] = state
-                zwift_offline.send_message_to_discord('%s riders online' % len(online))
+                zdiscord.send_message('%s riders online' % len(online))
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = global_ghosts.keys()
@@ -644,67 +645,13 @@ botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
 
-import discord
-import asyncio
-
-intents = discord.Intents.default()
-intents.members = True
-
-DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
-    CONFIG = ConfigParser()
-    SECTION = 'discord'
-    if sys.version_info[0] > 2:
-        CONFIG.read(DISCORD_CONFIG_FILE)
-    else:
-        file = open(DISCORD_CONFIG_FILE, 'rb')
-        CONFIG.readfp(file)
-    discord_token = CONFIG.get(SECTION, 'token')
-    discord_webhook = CONFIG.get(SECTION, 'webhook')
-    discord_channel = CONFIG.getint(SECTION, 'channel')
-    discord_welcome_message = CONFIG.get(SECTION, 'welcome_message')
-    discord_help_message = CONFIG.get(SECTION, 'help_message')
+    from discord_bot import DiscordThread
+    discord = DiscordThread(DISCORD_CONFIG_FILE)
 else:
-    discord_token = None
-    discord_webhook = None
+    class DummyDiscord():
+        def send_message(msg, sender_id=None):
+            pass
+    discord = DummyDiscord()
 
-class DiscordBot(discord.Client):
-    async def on_ready(self):
-        self.channel = self.get_channel(discord_channel)
-
-    async def on_member_join(self, member):
-        if discord_welcome_message:
-            await self.channel.send('%s\n%s' % (member.mention, discord_welcome_message))
-
-    async def on_message(self, message):
-        if message.author.id == self.user.id:
-            return
-        if message.content == '!online':
-            await message.channel.send('%s riders online' % len(online))
-        elif message.content == '!help' and discord_help_message:
-            await message.channel.send(discord_help_message)
-        elif message.content == '!ping':
-            await message.channel.send('pong')
-        elif message.channel == self.channel and not message.author.bot and not message.content.startswith('!'):
-            zwift_offline.send_message_to_all_online(message.content, message.author.name)
-
-class DiscordThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.loop = asyncio.get_event_loop()
-        self.start()
-
-    async def starter(self):
-        self.discord_bot = DiscordBot(intents=intents)
-        await self.discord_bot.start(discord_token)
-
-    def run(self):
-        try:
-            self.loop.run_until_complete(self.starter())
-        except BaseException:
-            time.sleep(5)
-
-if discord_token:
-    discord_thread = DiscordThread()
-
-zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue, discord_webhook)
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue, discord)

@@ -142,7 +142,6 @@ save_ghost = None
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
-discord_webhook = None
 
 class User(UserMixin, db.Model):
     player_id = db.Column(db.Integer, primary_key=True)
@@ -463,6 +462,7 @@ def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
+
 def send_message_to_all_online(message, sender='Server'):
     player_update = udp_node_msgs_pb2.PlayerUpdate()
     player_update.f2 = 1
@@ -488,6 +488,7 @@ def send_message_to_all_online(message, sender='Server'):
             player_update_queue[recieving_player_id] = list()
         player_update_queue[recieving_player_id].append(player_update.SerializeToString())
 
+
 def send_restarting_message():
     global restarting
     global restarting_in_minutes
@@ -498,9 +499,10 @@ def send_restarting_message():
         if restarting and restarting_in_minutes == 0:
             message = 'See you later! Look for the back online message.'
             send_message_to_all_online(message)
-            send_message_to_discord(message)
+            discord.send_message(message)
             time.sleep(6)
             os.kill(os.getpid(), signal.SIGINT)
+
 
 @app.route("/restart")
 @login_required
@@ -512,8 +514,9 @@ def restart_server():
         restarting_in_minutes = 10
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
-        send_message_to_discord('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/cancelrestart")
 @login_required
@@ -525,8 +528,9 @@ def cancel_restart_server():
         restarting_in_minutes = 0
         message = 'Restart of the server has been cancelled. Ride on!'
         send_message_to_all_online(message)
-        send_message_to_discord(message)
+        discord.send_message(message)
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/reloadbots")
 @login_required
@@ -535,6 +539,7 @@ def reload_bots():
     if bool(current_user.is_admin):
         reload_pacer_bots = True
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
@@ -701,7 +706,7 @@ def logout(player_id):
         online.pop(player_id)
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
-    send_message_to_discord('%s riders online' % len(online))
+    discord.send_message('%s riders online' % len(online))
 
 
 @app.route('/api/users/logout', methods=['POST'])
@@ -1063,7 +1068,7 @@ def api_profiles_activities_rideon(recieving_player_id):
 
         receiver = get_partial_profile(recieving_player_id)
         message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
-        send_message_to_discord(message, sending_player_id)
+        discord.send_message(message, sending_player_id)
     return '{}', 200
 
 
@@ -1218,21 +1223,6 @@ def add_player_to_world(player, course_world, is_pace_partner):
             course_world[course_id].f5 += 1
 
 
-import requests
-import json
-
-def send_message_to_discord(message, sender_id=None):
-    if not discord_webhook: return
-    if sender_id is not None:
-        profile = get_partial_profile(sender_id)
-        sender = profile.first_name + ' ' + profile.last_name
-    else: sender = 'Server'
-    data = {}
-    data["content"] = message
-    data["username"] = sender
-    requests.post(discord_webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})
-
-
 def relay_worlds_generic(world_id=None):
     courses = courses_lookup.keys()
     # Android client also requests a JSON version
@@ -1299,7 +1289,7 @@ def relay_worlds_generic(world_id=None):
             if player_update.type == 5:
                 chat_message = udp_node_msgs_pb2.ChatMessage()
                 chat_message.ParseFromString(player_update.payload)
-                send_message_to_discord(chat_message.message, chat_message.rider_id)
+                discord.send_message(chat_message.message, chat_message.rider_id)
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
@@ -1585,7 +1575,7 @@ def send_server_back_online_message():
     time.sleep(30)
     message = "We're back online. Ride on!"
     send_message_to_all_online(message)
-    send_message_to_discord(message)
+    discord.send_message(message)
 
 
 @app.before_first_request
@@ -1727,14 +1717,14 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord_webhook):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
     global global_pace_partners
     global global_bots
     global ghosts_enabled
     global save_ghost
     global player_update_queue
-    global discord_webhook
+    global discord
     global login_manager
     online = passed_online
     global_pace_partners = passed_global_pace_partners
@@ -1742,7 +1732,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     ghosts_enabled = passed_ghosts_enabled
     save_ghost = passed_save_ghost
     player_update_queue = passed_player_update_queue
-    discord_webhook = passed_discord_webhook
+    discord = passed_discord
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None
