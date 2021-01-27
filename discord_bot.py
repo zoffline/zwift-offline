@@ -74,7 +74,7 @@ class DiscordThread(threading.Thread):
 
     def send_message(self, message, sender_id=None):
         if sender_id is not None:
-            profile = get_partial_profile(sender_id)
+            profile = zwift_offline.get_partial_profile(sender_id)
             sender = profile.first_name + ' ' + profile.last_name
         else:
             sender = 'Server'
