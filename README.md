@@ -150,6 +150,7 @@ to generate your own certificates and do the same.
   <your ip> cdn.zwift.com
   ```
   * Run `Host Changer`, select created `hosts.txt` file and press the button
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer VPN" app.
 * Patch after every installation or update:
   * Install/update Zwift from Google play, do not start it.
     * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
@@ -177,13 +178,14 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
     * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cat cert-zwift-com.pem >> cacert.pem``
     * However you do it, ensure the permissions and ownership of the file remains the same.
-* Modify the device's /etc/hosts file
+* Modify the device's ``/etc/hosts`` file
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline.)
   * If no text editor on the device, recommend:
     * ``adb pull /etc/hosts``
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of modifying your ``hosts`` file.
 * Start Zwift and sign in using any email/password
   * If multiplayer is enabled, access https://secure.zwift.com/signup/ to sign up and import your files.
 
