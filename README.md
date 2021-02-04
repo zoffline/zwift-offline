@@ -142,12 +142,12 @@ to generate your own certificates and do the same.
 * Install required apps:
   * Install zoffline-obb.apk from https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk
   * Download "Host Changer VPN - The Game Changer" from Google play [[link here]](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger)
-  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/). The file must look like this (replace <your ip> with an actual IP):
+  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/). The file must look like this (replace <zoffline ip> with an actual IP):
   
   ```
-  <your ip> us-or-rly101.zwift.com
-  <your ip> secure.zwift.com
-  <your ip> cdn.zwift.com
+  <zoffline ip> us-or-rly101.zwift.com
+  <zoffline ip> secure.zwift.com
+  <zoffline ip> cdn.zwift.com
   ```
   * Run `Host Changer`, select created `hosts.txt` file and press the button
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer VPN" app.
@@ -160,7 +160,7 @@ to generate your own certificates and do the same.
 * Play zwift:
   * Host Changer button must be ON
   * Start Zwift and sign in using any email/password
-    * If multiplayer is enabled, access `https://<your ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
+    * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
 
 Why: We need to redirect Zwift to use zoffline (this is done by the VPN app) and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names (this is done by the patch tool ZofflineObb).
