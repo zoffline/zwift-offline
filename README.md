@@ -140,10 +140,9 @@ to generate your own certificates and do the same.
 <details><summary>Android (non-rooted device)</summary>
 
 * Install required apps:
-  * Install zoffline-obb.apk from https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk
-  * Download "Host Changer VPN - The Game Changer" from Google play [[link here]](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger)
-  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/). The file must look like this (replace ``<zoffline ip>`` with an actual IP):
-  
+  * Download and install ``zoffline-obb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk)
+  * Download "Host Changer VPN - The Game Changer" from Google Play ([link](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger))
+  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
   ```
   <zoffline ip> us-or-rly101.zwift.com
   <zoffline ip> secure.zwift.com
@@ -152,12 +151,12 @@ to generate your own certificates and do the same.
   * Run `Host Changer`, select created `hosts.txt` file and press the button
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer VPN" app.
 * Patch after every installation or update:
-  * Install/update Zwift from Google play, do not start it.
+  * Install/update Zwift from Google play, but do not start it yet.
     * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
-  * Open `ZofflineObb` apk and run it (allow access to storage)
+  * Open the `ZofflineObb` app and run it (allow access to storage)
   * Wait for process to finish (5-10min)
   * Run Zwift, hopefully it verifies download and runs
-* Play zwift:
+* Play Zwift:
   * Host Changer button must be ON
   * Start Zwift and sign in using any email/password
     * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
@@ -180,7 +179,7 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
     * However you do it, ensure the permissions and ownership of the file remains the same.
 * Modify the device's ``/etc/hosts`` file
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
-    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline.)
+    <br />(Where ``<zoffline ip>`` is the IP address of the machine running zoffline.)
   * If no text editor on the device, recommend:
     * ``adb pull /etc/hosts``
     * (modify on PC)
