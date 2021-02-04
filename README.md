@@ -142,7 +142,7 @@ to generate your own certificates and do the same.
 * Install required apps:
   * Install zoffline-obb.apk from https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk
   * Download "Host Changer VPN - The Game Changer" from Google play [[link here]](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger)
-  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/). The file must look like this (replace <zoffline ip> with an actual IP):
+  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/). The file must look like this (replace &lt;zoffline ip&gt; with an actual IP):
   
   ```
   <zoffline ip> us-or-rly101.zwift.com
