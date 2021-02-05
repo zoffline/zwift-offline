@@ -1396,10 +1396,10 @@ def relay_periodic_info():
 
 
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
-    where_stmt = ("WHERE segment_id = %s" % segment_id)
+    where_stmt = ("WHERE segment_id = '%s'" % segment_id)
     rows = None
     if player_id:
-        where_stmt += (" AND player_id = %s" % player_id)
+        where_stmt += (" AND player_id = '%s'" % player_id)
     if from_date:
         where_stmt += (" AND strftime('%s', finish_time_str) > strftime('%s', '%s')" % ('%s', '%s', from_date))
     if to_date:
