@@ -462,7 +462,8 @@ def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
-def send_message_to_all_online(message):
+
+def send_message_to_all_online(message, sender='Server'):
     player_update = udp_node_msgs_pb2.PlayerUpdate()
     player_update.f2 = 1
     player_update.type = 5 #chat message type
@@ -475,7 +476,7 @@ def send_message_to_all_online(message):
     chat_message.rider_id = 0
     chat_message.to_rider_id = 0
     chat_message.f3 = 1
-    chat_message.firstName = 'Server'
+    chat_message.firstName = sender
     chat_message.lastName = ''
     chat_message.message = message
     chat_message.countryCode = 0
@@ -487,6 +488,7 @@ def send_message_to_all_online(message):
             player_update_queue[recieving_player_id] = list()
         player_update_queue[recieving_player_id].append(player_update.SerializeToString())
 
+
 def send_restarting_message():
     global restarting
     global restarting_in_minutes
@@ -495,9 +497,12 @@ def send_restarting_message():
         time.sleep(60)
         restarting_in_minutes -= 1
         if restarting and restarting_in_minutes == 0:
-            send_message_to_all_online('See you later! Look for the back online message.')
+            message = 'See you later! Look for the back online message.'
+            send_message_to_all_online(message)
+            discord.send_message(message)
             time.sleep(6)
             os.kill(os.getpid(), signal.SIGINT)
+
 
 @app.route("/restart")
 @login_required
@@ -509,7 +514,9 @@ def restart_server():
         restarting_in_minutes = 10
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
+        discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/cancelrestart")
 @login_required
@@ -519,8 +526,11 @@ def cancel_restart_server():
     if bool(current_user.is_admin):
         restarting = False
         restarting_in_minutes = 0
-        send_message_to_all_online('Restart of the server has been cancelled. Ride on!')
+        message = 'Restart of the server has been cancelled. Ride on!'
+        send_message_to_all_online(message)
+        discord.send_message(message)
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/reloadbots")
 @login_required
@@ -529,6 +539,7 @@ def reload_bots():
     if bool(current_user.is_admin):
         reload_pacer_bots = True
     return redirect('/user/%s/' % current_user.username)
+
 
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
@@ -695,6 +706,7 @@ def logout(player_id):
         online.pop(player_id)
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
+    discord.send_message('%s riders online' % len(online))
 
 
 @app.route('/api/users/logout', methods=['POST'])
@@ -974,7 +986,7 @@ def garmin_upload(player_id, activity):
                 ciphered_text = f.read()
                 unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
                 unciphered_text = unciphered_text.decode(encoding='UTF-8')
-                split_credentials = unciphered_text.split('\r\n')
+                split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
             else:
@@ -1053,6 +1065,10 @@ def api_profiles_activities_rideon(recieving_player_id):
         if not recieving_player_id in player_update_queue:
             player_update_queue[recieving_player_id] = list()
         player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+
+        receiver = get_partial_profile(recieving_player_id)
+        message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
+        discord.send_message(message, sending_player_id)
     return '{}', 200
 
 
@@ -1270,6 +1286,10 @@ def relay_worlds_generic(world_id=None):
                     if not recieving_player_id in player_update_queue:
                         player_update_queue[recieving_player_id] = list()
                     player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+            if player_update.type == 5:
+                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message.ParseFromString(player_update.payload)
+                discord.send_message(chat_message.message, chat_message.rider_id)
             return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
@@ -1376,10 +1396,10 @@ def relay_periodic_info():
 
 
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
-    where_stmt = ("WHERE segment_id = %s" % segment_id)
+    where_stmt = ("WHERE segment_id = '%s'" % segment_id)
     rows = None
     if player_id:
-        where_stmt += (" AND player_id = %s" % player_id)
+        where_stmt += (" AND player_id = '%s'" % player_id)
     if from_date:
         where_stmt += (" AND strftime('%s', finish_time_str) > strftime('%s', '%s')" % ('%s', '%s', from_date))
     if to_date:
@@ -1553,7 +1573,9 @@ def check_columns():
 
 def send_server_back_online_message():
     time.sleep(30)
-    send_message_to_all_online("We're back online. Ride on!")
+    message = "We're back online. Ride on!"
+    send_message_to_all_online(message)
+    discord.send_message(message)
 
 
 @app.before_first_request
@@ -1564,8 +1586,6 @@ def before_first_request():
     db.session.commit()  # in case create_all created a table
     check_columns()
     db.session.close()
-    send_message_thread = threading.Thread(target=send_server_back_online_message)
-    send_message_thread.start()
 
 
 ####################
@@ -1646,10 +1666,13 @@ def auth_realms_zwift_protocol_openid_connect_token():
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
             return fake_jwt_with_session_cookie(token['session_cookie'])
         else:  # android login
+            current_user.enable_ghosts = user.enable_ghosts
+            ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
             return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
     else:
+        AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
         return FAKE_JWT, 200
 
 @app.route("/start-zwift" , methods=['POST'])
@@ -1694,13 +1717,14 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
     global global_pace_partners
     global global_bots
     global ghosts_enabled
     global save_ghost
     global player_update_queue
+    global discord
     global login_manager
     online = passed_online
     global_pace_partners = passed_global_pace_partners
@@ -1708,6 +1732,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     ghosts_enabled = passed_ghosts_enabled
     save_ghost = passed_save_ghost
     player_update_queue = passed_player_update_queue
+    discord = passed_discord
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None
@@ -1719,10 +1744,11 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     def load_user(uid):
         return User.query.get(int(uid))
 
-    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
-    thread = threading.Thread(target=server.serve_forever)
-    thread.start()
+    send_message_thread = threading.Thread(target=send_server_back_online_message)
+    send_message_thread.start()
     logger.info("Server is running.")
+    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
+    server.serve_forever()
 
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)
 

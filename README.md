@@ -69,10 +69,10 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 <details><summary>Windows Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.60474, you're all set.
+  * If your Zwift version is 1.0.61590, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.60474 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.60474 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.61590 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.61590 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
@@ -97,9 +97,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.60474, you're all set.
+  * If your Zwift version is 1.0.61590, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.60474: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.61590: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -137,7 +137,36 @@ to generate your own certificates and do the same.
 
 </details>
 
-<details><summary>Android (requires a rooted device)</summary>
+<details><summary>Android (non-rooted device)</summary>
+
+* Install required apps:
+  * Download and install ``zoffline-obb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk)
+  * Download "Host Changer VPN - The Game Changer" from Google Play ([link](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger))
+  * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
+  ```
+  <zoffline ip> us-or-rly101.zwift.com
+  <zoffline ip> secure.zwift.com
+  <zoffline ip> cdn.zwift.com
+  ```
+  * Run `Host Changer`, select created `hosts.txt` file and press the button
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer VPN" app.
+* Patch after every installation or update:
+  * Install/update Zwift from Google play, but do not start it yet.
+    * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
+  * Open the `ZofflineObb` app and run it (allow access to storage)
+  * Wait for process to finish (5-10min)
+  * Run Zwift, hopefully it verifies download and runs
+* Play Zwift:
+  * Host Changer button must be ON
+  * Start Zwift and sign in using any email/password
+    * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
+
+Why: We need to redirect Zwift to use zoffline (this is done by the VPN app) and convince Zwift to
+accept zoffline's self signed certificates for Zwift's domain names (this is done by the patch tool ZofflineObb).
+
+</details>
+
+<details><summary>Android (rooted device)</summary>
 
 * Install Zwift on the device
 * Open Zwift once to complete installation (i.e download all extra files).
@@ -148,13 +177,14 @@ to generate your own certificates and do the same.
     * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cat cert-zwift-com.pem >> cacert.pem``
     * However you do it, ensure the permissions and ownership of the file remains the same.
-* Modify the device's /etc/hosts file
+* Modify the device's ``/etc/hosts`` file
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com``
-    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline.)
+    <br />(Where ``<zoffline ip>`` is the IP address of the machine running zoffline.)
   * If no text editor on the device, recommend:
     * ``adb pull /etc/hosts``
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of modifying your ``hosts`` file.
 * Start Zwift and sign in using any email/password
   * If multiplayer is enabled, access https://secure.zwift.com/signup/ to sign up and import your files.
 
@@ -246,6 +276,15 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
 * To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* To enable the Discord bridge bot: ``pip3 install discord`` and create a ``discord.cfg`` file in the ``storage`` directory containing
+  ```
+  [discord]
+  token = 
+  webhook = 
+  channel = 
+  welcome_message = 
+  help_message = 
+  ```
 * If the Zwift client is having issues connecting to the Linux server ("The request was aborted: Could not create SSL/TLS secure channel." or "The underlying connection was closed: An unexpected error occurred on a send. Received an unexpected EOF or 0 bytes from the transport stream."): change MinProtocol in /etc/ssl/openssl.cnf to TLSv1.0
   ```
   [system_default_sect]

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from gevent import monkey
-monkey.patch_all()
 import os
 import signal
 import struct
@@ -9,7 +7,6 @@ import sys
 import threading
 import time
 import csv
-import requests
 from collections import deque
 from datetime import datetime
 from shutil import copyfile
@@ -45,6 +42,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
@@ -210,19 +208,18 @@ class CDNHandler(SimpleHTTPRequestHandler):
             # PROXYPASS_FILE existence indicates we know what we're doing and
             # we can try to obtain the official map schedule and update files.
             # This can only work if we're running on a different machine than the Zwift client.
-            sent = False
+            import requests
             try:
                 url = 'http://{}{}'.format(hostname, self.path)
                 req_header = self.parse_headers()
                 resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-                sent = True
-                self.send_response(resp.status_code)
-                self.send_resp_headers(resp)
-                self.wfile.write(resp.content)
-                return
-            finally:
-                if not sent:
+            except:
                     self.send_error(404, 'error trying to proxy')
+                    return
+            self.send_response(resp.status_code)
+            self.send_resp_headers(resp)
+            self.wfile.write(resp.content)
+            return
 
         SimpleHTTPRequestHandler.do_GET(self)
 
@@ -323,7 +320,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message_payload = message.SerializeToString()
                             self.request.sendall(struct.pack('!h', len(message_payload)))
                             self.request.sendall(message_payload)
-                            
+
                             message = udp_node_msgs_pb2.ServerToClient()
                             message.f1 = 1
                             message.player_id = player_id
@@ -519,7 +516,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
         for p_id in remove_players:
             online.pop(p_id)
         if state.roadTime:
-            online[player_id] = state
+            if player_id in online.keys():
+                online[player_id] = state
+            else:
+                online[player_id] = state
+                discord.send_message('%s riders online' % len(online))
 
         #Remove ghosts entries for inactive players (disconnected?)
         keys = global_ghosts.keys()
@@ -611,7 +612,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     state.CopyFrom(player)
         message.world_time = zwift_offline.world_time()
         socket.sendto(message.SerializeToString(), client_address)
-  
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
@@ -640,4 +641,13 @@ botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
 
-zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue)
+if os.path.isfile(DISCORD_CONFIG_FILE):
+    from discord_bot import DiscordThread
+    discord = DiscordThread(DISCORD_CONFIG_FILE)
+else:
+    class DummyDiscord():
+        def send_message(msg, sender_id=None):
+            pass
+    discord = DummyDiscord()
+
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue, discord)
