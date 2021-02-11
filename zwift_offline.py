@@ -1037,6 +1037,9 @@ def api_profiles_activities_id(player_id, activity_id):
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
+
+    with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
+        f.write(activity.SerializeToString())
     return response, 200
 
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
