@@ -32,6 +32,7 @@ import os
 import requests
 import sys
 import protobuf.activity_pb2 as activity_pb2
+import protobuf.profile_pb2 as profile_pb2
 
 
 if getattr(sys, 'frozen', False):
@@ -119,6 +120,34 @@ def upload_activity(session, access_token, activity):
         print('HTTP Request failed: %s' % e)
 
 
+def get_player_id(session, access_token):
+    try:
+        response = session.get(
+            url="https://us-or-rly101.zwift.com/api/profiles/me",
+            headers={
+                "Accept-Encoding": "gzip, deflate",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            verify=args.verifyCert,
+        )
+
+        if args.verbose:
+            print('Response HTTP Status Code: {status_code}'.format(
+                status_code=response.status_code))
+
+        profile = profile_pb2.Profile()
+        profile.ParseFromString(response.content)
+        return profile.id
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
 def logout(session, refresh_token):
     # Logout
     # POST https://secure.zwift.com/auth/realms/zwift/tokens/logout
@@ -168,7 +197,6 @@ def main(argv):
     parser.add_argument('--dont-check-certificates', action='store_false',
                         dest='verifyCert', default=True)
     parser.add_argument('-u', '--user', help='Zwift user name')
-    parser.add_argument('-p', '--profile', help='Profile ID')
     parser.add_argument('-a', '--activity', help='Activity file')
     args = parser.parse_args()
 
@@ -187,17 +215,6 @@ def main(argv):
             print('Could not parse activity file')
             sys.exit()
 
-    if args.profile:
-        profile = args.profile
-    else:
-        profile = input("Enter profile ID: ")
-    try:
-        p_id = int(profile)
-    except ValueError:
-        print('Invalid profile ID')
-        sys.exit()
-    activity.player_id = p_id
-
     if args.user:
         username = args.user
     else:
@@ -214,6 +231,7 @@ def main(argv):
 
     session = requests.session()
     access_token, refresh_token = login(session, username, password)
+    activity.player_id = get_player_id(session, access_token)
     ret = upload_activity(session, access_token, activity)
     print(ret)
     logout(session, refresh_token)
