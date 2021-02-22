@@ -291,7 +291,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
   MinProtocol = TLSv1.0
   CipherString = DEFAULT@SECLEVEL=1
   ```
-  * To disable the web server and run your own apache web server you must comment out lines 616-620 in standalone.py:
+ * To disable the web server and run your own apache web server you must comment out lines 616-620 in standalone.py:
   ```
    #socketserver.ThreadingTCPServer.allow_reuse_address = True
    #httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
