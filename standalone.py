@@ -342,8 +342,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
-            except Exception as e:
-                print('Exception TCP: %s' % e)
+            except:
+                # Zwift client 1.0.64913 no longer calls '/api/users/logout' or '/api/profiles/0'
+                zwift_offline.logout(player_id)
                 break
 
 class GhostsVariables:
