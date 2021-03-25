@@ -64,6 +64,32 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
 
 
+<details><summary>Using docker-compose</summary>
+ 
+* Install docker-compose
+* Either use the docker-compose.yml file in this repo which will build from the Dockerfile, or use this example compose file:
+   ```
+  services:
+      zoffline:
+           image: zoffline/zoffline:latest
+           container_name: zoffline
+           network_mode: host
+           environment:
+              - TZ=Europe/London
+           volumes:
+              - ./storage/:/usr/src/app/zwift-offline/storage
+           ports:
+              - 80:80
+              - 443:443
+              - 3022:3022/udp
+              - 3023:3023
+           restart: unless-stopped    
+   ```
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+* Start zoffline with:
+  ``docker-compose up -d ``
+</details>
+
 ### Step 2: Configure Zwift client to use zoffline
 
 <details><summary>Windows Instructions</summary>
