@@ -113,6 +113,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
+* If you have the helper scripts, open the __ip_address.txt__ file and change it to the zwift server ip. Launch the __launch.bat__ script as admin to start Zwift. This way, if you use the normal Zwift launcher, it'll go to Zwift's servers, and use this as a standalone launcher. 
 
 Why: We need to redirect Zwift to use zoffline and convince Windows and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
