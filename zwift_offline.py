@@ -60,10 +60,16 @@ if getattr(sys, 'frozen', False):
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
     LOGS_DIR = "%s/logs" % os.path.dirname(sys.executable)
+    SETTINGS_FILE = '%s/settings.cfg' % STORAGE_DIR
+    if not os.path.isfile(SETTINGS_FILE):
+        copyfile('%s/settings.cfg' % SCRIPT_DIR, SETTINGS_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     LOGS_DIR = "%s/logs" % SCRIPT_DIR
+    SETTINGS_FILE = '%s/settings.cfg' % STORAGE_DIR
+    if not os.path.isfile(SETTINGS_FILE):
+        copyfile('%s/settings.cfg' % SCRIPT_DIR, SETTINGS_FILE)
 
 try:
     # Ensure storage dir exists
@@ -83,7 +89,7 @@ BOTS_DIR = "%s/bots" % SCRIPT_DIR
 
 # For auth server
 parser = ConfigParser()
-SETTINGS = parser.read("%s/settings.cfg" % STORAGE_DIR)
+SETTINGS = parser.read(SETTINGS_FILE)
 
 AUTOLAUNCH = parser.getboolean('settings', 'auto_launch')
 SERVER_IP_SETTING =  parser.get('settings', 'server_ip')
