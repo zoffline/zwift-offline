@@ -1695,9 +1695,9 @@ def start_zwift():
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         if AnonUser.enable_ghosts:
             if not ENABLEGHOSTS:
-                parser.set('settings', 'enable_ghosts', True)
+                parser.set('settings', 'enable_ghosts', "True")
         else:
-            parser.set('settings', 'enable_ghosts', False)
+            parser.set('settings', 'enable_ghosts', "False")
     db.session.commit()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
