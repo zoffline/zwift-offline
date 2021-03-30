@@ -10,6 +10,7 @@ import csv
 from collections import deque
 from datetime import datetime
 from shutil import copyfile
+from configparser import ConfigParser
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
@@ -31,18 +32,27 @@ if getattr(sys, 'frozen', False):
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % SCRIPT_DIR, START_LINES_FILE)
+    SETTINGS_FILE = '%s/settings.cfg' % STORAGE_DIR
+    if not os.path.isfile(SETTINGS_FILE):
+        copyfile('%s/settings.cfg' % SCRIPT_DIR, SETTINGS_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
+    SETTINGS_FILE = '%s/settings.cfg' % STORAGE_DIR
+    if not os.path.isfile(SETTINGS_FILE):
+        copyfile('%s/settings.cfg' % SCRIPT_DIR, SETTINGS_FILE)
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
 PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
 BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
-PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
-SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
+parser = ConfigParser()
+SETTINGS = parser.read(SETTINGS_FILE)
+
+PROXYPASS = parser.get('settings', 'proxypass')
+SERVER_IP_SETTING = parser.get('settings', 'server_ip')
+DISCORD_CONFIG = parser['discord']
 MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
@@ -204,8 +214,8 @@ class CDNHandler(SimpleHTTPRequestHandler):
         exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
                       'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
                       'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
-        if os.path.exists(PROXYPASS_FILE) and self.path.startswith('/gameassets/') and not path_end in exceptions:
-            # PROXYPASS_FILE existence indicates we know what we're doing and
+        if PROXYPASS and self.path.startswith('/gameassets/') and not path_end in exceptions:
+            # PROXYPASS existence indicates we know what we're doing and
             # we can try to obtain the official map schedule and update files.
             # This can only work if we're running on a different machine than the Zwift client.
             import requests
@@ -256,9 +266,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
         servers = msg.servers.add()
         if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
             udp_node_ip = "127.0.0.1"
-        elif os.path.exists(SERVER_IP_FILE):
-            with open(SERVER_IP_FILE, 'r') as f:
-                udp_node_ip = f.read().rstrip('\r\n')
+        elif SERVER_IP_SETTING is not "127.0.0.1":
+            udp_node_ip = SERVER_IP_SETTING
         else:
             udp_node_ip = "127.0.0.1"
         details1 = servers.details.add()
@@ -642,9 +651,9 @@ botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
 
-if os.path.isfile(DISCORD_CONFIG_FILE):
+if parser.getboolean('discord', 'enabled'):
     from discord_bot import DiscordThread
-    discord = DiscordThread(DISCORD_CONFIG_FILE)
+    discord = DiscordThread(DISCORD_CONFIG)
 else:
     class DummyDiscord():
         def send_message(msg, sender_id=None):

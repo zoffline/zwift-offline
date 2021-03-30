@@ -19,6 +19,7 @@ from functools import wraps
 from io import BytesIO
 from shutil import copyfile
 from logging.handlers import RotatingFileHandler
+from configparser import ConfigParser
 
 import jwt
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
@@ -81,19 +82,20 @@ PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
 BOTS_DIR = "%s/bots" % SCRIPT_DIR
 
 # For auth server
-AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
-SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-if os.path.exists(SERVER_IP_FILE):
-    with open(SERVER_IP_FILE, 'r') as f:
-        server_ip = f.read().rstrip('\r\n')
+parser = ConfigParser()
+SETTINGS = parser.read("%s/settings.cfg" % STORAGE_DIR)
+
+AUTOLAUNCH = parser.getboolean('settings', 'auto_launch')
+SERVER_IP_SETTING =  parser.get('settings', 'server_ip')
+if SERVER_IP_SETTING is not "127.0.0.1":
+    server_ip = SERVER_IP_SETTING
 else:
     server_ip = '127.0.0.1'
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
-ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
-MULTIPLAYER = False
+ENABLEGHOSTS = parser.getboolean('settings', 'enable_ghosts')
+MULTIPLAYER = parser.getboolean('settings', 'multiplayer')
 garmin_key = None
-if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
-    MULTIPLAYER = True
+if MULTIPLAYER:
     try:
         if not os.path.isdir(LOGS_DIR):
             os.makedirs(LOGS_DIR)
@@ -412,20 +414,19 @@ def forgot():
         user = User.query.filter_by(username=username).first()
         if user:
             try:
-                with open('%s/gmail_credentials.txt' % STORAGE_DIR, 'r') as f:
-                    sender_email = f.readline().rstrip('\r\n')
-                    password = f.readline().rstrip('\r\n')
-                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
-                        server.login(sender_email, password)
-                        message = MIMEMultipart()
-                        message['From'] = sender_email
-                        message['To'] = username
-                        message['Subject'] = "Password reset"
-                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
-                        message.attach(MIMEText(content, 'plain'))
-                        server.sendmail(sender_email, username, message.as_string())
-                        server.close()
-                        flash("E-mail sent.")
+                sender_email = parser.get('gmail', 'email')
+                password = parser.get('gmail', 'password')
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
+                    server.login(sender_email, password)
+                    message = MIMEMultipart()
+                    message['From'] = sender_email
+                    message['To'] = username
+                    message['Subject'] = "Password reset"
+                    content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
+                    message.attach(MIMEText(content, 'plain'))
+                    server.sendmail(sender_email, username, message.as_string())
+                    server.close()
+                    flash("E-mail sent.")
             except:
                 flash("Could not send e-mail.")
         else:
@@ -1614,11 +1615,11 @@ def auth_rb():
 @app.route('/ride', methods=['GET'])
 def launch_zwift():
     # Zwift client has switched to calling https://launcher.zwift.com/launcher/ride
-    if request.path != "/ride" and not os.path.exists(AUTOLAUNCH_FILE):
+    if request.path != "/ride" and not AUTOLAUNCH:
         if MULTIPLAYER:
             return redirect(url_for('login'))
         else:
-            return render_template("user_home.html", username="", enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
+            return render_template("user_home.html", username="", enable_ghosts=ENABLEGHOSTS, online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -1675,7 +1676,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
             # cookie is not set in request since we just logged in so create it.
             return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
     else:
-        AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
+        AnonUser.enable_ghosts = ENABLEGHOSTS
         return FAKE_JWT, 200
 
 @app.route("/start-zwift" , methods=['POST'])
@@ -1687,11 +1688,10 @@ def start_zwift():
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         if AnonUser.enable_ghosts:
-            if not os.path.exists(ENABLEGHOSTS_FILE):
-                f = open(ENABLEGHOSTS_FILE, 'w')
-                f.close()
-        elif os.path.exists(ENABLEGHOSTS_FILE):
-            os.remove(ENABLEGHOSTS_FILE)
+            if not ENABLEGHOSTS:
+                parser.set('settings', 'enable_ghosts', True)
+        else:
+            parser.set('settings', 'enable_ghosts', False)
     db.session.commit()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':

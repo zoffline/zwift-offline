@@ -43,24 +43,20 @@ class DiscordBot(discord.Client):
 
 
 class DiscordThread(threading.Thread):
-    def __init__(self, config_file):
+    def __init__(self, config):
         threading.Thread.__init__(self)
-        if not os.path.isfile(config_file):
-            raise Exception("DiscordThread invoked without a configuration file")
+        if not config['token']:
+            raise Exception("DiscordThread invoked without a configuration")
 
-        self.CONFIG = ConfigParser()
-        SECTION = 'discord'
-        self.CONFIG.read(config_file)
-        self.token = self.CONFIG.get(SECTION, 'token')
-        self.webhook = self.CONFIG.get(SECTION, 'webhook')
-        self.channel = self.CONFIG.getint(SECTION, 'channel')
-        self.welcome_msg = self.CONFIG.get(SECTION, 'welcome_message')
-        self.help_msg = self.CONFIG.get(SECTION, 'help_message')
+        self.CONFIG = config
+        self.token = self.CONFIG['token']
+        self.webhook = self.CONFIG['webhook']
+        self.channel = self.CONFIG['channel']
+        self.welcome_msg = self.CONFIG['welcome_message']
+        self.help_msg = self.CONFIG['help_message']
 
         self.intents = discord.Intents.default()
         self.intents.members = True
-        self.loop = asyncio.get_event_loop()
-        self.start()
 
     async def starter(self):
         self.discord_bot = DiscordBot(intents=self.intents)
