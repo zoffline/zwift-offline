@@ -1,0 +1,19 @@
+course,spawnRoad,isForward,startRoad,roadTime,name
+2,0,,0,996941,Richmond
+6,0,,0,987711,Downtown
+6,22,,23,788778,Volcano Circuit
+6,36,,36,770795,Jungle start pens
+6,36,,35,546940,Jungle Circuit (move up to replace start pens)
+6,36,,43,23170,Road to Sky (move up to replace start pens)
+6,81,True,81,942254,Desert Flats
+6,81,False,81,913245,Titans Grove
+7,0,,0,532687,London 1
+7,7,,7,809519,London 2
+8,4,,4,173378,New York
+9,7,,7,157428,Innsbruck
+11,0,,0,5068,Yorkshire
+14,26,True,26,513383,France
+14,26,True,26,536700,Ven-Top (move up to replace Roule Ma Poule and Tire-Bouchon)
+14,26,False,26,487158,France 2
+14,26,False,0,26185,Douce France (move up to replace Casse-Pattes, Petit Boucle and R.G.V.)
+15,0,,0,485917,Paris
