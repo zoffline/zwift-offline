@@ -11,6 +11,7 @@ all:
 	protoc --python_out=. udp-node-msgs.proto
 	protoc --python_out=. tcp-node-msgs.proto
 	protoc --python_out=. hash-seeds.proto
+	protoc --python_out=. events.proto
 
 clean:
 	rm -f *_pb2.py *_pb2.pyc
