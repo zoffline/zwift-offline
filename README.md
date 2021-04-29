@@ -283,7 +283,7 @@ To obtain your current profile:
 
 </details>
 
-### Step 5 [OPTIONAL]: Upload activities to ZWIFT Server
+### Step 6 [OPTIONAL]: Upload activities to ZWIFT Server
 
 <details><summary>Expand</summary>
 
