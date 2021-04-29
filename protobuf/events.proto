@@ -1,0 +1,75 @@
+syntax = "proto2";
+
+message Category {
+	required uint64 id = 1; // 2395269
+	optional string description = 2; // "3R True2 Steady Ride [2.0w/kg avg] (C)"
+	optional string f3 = 3; // ""
+	optional uint32 f5 = 5; // 154
+	optional uint32 f6 = 6; // 0
+	optional string f7 = 7; // "PT3600S"
+	optional uint32 rules_id = 8; // 320
+	optional uint64 registrationStart = 9;
+	optional uint64 registrationStartWT = 10;
+	optional uint64 registrationEnd = 11;
+	optional uint64 registrationEndWT = 12;
+	optional uint64 lineUpStart = 13;
+	optional uint64 lineUpStartWT = 14;
+	optional uint64 lineUpEnd = 15;
+	optional uint64 lineUpEndWT = 16;
+	optional uint64 eventSubgroupStart = 17;
+	optional uint64 eventSubgroupStartWT = 18;
+	optional uint32 f21 = 21; // 0
+	required uint64 route_id = 22; // 3366225080
+	repeated uint32 leaders = 23; // or sweepers?
+	optional fixed32 f24 = 24;
+	optional uint32 laps = 25; // 0
+	optional uint32 startLocation = 29; // 13
+	optional uint32 label = 30; // 3
+	optional uint32 f31 = 31; // 1
+	optional fixed32 f32 = 32; // 1076258406
+	optional fixed32 f33 = 33; // 1078774989
+	optional uint32 duration = 34; // Duration of event in seconds
+	optional uint64 f36 = 36; // 493134166
+	optional uint32 f37 = 37; // 0
+	optional string audio = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4"
+	repeated uint32 sweepers = 41; // or leaders?
+	optional string f43 = 43;
+	optional uint32 f44 = 44; // 0
+	optional string tags = 45; // semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
+	optional uint32 lateJoinInMinutes = 46;
+	optional uint32 map_id = 47; // 1
+}
+
+message Event {
+	required uint64 id = 1;
+	optional uint32 world_id = 2;
+	required string title = 3;
+	optional string description = 4;
+	optional uint64 eventStart = 5; // Start time (epoch time in ms)
+	optional fixed32 f7 = 7;
+	optional uint64 laps = 8;
+	optional uint64 f9 = 9;
+	repeated Category category = 10;
+	optional string f11 = 11;
+	optional string pic_url = 12;
+	optional uint32 duration = 13; // Duration in seconds?
+	optional uint64 route_id = 14;
+	optional uint64 rules_id = 15;
+	optional uint64 f16 = 16;
+	optional uint64 f17 = 17;
+	optional uint64 f18 = 18;
+	optional string f19 = 19;
+	optional uint32 f22 = 22;
+	optional uint32 f24 = 24;
+	optional string f26 = 26;
+	optional uint32 f27 = 27;
+	optional uint32 f28 = 28;
+	optional uint32 f29 = 29;
+	optional string tags = 31; // semi-colon delimited tags
+	optional uint32 lateJoinInMinutes = 34;
+	optional uint32 map_id = 35;
+}
+
+message Events {
+	repeated Event events = 1;
+}

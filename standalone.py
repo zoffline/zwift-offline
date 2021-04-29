@@ -86,6 +86,7 @@ def save_ghost(name, player_id):
         f = '%s/%s-%s.bin' % (folder, zwift_offline.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
+    ghosts.rec = None
 
 def organize_ghosts(player_id):
     # organize ghosts in course/road_id directory structure
@@ -358,6 +359,7 @@ class GhostsVariables:
     last_rt = 0
     start_road = 0
     start_rt = 0
+    course = 0
 
 class PacePartnerVariables:
     route = None
@@ -477,7 +479,16 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         last_bot_update = last_bot_updates[player_id]
 
-        if recv.seqno == 1 or ghosts.rec == None:
+        if recv.seqno == 1:
+            ghosts.rec = None
+            organize_ghosts(player_id)
+
+        #Changed course
+        if get_course(state) and ghosts.course != get_course(state):
+            ghosts.rec = None
+            ghosts.course = get_course(state)
+
+        if ghosts.rec == None:
             ghosts.rec = udp_node_msgs_pb2.Ghost()
             ghosts.play = udp_node_msgs_pb2.Ghosts()
             ghosts.last_rt = 0
@@ -485,7 +496,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.loaded = False
             ghosts.started = False
             ghosts.rec.player_id = player_id
-            organize_ghosts(player_id)
 
         t = int(zwift_offline.get_utc_time())
         ghosts.last_package_time = t
