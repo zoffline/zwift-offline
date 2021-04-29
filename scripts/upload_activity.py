@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Adapted from https://github.com/jlemon/zlogger/blob/master/get_riders.py

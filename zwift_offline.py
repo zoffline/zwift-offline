@@ -476,7 +476,8 @@ def profile(username):
         	profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
         	profile_file = '%s/scripts/profile.bin' %SCRIPT_DIR
         	os.rename(profile_file, '%s/profile.bin' % profile_dir)
-    
+
+ 
     return render_template("profile.html", username=current_user.username)
 
 @app.route("/user/<username>/")
@@ -1106,7 +1107,9 @@ def api_profiles_activities_id(player_id, activity_id):
     # For using with upload_activity.py (to upload zoffline activity to Zwift server)
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
-    zwift_upload(player_id)
+    if server_ip != "localhost" and server_ip != "127.0.0.1":
+    	zwift_upload(player_id)
+    	
     return response, 200
 
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
