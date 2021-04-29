@@ -283,7 +283,21 @@ To obtain your current profile:
 
 </details>
 
-### Step 6 [OPTIONAL]: Enable multiplayer
+### Step 5 [OPTIONAL]: Upload activities to ZWIFT Server
+
+<details><summary>Expand</summary>
+
+
+* Create a file ``zwift_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
+  ```
+  <username>
+  <password>
+  ```
+  * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
+  * If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
+
+</details>
+### Step 7 [OPTIONAL]: Enable multiplayer
 
 <details><summary>Expand</summary>
 
