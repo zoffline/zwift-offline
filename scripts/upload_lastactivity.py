@@ -31,13 +31,9 @@ import json
 import os
 import requests
 import sys
-
-
-if getattr(sys, 'frozen', False):
-    # If we're running as a py installer bundle
-    SCRIPT_DIR = os.path.dirname(sys.executable)
-else:
-    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import protobuf.activity_pb2 as activity_pb2
+import protobuf.profile_pb2 as profile_pb2
 
 try:
     input = raw_input
@@ -45,7 +41,6 @@ except NameError:
     pass
 
 global args
-global dbh
 
 
 def post_credentials(session, username, password):
@@ -89,12 +84,38 @@ def post_credentials(session, username, password):
 
     except KeyError as e:
         print('Invalid uname and/or password')
-        exit(0)
+        sys.exit()
 
 
-def query_player_profile(session, access_token):
-    # Query Player Profile
-    # GET https://us-or-rly101.zwift.com/api/profiles/<player_id>
+def upload_activity(session, access_token, activity):
+    try:
+        response = session.put(
+            url="https://us-or-rly101.zwift.com/api/profiles/%s/activities/%s" % (activity.player_id, activity.id),
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
+                "Accept": "application/json",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            data=activity.SerializeToString(),
+            verify=args.verifyCert,
+        )
+
+        if args.verbose:
+            print('Response HTTP Status Code: {status_code}'.format(
+                status_code=response.status_code))
+
+        return response.status_code
+        #return response.content
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def get_player_id(session, access_token):
     try:
         response = session.get(
             url="https://us-or-rly101.zwift.com/api/profiles/me",
@@ -114,7 +135,9 @@ def query_player_profile(session, access_token):
             print('Response HTTP Status Code: {status_code}'.format(
                 status_code=response.status_code))
 
-        return response.content
+        profile = profile_pb2.Profile()
+        profile.ParseFromString(response.content)
+        return profile.id
 
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
@@ -157,50 +180,54 @@ def login(session, user, password):
 
 def main(argv):
     global args
-    global dbh
 
     access_token = None
     cookies = None
 
-    parser = argparse.ArgumentParser(description='Zwift Profile Fetcher')
+    parser = argparse.ArgumentParser(description='Zwift activity uploader')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Verbose output')
     parser.add_argument('--dont-check-certificates', action='store_false',
                         dest='verifyCert', default=True)
     parser.add_argument('-u', '--user', help='Zwift user name')
-    parser.add_argument('-p', '--password', help='Zwift password')
+    parser.add_argument('-p', '--password', help='Zwift Password')
+    parser.add_argument('-a', '--activity', help='Activity file')
     args = parser.parse_args()
 
-    #    if args.user:
-    #        password = getpass.getpass("Password for %s? " % args.user)
-    #    else:
-    #        file = os.environ['HOME'] + '/.zwift_cred.json'
-    #        with open(file) as f:
-    #            try:
-    #                cred = json.load(f)
-    #            except ValueError, se:
-    #                sys.exit('"%s": %s' % (args.output, se))
-    #        f.close
-    #        args.user = cred['user']
-    #        password = cred['pass']
+    activity = activity_pb2.Activity()
+    if args.activity:
+        activity_file = args.activity
+    else:
+        activity_file = input("Enter activity file: ")
+    if not os.path.isfile(activity_file):
+        print('Activity file not found')
+        sys.exit()
+    with open(activity_file, 'rb') as fd:
+        try:
+            activity.ParseFromString(fd.read())
+        except:
+            print('Could not parse activity file')
+            sys.exit()
 
     if args.user:
         username = args.user
     else:
         username = input("Enter Zwift login (e-mail): ")
-    
+
+
     if args.password:
         password = args.password
     else:
-        password = input("Enter Zwift password: ")
-  
+        if not sys.stdin.isatty():  # This terminal cannot support input without displaying text
+            password = input()
+        else:
+            password = getpass.getpass("Enter password: ")
+
     session = requests.session()
-
     access_token, refresh_token = login(session, username, password)
-    profile = query_player_profile(session, access_token)
-    with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
-        f.write(profile)
-
+    activity.player_id = get_player_id(session, access_token)
+    ret = upload_activity(session, access_token, activity)
+    print(ret)
     logout(session, refresh_token)
 
 
