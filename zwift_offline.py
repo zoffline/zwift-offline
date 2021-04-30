@@ -15,6 +15,8 @@ import threading
 import re
 import smtplib, ssl
 import subprocess
+import requests
+
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -43,6 +45,7 @@ import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
+
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -467,11 +470,10 @@ def profile(username):
         
         command = ['%s/scripts/get_profile.py' %SCRIPT_DIR, '-u', username, '-p', password]
         result = subprocess.run(command, text=True, capture_output=True)
-    
         if result.stdout:
         	flash("%s" %result.stdout)
         else:
-        	flash("Zwift profile downloaded")
+        	flash("Zwift profile installed currectly")
         	player_id = current_user.player_id
         	profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
         	profile_file = '%s/scripts/profile.bin' %SCRIPT_DIR
@@ -599,7 +601,7 @@ def upload(username):
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
-
+  
     name = ''
     profile = None
     profile_file = os.path.join(profile_dir, 'profile.bin')
@@ -1056,7 +1058,6 @@ def garmin_upload(player_id, activity):
     except:
         logger.warn("Garmin upload failed. No internet?")
 
-
 def zwift_upload(player_id):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
@@ -1077,9 +1078,9 @@ def zwift_upload(player_id):
         return
 
     try:
-        command = ['%s/scripts/upload_lastactivity.py' %SCRIPT_DIR, '-u', username, '-p', password, '-a', '%s/last_activity.bin' % profile_dir ]
+        command = ['%s/scripts/upload_activity.py' %SCRIPT_DIR, '-u', username, '-p', password, '-a', '%s/last_activity.bin' % profile_dir ]
         result = subprocess.run(command, text=True, capture_output=True)  
-        if result.stdout == "200\n":
+        if result.stdout == "OK\n":
             logger.warn("Zwift upload succesfull")
         else:
             logger.warn("Zwift upload failed. %s" %result.stdout )

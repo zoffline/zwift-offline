@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Adapted from https://github.com/jlemon/zlogger/blob/master/get_riders.py
@@ -84,7 +84,7 @@ def post_credentials(session, username, password):
 
     except KeyError as e:
         print('Invalid uname and/or password')
-        sys.exit()
+        sys.exit(-1)
 
 
 def upload_activity(session, access_token, activity):
@@ -107,9 +107,11 @@ def upload_activity(session, access_token, activity):
         if args.verbose:
             print('Response HTTP Status Code: {status_code}'.format(
                 status_code=response.status_code))
+            print('Response HTTP Response Body: {content}'.format(
+                content=response.content))
 
-        return response.content
-
+        return response.status_code
+        
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
 
@@ -183,7 +185,7 @@ def main(argv):
     access_token = None
     cookies = None
 
-    print('WARNING: remove zoffline IP from hosts file before running this script')
+    #print('WARNING: remove zoffline IP from hosts file before running this script')
 
     parser = argparse.ArgumentParser(description='Zwift activity uploader')
     parser.add_argument('-v', '--verbose', action='store_true',
@@ -191,6 +193,8 @@ def main(argv):
     parser.add_argument('--dont-check-certificates', action='store_false',
                         dest='verifyCert', default=True)
     parser.add_argument('-u', '--user', help='Zwift user name')
+    parser.add_argument('-p', '--password', help='Zwift password')
+
     parser.add_argument('-a', '--activity', help='Activity file')
     args = parser.parse_args()
 
@@ -201,27 +205,30 @@ def main(argv):
         activity_file = input("Enter activity file: ")
     if not os.path.isfile(activity_file):
         print('Activity file not found')
-        sys.exit()
+        sys.exit(-1)
     with open(activity_file, 'rb') as fd:
         try:
             activity.ParseFromString(fd.read())
         except:
             print('Could not parse activity file')
-            sys.exit()
+            sys.exit(-1)
 
     if args.user:
         username = args.user
     else:
         username = input("Enter Zwift login (e-mail): ")
 
-    if not sys.stdin.isatty():  # This terminal cannot support input without displaying text
-        print('*WARNING* The current shell (%s) cannot support hidden text entry.' % os.name)
-        print('Your password entry WILL BE VISIBLE.')
-        print('If you are running a bash shell under windows, try executing this program via winpty:')
-        print('>winpty python %s' % argv[0])
-        password = input("Enter password (will be shown):")
+    if args.password:
+        password = args.password
     else:
-        password = getpass.getpass("Enter password: ")
+    	if not sys.stdin.isatty():  # This terminal cannot support input without displaying text
+        	print('*WARNING* The current shell (%s) cannot support hidden text entry.' % os.name)
+        	print('Your password entry WILL BE VISIBLE.')
+        	print('If you are running a bash shell under windows, try executing this program via winpty:')
+        	print('>winpty python %s' % argv[0])
+        	password = input("Enter password (will be shown):")
+    	else:
+        	password = getpass.getpass("Enter password: ")
 
     session = requests.session()
     access_token, refresh_token = login(session, username, password)

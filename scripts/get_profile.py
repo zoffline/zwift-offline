@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Adapted from https://github.com/jlemon/zlogger/blob/master/get_riders.py
@@ -89,7 +89,7 @@ def post_credentials(session, username, password):
 
     except KeyError as e:
         print('Invalid uname and/or password')
-        exit(0)
+        exit(-1)
 
 
 def query_player_profile(session, access_token):
@@ -188,12 +188,18 @@ def main(argv):
         username = args.user
     else:
         username = input("Enter Zwift login (e-mail): ")
-    
     if args.password:
         password = args.password
     else:
-        password = input("Enter Zwift password: ")
-  
+    	if not sys.stdin.isatty():  # This terminal cannot support input without displaying text
+        	print(f'*WARNING* The current shell ({os.name}) cannot support hidden text entry.')
+        	print(f'Your password entry WILL BE VISIBLE.')
+        	print(f'If you are running a bash shell under windows, try executing this program via winpty:')
+        	print(f'>winpty python {argv[0]}')
+        	password = input("Enter password (will be shown):")
+    	else:
+        	password = getpass.getpass("Enter password: ")
+
     session = requests.session()
 
     access_token, refresh_token = login(session, username, password)
@@ -209,3 +215,5 @@ if __name__ == '__main__':
         main(sys.argv)
     except KeyboardInterrupt:
         pass
+    except SystemExit as se:
+        print("ERROR:", se)
