@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # Quick and dirty script for generating a random MapSchedule.xml
 

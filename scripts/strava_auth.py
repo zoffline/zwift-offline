@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 A basic authorization server.  Run this with your Strava Client ID and Client Secret and access from your
 browser (because the Strava OAuth page uses javascript) in order to get a resulting access token.  That access

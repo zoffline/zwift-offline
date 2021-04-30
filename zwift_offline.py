@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import calendar
 import datetime
@@ -640,6 +640,17 @@ def download():
     profile_file = os.path.join(profile_dir, 'profile.bin')
     if os.path.isfile(profile_file):
         return send_file(profile_file, attachment_filename='profile.bin')
+
+@app.route("/delete/<filename>", methods=["GET"])
+@login_required
+def delete(filename):
+    player_id = current_user.player_id
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
+    delete_file = os.path.join(profile_dir, filename)
+    if os.path.isfile(delete_file):
+        os.remove("%s" %delete_file)
+    return redirect(url_for('upload', username=current_user))
+
 
 
 @app.route("/logout/<username>")

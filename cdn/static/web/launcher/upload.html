@@ -2,7 +2,7 @@
 {% block content %}
   <h1><div class="text-shadow">Logged in as {{ username }} ({{ name }})</div></h1>
   <div class="row">
-    <div class="col-sm-6 col-md-6">
+    <div class="col-sm-8 col-md-7">
       <ul class="list-group">
         {% if profile %}
           <li class="list-group-item">
@@ -10,6 +10,7 @@
               <div class="col-md-12">
                 <label class="text-shadow">profile.bin - {{ profile }}</label>
                 &nbsp;&nbsp;<a href="/download/profile.bin"><div class="btn btn-sm btn-light">Download</div></a>
+		&nbsp;&nbsp;<a href="/delete/profile.bin"><div class="btn btn-sm btn-light">Delete</div></a>
               </div>
             </div>
           </li>
@@ -19,6 +20,7 @@
             <div class="row">
               <div class="col-md-12">
                 <label class="text-shadow">strava_token.txt - {{ token }}</label>
+		&nbsp;&nbsp;<a href="/delete/strava_token.txt"><div class="btn btn-sm btn-light">Delete</div></a>
               </div>
             </div>
           </li>
@@ -28,6 +30,7 @@
             <div class="row">
               <div class="col-md-12">
                 <label class="text-shadow">garmin_credentials.txt - {{ garmin }}</label>
+		&nbsp;&nbsp;<a href="/delete/garmin_credentials.txt"><div class="btn btn-sm btn-light">Delete</div></a> 
               </div>
             </div>
           </li>
@@ -37,6 +40,7 @@
             <div class="row">
               <div class="col-md-12">
                 <label class="text-shadow">zwift_credentials.txt - {{ zwift }}</label>
+		&nbsp;&nbsp;<a href="/delete/zwift_credentials.txt"><div class="btn btn-sm btn-light">Delete</div></a>
               </div>
             </div>
           </li>
@@ -44,7 +48,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-6 col-md-5">
+    <div class="col-sm-8 col-md-7">
       <form method="POST" action="/upload/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
         <h3 class="text-shadow">Upload file</h3>
         <div class="row">
