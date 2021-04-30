@@ -15,10 +15,10 @@ import threading
 import re
 import smtplib, ssl
 
-import subprocess
+#import subprocess
 import requests
-import protobuf.activity_pb2 as activity_pb2
-import protobuf.profile_pb2 as profile_pb2
+#import protobuf.activity_pb2 as activity_pb2
+#import protobuf.profile_pb2 as profile_pb2
 import scripts.online_sync as online_sync
 
 from copy import copy
@@ -830,8 +830,7 @@ def api_events_search():
         critccw_cat.route_id = 2875658892
         critccw_cat.startLocation = cat
         critccw_cat.label = cat
-
-    return '', 200
+    return events.SerializeToString(), 200
 
 @app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
 def api_events_subgroups_signup_id(event_id):

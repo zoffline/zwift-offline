@@ -86,8 +86,19 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.server.logger.error("No code param received.")
                 self.wfile.write(six.b("ERROR: No code param recevied.\n"))
         else:
+            SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+            print("Script: %s" %SCRIPT_DIR)
+            STORAGE_DIR = "%s/../storage" % SCRIPT_DIR
+            print("Storage: %s" %STORAGE_DIR)
+            SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+            if os.path.exists(SERVER_IP_FILE):
+                with open(SERVER_IP_FILE, 'r') as f:
+                    server_ip = f.read().rstrip('\r\n')
+            else:
+                server_ip = '127.0.0.1'
+            
             url = client.authorization_url(client_id=self.server.client_id,
-                                           redirect_uri='http://18.133.120.5:{}/authorization'.format(self.server.server_port),
+                                           redirect_uri='http://' + server_ip + ':{}/authorization'.format(self.server.server_port),
                                            scope='activity:write')
 
             self.send_response(302)
