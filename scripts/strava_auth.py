@@ -62,11 +62,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if request_path.startswith('/authorization'):
             self.send_response(200)
-            self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Disposition", "attachment; filename=strava_token.txt")
+            self.send_header(six.b("Content-type"), six.b("text/plain"))
             self.end_headers()
 
-            #self.wfile.write(six.b("Authorization Handler\n\n"))
+            self.wfile.write(six.b("Authorization Handler\n\n"))
             code = urlparse.parse_qs(parsed_path.query).get('code')
             if code:
                 code = code[0]
@@ -76,29 +75,22 @@ class RequestHandler(BaseHTTPRequestHandler):
                 access_token = token_response['access_token']
                 refresh_token = token_response['refresh_token']
                 expires_at = token_response['expires_at']
-                
-                self.wfile.write(six.b("{}\n".format(self.server.client_id)))
-                self.wfile.write(six.b("{}\n".format(self.server.client_secret)))
-                self.wfile.write(six.b("{}\n".format(access_token)))
-                self.wfile.write(six.b("{}\n".format(refresh_token)))
-                self.wfile.write(six.b("{}\n".format(expires_at)))
+                self.server.logger.info("Exchanged code {} for access token {}".format(code, access_token))
+                self.wfile.write(six.b("Access Token: {}\n".format(access_token)))
+                self.wfile.write(six.b("Refresh Token: {}\n".format(refresh_token)))
+                self.wfile.write(six.b("Expires at: {}\n".format(expires_at)))
+                with open('%s/strava_token.txt' % SCRIPT_DIR, 'w') as f:
+                    f.write(self.server.client_id + '\n');
+                    f.write(self.server.client_secret + '\n');
+                    f.write(access_token + '\n');
+                    f.write(refresh_token + '\n');
+                    f.write(str(expires_at) + '\n');
             else:
                 self.server.logger.error("No code param received.")
                 self.wfile.write(six.b("ERROR: No code param recevied.\n"))
         else:
-            SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-            print("Script: %s" %SCRIPT_DIR)
-            STORAGE_DIR = "%s/../storage" % SCRIPT_DIR
-            print("Storage: %s" %STORAGE_DIR)
-            SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-            if os.path.exists(SERVER_IP_FILE):
-                with open(SERVER_IP_FILE, 'r') as f:
-                    server_ip = f.read().rstrip('\r\n')
-            else:
-                server_ip = '127.0.0.1'
-            
             url = client.authorization_url(client_id=self.server.client_id,
-                                           redirect_uri='http://' + server_ip + ':{}/authorization'.format(self.server.server_port),
+                                           redirect_uri='http://localhost:{}/authorization'.format(self.server.server_port),
                                            scope='activity:write')
 
             self.send_response(302)
@@ -127,9 +119,9 @@ if __name__ == "__main__":
                         action='store', type=int, default=8000)
 
     parser.add_argument('--client-id', help='Strava API Client ID',
-                        action='store', default='65392')
+                        action='store', default='28117')
     parser.add_argument('--client-secret', help='Strava API Client Secret',
-                        action='store', default='c6a2af6ebb6306d9b6c9974356bf63be80659ac8')
+                        action='store', default='41b7b7b76d8cfc5dc12ad5f020adfea17da35468')
     args = parser.parse_args()
 
     main(port=args.port, client_id=args.client_id, client_secret=args.client_secret)
