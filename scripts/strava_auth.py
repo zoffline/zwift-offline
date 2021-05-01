@@ -86,10 +86,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.server.logger.error("No code param received.")
                 self.wfile.write(six.b("ERROR: No code param recevied.\n"))
         else:
-            SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-            print("Script: %s" %SCRIPT_DIR)
             STORAGE_DIR = "%s/../storage" % SCRIPT_DIR
-            print("Storage: %s" %STORAGE_DIR)
             SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
             if os.path.exists(SERVER_IP_FILE):
                 with open(SERVER_IP_FILE, 'r') as f:

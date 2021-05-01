@@ -1124,6 +1124,10 @@ def garmin_upload(player_id, activity):
 
 def zwift_upload(player_id):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+    if not os.path.exists(SERVER_IP_FILE):
+    	logger.info("server_ip.txt missing, skip Zwift activity update")
+    	return
     try:
         with open('%s/zwift_credentials.txt' % profile_dir, 'r') as f:
             if credentials_key is not None:
@@ -1197,12 +1201,12 @@ def api_profiles_activities_id(player_id, activity_id):
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
+    
     # For using with upload_activity.py (to upload zoffline activity to Zwift server)
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
-    if server_ip != "localhost" and server_ip != "127.0.0.1":
-    	zwift_upload(player_id)
-    	
+    zwift_upload(player_id)
+    
     return response, 200
 
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
