@@ -125,7 +125,13 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
                 f.write(Fernet.generate_key())
         with open(GARMIN_KEY_FILE, 'rb') as f:
             credentials_key = f.read()
-
+try:
+    with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
+        client_id = f.readline().rstrip('\r\n')
+        client_secret = f.readline().rstrip('\r\n')
+except:
+    client_id = '28117'
+    client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 from tokens import *
 
 # Android uses https for cdn
@@ -463,6 +469,41 @@ def reset(username):
         flash("Password changed.")
 
     return render_template("reset.html", username=current_user.username)
+@app.route("/strava", methods=['GET'])
+@login_required
+def strava():
+    try:
+        from stravalib.client import Client
+    except ImportError:
+        flash("stravalib is not installed. Skipping Strava authorization attempt.")
+        return redirect('/user/%s/' % current_user.username)
+    client = Client()
+    url = client.authorization_url(client_id=client_id,
+                                   redirect_uri='https://%s/authorization' % server_ip,
+                                   scope='activity:write')
+    return redirect(url)
+
+
+@app.route("/authorization", methods=["GET", "POST"])
+@login_required
+def authorization():
+    from stravalib.client import Client
+    try: 
+    	client = Client()
+    	code = request.args.get('code')
+    	token_response = client.exchange_code_for_token(client_id=client_id, client_secret=client_secret, code=code)
+    	with open('%s/strava_token.txt' % os.path.join(STORAGE_DIR, str(current_user.player_id)), 'w') as f:
+        	f.write(client_id + '\n');
+        	f.write(client_secret + '\n');
+        	f.write(token_response['access_token'] + '\n');
+        	f.write(token_response['refresh_token'] + '\n');
+        	f.write(str(token_response['expires_at']) + '\n');
+    	flash("Strava authorized. Go to \"Upload\" to remove authorization.")
+    except:
+    	flash("Strava canceled.")
+    flash("Please close that window and return to Zwift Launcher.")
+    return render_template("strava.html", username=current_user.username)
+
 
 @app.route("/profile/<username>/", methods=["GET", "POST"])
 @login_required
