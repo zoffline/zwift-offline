@@ -19,7 +19,7 @@ import smtplib, ssl
 import requests
 #import protobuf.activity_pb2 as activity_pb2
 #import protobuf.profile_pb2 as profile_pb2
-import scripts.online_sync as online_sync
+import online_sync as online_sync
 
 from copy import copy
 from functools import wraps
