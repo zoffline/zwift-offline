@@ -115,11 +115,11 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
         logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
         encrypt = False
     if encrypt:
-        GARMIN_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
-        if not os.path.exists(GARMIN_KEY_FILE):
-            with open(GARMIN_KEY_FILE, 'wb') as f:
+        CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
+        if not os.path.exists(CREDENTIALS_KEY_FILE):
+            with open(CREDENTIALS_KEY_FILE, 'wb') as f:
                 f.write(Fernet.generate_key())
-        with open(GARMIN_KEY_FILE, 'rb') as f:
+        with open(CREDENTIALS_KEY_FILE, 'rb') as f:
             credentials_key = f.read()
 try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
