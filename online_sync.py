@@ -25,29 +25,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
-import getpass
 import json
-import os
 import requests
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.profile_pb2 as profile_pb2
-
-
-if getattr(sys, 'frozen', False):
-    # If we're running as a py installer bundle
-    SCRIPT_DIR = os.path.dirname(sys.executable)
-else:
-    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-try:
-    input = raw_input
-except NameError:
-    pass
-
-global dbh
 
 
 def post_credentials(session, username, password):
@@ -86,7 +67,6 @@ def post_credentials(session, username, password):
     except KeyError as e:
         print('Invalid uname and/or password')
         flash('Invalid uname and/or password')
-        exit(-1)
 
 
 def query_player_profile(session, access_token):
@@ -183,4 +163,3 @@ def get_player_id(session, access_token):
 
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
-
