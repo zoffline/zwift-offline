@@ -15,8 +15,6 @@ import threading
 import re
 import smtplib, ssl
 import requests
-import online_sync
-
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -46,6 +44,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 import protobuf.events_pb2 as events_pb2
+import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -708,6 +707,7 @@ def download():
     if os.path.isfile(profile_file):
         return send_file(profile_file, attachment_filename='profile.bin')
 
+
 @app.route("/delete/<filename>", methods=["GET"])
 @login_required
 def delete(filename):
@@ -717,7 +717,6 @@ def delete(filename):
     if os.path.isfile(delete_file):
         os.remove("%s" %delete_file)
     return redirect(url_for('upload', username=current_user))
-
 
 
 @app.route("/logout/<username>")
@@ -1232,6 +1231,7 @@ def zwift_upload(player_id):
             logger.warn("Error uploading activity to Zwift Server")
     except:
         logger.warn("Zwift upload failed. No internet?")
+
 
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
 # converter does not handle so it's a string argument
