@@ -15,8 +15,8 @@
       <div class="col-md-12">
         <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-success">Upload</a>
         <a href="{{ url_for('reset', username=username) }}" class="btn btn-sm btn-secondary">Change password</a>
-    	<a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava auth</a>
-        {% if server_ip != "localhost" and server_ip != "127.0.0.1" %}
+        <a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava auth</a>
+        {% if server_ip %}
           <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Get Zwift profile</a>
         {% endif %}
         <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
