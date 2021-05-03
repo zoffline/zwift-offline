@@ -509,28 +509,10 @@ def profile(username):
         	flash("Zwift credentials can't be empty")
         	return render_template("profile.html", username=current_user.username)
         	exit(-1);
-
         username = request.form['username']
         password = request.form['password']	
         player_id = current_user.player_id
         profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
-        		
-        try:
-        	safe_zwift = request.form['safe_zwift']
-	        file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
-        	with open(file_path, 'w') as f:
-        		f.write(username + '\n');
-        		f.write(password + '\n');
-        	if credentials_key is not None:
-        		with open(file_path, 'rb') as fr:
-        			zwift_credentials = fr.read()
-        			cipher_suite = Fernet(credentials_key)        			
-        			ciphered_text = cipher_suite.encrypt(zwift_credentials)
-        			with open(file_path, 'wb') as fw:
-        				fw.write(ciphered_text)
-        	flash("Zwift credentials saved")
-        except:
-        	logger.warn("Zwift credentials not saved")
         session = requests.session()
         
         try:
@@ -544,6 +526,22 @@ def profile(username):
         		flash("Zwift profile installed locally.") 		
         	except:
         		flash("Error downloading profile")
+        	if request.form.get("safe_zwift", None) != None:
+	        	try:
+	        		file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
+        			with open(file_path, 'w') as f:
+        				f.write(username + '\n');
+        				f.write(password + '\n');
+        			if credentials_key is not None:
+        				with open(file_path, 'rb') as fr:
+        					zwift_credentials = fr.read()
+        					cipher_suite = Fernet(credentials_key)        			
+        					ciphered_text = cipher_suite.encrypt(zwift_credentials)
+        					with open(file_path, 'wb') as fw:
+        						fw.write(ciphered_text)
+        			flash("Zwift credentials saved")
+        		except:
+        			flash("Error saving 'zwift_credentiasl.txt' file")     
         except:
         	flash("Error invalid Username or password")
     return render_template("profile.html", username=current_user.username)
