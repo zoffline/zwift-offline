@@ -512,6 +512,25 @@ def profile(username):
 
         username = request.form['username']
         password = request.form['password']	
+        player_id = current_user.player_id
+        profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
+        		
+        try:
+        	safe_zwift = request.form['safe_zwift']
+	        file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
+        	with open(file_path, 'w') as f:
+        		f.write(username + '\n');
+        		f.write(password + '\n');
+        	if credentials_key is not None:
+        		with open(file_path, 'rb') as fr:
+        			zwift_credentials = fr.read()
+        			cipher_suite = Fernet(credentials_key)        			
+        			ciphered_text = cipher_suite.encrypt(zwift_credentials)
+        			with open(file_path, 'wb') as fw:
+        				fw.write(ciphered_text)
+        	flash("Zwift credentials saved")
+        except:
+        	logger.warn("Zwift credentials not saved")
         session = requests.session()
         
         try:
@@ -521,15 +540,12 @@ def profile(username):
         		with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
         			f.write(profile)
         		online_sync.logout(session, refresh_token)
-        		player_id = current_user.player_id
-        		profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
         		os.rename('%s/profile.bin' % SCRIPT_DIR, '%s/profile.bin' % profile_dir)
-        		flash("Zwift profile installed locally.")
+        		flash("Zwift profile installed locally.") 		
         	except:
         		flash("Error downloading profile")
         except:
-        	flash("Error invalid Username or password")   	
-
+        	flash("Error invalid Username or password")
     return render_template("profile.html", username=current_user.username)
 
 @app.route("/user/<username>/")
