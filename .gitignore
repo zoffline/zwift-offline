@@ -5,8 +5,3 @@ __pycache__/
 build/
 dist/
 logs/
-storage/
-.DS_Store
-ZwiftServer.bbprojectd/
-.gitignore
-
