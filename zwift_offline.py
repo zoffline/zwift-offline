@@ -499,7 +499,7 @@ def authorization():
         flash("Strava authorized. Go to \"Upload\" to remove authorization.")
     except:
         flash("Strava canceled.")
-    flash("Please close that window and return to Zwift Launcher.")
+    flash("Please close this window and return to Zwift Launcher.")
     return render_template("strava.html", username=current_user.username)
 
 
