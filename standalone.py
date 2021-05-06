@@ -344,8 +344,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except:
-                # Zwift client 1.0.64913 no longer calls '/api/users/logout' or '/api/profiles/0'
-                zwift_offline.logout(player_id)
+                if player_id in online:
+                    zwift_offline.logout(player_id)
                 break
 
 class GhostsVariables:
