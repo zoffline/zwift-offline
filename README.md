@@ -64,15 +64,41 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 </details>
 
 
+<details><summary>Using Docker Compose</summary>
+ 
+* Install docker-compose
+* Either use the ``docker-compose.yml`` file in this repo which will build from the Dockerfile, or use this example compose file:
+   ```
+  services:
+      zoffline:
+           image: zoffline/zoffline:latest
+           container_name: zoffline
+           network_mode: host
+           environment:
+              - TZ=Europe/London
+           volumes:
+              - ./storage/:/usr/src/app/zwift-offline/storage
+           ports:
+              - 80:80
+              - 443:443
+              - 3022:3022/udp
+              - 3023:3023
+           restart: unless-stopped    
+   ```
+* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+* Start zoffline with:
+  ``docker-compose up -d ``
+</details>
+
 ### Step 2: Configure Zwift client to use zoffline
 
 <details><summary>Windows Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.61590, you're all set.
+  * If your Zwift version is 1.0.67629, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.61590 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.61590 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.67629 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.67629 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
@@ -97,9 +123,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.61590, you're all set.
+  * If your Zwift version is 1.0.67629, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.61590: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.67629: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``

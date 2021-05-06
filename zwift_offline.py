@@ -42,6 +42,7 @@ import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
+import protobuf.events_pb2 as events_pb2
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -731,7 +732,65 @@ def api_per_session_info():
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
+    events = events_pb2.Events()
+
+    bologna = events.events.add()
+    bologna.id = 1000
+    bologna.title = "Bologna TT"
+    for cat in range(1,5):
+        bologna_cat = bologna.category.add()
+        bologna_cat.id = 1000 + cat
+        bologna_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+        bologna_cat.registrationEndWT = world_time() + 60000
+        bologna_cat.route_id = 2843604888
+        bologna_cat.startLocation = cat
+        bologna_cat.label = cat
+
+    critcw = events.events.add()
+    critcw.id = 2000
+    critcw.title = "Crit City CW"
+    for cat in range(1,5):
+        critcw_cat = critcw.category.add()
+        critcw_cat.id = 2000 + cat
+        critcw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+        critcw_cat.registrationEndWT = world_time() + 60000
+        critcw_cat.route_id = 947394567
+        critcw_cat.startLocation = cat
+        critcw_cat.label = cat
+
+    critccw = events.events.add()
+    critccw.id = 3000
+    critccw.title = "Crit City CCW"
+    for cat in range(1,5):
+        critccw_cat = critccw.category.add()
+        critccw_cat.id = 3000 + cat
+        critccw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+        critccw_cat.registrationEndWT = world_time() + 60000
+        critccw_cat.route_id = 2875658892
+        critccw_cat.startLocation = cat
+        critccw_cat.label = cat
+
+    return events.SerializeToString(), 200
+
+
+@app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
+def api_events_subgroups_signup_id(event_id):
+    return '{"signedUp":true}', 200
+
+
+@app.route('/api/events/subgroups/register/<int:event_id>', methods=['POST'])
+def api_events_subgroups_register_id(event_id):
+    return '{"registered":true}', 200
+
+
+@app.route('/api/events/subgroups/entrants/<int:event_id>', methods=['GET'])
+def api_events_subgroups_entrants_id(event_id):
     return '', 200
+
+
+@app.route('/relay/race/event_starting_line/<int:event_id>', methods=['POST'])
+def relay_race_event_starting_line_id(event_id):
+    return '', 204
 
 
 @app.route('/api/zfiles', methods=['POST'])
@@ -1037,7 +1096,7 @@ def api_profiles_activities_id(player_id, activity_id):
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
-
+    # For using with upload_activity.py (to upload zoffline activity to Zwift server)
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
     return response, 200
