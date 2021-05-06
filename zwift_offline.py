@@ -502,7 +502,8 @@ def send_restarting_message():
             send_message_to_all_online(message)
             discord.send_message(message)
             time.sleep(6)
-            os.kill(os.getpid(), signal.SIGINT)
+            os.system("systemctl restart zo-mp")
+#            os.kill(os.getpid(), signal.SIGINT)
 
 
 @app.route("/restart")
@@ -516,6 +517,7 @@ def restart_server():
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
         discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        os.system("git pull")
     return redirect('/user/%s/' % current_user.username)
 
 
