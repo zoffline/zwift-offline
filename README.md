@@ -161,6 +161,7 @@ Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
 
+For MacOS BigSur please read and apply: https://github.com/zoffline/zwift-offline/issues/132
 </details>
 
 <details><summary>Android (non-rooted device)</summary>
