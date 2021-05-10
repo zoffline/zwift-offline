@@ -152,8 +152,6 @@ to generate your own certificates and do the same.
         </dict>
    	</dict>
     ```
-* For MacOS BigSur please read and apply: https://github.com/zoffline/zwift-offline/issues/132
-
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -163,6 +161,7 @@ Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
 
+For MacOS BigSur please read and apply: https://github.com/zoffline/zwift-offline/issues/132
 </details>
 
 <details><summary>Android (non-rooted device)</summary>
