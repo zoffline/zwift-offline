@@ -1186,6 +1186,28 @@ def garmin_upload(player_id, activity):
     except:
         logger.warn("Garmin upload failed. No internet?")
 
+def runalyze_upload(player_id, activity):
+    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    try:
+        with open('%s/runalyze_token.txt' % profile_dir, 'r') as f:
+            runtoken = f.readline().rstrip('\r\n')
+    except:
+        logger.warn("Failed to read %s/runalyze_token.txt. Skipping Runalyze upload attempt." % profile_dir)
+        return
+    try:
+        with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
+            f.write(activity.fit)
+    except:
+        logger.warn("Failed to save fit file. Skipping Runalyze upload attempt.")
+        return
+    try:
+        r = requests.post("https://runalyze.com/api/v1/activities/uploads",
+                          files={'file': open('%s/last_activity.fit' % profile_dir, "rb")},
+                          headers={"token": runtoken})
+        logger.info(r.text)
+    except:
+        logger.warn("Runalyze upload failed. No internet?")
+
 
 def zwift_upload(player_id):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
@@ -1267,6 +1289,7 @@ def api_profiles_activities_id(player_id, activity_id):
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
+    runalyze_upload(player_id, activity)
     # For using with upload_activity.py (to upload zoffline activity to Zwift server)
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
