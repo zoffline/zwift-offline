@@ -14,6 +14,7 @@ import math
 import threading
 import re
 import smtplib, ssl
+import requests
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -43,6 +44,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 import protobuf.events_pb2 as events_pb2
+import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -92,7 +94,7 @@ else:
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = False
-garmin_key = None
+credentials_key = None
 if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     MULTIPLAYER = True
     try:
@@ -111,12 +113,23 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
         logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
         encrypt = False
     if encrypt:
-        GARMIN_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
-        if not os.path.exists(GARMIN_KEY_FILE):
-            with open(GARMIN_KEY_FILE, 'wb') as f:
+        OLD_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
+        CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
+        if os.path.exists(OLD_KEY_FILE):  # check if we need to migrate from the old filename to new
+            os.rename(OLD_KEY_FILE, CREDENTIALS_KEY_FILE)
+        if not os.path.exists(CREDENTIALS_KEY_FILE):
+            with open(CREDENTIALS_KEY_FILE, 'wb') as f:
                 f.write(Fernet.generate_key())
-        with open(GARMIN_KEY_FILE, 'rb') as f:
-            garmin_key = f.read()
+        with open(CREDENTIALS_KEY_FILE, 'rb') as f:
+            credentials_key = f.read()
+
+try:
+    with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
+        client_id = f.readline().rstrip('\r\n')
+        client_secret = f.readline().rstrip('\r\n')
+except:
+    client_id = '28117'
+    client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
 from tokens import *
 
@@ -457,11 +470,93 @@ def reset(username):
     return render_template("reset.html", username=current_user.username)
 
 
+@app.route("/strava", methods=['GET'])
+@login_required
+def strava():
+    try:
+        from stravalib.client import Client
+    except ImportError:
+        flash("stravalib is not installed. Skipping Strava authorization attempt.")
+        return redirect('/user/%s/' % current_user.username)
+    client = Client()
+    url = client.authorization_url(client_id=client_id,
+                                   redirect_uri='https://%s/authorization' % server_ip,
+                                   scope='activity:write')
+    return redirect(url)
+
+
+@app.route("/authorization", methods=["GET", "POST"])
+@login_required
+def authorization():
+    from stravalib.client import Client
+    try: 
+        client = Client()
+        code = request.args.get('code')
+        token_response = client.exchange_code_for_token(client_id=client_id, client_secret=client_secret, code=code)
+        with open('%s/strava_token.txt' % os.path.join(STORAGE_DIR, str(current_user.player_id)), 'w') as f:
+            f.write(client_id + '\n');
+            f.write(client_secret + '\n');
+            f.write(token_response['access_token'] + '\n');
+            f.write(token_response['refresh_token'] + '\n');
+            f.write(str(token_response['expires_at']) + '\n');
+        flash("Strava authorized. Go to \"Upload\" to remove authorization.")
+    except:
+        flash("Strava canceled.")
+    flash("Please close this window and return to Zwift Launcher.")
+    return render_template("strava.html", username=current_user.username)
+
+
+@app.route("/profile/<username>/", methods=["GET", "POST"])
+@login_required
+def profile(username):
+    if request.method == "POST":
+        if request.form['username'] == "" or request.form['password'] == "":
+            flash("Zwift credentials can't be empty")
+            return render_template("profile.html", username=current_user.username)
+
+        username = request.form['username']
+        password = request.form['password']    
+        player_id = current_user.player_id
+        profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
+        session = requests.session()
+        
+        try:
+            access_token, refresh_token = online_sync.login(session, username, password)
+            try:
+                profile = online_sync.query_player_profile(session, access_token)
+                with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
+                    f.write(profile)
+                online_sync.logout(session, refresh_token)
+                os.rename('%s/profile.bin' % SCRIPT_DIR, '%s/profile.bin' % profile_dir)
+                flash("Zwift profile installed locally.")         
+            except:
+                flash("Error downloading profile")
+            if request.form.get("safe_zwift", None) != None:
+                try:
+                    file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
+                    with open(file_path, 'w') as f:
+                        f.write(username + '\n');
+                        f.write(password + '\n');
+                    if credentials_key is not None:
+                        with open(file_path, 'rb') as fr:
+                            zwift_credentials = fr.read()
+                            cipher_suite = Fernet(credentials_key)                    
+                            ciphered_text = cipher_suite.encrypt(zwift_credentials)
+                            with open(file_path, 'wb') as fw:
+                                fw.write(ciphered_text)
+                    flash("Zwift credentials saved")
+                except:
+                    flash("Error saving 'zwift_credentiasl.txt' file")     
+        except:
+            flash("Error invalid Username or password")
+    return render_template("profile.html", username=current_user.username)
+
+
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
-        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
+        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes, server_ip=os.path.exists(SERVER_IP_FILE))
 
 
 def send_message_to_all_online(message, sender='Server'):
@@ -558,16 +653,23 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
-            if uploaded_file.filename == 'garmin_credentials.txt' and garmin_key is not None:
+            if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
                 with open(file_path, 'rb') as fr:
                     garmin_credentials = fr.read()
-                    cipher_suite = Fernet(garmin_key)
+                    cipher_suite = Fernet(credentials_key)
                     ciphered_text = cipher_suite.encrypt(garmin_credentials)
                     with open(file_path, 'wb') as fw:
                         fw.write(ciphered_text)
+            if uploaded_file.filename == 'zwift_credentials.txt' and credentials_key is not None:
+                with open(file_path, 'rb') as fr:
+                    garmin_credentials = fr.read()
+                    cipher_suite = Fernet(credentials_key)
+                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
+                    with open(file_path, 'wb') as fw:
+                        fw.write(ciphered_text)   
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
@@ -592,8 +694,13 @@ def upload(username):
     if os.path.isfile(garmin_file):
         stat = os.stat(garmin_file)
         garmin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+    zwift = None
+    zwift_file = os.path.join(profile_dir, 'zwift_credentials.txt')
+    if os.path.isfile(zwift_file):
+        stat = os.stat(zwift_file)
+        zwift = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
-    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token, garmin=garmin)
+    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token, garmin=garmin, zwift=zwift)
 
 
 @app.route("/download/profile.bin", methods=["GET"])
@@ -604,6 +711,19 @@ def download():
     profile_file = os.path.join(profile_dir, 'profile.bin')
     if os.path.isfile(profile_file):
         return send_file(profile_file, attachment_filename='profile.bin')
+
+
+@app.route("/delete/<filename>", methods=["GET"])
+@login_required
+def delete(filename):
+    player_id = current_user.player_id
+    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        return '', 403
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
+    delete_file = os.path.join(profile_dir, filename)
+    if os.path.isfile(delete_file):
+        os.remove("%s" % delete_file)
+    return redirect(url_for('upload', username=current_user))
 
 
 @app.route("/logout/<username>")
@@ -1042,8 +1162,8 @@ def garmin_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
         with open('%s/garmin_credentials.txt' % profile_dir, 'r') as f:
-            if garmin_key is not None:
-                cipher_suite = Fernet(garmin_key)
+            if credentials_key is not None:
+                cipher_suite = Fernet(credentials_key)
                 ciphered_text = f.read()
                 unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
                 unciphered_text = unciphered_text.decode(encoding='UTF-8')
@@ -1067,6 +1187,57 @@ def garmin_upload(player_id, activity):
         w.run()
     except:
         logger.warn("Garmin upload failed. No internet?")
+
+
+def zwift_upload(player_id):
+    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+    if not os.path.exists(SERVER_IP_FILE):
+        logger.info("server_ip.txt missing, skip Zwift activity update")
+        return
+    try:
+        with open('%s/zwift_credentials.txt' % profile_dir, 'r') as f:
+            if credentials_key is not None:
+                cipher_suite = Fernet(credentials_key)
+                ciphered_text = f.read()
+                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
+                unciphered_text = unciphered_text.decode(encoding='UTF-8')
+                split_credentials = unciphered_text.splitlines()
+                username = split_credentials[0]
+                password = split_credentials[1]
+            else:
+                username = f.readline().rstrip('\r\n')
+                password = f.readline().rstrip('\r\n')
+    except:
+        logger.warn("Failed to read %s/zwift_credentials.txt. Skipping Zwift upload attempt." % profile_dir)
+        return
+    
+    try:
+        session = requests.session()
+        try:
+            activity = activity_pb2.Activity()
+            access_token, refresh_token = online_sync.login(session, username, password)
+            activity.player_id = online_sync.get_player_id(session, access_token)
+            player_id = current_user.player_id
+            profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
+            activity_file = '%s/last_activity.bin' % profile_dir
+            if not os.path.isfile(activity_file):
+                print('Activity file not found')
+            with open(activity_file, 'rb') as fd:
+                try:
+                    activity.ParseFromString(fd.read())
+                except:
+                    print('Could not parse activity file')
+            res = online_sync.upload_activity(session, access_token, activity)
+            if res == 200:
+                logger.info("Zwift activity upload succesfull")
+            else:
+                logger.warn("Zwift activity upload failed:%s:" %res)
+            online_sync.logout(session, refresh_token)
+        except:
+            logger.warn("Error uploading activity to Zwift Server")
+    except:
+        logger.warn("Zwift upload failed. No internet?")
 
 
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
@@ -1101,6 +1272,7 @@ def api_profiles_activities_id(player_id, activity_id):
     # For using with upload_activity.py (to upload zoffline activity to Zwift server)
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
+    zwift_upload(player_id)
     return response, 200
 
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
