@@ -113,7 +113,10 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
         logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
         encrypt = False
     if encrypt:
+        OLD_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
         CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
+        if os.path.exists(OLD_KEY_FILE):  # check if we need to migrate from the old filename to new
+            os.rename(OLD_KEY_FILE, CREDENTIALS_KEY_FILE)
         if not os.path.exists(CREDENTIALS_KEY_FILE):
             with open(CREDENTIALS_KEY_FILE, 'wb') as f:
                 f.write(Fernet.generate_key())
@@ -712,10 +715,12 @@ def download():
 @login_required
 def delete(filename):
     player_id = current_user.player_id
+    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        return '', 403
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     delete_file = os.path.join(profile_dir, filename)
     if os.path.isfile(delete_file):
-        os.remove("%s" %delete_file)
+        os.remove("%s" % delete_file)
     return redirect(url_for('upload', username=current_user))
 
 
