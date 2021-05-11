@@ -1188,8 +1188,30 @@ def garmin_upload(player_id, activity):
     except:
         logger.warn("Garmin upload failed. No internet?")
 
+def runalyze_upload(player_id, activity):
+    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    try:
+        with open('%s/runalyze_token.txt' % profile_dir, 'r') as f:
+            runtoken = f.readline().rstrip('\r\n')
+    except:
+        logger.warn("Failed to read %s/runalyze_token.txt. Skipping Runalyze upload attempt." % profile_dir)
+        return
+    try:
+        with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
+            f.write(activity.fit)
+    except:
+        logger.warn("Failed to save fit file. Skipping Runalyze upload attempt.")
+        return
+    try:
+        r = requests.post("https://runalyze.com/api/v1/activities/uploads",
+                          files={'file': open('%s/last_activity.fit' % profile_dir, "rb")},
+                          headers={"token": runtoken})
+        logger.info(r.text)
+    except:
+        logger.warn("Runalyze upload failed. No internet?")
 
-def zwift_upload(player_id):
+
+def zwift_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
     if not os.path.exists(SERVER_IP_FILE):
@@ -1218,16 +1240,6 @@ def zwift_upload(player_id):
             activity = activity_pb2.Activity()
             access_token, refresh_token = online_sync.login(session, username, password)
             activity.player_id = online_sync.get_player_id(session, access_token)
-            player_id = current_user.player_id
-            profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
-            activity_file = '%s/last_activity.bin' % profile_dir
-            if not os.path.isfile(activity_file):
-                print('Activity file not found')
-            with open(activity_file, 'rb') as fd:
-                try:
-                    activity.ParseFromString(fd.read())
-                except:
-                    print('Could not parse activity file')
             res = online_sync.upload_activity(session, access_token, activity)
             if res == 200:
                 logger.info("Zwift activity upload succesfull")
@@ -1269,10 +1281,8 @@ def api_profiles_activities_id(player_id, activity_id):
     # will occur with these profiles).
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
-    # For using with upload_activity.py (to upload zoffline activity to Zwift server)
-    with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
-        f.write(activity.SerializeToString())
-    zwift_upload(player_id)
+    runalyze_upload(player_id, activity)
+    zwift_upload(player_id, activity)
     return response, 200
 
 @app.route('/api/profiles/<int:recieving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
