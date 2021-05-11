@@ -1,0 +1,44 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Download Zwift profile</div></h1>
+  <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form id="profile" action="{{ url_for('profile', username=username) }}" method="post">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Zwift Username</label>
+            <input type="text" id="username" name="username" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Zwift Password</label>
+            <input type="password" id="password" name="password" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-12 top-buffer">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="safe_zwift" name="safe_zwift">
+              <label class="form-check-label text-shadow" for="safe_zwift">Save credentials (will automatically update activities to Zwift)</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Submit" class="btn btn-sm btn-light">
+            <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item py-2">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

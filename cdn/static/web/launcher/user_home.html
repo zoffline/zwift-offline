@@ -15,6 +15,10 @@
       <div class="col-md-12">
         <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-success">Upload</a>
         <a href="{{ url_for('reset', username=username) }}" class="btn btn-sm btn-secondary">Change password</a>
+        <a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava auth</a>
+        {% if server_ip %}
+          <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Get Zwift profile</a>
+        {% endif %}
         <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
         {% if is_admin and not restarting %}
           <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
@@ -62,6 +66,17 @@
           </div>
         </div>
       </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
     </div>
   </div>
 {% endblock %}
