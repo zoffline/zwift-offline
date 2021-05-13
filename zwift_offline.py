@@ -1276,6 +1276,9 @@ def api_profiles_activities_id(player_id, activity_id):
             save_ghost(activity.name, player_id)
         except:
             pass
+    # For using with upload_activity
+    with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
+        f.write(activity.SerializeToString())
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
     # will occur with these profiles).

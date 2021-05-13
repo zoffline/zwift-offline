@@ -62,11 +62,9 @@ def post_credentials(session, username, password):
 
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
-        flash('HTTP Request failed: %s' % e)
 
     except KeyError as e:
         print('Invalid uname and/or password')
-        flash('Invalid uname and/or password')
 
 
 def query_player_profile(session, access_token):
@@ -120,6 +118,7 @@ def logout(session, refresh_token):
 def login(session, user, password):
     access_token, refresh_token, expired_in = post_credentials(session, user, password)
     return access_token, refresh_token
+
 
 def upload_activity(session, access_token, activity):
     try:

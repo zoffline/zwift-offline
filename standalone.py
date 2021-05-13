@@ -344,8 +344,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except:
-                if player_id in online:
-                    zwift_offline.logout(player_id)
                 break
 
 class GhostsVariables:
