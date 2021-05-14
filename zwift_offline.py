@@ -44,6 +44,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 import protobuf.events_pb2 as events_pb2
+import protobuf.variants_pb2 as variants_pb2
 import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -1962,6 +1963,21 @@ def auth_realms_zwift_tokens_access_codes():
         return fake_jwt_with_session_cookie(remember_token), 200
     else:
         return FAKE_JWT, 200
+
+
+@app.route('/v1/variant', methods=['POST'])
+def v1_variant():
+    variants = variants_pb2.Variants()
+    rth = variants.variants.add()
+    rth.name = 'return_to_home'
+    rth.value = 1
+    nhd = variants.variants.add()
+    nhd.name = 'game_1_12_nhd_v1'
+    nhd.value = 1
+    pd = variants.variants.add()
+    pd.name = 'pack_dynamics_v20'
+    pd.value = 1
+    return variants.SerializeToString(), 200
 
 
 def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):

@@ -1,0 +1,9 @@
+syntax = "proto2";
+message Variant {
+	required string name = 1;
+	optional uint32 value = 2;
+}
+
+message Variants {
+	repeated Variant variants = 1;
+}
