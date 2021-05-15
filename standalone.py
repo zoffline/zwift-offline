@@ -358,6 +358,7 @@ class GhostsVariables:
     start_road = 0
     start_rt = 0
     course = 0
+    last_package_time = 0
 
 class PacePartnerVariables:
     route = None
@@ -423,6 +424,23 @@ def play_bots():
             state.watchingRiderId = bot_id
             state.worldTime = zwift_offline.world_time()
         botthreadevent.wait(timeout=bot_update_freq)
+
+def remove_inactive():
+    while True:
+        remove_players = list()
+        for p_id in online.keys():
+            if zwift_offline.world_time() > online[p_id].worldTime + 60000:
+                remove_players.insert(0, p_id)
+        for p_id in remove_players:
+            zwift_offline.logout_player(p_id)
+
+        remove_players = list()
+        for p_id in global_ghosts.keys():
+            if zwift_offline.get_utc_time() > global_ghosts[p_id].last_package_time + 60:
+                remove_players.insert(0, p_id)
+        for p_id in remove_players:
+            global_ghosts.pop(p_id)
+        rithreadevent.wait(timeout=10)
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
@@ -517,28 +535,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
 #            else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
 
-        keys = online.keys()
-        remove_players = list()
-        for p_id in keys:
-            if zwift_offline.world_time() > online[p_id].worldTime + 10000:
-                remove_players.insert(0, p_id)
-        for p_id in remove_players:
-            online.pop(p_id)
         if state.roadTime:
-            if player_id in online.keys():
-                online[player_id] = state
-            else:
-                online[player_id] = state
-                discord.send_message('%s riders online' % len(online))
-
-        #Remove ghosts entries for inactive players (disconnected?)
-        keys = global_ghosts.keys()
-        remove_players = list()
-        for p_id in keys:
-            if global_ghosts[p_id].last_package_time < t - 10:
-                remove_players.insert(0, p_id)
-        for p_id in remove_players:
-            global_ghosts.pop(p_id)
+            if not player_id in online.keys():
+                discord.send_message('%s riders online' % (len(online) + 1))
+            online[player_id] = state
 
         if ghosts.started and t >= ghosts.last_play + ghost_update_freq:
             message = get_empty_message(player_id)
@@ -639,6 +639,10 @@ udpserver = socketserver.ThreadingUDPServer(('', 3022), UDPHandler)
 udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
 udpserver_thread.start()
+
+rithreadevent = threading.Event()
+ri = threading.Thread(target=remove_inactive)
+ri.start()
 
 load_pace_partners()
 ppthreadevent = threading.Event()

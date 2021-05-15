@@ -150,7 +150,6 @@ global_pace_partners = {}
 global_bots = {}
 ghosts_enabled = {}
 player_update_queue = {}
-player_ids = {}
 player_partial_profiles = {}
 save_ghost = None
 restarting = False
@@ -511,15 +510,15 @@ def authorization():
 def profile(username):
     if request.method == "POST":
         if request.form['username'] == "" or request.form['password'] == "":
-            flash("Zwift credentials can't be empty")
+            flash("Zwift credentials can't be empty.")
             return render_template("profile.html", username=current_user.username)
 
         username = request.form['username']
-        password = request.form['password']    
+        password = request.form['password']
         player_id = current_user.player_id
         profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
         session = requests.session()
-        
+
         try:
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
@@ -528,9 +527,9 @@ def profile(username):
                     f.write(profile)
                 online_sync.logout(session, refresh_token)
                 os.rename('%s/profile.bin' % SCRIPT_DIR, '%s/profile.bin' % profile_dir)
-                flash("Zwift profile installed locally.")         
+                flash("Zwift profile installed locally.")
             except:
-                flash("Error downloading profile")
+                flash("Error downloading profile.")
             if request.form.get("safe_zwift", None) != None:
                 try:
                     file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
@@ -540,15 +539,15 @@ def profile(username):
                     if credentials_key is not None:
                         with open(file_path, 'rb') as fr:
                             zwift_credentials = fr.read()
-                            cipher_suite = Fernet(credentials_key)                    
+                            cipher_suite = Fernet(credentials_key)
                             ciphered_text = cipher_suite.encrypt(zwift_credentials)
                             with open(file_path, 'wb') as fw:
                                 fw.write(ciphered_text)
-                    flash("Zwift credentials saved")
+                    flash("Zwift credentials saved.")
                 except:
-                    flash("Error saving 'zwift_credentiasl.txt' file")     
+                    flash("Error saving 'zwift_credentiasl.txt' file.")
         except:
-            flash("Error invalid Username or password")
+            flash("Invalid username or password.")
     return render_template("profile.html", username=current_user.username)
 
 
@@ -823,20 +822,20 @@ def api_users_login():
     return response.SerializeToString(), 200
 
 
-def logout(player_id):
+def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
         online.pop(player_id)
+        discord.send_message('%s riders online' % len(online))
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
-    discord.send_message('%s riders online' % len(online))
 
 
 @app.route('/api/users/logout', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def api_users_logout():
-    logout(current_user.player_id)
+    logout_player(current_user.player_id)
     return '', 204
 
 
@@ -1025,7 +1024,7 @@ def api_profiles_id(player_id):
         return '', 400
     if player_id == 0:
         # Zwift client 1.0.60239 calls /api/profiles/0 instead of /api/users/logout
-        logout(current_user.player_id)
+        logout_player(current_user.player_id)
         return '', 204
     if current_user.player_id != player_id:
         return '', 401
