@@ -75,7 +75,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 refresh_token = token_response['refresh_token']
                 expires_at = token_response['expires_at']
                 self.server.logger.info("Exchanged code {} for access token {}".format(code, access_token))
-                self.wfile.write(six.b("<script>function download() {"))
+                self.wfile.write(six.b("<html><head><script>function download() {"))
                 self.wfile.write(six.b("var text = `{}\n".format(self.server.client_id)))
                 self.wfile.write(six.b("{}\n".format(self.server.client_secret)))
                 self.wfile.write(six.b("{}\n".format(access_token)))
@@ -86,7 +86,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(six.b("pom.setAttribute('download', 'strava_token.txt');"))
                 self.wfile.write(six.b("pom.style.display = 'none'; document.body.appendChild(pom);"))
                 self.wfile.write(six.b("pom.click(); document.body.removeChild(pom); }"))
-                self.wfile.write(six.b("</script><html><head></head><body>Access token obtained successfully<br><br>"))
+                self.wfile.write(six.b("</script></head><body>Access token obtained successfully<br><br>"))
                 self.wfile.write(six.b("<button onclick=\"download()\">Download</button></body></html>"))
                 with open('%s/strava_token.txt' % SCRIPT_DIR, 'w') as f:
                     f.write(self.server.client_id + '\n');
