@@ -429,18 +429,18 @@ def remove_inactive():
     while True:
         remove_players = list()
         for p_id in online.keys():
-            if zwift_offline.world_time() > online[p_id].worldTime + 60000:
+            if zwift_offline.world_time() > online[p_id].worldTime + 10000:
                 remove_players.insert(0, p_id)
         for p_id in remove_players:
             zwift_offline.logout_player(p_id)
 
         remove_players = list()
         for p_id in global_ghosts.keys():
-            if zwift_offline.get_utc_time() > global_ghosts[p_id].last_package_time + 60:
+            if zwift_offline.get_utc_time() > global_ghosts[p_id].last_package_time + 10:
                 remove_players.insert(0, p_id)
         for p_id in remove_players:
             global_ghosts.pop(p_id)
-        rithreadevent.wait(timeout=10)
+        rithreadevent.wait(timeout=1)
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
