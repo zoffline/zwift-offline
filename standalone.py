@@ -45,9 +45,11 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
+online_update_freq = 1
 ghost_update_freq = 3
 pacer_update_freq = 1
 bot_update_freq = 3
+last_online_updates = {}
 last_pp_updates = {}
 last_bot_updates = {}
 global_ghosts = {}
@@ -429,18 +431,18 @@ def remove_inactive():
     while True:
         remove_players = list()
         for p_id in online.keys():
-            if zwift_offline.world_time() > online[p_id].worldTime + 60000:
+            if zwift_offline.world_time() > online[p_id].worldTime + 10000:
                 remove_players.insert(0, p_id)
         for p_id in remove_players:
             zwift_offline.logout_player(p_id)
 
         remove_players = list()
         for p_id in global_ghosts.keys():
-            if zwift_offline.get_utc_time() > global_ghosts[p_id].last_package_time + 60:
+            if zwift_offline.get_utc_time() > global_ghosts[p_id].last_package_time + 10:
                 remove_players.insert(0, p_id)
         for p_id in remove_players:
             global_ghosts.pop(p_id)
-        rithreadevent.wait(timeout=10)
+        rithreadevent.wait(timeout=1)
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
@@ -462,7 +464,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
             recv.ParseFromString(data[:-4])
         except:
             try:
-                recv.ParseFromString(data[3:-4])
+                #If no sensors connected, first byte must be skipped
+                recv.ParseFromString(data[1:-4])
             except:
                 return
 
@@ -483,17 +486,17 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         ghosts = global_ghosts[player_id]
 
+        #Add last online update for player if it's missing
+        if not player_id in last_online_updates.keys():
+            last_online_updates[player_id] = 0
+
         #Add pace partner last update for player if it's missing
         if not player_id in last_pp_updates.keys():
             last_pp_updates[player_id] = 0
 
-        last_pp_update = last_pp_updates[player_id]
-
         #Add bot last update for player if it's missing
         if not player_id in last_bot_updates.keys():
             last_bot_updates[player_id] = 0
-
-        last_bot_update = last_bot_updates[player_id]
 
         if recv.seqno == 1:
             ghosts.rec = None
@@ -573,13 +576,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.last_play = t
         message = get_empty_message(player_id)
         nearby = list()
-        for p_id in online.keys():
-            player = online[p_id]
-            if player.id != player_id:
-                #Check if players are close in world
-                if zwift_offline.is_nearby(nearby_state, player):
-                    nearby.append(p_id)
-        if t >= last_pp_update + pacer_update_freq:
+        if t >= last_online_updates[player_id] + online_update_freq:
+            last_online_updates[player_id] = t
+            for p_id in online.keys():
+                player = online[p_id]
+                if player.id != player_id:
+                    #Check if players are close in world
+                    if zwift_offline.is_nearby(nearby_state, player):
+                        nearby.append(p_id)
+        if t >= last_pp_updates[player_id] + pacer_update_freq:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
                 pace_partner_variables = global_pace_partners[p_id]
@@ -587,7 +592,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 #Check if pacepartner is close to player in world
                 if zwift_offline.is_nearby(nearby_state, pace_partner):
                     nearby.append(p_id)
-        if t >= last_bot_update + bot_update_freq:
+        if t >= last_bot_updates[player_id] + bot_update_freq:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
                 bot_variables = global_bots[p_id]
