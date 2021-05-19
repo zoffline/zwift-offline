@@ -213,6 +213,7 @@ class Online:
     yorkshire = 0
     france = 0
     paris = 0
+    makuriislands = 0
 
 courses_lookup = {
     2: 'Richmond',
@@ -221,9 +222,10 @@ courses_lookup = {
     7: 'London',
     8: 'New York',
     9: 'Innsbruck',
-    10: 'Unknown2',  # event specific?
+    10: 'Bologna',  # event specific?
     11: 'Yorkshire',
-    12: 'Unknown3',  # event specific?
+    12: 'Crit City',  # event specific?
+    13: 'Makuri Island',
     14: 'France',
     15: 'Paris'
 }
@@ -272,6 +274,8 @@ def get_online():
             online_in_region.france += 1
         elif course_name == 'Paris':
             online_in_region.paris += 1
+        elif course_name == 'Makuri Island':
+            online_in_region.makuriislands += 1
         online_in_region.total += 1
     return online_in_region
 
@@ -1968,15 +1972,36 @@ def auth_realms_zwift_tokens_access_codes():
 @app.route('/v1/variant', methods=['POST'])
 def v1_variant():
     variants = variants_pb2.Variants()
+    bbc = variants.variants.add()
+    bbc.name = 'ble_background_callbacks' 
+    bbc.value = 1
+    gxp = variants.variants.add()
+    gxp.name = 'game_1_12_grapher_x_pos'
+    dfi = variants.variants.add()
+    dfi.name = 'wwise_deadlock_fix_ios'
+    dfi.value = 1
+    dft = variants.variants.add()
+    dft.name = 'wwise_deadlock_fix_tvos'
+    asr = variants.variants.add()
+    asr.name = 'game_1_12_pc_skip_activity_save_retry'
+    rtw = variants.variants.add()
+    rtw.name = 'return_to_world_fix'
     rth = variants.variants.add()
     rth.name = 'return_to_home'
     rth.value = 1
     nhd = variants.variants.add()
     nhd.name = 'game_1_12_nhd_v1'
     nhd.value = 1
+    rthf = variants.variants.add()
+    rthf.name = 'game_1_12_return_to_world_fix'
+    rthf.value = 1
     pd = variants.variants.add()
     pd.name = 'pack_dynamics_v20'
     pd.value = 1
+    jmf = variants.variants.add()
+    jmf.name = 'game_1_13_japanese_medium_font'
+    rccc = variants.variants.add()
+    rccc.name = 'game_1_12_1_retire_client_chat_culling'
     return variants.SerializeToString(), 200
 
 
