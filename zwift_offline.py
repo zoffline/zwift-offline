@@ -206,6 +206,7 @@ class Online:
     richmond = 0
     watopia = 0
     london = 0
+    makuriislands = 0
     newyork = 0
     innsbruck = 0
     yorkshire = 0
@@ -222,6 +223,7 @@ courses_lookup = {
     10: 'Unknown2',  # event specific?
     11: 'Yorkshire',
     12: 'Unknown3',  # event specific?
+    13: 'Makuri Islands',
     14: 'France',
     15: 'Paris'
 }
@@ -260,6 +262,8 @@ def get_online():
             online_in_region.watopia += 1
         elif course_name == 'London':
             online_in_region.london += 1
+        elif course_name == 'Makuri Islands':
+            online_in_region.makuriislands += 1
         elif course_name == 'New York':
             online_in_region.newyork += 1
         elif course_name == 'Innsbruck':
