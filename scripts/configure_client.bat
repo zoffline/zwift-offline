@@ -17,8 +17,16 @@ IF %ERRORLEVEL% NEQ 0 (
 
 ECHO.
 
+SET OLD_CERT="a21d3c4435c8c3b6"
+certutil.exe -store Root | FIND /C /I %OLD_CERT% >nul 2>&1
+IF %ERRORLEVEL% EQU 0 (
+    ECHO Deleting old certificate
+    certutil.exe -delstore Root %OLD_CERT%
+    ECHO.
+)
+
 FOR /F "tokens=4-5 delims=. " %%I IN ('ver') DO SET VERSION=%%I
-certutil.exe -store Root | FIND /C /I "zwift.com" >nul 2>&1
+certutil.exe -store Root | FIND /C /I "52b3ce021abc44d6f90368131571588d93d80f83" >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Importing certificate
     IF %VERSION% == 10 ( ECHO.|certutil.exe -importpfx Root ..\ssl\cert-zwift-com.p12
@@ -39,12 +47,8 @@ SET CACERT=%FOLDER%\data\cacert.pem
 IF NOT EXIST %CACERT% GOTO:NOT_FOUND
 ECHO %FOLDER%>%ZWIFT%
 :FOUND
->nul 2>&1 FIND /C "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDxTWxAp8wUUS+n" %CACERT%
-IF %ERRORLEVEL% NEQ 0 (
-    ECHO Adding certificate to cacert.pem
-    ECHO.>>%CACERT%
-    TYPE ..\ssl\cert-zwift-com.pem>>%CACERT%
-) ELSE ( ECHO Certificate found in cacert.pem, no changes will be made )
+ECHO Replacing cacert.pem
+COPY ..\ssl\cacert.pem %CACERT%
 
 ECHO.
 
