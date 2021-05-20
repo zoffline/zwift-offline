@@ -487,6 +487,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         t = int(zwift_offline.get_utc_time())
 
+        #Update player online state
         if state.roadTime and t >= last_updates[player_id] + online_update_freq:
             last_updates[player_id] = t
             if not player_id in online.keys():
@@ -519,14 +520,17 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.rec.player_id = player_id
 
         if player_id in ghosts_enabled and ghosts_enabled[player_id]:
+            #Load ghosts for current course
             if not ghosts.loaded and get_course(state):
                 ghosts.loaded = True
                 load_ghosts(player_id, state, ghosts)
+            #Save player state as ghost if moving
             if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
                 if t >= ghosts.last_rec + ghost_update_freq:
                     s = ghosts.rec.states.add()
                     s.CopyFrom(state)
                     ghosts.last_rec = t
+                #Start loaded ghosts
                 if not ghosts.started and ghosts.play.ghosts and road_id(state) == ghosts.start_road:
                     if is_forward(state):
                         if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
@@ -534,6 +538,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     else:
                         if state.roadTime < ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
                             ghosts.started = True
+            #Uncomment to print player state when stopped (to find new start lines)
             #else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
 
@@ -565,14 +570,15 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Set state of player being watched
         watching_state = None
-        watching_id = state.watchingRiderId
-        if watching_id in online.keys():
-            watching_state = online[watching_id]
-        elif watching_id in global_pace_partners.keys():
-            pp = global_pace_partners[watching_id]
+        if state.watchingRiderId == player_id:
+            watching_state = state
+        elif state.watchingRiderId in online.keys():
+            watching_state = online[state.watchingRiderId]
+        elif state.watchingRiderId in global_pace_partners.keys():
+            pp = global_pace_partners[state.watchingRiderId]
             watching_state = pp.route.states[pp.position]
-        elif watching_id in global_bots.keys():
-            bot = global_bots[watching_id]
+        elif state.watchingRiderId in global_bots.keys():
+            bot = global_bots[state.watchingRiderId]
             watching_state = bot.route.states[bot.position]
         else:
             watching_state = state
@@ -600,7 +606,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if zwift_offline.is_nearby(watching_state, bot):
                     nearby.append(p_id)
 
-        #Send nearby riders states
+        #Send nearby riders states or empty message
         message = get_empty_message(player_id)
         if nearby:
             message.num_msgs = math.ceil(len(nearby) / 10)
