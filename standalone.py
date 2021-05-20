@@ -566,9 +566,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         #Set state of player being watched
         watching_state = None
         watching_id = state.watchingRiderId
-        if watching_id == player_id:
-            watching_state = state
-        elif watching_id in online.keys():
+        if watching_id in online.keys():
             watching_state = online[watching_id]
         elif watching_id in global_pace_partners.keys():
             pp = global_pace_partners[watching_id]
@@ -576,6 +574,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
         elif watching_id in global_bots.keys():
             bot = global_bots[watching_id]
             watching_state = bot.route.states[bot.position]
+        else:
+            watching_state = state
 
         #Check if online players, pace partners and bots are nearby
         nearby = list()
