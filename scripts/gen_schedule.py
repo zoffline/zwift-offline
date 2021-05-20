@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 # Make london and new york more likely
-MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'NEWYORK' ] * 2 + [ 'RICHMOND' ] + [ 'YORKSHIRE' ]
+MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'MAKURIISLANDS' ] + [ 'NEWYORK' ] * 2 + [ 'RICHMOND' ] + [ 'YORKSHIRE' ]
 
 
 dom = minidom.parseString('<MapSchedule><appointments></appointments><VERSION>1</VERSION></MapSchedule>')

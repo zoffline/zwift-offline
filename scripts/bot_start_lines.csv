@@ -11,7 +11,12 @@ course,spawnRoad,isForward,startRoad,roadTime,name
 7,7,,7,809519,London 2
 8,4,,4,173378,New York
 9,7,,7,157428,Innsbruck
+10,9,,0,38105,Bologna cat A
 11,0,,0,5068,Yorkshire
+12,20,,0,348149,Crit City CW cat A
+12,20,,19,845880,Crit City CCW cat A (move up to replace Crit City CW)
+13,0,False,0,880828,Makuri Islands
+13,0,True,0,497136,Makuri Islands 2
 14,26,True,26,513383,France
 14,26,True,26,536700,Ven-Top (move up to replace Roule Ma Poule and Tire-Bouchon)
 14,26,False,26,487158,France 2
