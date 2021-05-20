@@ -12,7 +12,7 @@ SET HOSTS="%WINDIR%\system32\drivers\etc\hosts"
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Adding servers to hosts file
     ECHO.>>%HOSTS%
-    ECHO 127.0.0.1 us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com>>%HOSTS%
+    ECHO 127.0.0.1 us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com experimentation.prd-gs.zwift.com>>%HOSTS%
 ) ELSE ( ECHO Servers found in hosts file, no changes will be made )
 
 ECHO.
@@ -39,7 +39,7 @@ SET CACERT=%FOLDER%\data\cacert.pem
 IF NOT EXIST %CACERT% GOTO:NOT_FOUND
 ECHO %FOLDER%>%ZWIFT%
 :FOUND
->nul 2>&1 FIND /C "MIIEowIBAAKCAQEAuPBKWMw8+OtDjAsZuXUpc89SDWSi5iyS1kfddC6UK6UC5Tsy" %CACERT%
+>nul 2>&1 FIND /C "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDxTWxAp8wUUS+n" %CACERT%
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Adding certificate to cacert.pem
     ECHO.>>%CACERT%
