@@ -604,7 +604,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 elif p_id in global_bots.keys():
                     bot_variables = global_bots[p_id]
                     player = bot_variables.route.states[bot_variables.position]
-                elif p_id >= 10000000:
+                elif p_id > 10000000:
                     player = ghosts.play.ghosts[math.floor(p_id / 10000000) - 1].states[ghosts.play_count - 1]
                     player.id = p_id
                     player.worldTime = zwift_offline.world_time()
