@@ -487,6 +487,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         t = int(zwift_offline.get_utc_time())
 
+        #Update player online state
         if state.roadTime and t >= last_updates[player_id] + online_update_freq:
             last_updates[player_id] = t
             if not player_id in online.keys():
@@ -519,14 +520,17 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.rec.player_id = player_id
 
         if player_id in ghosts_enabled and ghosts_enabled[player_id]:
+            #Load ghosts for current course
             if not ghosts.loaded and get_course(state):
                 ghosts.loaded = True
                 load_ghosts(player_id, state, ghosts)
+            #Save player state as ghost if moving
             if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
                 if t >= ghosts.last_rec + ghost_update_freq:
                     s = ghosts.rec.states.add()
                     s.CopyFrom(state)
                     ghosts.last_rec = t
+                #Start loaded ghosts
                 if not ghosts.started and ghosts.play.ghosts and road_id(state) == ghosts.start_road:
                     if is_forward(state):
                         if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
@@ -534,50 +538,28 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     else:
                         if state.roadTime < ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
                             ghosts.started = True
+            #Uncomment to print player state when stopped (to find new start lines)
             #else: print('course', get_course(state), 'road', road_id(state), 'isForward', is_forward(state), 'roadTime', state.roadTime)
             ghosts.last_rt = state.roadTime
 
-        #Send active ghosts states
-        if ghosts.started and t >= ghosts.last_play + ghost_update_freq:
-            ghosts.last_play = t
-            active_ghosts = 0
-            for g in ghosts.play.ghosts:
-                if len(g.states) > ghosts.play_count: active_ghosts += 1
-            if active_ghosts:
-                message = get_empty_message(player_id)
-                message.num_msgs = math.ceil(active_ghosts / 10)
-                ghost_id = 1
-                for g in ghosts.play.ghosts:
-                    if len(g.states) > ghosts.play_count:
-                        if len(message.states) > 9:
-                            message.world_time = zwift_offline.world_time()
-                            socket.sendto(message.SerializeToString(), client_address)
-                            message.msgnum += 1
-                            del message.states[:]
-                        s = message.states.add()
-                        s.CopyFrom(g.states[ghosts.play_count])
-                        s.id = player_id + ghost_id * 10000000
-                        s.worldTime = zwift_offline.world_time()
-                    ghost_id += 1
-                message.world_time = zwift_offline.world_time()
-                socket.sendto(message.SerializeToString(), client_address)
-                ghosts.play_count += 1
-
         #Set state of player being watched
         watching_state = None
-        watching_id = state.watchingRiderId
-        if watching_id in online.keys():
-            watching_state = online[watching_id]
-        elif watching_id in global_pace_partners.keys():
-            pp = global_pace_partners[watching_id]
-            watching_state = pp.route.states[pp.position]
-        elif watching_id in global_bots.keys():
-            bot = global_bots[watching_id]
-            watching_state = bot.route.states[bot.position]
-        else:
+        if state.watchingRiderId == player_id:
             watching_state = state
+        elif state.watchingRiderId in online.keys():
+            watching_state = online[state.watchingRiderId]
+        elif state.watchingRiderId in global_pace_partners.keys():
+            pp = global_pace_partners[state.watchingRiderId]
+            watching_state = pp.route.states[pp.position]
+        elif state.watchingRiderId in global_bots.keys():
+            bot = global_bots[state.watchingRiderId]
+            watching_state = bot.route.states[bot.position]
+        elif state.watchingRiderId > 10000000:
+            ghost = ghosts.play.ghosts[math.floor(state.watchingRiderId / 10000000) - 1]
+            if len(ghost.states) > ghosts.play_count:
+                watching_state = ghost.states[ghosts.play_count]
 
-        #Check if online players, pace partners and bots are nearby
+        #Check if online players, pace partners, bots and ghosts are nearby
         nearby = list()
         if t >= last_online_updates[player_id] + online_update_freq:
             last_online_updates[player_id] = t
@@ -599,8 +581,16 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 bot = bot_variables.route.states[bot_variables.position]
                 if zwift_offline.is_nearby(watching_state, bot):
                     nearby.append(p_id)
+        if ghosts.started and t >= ghosts.last_play + ghost_update_freq:
+            ghosts.last_play = t
+            ghost_id = 1
+            for g in ghosts.play.ghosts:
+                if len(g.states) > ghosts.play_count and zwift_offline.is_nearby(watching_state, g.states[ghosts.play_count]):
+                    nearby.append(player_id + ghost_id * 10000000)
+                ghost_id += 1
+            ghosts.play_count += 1
 
-        #Send nearby riders states
+        #Send nearby riders states or empty message
         message = get_empty_message(player_id)
         if nearby:
             message.num_msgs = math.ceil(len(nearby) / 10)
@@ -614,6 +604,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 elif p_id in global_bots.keys():
                     bot_variables = global_bots[p_id]
                     player = bot_variables.route.states[bot_variables.position]
+                elif p_id > 10000000:
+                    player = ghosts.play.ghosts[math.floor(p_id / 10000000) - 1].states[ghosts.play_count - 1]
+                    player.id = p_id
+                    player.worldTime = zwift_offline.world_time()
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()

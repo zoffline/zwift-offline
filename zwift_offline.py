@@ -216,14 +216,14 @@ class Online:
 
 courses_lookup = {
     2: 'Richmond',
-    4: 'Unknown1',  # event specific?
+    4: 'Unknown',  # event specific?
     6: 'Watopia',
     7: 'London',
     8: 'New York',
     9: 'Innsbruck',
-    10: 'Unknown2',  # event specific?
+    10: 'Bologna',  # event specific
     11: 'Yorkshire',
-    12: 'Unknown3',  # event specific?
+    12: 'Crit City',  # event specific
     13: 'Makuri Islands',
     14: 'France',
     15: 'Paris'
