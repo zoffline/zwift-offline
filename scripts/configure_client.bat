@@ -8,17 +8,15 @@ NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '%~0' & EXIT /B )
 CD /D "%~dp0"
 
 SET HOSTS="%WINDIR%\system32\drivers\etc\hosts"
->nul 2>&1 FIND /C /I "zwift.com" %HOSTS%
-IF %ERRORLEVEL% NEQ 0 (
-    ECHO Adding servers to hosts file
-    ECHO.>>%HOSTS%
-    ECHO 127.0.0.1 us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com experimentation.prd-gs.zwift.com>>%HOSTS%
-) ELSE ( ECHO Servers found in hosts file, no changes will be made )
+COPY %HOSTS% %HOSTS%.bak >nul
+TYPE %HOSTS%.bak | FINDSTR /V /I zwift > %HOSTS%
+ECHO Adding servers to hosts file
+ECHO 127.0.0.1 us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com experimentation.prd-gs.zwift.com>>%HOSTS%
 
 ECHO.
 
 FOR /F "tokens=4-5 delims=. " %%I IN ('ver') DO SET VERSION=%%I
-certutil.exe -store Root | FIND /C /I "zwift.com" >nul 2>&1
+certutil.exe -store Root | FIND /C /I "52b3ce021abc44d6f90368131571588d93d80f83" >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Importing certificate
     IF %VERSION% == 10 ( ECHO.|certutil.exe -importpfx Root ..\ssl\cert-zwift-com.p12

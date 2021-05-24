@@ -1979,9 +1979,6 @@ def v1_variant():
     nhd = variants.variants.add()
     nhd.name = 'game_1_12_nhd_v1'
     nhd.value = 1
-    pd = variants.variants.add()
-    pd.name = 'pack_dynamics_v20'
-    pd.value = 1
     return variants.SerializeToString(), 200
 
 
