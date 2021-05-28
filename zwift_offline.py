@@ -2006,6 +2006,7 @@ def v1_variant():
     rcc.name = 'game_1_12_1_retire_client_chat_culling'
     return variants.SerializeToString(), 200
 
+
 def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
     global global_pace_partners
