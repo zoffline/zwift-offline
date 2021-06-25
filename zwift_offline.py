@@ -148,6 +148,7 @@ db = SQLAlchemy(app)
 online = {}
 global_pace_partners = {}
 global_bots = {}
+global_ghosts = {}
 ghosts_enabled = {}
 player_update_queue = {}
 player_partial_profiles = {}
@@ -1093,8 +1094,14 @@ def api_profiles():
                     p = profiles.profiles.add()
                     p.CopyFrom(profile)
                     p.id = p_id
-                    p.first_name = 'zoffline'
-                    p.last_name = 'ghost %s' % ghostId
+                    p.first_name = ''
+                    seconds = (world_time() - global_ghosts[player_id].play.ghosts[ghostId - 1].states[0].worldTime) // 1000
+                    if seconds < 7200: span = '%s minutes' % (seconds // 60)
+                    elif seconds < 172800: span = '%s hours' % (seconds // 3600)
+                    elif seconds < 1209600: span = '%s days' % (seconds // 86400)
+                    elif seconds < 5259492: span = '%s weeks' % (seconds // 604800)
+                    else: span = '%s months' % (seconds // 2629746)
+                    p.last_name = span + ' ago [ghost]'
                     p.f20 = 3761002195 # basic 4 jersey
                     p.f24 = 1456463855 # tron bike
                     p.f27 = 125 # blue
@@ -1967,10 +1974,11 @@ def auth_realms_zwift_tokens_access_codes():
         return FAKE_JWT, 200
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
+def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
     global global_pace_partners
     global global_bots
+    global global_ghosts
     global ghosts_enabled
     global save_ghost
     global player_update_queue
@@ -1979,6 +1987,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     online = passed_online
     global_pace_partners = passed_global_pace_partners
     global_bots = passed_global_bots
+    global_ghosts = passed_global_ghosts
     ghosts_enabled = passed_ghosts_enabled
     save_ghost = passed_save_ghost
     player_update_queue = passed_player_update_queue
