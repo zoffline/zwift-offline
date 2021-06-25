@@ -1468,7 +1468,7 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.distance = player.distance
             online_player.time = player.time
             online_player.f6 = 840#0
-            online_player.f8 = 0
+            online_player.f8 = player.sport
             online_player.f9 = 0
             online_player.f10 = 0
             online_player.f11 = 0
