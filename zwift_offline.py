@@ -1102,10 +1102,20 @@ def api_profiles():
                     elif seconds < 5259492: span = '%s weeks' % (seconds // 604800)
                     else: span = '%s months' % (seconds // 2629746)
                     p.last_name = span + ' ago [ghost]'
-                    p.f20 = 3761002195 # basic 4 jersey
                     p.f24 = 1456463855 # tron bike
-                    p.f27 = 125 # blue
                     p.country_code = 0
+                    if p.f20 == 3761002195:
+                        p.f20 = 1869390707 # basic 2 jersey
+                        p.f27 = 80 # green bike
+                    else:
+                        p.f20 = 3761002195 # basic 4 jersey
+                        p.f27 = 125 # blue bike
+                    if p.f68 == 3344420794:
+                        p.f68 = 4197967370 # shirt 11
+                        p.f69 = 3273293920 # shorts 11
+                    else:
+                        p.f68 = 3344420794 # shirt 10
+                        p.f69 = 4269451728 # shorts 10
         else:
             if p_id > 2000000 and p_id < 3000000:
                 profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
