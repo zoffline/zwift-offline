@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3-alpine
 MAINTAINER zoffline <zoffline@tutanota.com>
 
 WORKDIR /usr/src/app
