@@ -605,7 +605,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     bot_variables = global_bots[p_id]
                     player = bot_variables.route.states[bot_variables.position]
                 elif p_id > 10000000:
-                    player = ghosts.play.ghosts[math.floor(p_id / 10000000) - 1].states[ghosts.play_count - 1]
+                    player = udp_node_msgs_pb2.PlayerState()
+                    player.CopyFrom(ghosts.play.ghosts[math.floor(p_id / 10000000) - 1].states[ghosts.play_count - 1])
                     player.id = p_id
                     player.worldTime = zwift_offline.world_time()
                 if player != None:
@@ -662,4 +663,4 @@ else:
             pass
     discord = DummyDiscord()
 
-zwift_offline.run_standalone(online, global_pace_partners, global_bots, ghosts_enabled, save_ghost, player_update_queue, discord)
+zwift_offline.run_standalone(online, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)
