@@ -111,6 +111,14 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 </details>
 
+### [OPTIONAL]: Documentation of how to create iOS >13 compatible certificate.
+
+<details><summary>Expand</summary>
+
+* TBA
+
+</details>
+
 ## Disclaimer
 
 Zwift is a trademark of Zwift, Inc., which is not affiliated with the maker of

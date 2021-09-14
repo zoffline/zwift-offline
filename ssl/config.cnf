@@ -1,0 +1,24 @@
+[ req ]
+prompt             = no
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+[ req_distinguished_name ]
+countryName                = US
+localityName               = NY
+organizationName           = Zwift
+commonName                 = *.zwift.com
+[ req_ext ]
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+DNS.2 = *.zwift.com
+DNS.3 = *.prd-gs.zwift.com
+DNS.4 = us-or-rly101.zwift.com
+DNS.5 = secure.zwift.com
+DNS.6 = cdn.zwift.com
+DNS.7 = launcher.zwift.com
+DNS.8 = experimentation.prd-gs.zwift.com
+IP.1 = 192.168.50.10
+IP.2 = 127.0.0.1
