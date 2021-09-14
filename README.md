@@ -12,6 +12,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 ## Server install
 
+<details><summary>Instructions</summary>
+
 Download the zoffline server IMG for Raspberry Pi:<br> 
 https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
 
