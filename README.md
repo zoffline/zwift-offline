@@ -35,19 +35,13 @@ https://sourceforge.net/projects/win32diskimager/
   * If your Zwift version is newer than 1.0.80068 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
   * If your Zwift version is newer than 1.0.80068 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
-* On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``:
+* On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``
   * Open a browser and go to http://192.168.50.10/certs
   * Download the files ``cacert.pem`` and ``import-into-win-macos.p12``
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root import-into-win-macos.p12``
   * If you're prompted for a password, just leave it blank. There is no password.
 * Copy the file ``cacert.pem`` to the folder ``C:\Program Files (x86)\Zwift\data`` and overwrite the old file
-  * Note: Appending cert-zwift-com.pem via Notepad will not work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
-* Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
-  * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
-    <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
-    it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
-* If you wish to leave the ``hosts`` file unchanged except for when specifically using zoffline, you may optionally use the __launch.bat__ script within the ``scripts`` directory to launch zoffline instead of using the normal Zwift Launcher. See [#121](https://github.com/zoffline/zwift-offline/issues/121) for details.
 
 </details>
 
