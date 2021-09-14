@@ -16,8 +16,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 * Download the zoffline server IMG file:<br> 
   * https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
-
-* Extract the ZIP file to a known location.<br>
+* Extract the ZIP file to a known location.
 * Write the IMG file with a program to a SD-Card which is at least 4GB in size. 
 * Windows users can use Win32 Disk Imager:<br>
   * https://sourceforge.net/projects/win32diskimager/
