@@ -1,7 +1,12 @@
-# zoffline server IMG for Raspberry Pi 2b v1.2, 3a+, 3b, 3b+ or 4b.
+# zoffline server IMG for Raspberry Pi
 
 I made a ready to play zoffline server for the Raspberry Pi.
-You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi.
+
+Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) or 4b.
+Passthrough internet on the Pi hotspot is enabled if you connect the Pi over a ethernet cable.
+
+You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi. 
+iOS needs a temorary jailbreak.
 
 This is a fork of https://github.com/zoffline/zwift-offline
 
