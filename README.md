@@ -59,8 +59,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
 * Now we do the certificate file installation for iOS and Zwift.
   * Open in Safari http://192.168.50.10/certs
     * Short touch press on ``import-into-ios.pem``. 
-    * Follow this tutorial now:
-	* https://support.securly.com/hc/en-us/articles/206978437-How-do-I-deploy-Securly-SSL-certificate-to-iOS-
+    * Follow this tutorial now:<br>
+	https://support.securly.com/hc/en-us/articles/206978437-How-do-I-deploy-Securly-SSL-certificate-to-iOS-
   * Go back to Safari and open again http://192.168.50.10/certs
     * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<p>
   * Open Filza file browser App. 
