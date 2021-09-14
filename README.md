@@ -12,7 +12,12 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 ## Install
 
-Setting up zoffline requires two primary steps. First, zoffline must be installed and run on a system before running Zwift (either on the system running Zwift or on another locally networked system).  Second, Zwift must be configured to use zoffline instead of the official Zwift server.
+Download the zoffline server IMG for Raspberry Pi: 
+
+Extract the IMG file to a known location.
+Write the image to a 32GB SD-Card with a compatible program.
+
+Windows users can use Win32 Disk Imager: https://sourceforge.net/projects/win32diskimager/
 
 ### Step 1: Install zoffline
 There are three ways with which to install and run zoffline depending on your platform:
