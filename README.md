@@ -101,7 +101,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 <details><summary>Expand</summary>
 
-* Connect with a SSH program like Putty or WinSCP to the Pi ``(User: pi Password: raspberry)``.
+* Connect with a SSH program like Putty or WinSCP to the Pi.<br> 
+``(User: pi Password: raspberry)``.
   * Uploading activities.
     * The Pi needs to be connected to a ethernet cable with internet access.
     * Modify the necessary files (garmin, strava).
