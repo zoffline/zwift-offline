@@ -27,7 +27,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 ## Client install
 
-<details><summary>Windows Instructions</summary>
+<details><summary>Windows instructions</summary>
 
 * Install Zwift https://www.zwift.com/eu-de/download
 * On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``
@@ -37,10 +37,11 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * ``certutil.exe -importpfx Root import-into-win-macos.p12``
   * If you're prompted for a password, just leave it blank. There is no password.
 * Copy the file ``cacert.pem`` to the folder ``C:\Program Files (x86)\Zwift\data`` and overwrite the old file
+* You are done, have fun.
 
 </details>
 
-<details><summary>iOS Instructions</summary>
+<details><summary>iOS instructions</summary>
 
 * You need a temporary jailbroken iOS device. 
   * After the replacement of the``cacert.pem`` in the Zwift folder we do not need the jailbreak anymore.
@@ -68,7 +69,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
     * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<br>
-* Check if you you are still connected to the zoffline AP.<br>
+* Check if you you are still connected to the zoffline AP, if not connect to it.<br>
 * Launch the Zwift App.
   * Press on add existing user and not on create new user.
   * Login with random credentials with any mail or username and password (check next two steps before you do it).
@@ -77,6 +78,37 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Official online use: Connect to your usual internet AP and open Zwift (close Zwift if it is open in background).
   * zoffline use: Connect to the zoffline AP and open Zwift (close Zwift if it is open in background).
     * If you are using a zoffline and a offical online profile you have two profiles in the Zwift App.
+* If you wan't to deactivate the jailbreak, reboot your device.
+* You are done, have fun.
+
+</details>
+
+<details><summary>macOS instructions</summary>
+
+* TBA
+
+</details>
+
+<details><summary>Android instructions</summary>
+
+* TBA
+
+</details>
+
+### [OPTIONAL]: Upload activities, activate Multiplayer profiles, etc.
+
+<details><summary>Expand</summary>
+
+* Connect with a SSH program like Putty or WinSCP to the Pi ``(User: pi Password: raspberry)``.
+  * Uploading activities.
+    * The Pi needs to be connected to a ethernet cable with internet access.
+    * Modify the necessary files (garmin, strava).
+  * Enable Multiplayer profiles.
+    * Modify the necessary files.
+
+* Which files to be modified you can look here:<br>
+  * https://github.com/zoffline/zwift-offline/blob/master/README.md	
+
 </details>
 
 ## Disclaimer
