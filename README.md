@@ -64,7 +64,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Go back to Safari and open again http://192.168.50.10/certs
     * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<p>
   * Open Filza file browser App. 
-    * Go to the path ``/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads``.
+    * Go to the path<p> 
+	``/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads``.
 	* Long press on ``cacert.pem`` choose move.
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
