@@ -106,7 +106,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Enable Multiplayer profiles.
     * Modify the necessary files.
 
-* Which files to be modified you can look here:<br>
+* Which files you need to modify you can look here:<br>
   * https://github.com/zoffline/zwift-offline/blob/master/README.md	
 
 </details>
