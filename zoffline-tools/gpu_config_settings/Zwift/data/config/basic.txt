@@ -1,0 +1,15 @@
+res 1920x1080(0x)
+sres 1024x1024
+aniso 4
+
+set gSunRays=1
+set gHeadlight=1
+set gSimpleReflections=1
+set gLODBias=1
+set gFoliagePercent=0.5
+
+set gShowFPS=0
+
+set gFXAA=0
+set gBloom=0
+set gSSAO=0
