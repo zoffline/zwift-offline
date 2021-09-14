@@ -49,7 +49,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Zwift will still work with zoffline and should be updateable without going through the procedure again (untested).<p>
 * Check if your device is compatible with the checkra1n jailbreak, other jailbreaks may work but are not tested. 
   * https://taig9.com/apps/checkra1n-downloader/
-  * If yes follow this tutorial, other tutorials may work but are not tested.
+  * If yes follow this tutorial, other tutorials may work but are not tested:
   * https://www.techacrobat.com/checkra1n-jailbreak-for-windows/<p>
 * If you did everything right you should now have a new App called Checkra1n on your iOS device.
   * Install Cydia App through the Checkra1n App on the iPad.
