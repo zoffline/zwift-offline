@@ -28,14 +28,14 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 <details><summary>Windows instructions</summary>
 
-* Install Zwift https://www.zwift.com/eu-de/download
-* On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``
-  * Open a browser and go to http://192.168.50.10/certs
-  * Download the files ``cacert.pem`` and ``import-into-win-macos.p12``
-* Open Command Prompt as an admin, cd to that location and run
+* Install Zwift https://www.zwift.com/eu-de/download<p>
+* On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``<p>
+* Open a browser and go to http://192.168.50.10/certs
+  * Download the files ``cacert.pem`` and ``import-into-win-macos.p12``<p>
+* Open Command Prompt as an admin, cd to that location and run.
   * ``certutil.exe -importpfx Root import-into-win-macos.p12``
-  * If you're prompted for a password, just leave it blank. There is no password.
-* Copy the file ``cacert.pem`` to the folder ``C:\Program Files (x86)\Zwift\data`` and overwrite the old file
+  * If you're prompted for a password, just leave it blank. There is no password.<p>
+* Copy the file ``cacert.pem`` to the folder ``C:\Program Files (x86)\Zwift\data`` and overwrite the old file.<p>
 * You are done, have fun.
 
 </details>
@@ -48,27 +48,27 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Zwift will still work with zoffline and should be updateable without going through the procedure again (untested).<p>
 * Check if your device is compatible with the checkra1n jailbreak, other jailbreaks may work but are not tested. 
   * https://taig9.com/apps/checkra1n-downloader/
-* If yes follow this tutorial, other tutorials may work but are not tested.
-  * https://www.techacrobat.com/checkra1n-jailbreak-for-windows/
+  * If yes follow this tutorial, other tutorials may work but are not tested.
+  * https://www.techacrobat.com/checkra1n-jailbreak-for-windows/<p>
 * If you did everything right you should now have a new App called Checkra1n on your iOS device.
   * Install Cydia App through the Checkra1n App on the iPad.
-  * Install Filza file browser App through Cydia App.<br>
-* Install the Zwift App through the official App store if you did not already.<br>
-* Connect to the zoffline hotspot; ``password zoffline``.<br>
+  * Install Filza file browser App through Cydia App.<p>
+* Install the Zwift App through the official App store if you did not already.<p>
+* Connect to the zoffline hotspot; ``password zoffline``.<p>
 * Now we do the certificate file installation for iOS and Zwift.
   * Open in Safari http://192.168.50.10/certs
     * Short touch press on ``import-into-ios.pem``. 
     * Follow this tutorial now:
 	* https://support.securly.com/hc/en-us/articles/206978437-How-do-I-deploy-Securly-SSL-certificate-to-iOS-
   * Go back to Safari and open again http://192.168.50.10/certs
-    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<br>
+    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<p>
   * Open Filza file browser App. 
     * Go to the path ``/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads``.
 	* Long press on ``cacert.pem`` choose move.
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
-    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<br>
-* Check if you you are still connected to the zoffline AP, if not connect to it.<br>
+    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<p>
+* Check if you you are still connected to the zoffline AP, if not connect to it.<p>
 * Launch the Zwift App.
   * Press on add existing user and not on create new user.
   * Login with random credentials with any mail or username and password (check next two steps before you do it).
@@ -76,8 +76,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
     * If you wan't that, then do not use your Zwift online E-Mail username to create your zoffline user.
   * Official online use: Connect to your usual internet AP and open Zwift (close Zwift if it is open in background).
   * zoffline use: Connect to the zoffline AP and open Zwift (close Zwift if it is open in background).
-    * If you are using a zoffline and a offical online profile you have two profiles in the Zwift App.
-* If you wan't to deactivate the jailbreak, reboot your device.
+    * If you are using a zoffline and a offical online profile you have two profiles in the Zwift App.<p>
+* If you wan't to deactivate the jailbreak, reboot your device.<p>
 * You are done, have fun.
 
 </details>
