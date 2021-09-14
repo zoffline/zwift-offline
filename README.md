@@ -29,7 +29,8 @@ This is a fork of https://github.com/zoffline/zwift-offline
 <details><summary>Windows instructions</summary>
 
 * Install Zwift https://www.zwift.com/eu-de/download<p>
-* On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``<p>
+* Connect to the zoffline hotspot on the windows laptop which you will use to Zwift.<br>
+``password zoffline``<p>
 * Open a browser and go to http://192.168.50.10/certs
   * Download the files ``cacert.pem`` and ``import-into-win-macos.p12``<p>
 * Open Command Prompt as an admin, cd to that location and run.
