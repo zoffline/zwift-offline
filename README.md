@@ -15,11 +15,11 @@ This is a fork of https://github.com/zoffline/zwift-offline
 <details><summary>Instructions</summary>
 
 * Download the zoffline server IMG file:<br> 
-  * https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
+  https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
 * Extract the ZIP file to a known location.
 * Write the IMG file with a program to a SD-Card which is at least 4GB in size. 
 * Windows users can use Win32 Disk Imager:<br>
-  * https://sourceforge.net/projects/win32diskimager/
+  https://sourceforge.net/projects/win32diskimager/<p>
 * The OS will auto resize at boot and use all remaining space of the SD-Card.
 
 </details>
@@ -70,7 +70,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
 	* Long press on ``cacert.pem`` choose move.
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
-    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<p>
+    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.
 * Check if you you are still connected to the zoffline AP, if not connect to it.<p>
 * Launch the Zwift App.
   * Press on add existing user and not on create new user.
@@ -106,10 +106,10 @@ This is a fork of https://github.com/zoffline/zwift-offline
     * The Pi needs to be connected to a ethernet cable with internet access.
     * Modify the necessary files (garmin, strava).
   * Enable Multiplayer profiles.
-    * Modify the necessary files.
+    * Modify the necessary files.<br>
 
-* Which files you need to modify you can look here:<br>
-  * https://github.com/zoffline/zwift-offline/blob/master/README.md	
+* Which files you need to modify you can look here (step 3-6):<br>
+  https://github.com/zoffline/zwift-offline/blob/master/README.md	
 
 </details>
 
