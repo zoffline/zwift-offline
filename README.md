@@ -23,6 +23,7 @@ Write the image with a program to a SD-Card which is at least 4GB in size<br> (t
 Windows users can use Win32 Disk Imager:<br>
 https://sourceforge.net/projects/win32diskimager/
 
+</details>
 
 ## Client install
 
@@ -48,6 +49,8 @@ https://sourceforge.net/projects/win32diskimager/
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
 * If you wish to leave the ``hosts`` file unchanged except for when specifically using zoffline, you may optionally use the __launch.bat__ script within the ``scripts`` directory to launch zoffline instead of using the normal Zwift Launcher. See [#121](https://github.com/zoffline/zwift-offline/issues/121) for details.
+
+</details>
 
 Why: We need to redirect Zwift to use zoffline and convince Windows and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
