@@ -6,7 +6,7 @@ Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) and 4
 Passthrough internet on the Pi hotspot is enabled if you connect the Pi over a ethernet cable.
 
 You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi.<br> 
-``The iOS Zwift client needs a temorary jailbroken device.``
+``The iOS Zwift client needs a temporary jailbroken device.``
 
 This is a fork of https://github.com/zoffline/zwift-offline
 
@@ -19,10 +19,9 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 * Extract the ZIP file to a known location.<br>
 * Write the IMG file with a program to a SD-Card which is at least 4GB in size. 
-* The OS will auto resize at boot and use all remaining space of the SD-Card.
-
 * Windows users can use Win32 Disk Imager:<br>
   * https://sourceforge.net/projects/win32diskimager/
+* The OS will auto resize at boot and use all remaining space of the SD-Card.
 
 </details>
 
