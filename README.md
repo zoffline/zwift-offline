@@ -15,7 +15,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
 Download the zoffline server IMG for Raspberry Pi: 
 
 Extract the IMG file to a known location.
-Write the image to a 32GB SD-Card with a compatible program.
+Write the image with a program to a SD-Card which is at least 4GB in size (the OS will auto resize at boot and use all remaining space of the SD-Card).
 
 Windows users can use Win32 Disk Imager: https://sourceforge.net/projects/win32diskimager/
 
