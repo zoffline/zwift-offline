@@ -2,7 +2,7 @@
 
 I made a ready to play zoffline server for the Raspberry Pi.
 
-Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) or 4b.
+Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) or 4b.<br>
 Passthrough internet on the Pi hotspot is enabled if you connect the Pi over a ethernet cable.
 
 You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi.<br> 
@@ -10,7 +10,7 @@ iOS needs a temorary jailbreak.
 
 This is a fork of https://github.com/zoffline/zwift-offline
 
-## Install
+## Server install
 
 Download the zoffline server IMG for Raspberry Pi: 
 https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
@@ -21,87 +21,8 @@ Write the image with a program to a SD-Card which is at least 4GB in size (the O
 Windows users can use Win32 Disk Imager:
 https://sourceforge.net/projects/win32diskimager/
 
-### Step 1: Install zoffline
-There are three ways with which to install and run zoffline depending on your platform:
 
-<details><summary>Simplest (Windows only)</summary>
-To install zoffline on Windows:
-
-* Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases
-* Run the downloaded zoffline.exe
-  * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
-* Start Zwift with zoffline.exe running (__after completing step 2__ or running __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper)
-  * It takes zoffline a few seconds to start. Wait until text appears in the command prompt before opening Zwift.
-* When done with Zwift, press Ctrl+C in the command line to close zoffline.
-</details>
-
-<details><summary>Linux, Windows, or Mac OS X (from source)</summary>
-To install zoffline on Linux, Windows, or Mac OS X:
-
-* Install Python 3 (https://www.python.org/downloads/) if not already installed
-  * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
-  * Python 2 remains supported for now, but it is not recommended.
-* Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip3 install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
-  * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
-* Clone or download this repo
-* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
-* Run standalone.py before starting Zwift
-  * e.g., on Linux/Mac: ``sudo ./standalone.py``
-    * sudo is needed because we're binding to the privileged ports 80 and 443.
-    * If using Python 3, but Python 3 is not your system default run ``sudo python3 standalone.py``
-  * e.g., on Windows in command prompt: ``python standalone.py``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\python.exe`` instead of just ``python``
-* Start Zwift with standalone.py running (__after completing step 2__)
-* Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
-
-zoffline can be installed on the same machine as Zwift or another local machine.
-</details>
-
-
-<details><summary>Using Docker</summary>
- 
-* Install Docker
-* Create the docker container with:<br>
-  ``docker create --name zwift-offline -p 443:443 -p 80:80 -p 3022:3022/udp -p 3023:3023 -v </path/to/host/storage>:/usr/src/app/zwift-offline/storage -e TZ=<timezone> zoffline/zoffline``
-  * You can optionally exclude ``-v </path/to/host/storage>:/usr/src/app/zwift-offline/storage`` if you don't care if your Zwift progress state is retained across zoffline updates (unlikely).
-  * The path you pass to ``-v`` will likely need to be world readable and writable.
-  * A list of valid ``<timezone>`` values (e.g. America/New_York) can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-  * Adding ``--restart unless-stopped`` will make zoffline start on boot if you have Docker v1.9.0 or greater.
-* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``</path/to/host/storage>`` directory containing the IP address of the PC running zoffline.
-* Start zoffline with:
-  ``docker start zwift-offline``
-</details>
-
-
-<details><summary>Using Docker Compose</summary>
- 
-* Install docker-compose
-* Either use the ``docker-compose.yml`` file in this repo which will build from the Dockerfile, or use this example compose file:
-   ```
-  services:
-      zoffline:
-           image: zoffline/zoffline:latest
-           container_name: zoffline
-           network_mode: host
-           environment:
-              - TZ=Europe/London
-           volumes:
-              - ./storage/:/usr/src/app/zwift-offline/storage
-           ports:
-              - 80:80
-              - 443:443
-              - 3022:3022/udp
-              - 3023:3023
-           restart: unless-stopped    
-   ```
-* If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
-* Start zoffline with:
-  ``docker-compose up -d ``
-</details>
-
-### Step 2: Configure Zwift client to use zoffline
+## Client install
 
 <details><summary>Windows Instructions</summary>
 
