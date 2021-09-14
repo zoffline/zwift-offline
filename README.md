@@ -42,7 +42,10 @@ https://sourceforge.net/projects/win32diskimager/
 
 <details><summary>iOS Instructions</summary>
 
-* We need a temporary jailbroken iOS device, after the Zwift client ``cacert.pem`` we do not need the jailbreak anymore.
+* We need a temporary jailbroken iOS device. 
+  * After the replacement of the``cacert.pem`` in the Zwift folder we do not need the jailbreak anymore.
+  * At the end of the procedure you can reboot your iOS device and the jailbreak is not active anymore.
+  * Zwift will still work with zoffline and should be updateable without going through the procedure again (untested).
 * Check if your device is compatible with the checkra1n jailbreak, other jailbreaks may work but are not tested. 
 * https://taig9.com/apps/checkra1n-downloader/
 * If yes follow this tutorial, other tutorials may work but are not tested.
