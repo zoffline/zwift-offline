@@ -53,28 +53,28 @@ https://sourceforge.net/projects/win32diskimager/
   * https://www.techacrobat.com/checkra1n-jailbreak-for-windows/
 * If you did everything right you should now have a new App called Checkra1n on your iOS device.
   * Install Cydia App through the Checkra1n App on the iPad.
-  * Install Filza file browser App through Cydia App.<br>
+  * Install Filza file browser App through Cydia App.
   
-* Install the Zwift App through the official App store if you did not already.<br>
+* Install the Zwift App through the official App store if you did not already.
 
-* Connect to the zoffline hotspot; ``password zoffline``.<br>
+* Connect to the zoffline hotspot; ``password zoffline``.
 
-* Now we do the certificate file installation for iOS and Zwift.<br>
+* Now we do the certificate file installation for iOS and Zwift.
   * Open in Safari http://192.168.50.10/certs
     * Short touch press on ``import-into-ios.pem``. 
     * Follow this tutorial now.<br> 
 	  * https://support.securly.com/hc/en-us/articles/206978437-How-do-I-deploy-Securly-SSL-certificate-to-iOS-
   * Go back to Safari and open again http://192.168.50.10/certs
-    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<br>
+    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.
 
   * Open Filza file browser App. 
     * Go to the path ``/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads``.
 	* Long press on ``cacert.pem`` choose move.
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
-    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<br>
+    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.
 	
-* Check if you you are still connected to the zoffline AP.<br>
+* Check if you you are still connected to the zoffline AP.
 
 * Launch the Zwift App.
   * Press on add existing user and not on create new user.
