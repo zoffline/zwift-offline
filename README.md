@@ -5,7 +5,7 @@ This is a ready to play autostart zoffline server for the Raspberry Pi.
 Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) and 4b.<br>
 Passthrough internet on the Pi hotspot is enabled if you connect the Pi over a ethernet cable.
 
-You can play on any Zwift client (Windows, iOS, Android, macOS) ``over the zoffline wifi hotspot from the Pi.``<br> 
+You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi.<br> 
 ``The iOS Zwift client needs a temorary jailbroken device.``
 
 This is a fork of https://github.com/zoffline/zwift-offline
@@ -14,14 +14,15 @@ This is a fork of https://github.com/zoffline/zwift-offline
 
 <details><summary>Instructions</summary>
 
-Download the zoffline server IMG file:<br> 
-https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
+* Download the zoffline server IMG file:<br> 
+  * https://drive.google.com/u/0/uc?id=1WNHDLaHiUb-6NyaCZs1b8IM0pfKUMgDO&export=download
 
-Extract the ZIP file to a known location.<br>
-Write the IMG file with a program to a SD-Card which is at least 4GB in size<br> (the OS will auto resize at boot and use all remaining space of the SD-Card).
+* Extract the ZIP file to a known location.<br>
+* Write the IMG file with a program to a SD-Card which is at least 4GB in size. 
+* The OS will auto resize at boot and use all remaining space of the SD-Card.
 
-Windows users can use Win32 Disk Imager:<br>
-https://sourceforge.net/projects/win32diskimager/
+* Windows users can use Win32 Disk Imager:<br>
+  * https://sourceforge.net/projects/win32diskimager/
 
 </details>
 
