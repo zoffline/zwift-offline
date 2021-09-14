@@ -47,9 +47,9 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * After the replacement of the``cacert.pem`` in the Zwift folder we do not need the jailbreak anymore.
   * At the end of the procedure you can reboot your iOS device and the jailbreak is not active anymore.
   * Zwift will still work with zoffline and should be updateable without going through the procedure again (untested).<p>
-* Check if your device is compatible with the checkra1n jailbreak,<br> other jailbreaks may work but are not tested: 
+* Check if your device is compatible with the checkra1n jailbreak,<br> other jailbreaks may work but are not tested:<br> 
    https://taig9.com/apps/checkra1n-downloader/
-  * If yes follow this tutorial, other tutorials may work but are not tested:<br>
+* If yes follow this tutorial, other tutorials may work but are not tested:<br>
   https://www.techacrobat.com/checkra1n-jailbreak-for-windows/<p>
 * If you did everything right you should now have a new App called Checkra1n on your iOS device.
   * Install Cydia App through the Checkra1n App on the iPad.
