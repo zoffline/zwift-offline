@@ -51,7 +51,7 @@ This is a fork of https://github.com/zoffline/zwift-offline
   * Check if it is compatible with the checkra1n jailbreak,<br> other jailbreaks may work but are not tested:<br> 
    https://taig9.com/apps/checkra1n-downloader/
   * If yes follow this tutorial, other tutorials may work but are not tested:<br>
-    https://www.techacrobat.com/checkra1n-jailbreak-for-windows/<p>
+    https://www.techacrobat.com/checkra1n-jailbreak-for-windows/
   * If you did everything right you should now have a new App called Checkra1n on your iOS device.
     * Install Cydia App through the Checkra1n App on the iPad.
     * Install Filza file browser App through Cydia App.<p>
@@ -63,14 +63,14 @@ This is a fork of https://github.com/zoffline/zwift-offline
     * Follow this tutorial now:<br>
 	https://support.securly.com/hc/en-us/articles/206978437-How-do-I-deploy-Securly-SSL-certificate-to-iOS-
   * Go back to Safari and open again http://192.168.50.10/certs
-    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.<p>
+    * Long touch press on ``cacert.pem`` touch press on ``download linked file``.
   * Open Filza file browser App. 
     * Go to the path<br> 
 	``/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads``.
 	* Long press on ``cacert.pem`` choose move.
 	* Go to the path ``/var/containers/Bundle/Application/Zwift/Zwift.app/dataES``.
     * Press the pinboard icon on the bottom left hand side and then the left icon arrow ``paste``.
-    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.
+    * If you did it right you will be asked if you want to replace the file ``cacert.pem`` press ``replace``.<p>
 * Check if you you are still connected to the zoffline AP, if not connect to it.<p>
 * Launch the Zwift App.
   * Press on add existing user and not on create new user.
