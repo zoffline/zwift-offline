@@ -6,7 +6,7 @@ Following Raspberry Pi should be comaptible: 2b v1.2, 3a+, 3b, 3b+(tested) and 4
 Passthrough internet on the Pi hotspot is enabled if you connect the Pi over a ethernet cable.
 
 You can play on any Zwift client (Windows, iOS, Android, macOS) ``over the zoffline wifi hotspot from the Pi.``<br> 
-``iOS needs a temorary jailbreak.``
+``The iOS Zwift client needs a temorary jailbroken device.``
 
 This is a fork of https://github.com/zoffline/zwift-offline
 
