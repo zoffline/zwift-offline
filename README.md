@@ -29,12 +29,7 @@ https://sourceforge.net/projects/win32diskimager/
 
 <details><summary>Windows Instructions</summary>
 
-* Install Zwift
-  * If your Zwift version is 1.0.80068, you're all set.
-  * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.80068 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.80068 and zoffline is not running from source: wait for zoffline to be updated.
-* __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
+* Install Zwift https://www.zwift.com/eu-de/download
 * On your Windows machine running Zwift, connect to the zoffline hotspot; ``password zoffline``
   * Open a browser and go to http://192.168.50.10/certs
   * Download the files ``cacert.pem`` and ``import-into-win-macos.p12``
