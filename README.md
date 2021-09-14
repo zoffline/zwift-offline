@@ -1,10 +1,9 @@
-# zoffline
+# zoffline server IMG for Raspberry Pi 2b v1.2, 3a+, 3b, 3b+ or 4b.
 
-zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server. By default zoffline is only for a single player. See [Step 6: Enable Multiplayer](#step-6-optional-enable-multiplayer) for how to enable support for multiple users/profiles.
+I made a ready to play zoffline server for the Raspberry Pi.
+You can play on any Zwift client (Windows, iOS, Android, macOS) over the zoffline wifi hotspot from the Pi.
 
-zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See https://github.com/zoffline/zwift-offline/issues/56 for extra details.
-
-Additionally, zoffline's launcher allows selecting a specific map to ride on without mucking about with config files.
+This is a fork of https://github.com/zoffline/zwift-offline
 
 ## Install
 
