@@ -44,6 +44,7 @@ import protobuf.world_pb2 as world_pb2
 import protobuf.zfiles_pb2 as zfiles_pb2
 import protobuf.hash_seeds_pb2 as hash_seeds_pb2
 import protobuf.events_pb2 as events_pb2
+import protobuf.variants_pb2 as variants_pb2
 import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -1984,6 +1985,39 @@ def auth_realms_zwift_tokens_access_codes():
         return fake_jwt_with_session_cookie(remember_token), 200
     else:
         return FAKE_JWT, 200
+
+
+@app.route('/experimentation/v1/variant', methods=['POST'])
+def experimentation_v1_variant():
+    variant_list = [('game_1_12_pc_skip_activity_save_retry', None),
+                    ('return_to_home', 1),
+                    ('game_1_12_nhd_v1', 1),
+                    ('game_1_13_japanese_medium_font', 1),
+                    ('game_1_12_1_retire_client_chat_culling', 1),
+                    ('game_1_14_draftlock_fix', None),
+                    ('xplatform_partner_connection_vitality', None),
+                    ('game_1_16_new_route_ui', 1),
+                    ('pack_dynamics_30_global', None),
+                    ('pack_dynamics_30_makuri', None),
+                    ('pack_dynamics_30_london', None),
+                    ('pack_dynamics_30_watopia', None),
+                    ('pack_dynamics_30_exclude_events', None),
+                    ('game_1_17_server_connection_notifications', None),
+                    ('zc_ios_aug_2021_release_sync', None),
+                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1),
+                    ('game_1_17_game_client_activity_event', None),
+                    ('game_1_17_tdf_femmes_yellow_jersey', None),
+                    ('game_1_17_ble_disable_component_sport_filter', None),
+                    ('game_1_15_assert_disable_abort', 1),
+                    ('game_1_14_settings_refactor', None)]
+
+    variants = variants_pb2.Variants()
+    for variant in variant_list:
+        item = variants.variants.add()
+        item.name = variant[0]
+        if variant[1] is not None:
+            item.value = variant[1]
+    return variants.SerializeToString(), 200
 
 
 def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
