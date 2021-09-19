@@ -402,6 +402,13 @@ def login():
             login_user(user, remember=True)
             user.remember = remember
             db.session.commit()
+            profile_dir = os.path.join(STORAGE_DIR, str(user.player_id))
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError as e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                return '', 500
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
@@ -676,14 +683,7 @@ def reload_bots():
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
 def upload(username):
-    player_id = current_user.player_id
-    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
-    try:
-        if not os.path.isdir(profile_dir):
-            os.makedirs(profile_dir)
-    except IOError as e:
-        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        return '', 500
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
