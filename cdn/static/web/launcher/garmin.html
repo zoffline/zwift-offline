@@ -1,0 +1,38 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Garmin Connect credentials</div></h1>
+  <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  <div class="row">
+    <div class="col-sm-6 col-md-5">
+      <form id="garmin" action="{{ url_for('garmin', username=username) }}" method="post">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Garmin Username</label>
+            <input type="text" id="username" name="username" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Garmin Password</label>
+            <input type="password" id="password" name="password" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Submit" class="btn btn-sm btn-light">
+            <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item py-2">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

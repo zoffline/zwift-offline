@@ -402,6 +402,13 @@ def login():
             login_user(user, remember=True)
             user.remember = remember
             db.session.commit()
+            profile_dir = os.path.join(STORAGE_DIR, str(user.player_id))
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError as e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                return '', 500
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
@@ -485,7 +492,7 @@ def strava():
         return redirect('/user/%s/' % current_user.username)
     client = Client()
     url = client.authorization_url(client_id=client_id,
-                                   redirect_uri='https://%s/authorization' % server_ip,
+                                   redirect_uri='https://launcher.zwift.com/authorization',
                                    scope='activity:write')
     return redirect(url)
 
@@ -498,7 +505,7 @@ def authorization():
         client = Client()
         code = request.args.get('code')
         token_response = client.exchange_code_for_token(client_id=client_id, client_secret=client_secret, code=code)
-        with open('%s/strava_token.txt' % os.path.join(STORAGE_DIR, str(current_user.player_id)), 'w') as f:
+        with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'strava_token.txt'), 'w') as f:
             f.write(client_id + '\n');
             f.write(client_secret + '\n');
             f.write(token_response['access_token'] + '\n');
@@ -521,8 +528,7 @@ def profile(username):
 
         username = request.form['username']
         password = request.form['password']
-        player_id = current_user.player_id
-        profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
+        profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
         session = requests.session()
 
         try:
@@ -555,6 +561,35 @@ def profile(username):
         except:
             flash("Invalid username or password.")
     return render_template("profile.html", username=current_user.username)
+
+
+@app.route("/garmin/<username>/", methods=["GET", "POST"])
+@login_required
+def garmin(username):
+    if request.method == "POST":
+        if request.form['username'] == "" or request.form['password'] == "":
+            flash("Garmin credentials can't be empty.")
+            return render_template("garmin.html", username=current_user.username)
+
+        username = request.form['username']
+        password = request.form['password']
+
+        try:
+            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.txt')
+            with open(file_path, 'w') as f:
+                f.write(username + '\n');
+                f.write(password + '\n');
+            if credentials_key is not None:
+                with open(file_path, 'rb') as fr:
+                    garmin_credentials = fr.read()
+                    cipher_suite = Fernet(credentials_key)
+                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
+                    with open(file_path, 'wb') as fw:
+                        fw.write(ciphered_text)
+            flash("Garmin credentials saved.")
+        except:
+            flash("Error saving 'garmin_credentials.txt' file.")
+    return render_template("garmin.html", username=current_user.username)
 
 
 @app.route("/user/<username>/")
@@ -647,14 +682,7 @@ def reload_bots():
 @app.route("/upload/<username>/", methods=["GET", "POST"])
 @login_required
 def upload(username):
-    player_id = current_user.player_id
-    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
-    try:
-        if not os.path.isdir(profile_dir):
-            os.makedirs(profile_dir)
-    except IOError as e:
-        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        return '', 500
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
 
     if request.method == 'POST':
         uploaded_file = request.files['file']

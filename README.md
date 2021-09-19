@@ -244,7 +244,7 @@ To obtain your current profile:
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``get_profile.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
 * Move the resulting ``profile.bin`` (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
   * If using zoffline.exe on Windows, create a ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
-  * If multiplayer is enabled, use the upload button in the launcher window to import your file.
+  * If multiplayer is enabled, use the profile button in the launcher window to import your file.
   * If using Docker, move ``profile.bin`` into the path you passed to ``-v``
 
 </details>
@@ -263,7 +263,7 @@ To obtain your current profile:
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
-  * If multiplayer is enabled, use the upload button in the launcher window to import your file.
+  * If multiplayer is enabled, use the profile button in the launcher window to import your file.
 
 </details>
 
@@ -281,7 +281,7 @@ To obtain your current profile:
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
-  * If multiplayer is enabled, use the upload button in the launcher window to encrypt the credentials file.
+  * If multiplayer is enabled, use the profile button in the launcher window to encrypt the credentials file.
 
 </details>
 
