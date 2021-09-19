@@ -505,7 +505,7 @@ def authorization():
         client = Client()
         code = request.args.get('code')
         token_response = client.exchange_code_for_token(client_id=client_id, client_secret=client_secret, code=code)
-        with open('%s/strava_token.txt' % os.path.join(STORAGE_DIR, str(current_user.player_id)), 'w') as f:
+        with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'strava_token.txt'), 'w') as f:
             f.write(client_id + '\n');
             f.write(client_secret + '\n');
             f.write(token_response['access_token'] + '\n');
@@ -574,11 +574,9 @@ def garmin(username):
 
         username = request.form['username']
         password = request.form['password']
-        player_id = current_user.player_id
-        profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
 
         try:
-            file_path = os.path.join(profile_dir, 'garmin_credentials.txt')
+            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.txt')
             with open(file_path, 'w') as f:
                 f.write(username + '\n');
                 f.write(password + '\n');
