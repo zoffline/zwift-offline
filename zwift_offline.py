@@ -528,8 +528,7 @@ def profile(username):
 
         username = request.form['username']
         password = request.form['password']
-        player_id = current_user.player_id
-        profile_dir = '%s/%s' % (STORAGE_DIR, str(player_id))
+        profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
         session = requests.session()
 
         try:
@@ -582,9 +581,9 @@ def garmin(username):
                 f.write(password + '\n');
             if credentials_key is not None:
                 with open(file_path, 'rb') as fr:
-                    zwift_credentials = fr.read()
+                    garmin_credentials = fr.read()
                     cipher_suite = Fernet(credentials_key)
-                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
+                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
                     with open(file_path, 'wb') as fw:
                         fw.write(ciphered_text)
             flash("Garmin credentials saved.")
