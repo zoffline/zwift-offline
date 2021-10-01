@@ -168,8 +168,8 @@ to generate your own certificates and do the same.
 <details><summary>Android (non-rooted device)</summary>
 
 * Install required apps:
-  * Download and install ``zoffline-obb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/blob/master/app/release/zoffline-obb.apk)
-  * Download "Host Changer VPN - The Game Changer" from Google Play ([link](https://play.google.com/store/apps/details?id=com.hostchanger.gamingvpn.gamechanger))
+  * Download and install ``ZofflineObb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/releases/download/v1.1/ZofflineObb.apk)
+  * Download "#1 HOST CHANGER - BEST FOR GAMING" from Google Play ([link](https://play.google.com/store/apps/details?id=best.see.world.company))
   * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
   ```
   <zoffline ip> us-or-rly101.zwift.com
@@ -177,7 +177,7 @@ to generate your own certificates and do the same.
   <zoffline ip> cdn.zwift.com
   ```
   * Run `Host Changer`, select created `hosts.txt` file and press the button
-  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer VPN" app.
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app.
 * Patch after every installation or update:
   * Install/update Zwift from Google play, but do not start it yet.
     * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
@@ -189,7 +189,7 @@ to generate your own certificates and do the same.
   * Start Zwift and sign in using any email/password
     * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
 
-Why: We need to redirect Zwift to use zoffline (this is done by the VPN app) and convince Zwift to
+Why: We need to redirect Zwift to use zoffline (this is done by the Host Changer app) and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names (this is done by the patch tool ZofflineObb).
 
 </details>
