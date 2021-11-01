@@ -321,11 +321,9 @@ To enable support for multiple users perform the steps below. zoffline's previou
   ```
 </details>
 
-## Community Discord and zoffline (online) server
+## Community Discord server and Strava club
 
-Please join the community supported [Discord](https://discord.gg/GMdn8F8) and their enhanced version of zoffline, hosted Online!
-
-Follow the guide in #instructions to create your account and join other Zwifters.
+Please join the community supported [Discord](https://discord.gg/GMdn8F8) server and [Strava](https://www.strava.com/clubs/zoffline) club.
 
 ## Dependencies
 
