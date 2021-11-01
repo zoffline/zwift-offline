@@ -2030,13 +2030,16 @@ def experimentation_v1_variant():
                     ('pack_dynamics_30_london', None),
                     ('pack_dynamics_30_watopia', None),
                     ('pack_dynamics_30_exclude_events', None),
-                    ('game_1_17_server_connection_notifications', None),
+                    ('game_1_18_server_connection_notifications', None),
                     ('zc_ios_aug_2021_release_sync', None),
                     ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1),
                     ('game_1_17_game_client_activity_event', None),
-                    ('game_1_17_tdf_femmes_yellow_jersey', None),
-                    ('game_1_17_ble_disable_component_sport_filter', None),
+                    ('game_1_17_1_tdf_femmes_yellow_jersey', None),
+                    ('game_1_17_ble_disable_component_sport_filter', 1),
+                    ('game_1_18_new_welcome_ride', None),
+                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1),
                     ('game_1_15_assert_disable_abort', 1),
+                    ('game_1_18_holiday_mode', None),
                     ('game_1_14_settings_refactor', None)]
 
     variants = variants_pb2.Variants()
