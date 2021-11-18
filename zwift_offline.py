@@ -1480,6 +1480,7 @@ def api_profiles_goals_id(player_id, goal_id):
 
 
 @app.route('/api/tcp-config', methods=['GET'])
+@app.route('/relay/tcp-config', methods=['GET'])
 def api_tcp_config():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
@@ -2015,30 +2016,47 @@ def auth_realms_zwift_tokens_access_codes():
 
 @app.route('/experimentation/v1/variant', methods=['POST'])
 def experimentation_v1_variant():
-    variant_list = [('game_1_12_pc_skip_activity_save_retry', None),
-                    ('return_to_home', 1),
-                    ('game_1_12_nhd_v1', 1),
-                    ('game_1_13_japanese_medium_font', 1),
-                    ('game_1_12_1_retire_client_chat_culling', 1),
-                    ('game_1_14_draftlock_fix', None),
-                    ('xplatform_partner_connection_vitality', None),
-                    ('game_1_16_new_route_ui', 1),
-                    ('pack_dynamics_30_global', None),
-                    ('pack_dynamics_30_makuri', None),
-                    ('pack_dynamics_30_london', None),
-                    ('pack_dynamics_30_watopia', None),
-                    ('pack_dynamics_30_exclude_events', None),
-                    ('game_1_18_server_connection_notifications', None),
-                    ('zc_ios_aug_2021_release_sync', None),
-                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1),
-                    ('game_1_17_game_client_activity_event', None),
-                    ('game_1_17_1_tdf_femmes_yellow_jersey', None),
-                    ('game_1_17_ble_disable_component_sport_filter', 1),
-                    ('game_1_18_new_welcome_ride', None),
-                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1),
-                    ('game_1_15_assert_disable_abort', 1),
-                    ('game_1_18_holiday_mode', None),
-                    ('game_1_14_settings_refactor', None)]
+    variant_list = [('game_1_12_pc_skip_activity_save_retry', None, None),
+                    ('return_to_home', 1, None),
+                    ('game_1_12_nhd_v1', 1, None),
+                    ('game_1_13_japanese_medium_font', 1, None),
+                    ('game_1_12_1_retire_client_chat_culling', 1, None),
+                    ('game_1_14_draftlock_fix', None, None),
+                    ('xplatform_partner_connection_vitality', None, None),
+                    ('game_1_16_new_route_ui', 1, None),
+                    ('pack_dynamics_30_global', 1, None),
+                    ('pack_dynamics_30_makuri', 1, None),
+                    ('pack_dynamics_30_london', 1, None),
+                    ('pack_dynamics_30_watopia', 1, None),
+                    ('pack_dynamics_30_exclude_events', None, None),
+                    ('game_1_19_system_alerts', 1, None),
+                    ('zc_ios_aug_2021_release_sync', None, None),
+                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
+                    ('game_1_17_game_client_activity_event', None, None),
+                    ('game_1_17_1_tdf_femmes_yellow_jersey', None, None),
+                    ('game_1_17_ble_disable_component_sport_filter', 1, None),
+                    ('game_1_18_new_welcome_ride', None, None),
+                    ('game_1_19_achievement_service_persist', None, None),
+                    ('game_1_19_achievement_service_src_of_truth', None, None),
+                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
+                    ('game_1_18_alternate_control_point_pairing', None, None),
+                    ('game_1_18_swap_legacy_controllable_for_ftms', None, None),
+                    ('game_1_19_gender_dob_change', None, None),
+                    ('game_1_18_0_osx_monterey_bluetooth_uart_fix', None, 0),
+                    ('game_1_19_0_default_rubberbanding', None, None),
+                    ('game_1_19_use_tabbed_settings', None, 0),
+                    ('pedal_assist_20', None, None),
+                    ('game_1_19_segment_results_sub_active', None, 0),
+                    ('game_1_19_hw_experiment_1', None, None),
+                    ('game_1_19_paired_devices_alerts', 1, None),
+                    ('game_1_19_real_time_unlocks', None, None),
+                    ('game_1_15_assert_disable_abort', 1, None),
+                    ('game_1_19_local_activity_persistence', None, None),
+                    ('game_1_18_holiday_mode', None, None),
+                    ('game_1_17_noesis_enabled', None, None),
+                    ('game_1_17_home_screen', None, None),
+                    ('game_1_19_noesis_dummy', None, None),
+                    ('game_1_14_settings_refactor', None, None)]
 
     variants = variants_pb2.Variants()
     for variant in variant_list:
@@ -2046,6 +2064,12 @@ def experimentation_v1_variant():
         item.name = variant[0]
         if variant[1] is not None:
             item.value = variant[1]
+        f3 = item.f3.add()
+        if variant[2] is not None:
+            f1 = f3.f1.add()
+            f1.name = variant[0]
+            f2 = f1.f2.add()
+            f2.f4 = variant[2]
     return variants.SerializeToString(), 200
 
 
