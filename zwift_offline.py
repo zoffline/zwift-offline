@@ -840,6 +840,7 @@ def api_clubs_club_cancreate():
 @app.route('/api/notifications', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/event-feed', methods=['GET'])
+@app.route('/api/activity-feed/feed/', methods=['GET'])
 def api_empty_arrays():
     return '[]'
 
