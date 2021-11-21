@@ -259,7 +259,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024)
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
-            hello.ParseFromString(self.data[3:-4])
+            hello.ParseFromString(self.data[8:-9])
         except:
             return
         # send packet containing UDP server (127.0.0.1)
