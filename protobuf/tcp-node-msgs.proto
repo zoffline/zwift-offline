@@ -41,6 +41,14 @@ message TCPHello {
 	required int32 player_id = 2;
 }
 
+message TCPCompanionConnect {
+	required int32 player_id = 2;
+	required int32 dummy = 3;
+	required string zc_local_ip = 12;
+	required int32 zc_local_port = 15;
+	required int32 kind = 16;
+}
+
 ////////////////////////////////////////
 // Recurring TCP response below
 ////////////////////////////////////////
@@ -50,4 +58,17 @@ message RecurringTCPResponse {
 	optional int32 player_id = 2;
 	optional int32 f3 = 3;
 	optional int32 f11 = 11;
+}
+
+// Zwift companion protocol
+
+message PhoneToGameCommand {
+	required int32 seqno = 1;
+	required int32 command = 2;
+	required int32 command_copy = 10;
+}
+
+message PhoneToGame {
+	required int32 player_id = 1;
+	repeated PhoneToGameCommand command = 2;
 }

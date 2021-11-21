@@ -246,6 +246,16 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        #zc_params = tcp_node_msgs_pb2.PhoneToGame()
+        #zc_params.player_id = 1
+        #cmd = zc_params.command.add()
+        #cmd.seqno = 1
+        #cmd.command = 1
+        #cmd.command_copy = 1
+        #zc_params_payload = zc_params.SerializeToString()
+        ##self.request.sendall(struct.pack('!h', len(zc_params_payload)))
+        ##self.request.sendall(zc_params_payload)
+        #print("camera: " + zc_params_payload.hex())
         self.data = self.request.recv(1024)
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
@@ -308,6 +318,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
             try:
+                #if ZC need to be registered
+                if player_id in zwift_offline.zc_connect_queue and player_id in online:
+                    zc_params = tcp_node_msgs_pb2.TCPCompanionConnect()
+                    zc_params.player_id = player_id
+                    zc_params.dummy = 0 #what is it?
+                    zc_params.zc_local_ip = zwift_offline.zc_connect_queue[player_id][0]
+                    zc_params.zc_local_port = zwift_offline.zc_connect_queue[player_id][1] #21587
+                    zc_params.kind = 2 #TCP
+                    zc_params_payload = zc_params.SerializeToString()
+                    self.request.sendall(struct.pack('!h', len(zc_params_payload)))
+                    self.request.sendall(zc_params_payload)
+                    print("register_zc" + zc_params_payload.hex())
+                    zwift_offline.zc_connect_queue.pop(player_id)
+
                 message = udp_node_msgs_pb2.ServerToClient()
                 message.f1 = 1
                 message.player_id = player_id
@@ -458,6 +482,7 @@ def get_empty_message(player_id):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        global discord
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
@@ -490,7 +515,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         #Update player online state
         if state.roadTime and t >= last_updates[player_id] + online_update_freq:
             last_updates[player_id] = t
-            if not player_id in online.keys():
+            if (not player_id in online.keys()) and ('discord' in globals()):
                 discord.send_message('%s riders online' % (len(online) + 1))
             online[player_id] = state
 

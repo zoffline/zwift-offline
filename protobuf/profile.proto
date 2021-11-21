@@ -42,10 +42,10 @@ message Profile {
     optional uint32 total_watt_hours = 41;
     optional uint32 height_in_millimeters = 42;
     optional string dob = 43;
-    optional uint32 f44 = 44;
+    optional uint32 f44 = 44; /* max heart rate */
     optional bool f45 = 45;
     optional uint32 total_xp = 46;
-    optional uint32 f47 = 47;
+    optional uint32 f47 = 47; /* drops */
     
     optional PlayerType player_type = 48;
     enum PlayerType {
@@ -57,7 +57,7 @@ message Profile {
     }
     
     optional uint32 achievement_level = 49;
-    optional bool f50 = 50;
+    optional bool f50 = 50; /* metric */
     optional bool f51 = 51;
     optional uint32 f52 = 52;
     optional uint32 f53 = 53;
@@ -101,8 +101,8 @@ message Profile {
     optional fixed32 f71 = 71;
     optional fixed32 f72 = 72;
     optional fixed32 f73 = 73;
-    optional uint32 f74 = 74;
-    optional uint32 f75 = 75;
+    optional uint32 f74 = 74; /* totalRunDistance */
+    optional uint32 f75 = 75; /* totalRunExperiencePoints */
     optional fixed32 f76 = 76;
     optional fixed32 f77 = 77;
     optional fixed32 f78 = 78;
@@ -118,7 +118,7 @@ message Profile {
         SPORT4 = 4;
     }
     optional string mix_panel_distinct_id = 83;
-    optional uint32 f84 = 84;
+    optional uint32 f84 = 84; /* run achievement */
     optional uint32 f85 = 85;
     optional Sport sport = 86;
     optional uint32 f87 = 87;

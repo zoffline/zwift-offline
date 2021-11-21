@@ -26,6 +26,7 @@ from flask import Flask, request, jsonify, redirect, render_template, url_for, f
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
+from google.protobuf.json_format import MessageToJson
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -152,6 +153,7 @@ global_bots = {}
 global_ghosts = {}
 ghosts_enabled = {}
 player_update_queue = {}
+zc_connect_queue = {}
 player_partial_profiles = {}
 save_ghost = None
 restarting = False
@@ -830,11 +832,47 @@ def get_id(table_name):
 def world_time():
     return int((get_utc_time()-1414016075)*1000)
 
+@app.route('/api/clubs/club/can-create', methods=['GET'])
+def api_clubs_club_cancreate():
+    return '{"result":false}'
+
+@app.route('/api/campaign/profile/campaigns', methods=['GET'])
+@app.route('/api/notifications', methods=['GET'])
+@app.route('/api/announcements/active', methods=['GET'])
+@app.route('/api/event-feed', methods=['GET'])
+def api_empty_arrays():
+    return '[]'
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
     return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
 
+@app.route('/api/server', methods=['GET'])
+def api_server():
+    return '{"build":"zwift_1.263.0","version":"1.263.0"}'
+
+@app.route('/api/servers', methods=['GET'])
+def api_servers():
+    return '{"baseUrl":"https://us-or-rly101.zwift.com/relay"}'
+
+@app.route('/api/clubs/club/list/my-clubs', methods=['GET'])
+def api_clubs():
+    return '{"total":0,"results":[]}'
+
+@app.route('/api/clubs/club/list/my-clubs.proto', methods=['GET'])
+@app.route('/api/campaign/proto/campaigns', methods=['GET'])
+def api_proto_empty():
+    return world_pb2.Worlds().SerializeToString(), 200
+
+@app.route('/api/game_info/version', methods=['GET'])
+def api_gameinfo_version():
+    return '{"version":"50CC5D2253ED559D421261FB1ED610BF"}'
+
+@app.route('/api/game_info', methods=['GET'])
+def api_gameinfo():
+    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    with open(game_info_file, mode="r", encoding="utf-8") as f:
+        return f.read()
 
 @app.route('/api/users/login', methods=['POST'])
 def api_users_login():
@@ -862,7 +900,7 @@ def logout_player(player_id):
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
-
+@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 @app.route('/api/users/logout', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -968,6 +1006,17 @@ def custom_style(filename):
 def static_web_launcher(filename):
     return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
 
+@app.route('/static/world_headers/<path:filename>')
+def static_world_headers(filename):
+    return send_from_directory('%s/cdn/static/world_headers' % SCRIPT_DIR, filename)
+
+@app.route('/static/zc/<path:filename>')
+def static_zc(filename):
+    return send_from_directory('%s/cdn/static/zc' % SCRIPT_DIR, filename)
+
+@app.route('/phoneicons/<path:filename>')
+def cdn_phoneicons(filename):
+    return send_from_directory('%s/cdn/phoneicons' % SCRIPT_DIR, filename)
 
 # Probably don't need, haven't investigated
 @app.route('/api/zfiles/list', methods=['GET', 'POST'])
@@ -986,11 +1035,7 @@ def api_private_event_feed():
 def api_telemetry_config():
     return '{"isEnabled":false}'
 
-
-@app.route('/api/profiles/me', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def api_profiles_me():
+def do_api_profiles_me(is_json):
     profile_id = current_user.player_id
     if MULTIPLAYER:
         profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
@@ -1022,31 +1067,61 @@ def api_profiles_me():
         profile.email = current_user.username
         profile.first_name = current_user.first_name
         profile.last_name = current_user.last_name
+    else: 
+        with open(profile_file, 'rb') as fd:
+            profile.ParseFromString(fd.read())
+            if MULTIPLAYER:
+                # For newly added existing profiles, User's player id likely differs from profile's player id.
+                # If there's existing data in db for this profile, update it for the newly assigned player id.
+                # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
+                #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
+                # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
+                if profile.id != profile_id:
+                    db.session.execute(sqlalchemy.text('UPDATE activity SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
+                    db.session.execute(sqlalchemy.text('UPDATE goal SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
+                    db.session.execute(sqlalchemy.text('UPDATE segment_result SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
+                    db.session.commit()
+                profile.id = profile_id
+            elif current_user.player_id != profile.id:
+                # Update AnonUser's player_id to match
+                AnonUser.player_id = profile.id
+                ghosts_enabled[profile.id] = AnonUser.enable_ghosts
+            if not profile.email:
+                profile.email = 'user@email.com'
+            if profile.f60:
+                del profile.f60[:]
+    if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
+        jprofile = {"id": profile.id, "firstName": profile.first_name, "lastName": profile.last_name, "male": profile.is_male, "imageSrc": None, "imageSrcLarge": None, "playerType": "NORMAL", "playerTypeId": 1, "emailAddress": profile.email,"privateAttributes": {"839250175": ""}, "countryCode": profile.country_code, "dob": profile.dob, "countryAlpha3": "rus", "useMetric": profile.f50, "privacy": {"approvalRequired": False, "displayWeight": True, "minor": False, "privateMessaging": False, "defaultFitnessDataPrivacy": False, "suppressFollowerNotification": False, "displayAge": True, "defaultActivityPrivacy": "PUBLIC"}, "age": profile.age, "ftp": profile.ftp, "b": False, "weight": profile.weight_in_grams, "connectedToStrava": False, "connectedToTrainingPeaks": False, "connectedToTodaysPlan": False, "connectedToUnderArmour": False, "connectedToFitbit": False, "connectedToGarmin": False, "height": profile.height_in_millimeters, "location": "", "socialFacts": {"profileId": profile.social_facts.profile_id, "followersCount": profile.social_facts.f2, "followeesCount": profile.social_facts.f3, "followeesInCommonWithLoggedInPlayer": profile.social_facts.f4, "followerStatusOfLoggedInPlayer": "SELF", "followeeStatusOfLoggedInPlayer": "SELF", "isFavoriteOfLoggedInPlayer": profile.social_facts.f7}, "totalExperiencePoints": profile.total_xp, "worldId": None, "totalDistance": profile.total_distance_in_meters, "totalDistanceClimbed": profile.elevation_gain_in_meters, "totalTimeInMinutes": profile.time_ridden_in_minutes, "achievementLevel": profile.achievement_level, "totalWattHours": profile.total_watt_hours, "runTime1miInSeconds": profile.f117, "runTime5kmInSeconds": profile.f118, "runTime10kmInSeconds": profile.f119, "runTimeHalfMarathonInSeconds": profile.f120, "runTimeFullMarathonInSeconds": profile.f121,"totalInKomJersey": profile.f38, "totalInSprintersJersey": profile.f39, "totalInOrangeJersey": profile.f40, "currentActivityId": None, "enrolledZwiftAcademy": False,"runAchievementLevel": profile.f84, "totalRunDistance": profile.f74, "totalRunTimeInMinutes": profile.time_ridden_in_minutes, "totalRunExperiencePoints": profile.f75, "totalRunCalories": int(profile.total_watt_hours * 3.07089), "totalGold": profile.f47, "powerSourceType": "Power Source", "powerSourceModel": "Power Meter", "virtualBikeModel": "Zwift Carbon"}
+        #print (jsonify(jprofile).data.decode("utf-8"))
+        return jsonify(jprofile)
+    else:
         return profile.SerializeToString(), 200
-    with open(profile_file, 'rb') as fd:
-        profile.ParseFromString(fd.read())
-        if MULTIPLAYER:
-            # For newly added existing profiles, User's player id likely differs from profile's player id.
-            # If there's existing data in db for this profile, update it for the newly assigned player id.
-            # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
-            #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
-            # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
-            if profile.id != profile_id:
-                db.session.execute(sqlalchemy.text('UPDATE activity SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                db.session.execute(sqlalchemy.text('UPDATE goal SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                db.session.execute(sqlalchemy.text('UPDATE segment_result SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                db.session.commit()
-            profile.id = profile_id
-        elif current_user.player_id != profile.id:
-            # Update AnonUser's player_id to match
-            AnonUser.player_id = profile.id
-            ghosts_enabled[profile.id] = AnonUser.enable_ghosts
-        if not profile.email:
-            profile.email = 'user@email.com'
-        if profile.f60:
-            del profile.f60[:]
-        return profile.SerializeToString(), 200
+        
+@app.route('/api/profiles/me', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_me_bin():
+    return do_api_profiles_me(False)
 
+@app.route('/api/profiles/me/', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_me_json():
+    return do_api_profiles_me(True)
+
+@app.route('/relay/profiles/me/phone', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_me_phone():
+    global zc_connect_queue
+    if not request.stream:
+        return '', 400
+    phoneAddress = request.json['phoneAddress']
+    phonePort = int(request.json['port'])
+    zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort)
+    #todo UDP scenario
+    logger.info("ZCompanion %d reg: %s:%d" % (current_user.player_id, phoneAddress, phonePort))
+    return '', 204
 
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
 @jwt_to_session_cookie
@@ -1368,6 +1443,10 @@ def api_profiles_activities_rideon(recieving_player_id):
     return '{}', 200
 
 
+@app.route('/api/private_event/entitlement', methods=['GET'])
+def api_empty_obj():
+    return '{}', 200
+
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
 def api_profiles_followees(player_id):
     return '', 200
@@ -1586,7 +1665,7 @@ def relay_worlds_generic(world_id=None):
                 chat_message = udp_node_msgs_pb2.ChatMessage()
                 chat_message.ParseFromString(player_update.payload)
                 discord.send_message(chat_message.message, chat_message.rider_id)
-            return '{}', 200
+        return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.Worlds()
         world = None
@@ -1624,8 +1703,12 @@ def relay_worlds_generic(world_id=None):
 def relay_worlds():
     return relay_worlds_generic()
 
+@app.route('/relay/worlds/<int:world_id>/aggregate/mobile', methods=['GET'])
+def relay_worlds_id_aggregate_mobile(world_id):
+    return '{"events":[],"goals":[],"activities":null,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":false,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}'
 
 @app.route('/relay/worlds/<int:world_id>', methods=['GET'])
+@app.route('/relay/worlds/<int:world_id>/', methods=['GET'])
 def relay_worlds_id(world_id):
     return relay_worlds_generic(world_id)
 
@@ -1646,8 +1729,7 @@ def relay_worlds_id_players_id(world_id, player_id):
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
-    return None
-
+    return ""
 
 @app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
 def relay_worlds_my_hash_seeds(world_id):
@@ -1666,8 +1748,12 @@ def relay_worlds_hash_seeds():
 
 
 # XXX: attributes have not been thoroughly investigated
+@app.route('/relay/worlds/attributes', methods=['POST'])
+def relay_worlds_attributes():
+    return relay_worlds_generic()
+
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
-def relay_worlds_attributes(world_id):
+def relay_worlds_id_attributes(world_id):
 # NOTE: This was previously a protobuf message in Zwift client, but later changed.
 #    attribs = world_pb2.WorldAttributes()
 #    attribs.world_time = world_time()
