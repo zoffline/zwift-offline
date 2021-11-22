@@ -257,10 +257,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
         ##self.request.sendall(zc_params_payload)
         #print("camera: " + zc_params_payload.hex())
         self.data = self.request.recv(1024)
+        print("TCPHandler hello: %s" % self.data.hex())
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
-            hello.ParseFromString(self.data[8:-9])
+            hello.ParseFromString(self.data[4:-4]) #2 bytes: length, 2 bytes: unrecognised; 4 bytes: CRC?
         except:
+            print('TCPHandler ParseFromString exception')
             return
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
@@ -307,6 +309,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(payload)
 
         player_id = hello.player_id
+        print("TCPHandler for %d" % player_id)
         msg = tcp_node_msgs_pb2.RecurringTCPResponse()
         msg.player_id = player_id
         msg.f3 = 0
@@ -319,7 +322,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             tcpthreadevent.wait(timeout=5)
             try:
                 #if ZC need to be registered
-                if player_id in zwift_offline.zc_connect_queue and player_id in online:
+                if player_id in zwift_offline.zc_connect_queue: # and player_id in online:
                     zc_params = tcp_node_msgs_pb2.TCPCompanionConnect()
                     zc_params.player_id = player_id
                     zc_params.dummy = 0 #what is it?
@@ -329,7 +332,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     zc_params_payload = zc_params.SerializeToString()
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
-                    print("register_zc" + zc_params_payload.hex())
+                    print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
                     zwift_offline.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()
@@ -372,6 +375,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
             except:
+                print('TCPHandler loop exception')
                 break
 
 class GhostsVariables:
@@ -494,6 +498,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 #If no sensors connected, first byte must be skipped
                 recv.ParseFromString(data[1:-4])
             except:
+                print('UDPHandler ParseFromString exception')
                 return
 
         client_address = self.client_address

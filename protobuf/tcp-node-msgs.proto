@@ -39,6 +39,9 @@ message TCPServerInfo {
 
 message TCPHello {
 	required int32 player_id = 2;
+	optional int32 f3 = 3; // ?? always 0?
+	optional int32 seqno = 4;
+	optional int32 f13 = 13;
 }
 
 message TCPCompanionConnect {
