@@ -168,7 +168,7 @@ to generate your own certificates and do the same.
 <details><summary>Android (non-rooted device)</summary>
 
 * Install required apps:
-  * Download and install ``ZofflineObb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/releases/download/v1.1/ZofflineObb.apk)
+  * Download and install ``ZofflineObb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/releases/latest)
   * Download "#1 HOST CHANGER - BEST FOR GAMING" from Google Play ([link](https://play.google.com/store/apps/details?id=best.see.world.company))
   * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
   ```
