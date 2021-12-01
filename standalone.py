@@ -85,8 +85,8 @@ def save_ghost(name, player_id):
         try:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
-        except:
-            return
+        except Exception as exc:
+            print('save_ghost: %s' % repr(exc))
         f = '%s/%s-%s.bin' % (folder, zwift_offline.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
@@ -108,8 +108,8 @@ def organize_ghosts(player_id):
                 try:
                     if not os.path.isdir(dest):
                         os.makedirs(dest)
-                except:
-                    return
+                except Exception as exc:
+                    print('organize_ghosts: %s' % repr(exc))
             os.rename(file, os.path.join(dest, f))
 
 def load_ghosts(player_id, state, ghosts):
@@ -218,9 +218,10 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 url = 'http://{}{}'.format(hostname, self.path)
                 req_header = self.parse_headers()
                 resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            except:
-                    self.send_error(404, 'error trying to proxy')
-                    return
+            except Exception as exc:
+                print('Error trying to proxy: %s' % repr(exc))
+                self.send_error(404, 'error trying to proxy')
+                return
             self.send_response(resp.status_code)
             self.send_resp_headers(resp)
             self.wfile.write(resp.content)
@@ -261,8 +262,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
             hello.ParseFromString(self.data[4:-4]) #2 bytes: length, 2 bytes: unrecognised; 4 bytes: CRC?
-        except:
-            print('TCPHandler ParseFromString exception')
+        except Exception as exc:
+            print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
@@ -321,6 +322,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
             try:
+                t = int(zwift_offline.get_utc_time())
+
                 #if ZC need to be registered
                 if player_id in zwift_offline.zc_connect_queue: # and player_id in online:
                     zc_params = tcp_node_msgs_pb2.TCPCompanionConnect()
@@ -330,6 +333,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     zc_params.zc_local_port = zwift_offline.zc_connect_queue[player_id][1] #21587
                     zc_params.kind = 2 #TCP
                     zc_params_payload = zc_params.SerializeToString()
+                    last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
                     print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
@@ -362,8 +366,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for player_update_proto in added_player_updates:
                         player_update_queue[player_id].remove(player_update_proto)
 
-                t = int(zwift_offline.get_utc_time())
-
                 #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
                 if len(message.updates) > 0:
                     last_alive_check = t
@@ -374,8 +376,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
-            except:
-                print('TCPHandler loop exception')
+            except Exception as exc:
+                print('TCPHandler loop exception: %s' % repr(exc))
                 break
 
 class GhostsVariables:
@@ -497,8 +499,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
             try:
                 #If no sensors connected, first byte must be skipped
                 recv.ParseFromString(data[1:-4])
-            except:
-                print('UDPHandler ParseFromString exception')
+            except Exception as exc:
+                print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
 
         client_address = self.client_address

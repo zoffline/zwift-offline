@@ -1448,6 +1448,7 @@ def api_profiles_activities_rideon(recieving_player_id):
 def api_empty_obj():
     return '{}', 200
 
+@app.route('/api/profiles/<int:player_id>/campaigns/otm2020', methods=['GET'])
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
 def api_profiles_followees(player_id):
     return '', 200
