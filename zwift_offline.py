@@ -202,6 +202,7 @@ class PartialProfile:
     first_name = ''
     last_name = ''
     country_code = 0
+    route = 0
 
 class Online:
     total = 0
@@ -298,6 +299,10 @@ def get_partial_profile(player_id):
                     partial_profile.first_name = profile.first_name
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
+                    for f in profile.f114:
+                        if f.id == 1766985504:
+                            partial_profile.route = f.number_value
+                            break
                     player_partial_profiles[player_id] = partial_profile
             except:
                 return None
@@ -1643,7 +1648,10 @@ def relay_worlds_id_players_id(world_id, player_id):
         return player.SerializeToString()
     if player_id in global_pace_partners.keys():
         pace_partner = global_pace_partners[player_id]
-        return pace_partner.route.states[pace_partner.position].SerializeToString()
+        state = pace_partner.route.states[pace_partner.position]
+        state.world = get_course(state)
+        state.route = get_partial_profile(player_id).route
+        return state.SerializeToString()
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()

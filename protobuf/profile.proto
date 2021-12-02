@@ -234,7 +234,7 @@ message Subscription {
 
 message PacerSetting {
     required int64 id = 1;
-    optional int64 number_value = 2;
+    optional uint64 number_value = 2;
     optional fixed32 hex_value = 3;
     optional string string_value = 5;
 }
