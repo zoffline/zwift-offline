@@ -1676,12 +1676,17 @@ def relay_worlds_hash_seeds():
 
 # XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
-def relay_worlds_attributes(world_id):
+def relay_worlds_id_attributes(world_id):
 # NOTE: This was previously a protobuf message in Zwift client, but later changed.
 #    attribs = world_pb2.WorldAttributes()
 #    attribs.world_time = world_time()
 #    return attribs.SerializeToString(), 200
     return relay_worlds_generic(world_id)
+
+
+@app.route('/relay/worlds/attributes', methods=['POST'])
+def relay_worlds_attributes():
+    return relay_worlds_generic()
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
