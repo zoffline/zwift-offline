@@ -300,7 +300,7 @@ def get_partial_profile(player_id):
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
                     for f in profile.f114:
-                        if f.id == 1766985504:
+                        if f.id == 1766985504 or f.id == 3273955058:
                             partial_profile.route = f.number_value
                             break
                     player_partial_profiles[player_id] = partial_profile
