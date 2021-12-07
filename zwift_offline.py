@@ -1512,16 +1512,13 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.lastName = partial_profile.last_name
             online_player.distance = player.distance
             online_player.time = player.time
-            online_player.f6 = 840#0
+            online_player.f6 = partial_profile.country_code
             online_player.f8 = player.sport
-            online_player.f9 = 0
-            online_player.f10 = 0
-            online_player.f11 = 0
             online_player.power = player.power
-            online_player.f13 = 2355
             online_player.x = player.x
             online_player.altitude = player.altitude
             online_player.y = player.y
+            online_player.route = partial_profile.route
             course_world[course_id].f5 += 1
 
 
