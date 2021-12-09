@@ -202,6 +202,7 @@ class PartialProfile:
     first_name = ''
     last_name = ''
     country_code = 0
+    route = 0
 
 class Online:
     total = 0
@@ -298,6 +299,10 @@ def get_partial_profile(player_id):
                     partial_profile.first_name = profile.first_name
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
+                    for f in profile.f114:
+                        if f.id == 1766985504 or f.id == 3273955058:
+                            partial_profile.route = f.number_value
+                            break
                     player_partial_profiles[player_id] = partial_profile
             except:
                 return None
@@ -1507,16 +1512,13 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.lastName = partial_profile.last_name
             online_player.distance = player.distance
             online_player.time = player.time
-            online_player.f6 = 840#0
+            online_player.f6 = partial_profile.country_code
             online_player.f8 = player.sport
-            online_player.f9 = 0
-            online_player.f10 = 0
-            online_player.f11 = 0
             online_player.power = player.power
-            online_player.f13 = 2355
             online_player.x = player.x
             online_player.altitude = player.altitude
             online_player.y = player.y
+            online_player.route = partial_profile.route
             course_world[course_id].f5 += 1
 
 
@@ -1643,7 +1645,10 @@ def relay_worlds_id_players_id(world_id, player_id):
         return player.SerializeToString()
     if player_id in global_pace_partners.keys():
         pace_partner = global_pace_partners[player_id]
-        return pace_partner.route.states[pace_partner.position].SerializeToString()
+        state = pace_partner.route.states[pace_partner.position]
+        state.world = get_course(state)
+        state.route = get_partial_profile(player_id).route
+        return state.SerializeToString()
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
@@ -1668,12 +1673,62 @@ def relay_worlds_hash_seeds():
 
 # XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
-def relay_worlds_attributes(world_id):
+def relay_worlds_id_attributes(world_id):
 # NOTE: This was previously a protobuf message in Zwift client, but later changed.
 #    attribs = world_pb2.WorldAttributes()
 #    attribs.world_time = world_time()
 #    return attribs.SerializeToString(), 200
     return relay_worlds_generic(world_id)
+
+
+@app.route('/relay/worlds/attributes', methods=['POST'])
+def relay_worlds_attributes():
+# PlayerUpdate was previously a json request handled in relay_worlds_generic()
+# now it's protobuf posted to this new route (at least in Windows client)
+    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    try:
+        player_update.ParseFromString(request.data)
+    except:
+        return '', 422
+
+    player_update.world_time2 = world_time() + 60000
+    player_update.f12 = 1
+    player_update.f14 = int(get_utc_time() * 1000000)
+    for receiving_player_id in online.keys():
+        should_receive = False
+        if player_update.type in [5, 105]:
+            receiving_player = online[receiving_player_id]
+            # Chat message
+            if player_update.type == 5:
+                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message.ParseFromString(player_update.payload)
+                sending_player_id = chat_message.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if is_nearby(sending_player, receiving_player):
+                        should_receive = True
+            # Segment complete
+            else:
+                segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                segment_complete.ParseFromString(player_update.payload)
+                sending_player_id = segment_complete.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
+                        should_receive = True
+        # Other PlayerUpdate, send to all
+        else:
+            should_receive = True
+        if should_receive:
+            if not receiving_player_id in player_update_queue:
+                player_update_queue[receiving_player_id] = list()
+            player_update_queue[receiving_player_id].append(player_update.SerializeToString())
+    # If it's a chat message, send to Discord
+    if player_update.type == 5:
+        chat_message = udp_node_msgs_pb2.ChatMessage()
+        chat_message.ParseFromString(player_update.payload)
+        discord.send_message(chat_message.message, chat_message.rider_id)
+    return '', 201
 
 
 @app.route('/relay/periodic-info', methods=['GET'])

@@ -36,4 +36,6 @@ message Player {
 	optional float x = 14;
 	optional float altitude = 15;
 	optional float y = 16;
+	optional uint64 route = 17;
+	optional uint32 f18 = 18;
 }

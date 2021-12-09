@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14protobuf/world.proto\"\xa6\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\xdb\x01\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02'
+  serialized_pb=b'\n\x14protobuf/world.proto\"\xa6\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\xf7\x01\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r'
 )
 
 
@@ -283,6 +283,20 @@ _PLAYER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='route', full_name='Player.route', index=15,
+      number=17, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f18', full_name='Player.f18', index=16,
+      number=18, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -296,7 +310,7 @@ _PLAYER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=267,
-  serialized_end=486,
+  serialized_end=514,
 )
 
 _WORLD.fields_by_name['player_states'].message_type = _PLAYER
