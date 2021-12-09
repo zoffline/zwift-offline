@@ -1683,7 +1683,52 @@ def relay_worlds_id_attributes(world_id):
 
 @app.route('/relay/worlds/attributes', methods=['POST'])
 def relay_worlds_attributes():
-    return relay_worlds_generic()
+# PlayerUpdate was previously a json request handled in relay_worlds_generic()
+# now it's protobuf posted to this new route (at least in Windows client)
+    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    try:
+        player_update.ParseFromString(request.data)
+    except:
+        return '', 422
+
+    player_update.world_time2 = world_time() + 60000
+    player_update.f12 = 1
+    player_update.f14 = int(get_utc_time() * 1000000)
+    for receiving_player_id in online.keys():
+        should_receive = False
+        if player_update.type in [5, 105]:
+            receiving_player = online[receiving_player_id]
+            # Chat message
+            if player_update.type == 5:
+                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message.ParseFromString(player_update.payload)
+                sending_player_id = chat_message.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if is_nearby(sending_player, receiving_player):
+                        should_receive = True
+            # Segment complete
+            else:
+                segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                segment_complete.ParseFromString(player_update.payload)
+                sending_player_id = segment_complete.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
+                        should_receive = True
+        # Other PlayerUpdate, send to all
+        else:
+            should_receive = True
+        if should_receive:
+            if not receiving_player_id in player_update_queue:
+                player_update_queue[receiving_player_id] = list()
+            player_update_queue[receiving_player_id].append(player_update.SerializeToString())
+    # If it's a chat message, send to Discord
+    if player_update.type == 5:
+        chat_message = udp_node_msgs_pb2.ChatMessage()
+        chat_message.ParseFromString(player_update.payload)
+        discord.send_message(chat_message.message, chat_message.rider_id)
+    return '', 201
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
