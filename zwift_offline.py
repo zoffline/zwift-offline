@@ -2084,7 +2084,7 @@ def experimentation_v1_variant():
                     ('pack_dynamics_30_london', 1, None),
                     ('pack_dynamics_30_watopia', 1, None),
                     ('pack_dynamics_30_exclude_events', None, None),
-                    ('game_1_19_system_alerts', 1, None),
+                    #('game_1_19_system_alerts', 1, None),
                     ('zc_ios_aug_2021_release_sync', None, None),
                     ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
                     ('game_1_17_game_client_activity_event', None, None),
