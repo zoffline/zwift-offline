@@ -202,6 +202,7 @@ class PartialProfile:
     first_name = ''
     last_name = ''
     country_code = 0
+    route = 0
 
 class Online:
     total = 0
@@ -298,6 +299,10 @@ def get_partial_profile(player_id):
                     partial_profile.first_name = profile.first_name
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
+                    for f in profile.f114:
+                        if f.id == 1766985504 or f.id == 3273955058:
+                            partial_profile.route = f.number_value
+                            break
                     player_partial_profiles[player_id] = partial_profile
             except:
                 return None
@@ -606,7 +611,7 @@ def send_message_to_all_online(message, sender='Server'):
     player_update.world_time1 = world_time()
     player_update.world_time2 = world_time() + 60000
     player_update.f12 = 1
-    player_update.f14 = int(str(int(get_utc_time()*1000000)))
+    player_update.f14 = int(get_utc_time()*1000000)
 
     chat_message = udp_node_msgs_pb2.ChatMessage()
     chat_message.rider_id = 0
@@ -1482,6 +1487,7 @@ def api_profiles_goals_id(player_id, goal_id):
 
 
 @app.route('/api/tcp-config', methods=['GET'])
+@app.route('/relay/tcp-config', methods=['GET'])
 def api_tcp_config():
     infos = periodic_info_pb2.PeriodicInfos()
     info = infos.infos.add()
@@ -1508,16 +1514,13 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.lastName = partial_profile.last_name
             online_player.distance = player.distance
             online_player.time = player.time
-            online_player.f6 = 840#0
+            online_player.f6 = partial_profile.country_code
             online_player.f8 = player.sport
-            online_player.f9 = 0
-            online_player.f10 = 0
-            online_player.f11 = 0
             online_player.power = player.power
-            online_player.f13 = 2355
             online_player.x = player.x
             online_player.altitude = player.altitude
             online_player.y = player.y
+            online_player.route = partial_profile.route
             course_world[course_id].f5 += 1
 
 
@@ -1552,7 +1555,7 @@ def relay_worlds_generic(world_id=None):
             #PlayerUpdate
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
-            player_update.f14 = int(str(int(get_utc_time()*1000000)))
+            player_update.f14 = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
@@ -1644,7 +1647,10 @@ def relay_worlds_id_players_id(world_id, player_id):
         return player.SerializeToString()
     if player_id in global_pace_partners.keys():
         pace_partner = global_pace_partners[player_id]
-        return pace_partner.route.states[pace_partner.position].SerializeToString()
+        state = pace_partner.route.states[pace_partner.position]
+        state.world = get_course(state)
+        state.route = get_partial_profile(player_id).route
+        return state.SerializeToString()
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
@@ -1669,12 +1675,62 @@ def relay_worlds_hash_seeds():
 
 # XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
-def relay_worlds_attributes(world_id):
+def relay_worlds_id_attributes(world_id):
 # NOTE: This was previously a protobuf message in Zwift client, but later changed.
 #    attribs = world_pb2.WorldAttributes()
 #    attribs.world_time = world_time()
 #    return attribs.SerializeToString(), 200
     return relay_worlds_generic(world_id)
+
+
+@app.route('/relay/worlds/attributes', methods=['POST'])
+def relay_worlds_attributes():
+# PlayerUpdate was previously a json request handled in relay_worlds_generic()
+# now it's protobuf posted to this new route (at least in Windows client)
+    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    try:
+        player_update.ParseFromString(request.data)
+    except:
+        return '', 422
+
+    player_update.world_time2 = world_time() + 60000
+    player_update.f12 = 1
+    player_update.f14 = int(get_utc_time() * 1000000)
+    for receiving_player_id in online.keys():
+        should_receive = False
+        if player_update.type in [5, 105]:
+            receiving_player = online[receiving_player_id]
+            # Chat message
+            if player_update.type == 5:
+                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message.ParseFromString(player_update.payload)
+                sending_player_id = chat_message.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if is_nearby(sending_player, receiving_player):
+                        should_receive = True
+            # Segment complete
+            else:
+                segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                segment_complete.ParseFromString(player_update.payload)
+                sending_player_id = segment_complete.rider_id
+                if sending_player_id in online:
+                    sending_player = online[sending_player_id]
+                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
+                        should_receive = True
+        # Other PlayerUpdate, send to all
+        else:
+            should_receive = True
+        if should_receive:
+            if not receiving_player_id in player_update_queue:
+                player_update_queue[receiving_player_id] = list()
+            player_update_queue[receiving_player_id].append(player_update.SerializeToString())
+    # If it's a chat message, send to Discord
+    if player_update.type == 5:
+        chat_message = udp_node_msgs_pb2.ChatMessage()
+        chat_message.ParseFromString(player_update.payload)
+        discord.send_message(chat_message.message, chat_message.rider_id)
+    return '', 201
 
 
 @app.route('/relay/periodic-info', methods=['GET'])
@@ -2017,30 +2073,47 @@ def auth_realms_zwift_tokens_access_codes():
 
 @app.route('/experimentation/v1/variant', methods=['POST'])
 def experimentation_v1_variant():
-    variant_list = [('game_1_12_pc_skip_activity_save_retry', None),
-                    ('return_to_home', 1),
-                    ('game_1_12_nhd_v1', 1),
-                    ('game_1_13_japanese_medium_font', 1),
-                    ('game_1_12_1_retire_client_chat_culling', 1),
-                    ('game_1_14_draftlock_fix', None),
-                    ('xplatform_partner_connection_vitality', None),
-                    ('game_1_16_new_route_ui', 1),
-                    ('pack_dynamics_30_global', None),
-                    ('pack_dynamics_30_makuri', None),
-                    ('pack_dynamics_30_london', None),
-                    ('pack_dynamics_30_watopia', None),
-                    ('pack_dynamics_30_exclude_events', None),
-                    ('game_1_18_server_connection_notifications', None),
-                    ('zc_ios_aug_2021_release_sync', None),
-                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1),
-                    ('game_1_17_game_client_activity_event', None),
-                    ('game_1_17_1_tdf_femmes_yellow_jersey', None),
-                    ('game_1_17_ble_disable_component_sport_filter', 1),
-                    ('game_1_18_new_welcome_ride', None),
-                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1),
-                    ('game_1_15_assert_disable_abort', 1),
-                    ('game_1_18_holiday_mode', None),
-                    ('game_1_14_settings_refactor', None)]
+    variant_list = [('game_1_12_pc_skip_activity_save_retry', None, None),
+                    ('return_to_home', 1, None),
+                    ('game_1_12_nhd_v1', 1, None),
+                    ('game_1_13_japanese_medium_font', 1, None),
+                    ('game_1_12_1_retire_client_chat_culling', 1, None),
+                    ('game_1_14_draftlock_fix', None, None),
+                    ('xplatform_partner_connection_vitality', None, None),
+                    ('game_1_16_new_route_ui', 1, None),
+                    ('pack_dynamics_30_global', 1, None),
+                    ('pack_dynamics_30_makuri', 1, None),
+                    ('pack_dynamics_30_london', 1, None),
+                    ('pack_dynamics_30_watopia', 1, None),
+                    ('pack_dynamics_30_exclude_events', None, None),
+                    #('game_1_19_system_alerts', 1, None),
+                    ('zc_ios_aug_2021_release_sync', None, None),
+                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
+                    ('game_1_17_game_client_activity_event', None, None),
+                    ('game_1_17_1_tdf_femmes_yellow_jersey', None, None),
+                    ('game_1_17_ble_disable_component_sport_filter', 1, None),
+                    ('game_1_18_new_welcome_ride', None, None),
+                    ('game_1_19_achievement_service_persist', None, None),
+                    ('game_1_19_achievement_service_src_of_truth', None, None),
+                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
+                    ('game_1_18_alternate_control_point_pairing', None, None),
+                    ('game_1_18_swap_legacy_controllable_for_ftms', None, None),
+                    ('game_1_19_gender_dob_change', None, None),
+                    ('game_1_18_0_osx_monterey_bluetooth_uart_fix', None, 0),
+                    ('game_1_19_0_default_rubberbanding', None, None),
+                    ('game_1_19_use_tabbed_settings', None, 0),
+                    ('pedal_assist_20', None, None),
+                    ('game_1_19_segment_results_sub_active', None, 0),
+                    ('game_1_19_hw_experiment_1', None, None),
+                    ('game_1_19_paired_devices_alerts', 1, None),
+                    ('game_1_19_real_time_unlocks', None, None),
+                    ('game_1_15_assert_disable_abort', 1, None),
+                    ('game_1_19_local_activity_persistence', None, None),
+                    ('game_1_18_holiday_mode', None, None),
+                    ('game_1_17_noesis_enabled', None, None),
+                    ('game_1_17_home_screen', None, None),
+                    ('game_1_19_noesis_dummy', None, None),
+                    ('game_1_14_settings_refactor', None, None)]
 
     variants = variants_pb2.Variants()
     for variant in variant_list:
@@ -2048,6 +2121,12 @@ def experimentation_v1_variant():
         item.name = variant[0]
         if variant[1] is not None:
             item.value = variant[1]
+        f3 = item.f3.add()
+        if variant[2] is not None:
+            f1 = f3.f1.add()
+            f1.name = variant[0]
+            f2 = f1.f2.add()
+            f2.f4 = variant[2]
     return variants.SerializeToString(), 200
 
 
