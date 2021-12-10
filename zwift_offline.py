@@ -611,7 +611,7 @@ def send_message_to_all_online(message, sender='Server'):
     player_update.world_time1 = world_time()
     player_update.world_time2 = world_time() + 60000
     player_update.f12 = 1
-    player_update.f14 = int(str(int(get_utc_time()*1000000)))
+    player_update.f14 = int(get_utc_time()*1000000)
 
     chat_message = udp_node_msgs_pb2.ChatMessage()
     chat_message.rider_id = 0
@@ -1553,7 +1553,7 @@ def relay_worlds_generic(world_id=None):
             #PlayerUpdate
             player_update.world_time2 = world_time() + 60000
             player_update.f12 = 1
-            player_update.f14 = int(str(int(get_utc_time()*1000000)))
+            player_update.f14 = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.type == 5 or player_update.type == 105:
