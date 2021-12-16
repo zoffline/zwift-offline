@@ -1306,7 +1306,7 @@ def zwift_upload(player_id, activity):
 
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
 # converter does not handle so it's a string argument
-@app.route('/api/profiles/<int:player_id>/activities/<string:activity_id>', methods=['PUT'])
+@app.route('/api/profiles/<int:player_id>/activities/<string:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_activities_id(player_id, activity_id):
@@ -1314,6 +1314,8 @@ def api_profiles_activities_id(player_id, activity_id):
         return '', 400
     if current_user.player_id != player_id:
         return '', 401
+    if request.method == 'DELETE':
+        return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
@@ -1826,6 +1828,11 @@ def api_segment_results():
     return handle_segment_results(request)
 
 
+@app.route('/live-segment-results-service/leaders', methods=['GET'])
+def live_segment_results_service_leaders():
+    return '', 200
+
+
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
     return '{"worldtime":%ld}' % world_time()
@@ -2085,13 +2092,12 @@ def experimentation_v1_variant():
                     ('pack_dynamics_30_watopia', 1, None),
                     ('pack_dynamics_30_exclude_events', None, None),
                     #('game_1_19_system_alerts', 1, None),
-                    ('zc_ios_aug_2021_release_sync', None, None),
                     ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
                     ('game_1_17_game_client_activity_event', None, None),
                     ('game_1_17_1_tdf_femmes_yellow_jersey', None, None),
                     ('game_1_17_ble_disable_component_sport_filter', 1, None),
                     ('game_1_18_new_welcome_ride', None, None),
-                    ('game_1_19_achievement_service_persist', None, None),
+                    ('game_1_19_achievement_service_persist', 1, None),
                     ('game_1_19_achievement_service_src_of_truth', None, None),
                     ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
                     ('game_1_18_alternate_control_point_pairing', None, None),
@@ -2101,15 +2107,22 @@ def experimentation_v1_variant():
                     ('game_1_19_0_default_rubberbanding', None, None),
                     ('game_1_19_use_tabbed_settings', None, 0),
                     ('pedal_assist_20', None, None),
-                    ('game_1_19_segment_results_sub_active', None, 0),
-                    ('game_1_19_hw_experiment_1', None, None),
+                    ('game_1_19_segment_results_sub_active', 1, 0),
+                    ('game_1_19_0_alternate_ble_dll', None, None),
+                    ('game_1_20_hw_experiment_1', None, None),
                     ('game_1_19_paired_devices_alerts', 1, None),
                     ('game_1_19_real_time_unlocks', None, None),
+                    ('game_1_20_apple_novus_ble_refactor', None, None),
+                    ('game_1_20_0_ble_data_guard', 1, None),
+                    ('game_1_20_disable_high_volume_send_mixpanel', None, None),
+                    ('game_1_20_steering_mode_cleanup', None, None),
+                    ('game_1_20_clickable_telemetry_box', None, None),
+                    ('game_1_20_0_enable_stages_steering', None, 0),
                     ('game_1_15_assert_disable_abort', 1, None),
-                    ('game_1_19_local_activity_persistence', None, None),
+                    ('game_1_19_local_activity_persistence', 1, None),
                     ('game_1_18_holiday_mode', None, None),
                     ('game_1_17_noesis_enabled', None, None),
-                    ('game_1_17_home_screen', None, None),
+                    ('game_1_20_home_screen', None, None),
                     ('game_1_19_noesis_dummy', None, None),
                     ('game_1_14_settings_refactor', None, None)]
 
