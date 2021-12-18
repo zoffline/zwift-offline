@@ -202,7 +202,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     self.send_response(200)
                     self.send_header('Content-type', 'text/xml')
                     self.end_headers()
-                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], datetime.now().strftime("%Y-%m-%dT00:01-04"))
+                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], datetime.now().strftime("2020-%m-%dT00:01-04"))
                     self.wfile.write(output.encode())
                     MAP_OVERRIDE.remove(override)
                     return
