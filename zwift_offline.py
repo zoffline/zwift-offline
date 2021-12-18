@@ -1147,6 +1147,13 @@ def api_profiles_id(player_id):
         db.session.commit()
     return '', 204
 
+@app.route('/api/profiles/<int:player_id>/activities/<int:act_id>', methods=['DELETE'], strict_slashes=False)
+@jwt_to_session_cookie
+@login_required
+def api_profiles_activities_delete(player_id, act_id):
+    db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % act_id))
+    db.session.commit()
+    return '', 204
 
 @app.route('/api/profiles/<int:player_id>/activities/', methods=['GET', 'POST'], strict_slashes=False)
 @jwt_to_session_cookie
