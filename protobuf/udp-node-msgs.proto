@@ -27,6 +27,9 @@ message PlayerState {
 	optional int32 groupId = 29;
 	optional int64 sport = 31;
 	optional float f34 = 34;
+	optional int32 world = 35;
+	optional int32 f38 = 38;
+	optional uint64 route = 39;
 }
 
 message ClientToServer {
