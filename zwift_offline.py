@@ -1390,7 +1390,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if current_user.player_id != player_id:
         return '', 401
     if request.method == 'DELETE':
-        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % act_id))
+        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
         db.session.commit()
         return '', 204
     activity_id = int(activity_id) & 0xffffffffffffffff
@@ -2201,7 +2201,7 @@ def experimentation_v1_variant():
                     ('game_1_20_0_ble_data_guard', 1, None),
                     ('game_1_20_disable_high_volume_send_mixpanel', None, None),
                     ('game_1_20_steering_mode_cleanup', None, None),
-                    ('game_1_20_clickable_telemetry_box', None, None),
+                    ('game_1_20_clickable_telemetry_box', 1, None),
                     ('game_1_20_0_enable_stages_steering', None, 0),
                     ('game_1_15_assert_disable_abort', 1, None),
                     ('game_1_19_local_activity_persistence', 1, None),
