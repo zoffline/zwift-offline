@@ -890,44 +890,26 @@ def api_per_session_info():
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
+    events_list = [('Bologna TT', 2843604888),
+                   ('Crit City CW', 947394567),
+                   ('Crit City CCW', 2875658892),
+                   ('Neokyo Crit', 1127056801),
+                   ('Watopia Waistband', 1064303857)]
+    event_id = 1000
     events = events_pb2.Events()
-
-    bologna = events.events.add()
-    bologna.id = 1000
-    bologna.title = "Bologna TT"
-    for cat in range(1,5):
-        bologna_cat = bologna.category.add()
-        bologna_cat.id = 1000 + cat
-        bologna_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        bologna_cat.registrationEndWT = world_time() + 60000
-        bologna_cat.route_id = 2843604888
-        bologna_cat.startLocation = cat
-        bologna_cat.label = cat
-
-    critcw = events.events.add()
-    critcw.id = 2000
-    critcw.title = "Crit City CW"
-    for cat in range(1,5):
-        critcw_cat = critcw.category.add()
-        critcw_cat.id = 2000 + cat
-        critcw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        critcw_cat.registrationEndWT = world_time() + 60000
-        critcw_cat.route_id = 947394567
-        critcw_cat.startLocation = cat
-        critcw_cat.label = cat
-
-    critccw = events.events.add()
-    critccw.id = 3000
-    critccw.title = "Crit City CCW"
-    for cat in range(1,5):
-        critccw_cat = critccw.category.add()
-        critccw_cat.id = 3000 + cat
-        critccw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        critccw_cat.registrationEndWT = world_time() + 60000
-        critccw_cat.route_id = 2875658892
-        critccw_cat.startLocation = cat
-        critccw_cat.label = cat
-
+    for item in events_list:
+        event = events.events.add()
+        event.id = event_id
+        event.title = item[0]
+        for cat in range(1,5):
+            event_cat = event.category.add()
+            event_cat.id = event_id + cat
+            event_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+            event_cat.registrationEndWT = world_time() + 60000
+            event_cat.route_id = item[1]
+            event_cat.startLocation = cat
+            event_cat.label = cat
+        event_id += 1000
     return events.SerializeToString(), 200
 
 
