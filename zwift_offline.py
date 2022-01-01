@@ -2123,6 +2123,28 @@ def experimentation_v1_variant():
     return variants.SerializeToString(), 200
 
 
+@app.route('/achievement/loadPlayerAchievements', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def achievement_loadPlayerAchievements():
+    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
+    if not os.path.isfile(achievements_file):
+        return '', 200
+    with open(achievements_file, 'rb') as f:
+        return f.read(), 200
+
+
+@app.route('/achievement/unlock', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def achievement_unlock():
+    if not request.stream:
+        return '', 400
+    with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
+        f.write(request.stream.read())
+    return '', 202
+
+
 def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
     global global_pace_partners
