@@ -2080,7 +2080,7 @@ def experimentation_v1_variant():
                     ('game_1_17_ble_disable_component_sport_filter', 1, None),
                     ('game_1_18_new_welcome_ride', None, None),
                     ('game_1_19_achievement_service_persist', 1, None),
-                    ('game_1_19_achievement_service_src_of_truth', 1, None),
+                    #('game_1_19_achievement_service_src_of_truth', 1, None),
                     ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
                     ('game_1_18_alternate_control_point_pairing', None, None),
                     ('game_1_18_swap_legacy_controllable_for_ftms', None, None),
