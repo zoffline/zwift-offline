@@ -15,6 +15,7 @@ import threading
 import re
 import smtplib, ssl
 import requests
+import json
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -880,7 +881,10 @@ def api_proto_empty():
 
 @app.route('/api/game_info/version', methods=['GET'])
 def api_gameinfo_version():
-    return '{"version":"A6ECBAC20EF1D88AD223EA2A3C5E3921"}'
+    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
+        data = json.load(f)
+        return '{"version":"%s"}' % data['gameInfoHash']
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():

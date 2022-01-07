@@ -17,6 +17,8 @@ def downloadImage(url):
 with open('game_info.txt', encoding='utf-8-sig') as f:
     data = json.load(f)
 
+print(data['gameInfoHash'])
+
 for m in data['maps']:
     for r in m['routes']:
         downloadImage(r['imageUrl'])
