@@ -302,7 +302,7 @@ def get_partial_profile(player_id):
                     partial_profile.first_name = profile.first_name
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
-                    for f in profile.pacer_settings:
+                    for f in profile.pacer_settings2:
                         if f.id == 1766985504 or f.id == 3273955058:
                             partial_profile.route = f.number_value
                             break
