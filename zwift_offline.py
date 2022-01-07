@@ -936,44 +936,26 @@ def api_per_session_info():
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
+    events_list = [('Bologna TT', 2843604888),
+                   ('Crit City CW', 947394567),
+                   ('Crit City CCW', 2875658892),
+                   ('Neokyo Crit', 1127056801),
+                   ('Watopia Waistband', 1064303857)]
+    event_id = 1000
     events = events_pb2.Events()
-
-    bologna = events.events.add()
-    bologna.id = 1000
-    bologna.title = "Bologna TT"
-    for cat in range(1,5):
-        bologna_cat = bologna.category.add()
-        bologna_cat.id = 1000 + cat
-        bologna_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        bologna_cat.registrationEndWT = world_time() + 60000
-        bologna_cat.route_id = 2843604888
-        bologna_cat.startLocation = cat
-        bologna_cat.label = cat
-
-    critcw = events.events.add()
-    critcw.id = 2000
-    critcw.title = "Crit City CW"
-    for cat in range(1,5):
-        critcw_cat = critcw.category.add()
-        critcw_cat.id = 2000 + cat
-        critcw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        critcw_cat.registrationEndWT = world_time() + 60000
-        critcw_cat.route_id = 947394567
-        critcw_cat.startLocation = cat
-        critcw_cat.label = cat
-
-    critccw = events.events.add()
-    critccw.id = 3000
-    critccw.title = "Crit City CCW"
-    for cat in range(1,5):
-        critccw_cat = critccw.category.add()
-        critccw_cat.id = 3000 + cat
-        critccw_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
-        critccw_cat.registrationEndWT = world_time() + 60000
-        critccw_cat.route_id = 2875658892
-        critccw_cat.startLocation = cat
-        critccw_cat.label = cat
-
+    for item in events_list:
+        event = events.events.add()
+        event.id = event_id
+        event.title = item[0]
+        for cat in range(1,5):
+            event_cat = event.category.add()
+            event_cat.id = event_id + cat
+            event_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+            event_cat.registrationEndWT = world_time() + 60000
+            event_cat.route_id = item[1]
+            event_cat.startLocation = cat
+            event_cat.label = cat
+        event_id += 1000
     return events.SerializeToString(), 200
 
 
@@ -2261,29 +2243,29 @@ def experimentation_v1_variant():
                     ('pack_dynamics_30_london', 1, None),
                     ('pack_dynamics_30_watopia', 1, None),
                     ('pack_dynamics_30_exclude_events', None, None),
-                    ('game_1_19_system_alerts', 0, None),
+                    #('game_1_19_system_alerts', 1, None),
                     ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
                     ('game_1_17_game_client_activity_event', None, None),
                     ('game_1_17_1_tdf_femmes_yellow_jersey', None, None),
                     ('game_1_17_ble_disable_component_sport_filter', 1, None),
                     ('game_1_18_new_welcome_ride', None, None),
                     ('game_1_19_achievement_service_persist', 1, None),
-                    ('game_1_19_achievement_service_src_of_truth', None, None),
+                    #('game_1_19_achievement_service_src_of_truth', 1, None),
                     ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
                     ('game_1_18_alternate_control_point_pairing', None, None),
                     ('game_1_18_swap_legacy_controllable_for_ftms', None, None),
-                    ('game_1_19_gender_dob_change', None, None),
-                    ('game_1_18_0_osx_monterey_bluetooth_uart_fix', None, 0),
+                    ('game_1_19_gender_dob_change', 1, None),
+                    ('game_1_18_0_osx_monterey_bluetooth_uart_fix', 1, 0),
                     ('game_1_19_0_default_rubberbanding', None, None),
                     ('game_1_19_use_tabbed_settings', None, 0),
                     ('pedal_assist_20', None, None),
                     ('game_1_19_segment_results_sub_active', 1, 0),
                     ('game_1_19_0_alternate_ble_dll', None, None),
-                    ('game_1_20_hw_experiment_1', None, None),
+                    ('game_1_20_hw_experiment_1', 1, None),
                     ('game_1_19_paired_devices_alerts', 1, None),
                     ('game_1_19_real_time_unlocks', None, None),
                     ('game_1_20_apple_novus_ble_refactor', None, None),
-                    ('game_1_20_0_ble_data_guard', 1, None),
+                    ('game_1_20_0_ble_data_guard', None, None),
                     ('game_1_20_disable_high_volume_send_mixpanel', None, None),
                     ('game_1_20_steering_mode_cleanup', None, None),
                     ('game_1_20_clickable_telemetry_box', 1, None),
@@ -2309,6 +2291,28 @@ def experimentation_v1_variant():
             f2 = f1.f2.add()
             f2.f4 = variant[2]
     return variants.SerializeToString(), 200
+
+
+@app.route('/achievement/loadPlayerAchievements', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def achievement_loadPlayerAchievements():
+    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
+    if not os.path.isfile(achievements_file):
+        return '', 200
+    with open(achievements_file, 'rb') as f:
+        return f.read(), 200
+
+
+@app.route('/achievement/unlock', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def achievement_unlock():
+    if not request.stream:
+        return '', 400
+    with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
+        f.write(request.stream.read())
+    return '', 202
 
 
 def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
