@@ -301,7 +301,7 @@ def get_partial_profile(player_id):
                     partial_profile.first_name = profile.first_name
                     partial_profile.last_name = profile.last_name
                     partial_profile.country_code = profile.country_code
-                    for f in profile.f114:
+                    for f in profile.pacer_settings:
                         if f.id == 1766985504 or f.id == 3273955058:
                             partial_profile.route = f.number_value
                             break
@@ -863,7 +863,7 @@ def api_auth():
 
 @app.route('/api/server', methods=['GET'])
 def api_server():
-    return '{"build":"zwift_1.263.0","version":"1.263.0"}'
+    return '{"build":"zwift_1.267.0","version":"1.267.0"}'
 
 @app.route('/api/servers', methods=['GET'])
 def api_servers():
@@ -880,12 +880,12 @@ def api_proto_empty():
 
 @app.route('/api/game_info/version', methods=['GET'])
 def api_gameinfo_version():
-    return '{"version":"50CC5D2253ED559D421261FB1ED610BF"}'
+    return '{"version":"A6ECBAC20EF1D88AD223EA2A3C5E3921"}'
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():
     game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
-    with open(game_info_file, mode="r", encoding="utf-8") as f:
+    with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         return f.read()
 
 @app.route('/api/users/login', methods=['POST'])
@@ -1065,7 +1065,6 @@ def do_api_profiles_me(is_json):
     profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
         profile.id = profile_id
-        profile.is_connected_to_strava = True
         profile.email = current_user.username
         profile.first_name = current_user.first_name
         profile.last_name = current_user.last_name
@@ -1090,12 +1089,12 @@ def do_api_profiles_me(is_json):
                 ghosts_enabled[profile.id] = AnonUser.enable_ghosts
             if not profile.email:
                 profile.email = 'user@email.com'
-            if profile.f60:
-                del profile.f60[:]
+            if profile.entitlements:
+                del profile.entitlements[:]
     if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
         if profile.age == 0 and profile.dob != "":
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
-        jprofile = {"id": profile.id, "firstName": profile.first_name, "lastName": profile.last_name, "male": profile.is_male, "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % (profile_id), "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % (profile_id), "playerType": "NORMAL", "playerTypeId": 1, "emailAddress": profile.email,"privateAttributes": {"839250175": ""}, "countryCode": profile.country_code, "dob": profile.dob, "countryAlpha3": "rus", "useMetric": profile.useMetric, "privacy": {"approvalRequired": False, "displayWeight": True, "minor": False, "privateMessaging": False, "defaultFitnessDataPrivacy": False, "suppressFollowerNotification": False, "displayAge": True, "defaultActivityPrivacy": "PUBLIC"}, "age": profile.age, "ftp": profile.ftp, "b": False, "weight": profile.weight_in_grams, "connectedToStrava": False, "connectedToTrainingPeaks": False, "connectedToTodaysPlan": False, "connectedToUnderArmour": False, "connectedToFitbit": False, "connectedToGarmin": False, "height": profile.height_in_millimeters, "location": "", "socialFacts": {"profileId": profile.social_facts.profile_id, "followersCount": profile.social_facts.followersCount, "followeesCount": profile.social_facts.followeesCount, "followeesInCommonWithLoggedInPlayer": profile.social_facts.followeesInCommonWithLoggedInPlayer, "followerStatusOfLoggedInPlayer": "SELF", "followeeStatusOfLoggedInPlayer": "SELF", "isFavoriteOfLoggedInPlayer": profile.social_facts.isFavoriteOfLoggedInPlayer}, "totalExperiencePoints": profile.total_xp, "worldId": None, "totalDistance": profile.total_distance_in_meters, "totalDistanceClimbed": profile.elevation_gain_in_meters, "totalTimeInMinutes": profile.time_ridden_in_minutes, "achievementLevel": profile.achievement_level, "totalWattHours": profile.total_watt_hours, "runTime1miInSeconds": profile.runTime1miInSeconds, "runTime5kmInSeconds": profile.runTime5kmInSeconds, "runTime10kmInSeconds": profile.runTime10kmInSeconds, "runTimeHalfMarathonInSeconds": profile.runTimeHalfMarathonInSeconds, "runTimeFullMarathonInSeconds": profile.runTimeFullMarathonInSeconds,"totalInKomJersey": profile.totalInKomJersey, "totalInSprintersJersey": profile.totalInSprintersJersey, "totalInOrangeJersey": profile.totalInOrangeJersey, "currentActivityId": None, "enrolledZwiftAcademy": False,"runAchievementLevel": profile.runAchievementLevel, "totalRunDistance": profile.totalRunDistance, "totalRunTimeInMinutes": profile.time_ridden_in_minutes, "totalRunExperiencePoints": profile.totalRunExperiencePoints, "totalRunCalories": int(profile.total_watt_hours * 3.07089), "totalGold": profile.totalGold, "powerSourceType": "Power Source", "powerSourceModel": "Power Meter", "virtualBikeModel": "Zwift Carbon"}
+        jprofile = {"id": profile.id, "firstName": profile.first_name, "lastName": profile.last_name, "male": profile.is_male, "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % (profile_id), "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % (profile_id), "playerType": "NORMAL", "playerTypeId": 1, "emailAddress": profile.email,"privateAttributes": {"839250175": ""}, "countryCode": profile.country_code, "dob": profile.dob, "countryAlpha3": "rus", "useMetric": profile.use_metric, "privacy": {"approvalRequired": False, "displayWeight": True, "minor": False, "privateMessaging": False, "defaultFitnessDataPrivacy": False, "suppressFollowerNotification": False, "displayAge": True, "defaultActivityPrivacy": "PUBLIC"}, "age": profile.age, "ftp": profile.ftp, "b": False, "weight": profile.weight_in_grams, "connectedToStrava": profile.connected_to_strava, "connectedToTrainingPeaks": profile.connected_to_training_peaks, "connectedToTodaysPlan": profile.connected_to_todays_plan, "connectedToUnderArmour": profile.connected_to_under_armour, "connectedToFitbit": profile.connected_to_fitbit, "connectedToGarmin": profile.connected_to_garmin, "height": profile.height_in_millimeters, "location": "", "socialFacts": {"profileId": profile.social_facts.profile_id, "followersCount": profile.social_facts.followers_count, "followeesCount": profile.social_facts.followees_count, "followeesInCommonWithLoggedInPlayer": profile.social_facts.followees_in_common_with_logged_in_player, "followerStatusOfLoggedInPlayer": "SELF", "followeeStatusOfLoggedInPlayer": "SELF", "isFavoriteOfLoggedInPlayer": profile.social_facts.is_favorite_of_logged_in_player}, "totalExperiencePoints": profile.total_xp, "worldId": profile.world_id, "totalDistance": profile.total_distance_in_meters, "totalDistanceClimbed": profile.elevation_gain_in_meters, "totalTimeInMinutes": profile.time_ridden_in_minutes, "achievementLevel": profile.achievement_level, "totalWattHours": profile.total_watt_hours, "runTime1miInSeconds": profile.run_time_1mi_in_seconds, "runTime5kmInSeconds": profile.run_time_5km_in_seconds, "runTime10kmInSeconds": profile.run_time_10km_in_seconds, "runTimeHalfMarathonInSeconds": profile.run_time_half_marathon_in_seconds, "runTimeFullMarathonInSeconds": profile.run_time_full_marathon_in_seconds,"totalInKomJersey": profile.total_in_kom_jersey, "totalInSprintersJersey": profile.total_in_sprinters_jersey, "totalInOrangeJersey": profile.total_in_orange_jersey, "currentActivityId": profile.current_activity_id, "enrolledZwiftAcademy": False,"runAchievementLevel": profile.run_achievement_level, "totalRunDistance": profile.total_run_distance, "totalRunTimeInMinutes": profile.time_ridden_in_minutes, "totalRunExperiencePoints": profile.total_run_experience_points, "totalRunCalories": int(profile.total_watt_hours * 3.07089), "totalGold": profile.total_gold, "powerSourceType": "Power Source", "powerSourceModel": "Power Meter", "virtualBikeModel": "Zwift Carbon"}
         #print (jsonify(jprofile).data.decode("utf-8"))
         return jsonify(jprofile)
     else:
@@ -1172,8 +1171,10 @@ def api_profiles_me_id(player_id):
     profile.last_name = request.json['lastName']
     profile.height_in_millimeters = request.json['height']
     profile.is_male = request.json['male']
-    profile.useMetric = request.json['useMetric']
+    profile.use_metric = request.json['useMetric']
     profile.weight_in_grams = request.json['weight']
+    #profile.large_avatar_url = request.json['imageSrcLarge']
+    profile.large_avatar_url = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
     #profile.age = request.json['age']
     with open(profile_file, 'wb') as fd:
         fd.write(profile.SerializeToString())

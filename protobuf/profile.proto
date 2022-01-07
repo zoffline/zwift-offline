@@ -1,12 +1,12 @@
 syntax = "proto2";
 message Profile {
     optional int64 id = 1;
-    optional int32 is_connected_to_strava = 2;
+    optional int64 world_id = 2;
     optional string email = 3;
     optional string first_name = 4;
     optional string last_name = 5;
     optional bool is_male = 6;
-    optional bytes f7 = 7;
+    optional string f7 = 7;
     optional uint32 weight_in_grams = 9;
     optional uint32 ftp = 10;
     optional uint32 f11 = 11;
@@ -36,28 +36,33 @@ message Profile {
     optional uint32 total_distance_in_meters = 35;
     optional uint32 elevation_gain_in_meters = 36;
     optional uint32 time_ridden_in_minutes = 37;
-    optional uint32 totalInKomJersey = 38;
-    optional uint32 totalInSprintersJersey = 39;
-    optional uint32 totalInOrangeJersey = 40;
+    optional uint32 total_in_kom_jersey = 38;
+    optional uint32 total_in_sprinters_jersey = 39;
+    optional uint32 total_in_orange_jersey = 40;
     optional uint32 total_watt_hours = 41;
     optional uint32 height_in_millimeters = 42;
     optional string dob = 43;
     optional uint32 max_heart_rate = 44;
-    optional bool f45 = 45;
+    optional bool connected_to_strava = 45;
     optional uint32 total_xp = 46;
-    optional uint32 totalGold = 47; /* drops */
+    optional uint32 total_gold = 47; /* drops */
     
     optional PlayerType player_type = 48;
     enum PlayerType {
         PLAYERTYPE0 = 0;
         NORMAL = 1;
-        PLAYERTYPE2 = 2;
-        PLAYERTYPE3 = 3;
-        PLAYERTYPE4 = 4;
+        PRO_CYCLIST = 2;
+        ZWIFT_STAFF = 3;
+        AMBASSADOR = 4;
+        VERIFIED = 5;
+        ZED = 6;
+        ZAC = 7;
+        PRO_TRIATHLETE = 8;
+        PRO_RUNNER = 9;
     }
     
     optional uint32 achievement_level = 49;
-    optional bool useMetric = 50;
+    optional bool use_metric = 50;
     optional bool f51 = 51;
     optional uint32 f52 = 52;
     optional uint32 f53 = 53;
@@ -65,35 +70,35 @@ message Profile {
     optional uint32 age = 55;
     optional fixed32 f56 = 56;
     optional uint32 f57 = 57;
-    optional bytes f58 = 58;
+    optional string large_avatar_url = 58;
     optional fixed64 f59 = 59;
-    repeated bytes f60 = 60; /* related to subscription/billing */
+    repeated ProfileEntitlement entitlements = 60;
     
     optional ProfileSocialFacts social_facts = 61;
     message ProfileSocialFacts {
         optional int64 profile_id = 1;
-        optional int64 followersCount = 2;
-        optional int64 followeesCount = 3;
-        optional int64 followeesInCommonWithLoggedInPlayer = 4;
-        optional ProfileFollowStatus f5 = 5;
-        optional ProfileFollowStatus f6 = 6;
-        optional bool isFavoriteOfLoggedInPlayer = 7;
+        optional int64 followers_count = 2;
+        optional int64 followees_count = 3;
+        optional int64 followees_in_common_with_logged_in_player = 4;
+        optional ProfileFollowStatus follower_status_of_logged_in_player = 5;
+        optional ProfileFollowStatus followee_status_of_logged_in_player = 6;
+        optional bool is_favorite_of_logged_in_player = 7;
     }
     
-    optional ProfileFollowStatus f62 = 62;
-    optional bool f63 = 63;
-    optional bool f64 = 64;
+    optional ProfileFollowStatus follow_status = 62;
+    optional bool connected_to_training_peaks = 63;
+    optional bool connected_to_todays_plan = 64;
     
-    optional ProfileEnrolledProgram f65 = 65;
+    optional ProfileEnrolledProgram enrolled_program = 65;
     enum ProfileEnrolledProgram {
         ENROLLEDPROGRAM0 = 0;
-        ENROLLEDPROGRAM1 = 1;
+        ZWIFT_ACADEMY = 1;
         ENROLLEDPROGRAM2 = 2;
         ENROLLEDPROGRAM3 = 3;
         ENROLLEDPROGRAM4 = 4;
     }
     
-    optional bytes f66 = 66;
+    optional string f66 = 66;
     optional uint32 f67 = 67;
     optional fixed32 f68 = 68;
     optional fixed32 f69 = 69;
@@ -101,8 +106,8 @@ message Profile {
     optional fixed32 f71 = 71;
     optional fixed32 f72 = 72;
     optional fixed32 f73 = 73;
-    optional uint32 totalRunDistance = 74;
-    optional uint32 totalRunExperiencePoints = 75;
+    optional uint32 total_run_distance = 74;
+    optional uint32 total_run_experience_points = 75;
     optional fixed32 f76 = 76;
     optional fixed32 f77 = 77;
     optional fixed32 f78 = 78;
@@ -111,18 +116,18 @@ message Profile {
     optional uint32 f81 = 81;
     optional Subscription f82 = 82;
     enum Sport {
-        SPORT0 = 0;
-        SPORT1 = 1;
-        SPORT2 = 2;
+        CYCLING = 0;
+        RUNNING = 1;
+        ROWING = 2;
         SPORT3 = 3;
         SPORT4 = 4;
     }
     optional string mix_panel_distinct_id = 83;
-    optional uint32 runAchievementLevel = 84;
+    optional uint32 run_achievement_level = 84;
     optional uint32 f85 = 85;
     optional Sport sport = 86;
     optional uint32 f87 = 87;
-    optional bool f88 = 88;
+    optional bool connected_to_under_armour = 88;
     optional string preferred_language = 89;
     optional uint32 f90 = 90;
     optional uint32 f91 = 91;
@@ -140,18 +145,20 @@ message Profile {
     optional uint32 f103 = 103;
     optional uint32 f104 = 104;
     optional bool f105 = 105;
-    optional bool f106 = 106;
+    optional bool connected_to_fitbit = 106;
     repeated bytes f107 = 107;
     optional string launched_game_client = 108;
-    optional int64 f109 = 109;
-    optional bool f110 = 110;
-    repeated PacerSetting f114 = 114;
-    optional int32 runTime1miInSeconds = 117;
-    optional int32 runTime5kmInSeconds = 118;
-    optional int32 runTime10kmInSeconds = 119;
-    optional int32 runTimeHalfMarathonInSeconds = 120;
-    optional int32 runTimeFullMarathonInSeconds = 121;
+    optional int64 current_activity_id = 109;
+    optional bool connected_to_garmin = 110;
+    repeated PacerSetting pacer_settings1 = 113;
+    repeated PacerSetting pacer_settings2 = 114;
+    optional int32 run_time_1mi_in_seconds = 117;
+    optional int32 run_time_5km_in_seconds = 118;
+    optional int32 run_time_10km_in_seconds = 119;
+    optional int32 run_time_half_marathon_in_seconds = 120;
+    optional int32 run_time_full_marathon_in_seconds = 121;
     optional int32 f125 = 125;
+    repeated SomeSetting some_settings = 127;
 }
 
 message Profiles {
@@ -159,13 +166,13 @@ message Profiles {
 }
 
 message ProfileEntitlement {
-    optional EntitlementType f1 = 1;
+    optional EntitlementType type = 1;
     enum EntitlementType {
         ENTITLEMENTTYPE0 = 0;
-        ENTITLEMENTTYPE1 = 1;
-        ENTITLEMENTTYPE2 = 2;
-        ENTITLEMENTTYPE3 = 3;
-        ENTITLEMENTTYPE4 = 4;
+        RIDE = 1;
+        RUN = 2;
+        ROW = 3;
+        USE = 4;
     }
     
     optional int64 f2 = 2;
@@ -173,63 +180,75 @@ message ProfileEntitlement {
     optional ProfileEntitlementStatus c = 3;
     enum ProfileEntitlementStatus {
         ENTITLEMENTSTATUS0 = 0;
-        ENTITLEMENTSTATUS1 = 1;
-        ENTITLEMENTSTATUS2 = 2;
-        ENTITLEMENTSTATUS3 = 3;
-        ENTITLEMENTSTATUS4 = 4;
+        EXPIRED = 1;
+        ACTIVE = 2;
+        CANCELED = 3;
+        INACTIVE = 4;
+        APPLIED_AS_SUBSCRIPTION_TRIAL_PERIOD = 5;
     }
     
-    optional bytes f4 = 4;
+    optional string f4 = 4;
     optional uint32 f5 = 5;
     optional uint32 f6 = 6;
     optional uint32 f7 = 7;
     optional uint32 f8 = 8;
     optional uint32 f9 = 9;
-    optional bytes f10 = 10;
+    optional string f10 = 10;
     
-    optional Platform f11 = 11;
+    optional Platform platform = 11;
     enum Platform {
-        PLATFORM0 = 0;
-        PLATFORM1 = 1;
-        PLATFORM2 = 2;
-        PLATFORM3 = 3;
-        PLATFORM4 = 4;
+        PLATFORM_OSX = 0;
+        PLATFORM_PC = 1;
+        PLATFORM_IOS = 2;
+        PLATFORM_ANDROID = 3;
+        PLATFORM_TVOS = 4;
         PLATFORM5 = 5;
         PLATFORM6 = 6;
     }
     
     optional uint32 f12 = 12;
     optional bool f13 = 13;
+    repeated uint32 f14 = 14;
 }
 
 enum ProfileFollowStatus {
     FOLLOWSTATUS0 = 0;
-    SELF = 1;
-    FOLLOWSTATUS2 = 2;
-    FOLLOWSTATUS3 = 3;
-    FOLLOWSTATUS4 = 4;
+    UNKNOWN = 1;
+    REQUESTS_TO_FOLLOW = 2;
+    IS_FOLLOWING = 3;
+    HAS_BEEN_DECLINED = 7;
+    IS_BLOCKED = 4;
+    NO_RELATIONSHIP = 5;
+    SELF = 6;
 }
 
 message Subscription {
-    optional Gateway f1 = 1;
+    optional Gateway gateway = 1;
     enum Gateway {
-        GATEWAY0 = 0;
-        GATEWAY1 = 1;
-        GATEWAY2 = 2;
-        GATEWAY3 = 3;
-        GATEWAY4 = 4;
+        BRAINTREE = 0;
+        APPLE = 1;
     }
     
-    optional SubscriptionStatus f2 = 2;
+    optional SubscriptionStatus status = 2;
     enum SubscriptionStatus {
-        STATUS0 = 0;
-        STATUS1 = 1;
+        NEW = 0;
+        EXPIRED = 1;
         ACTIVE = 2;
-        ACTIVE_CANCELLED = 3;
-        STATUS4 = 4;
-        STATUS5 = 5;
-        STATUS6 = 6;
+        CANCELED = 3;
+        PAST_DUE = 4;
+        PENDING = 5;
+        SUBERROR = 6;
+        UNRECOGNIZED = 7;
+        UNKNOWN = 8;
+        ACTIVE_WITH_PAYMENT_FAILURE = 9;
+        ABANDONED = 10;
     }
+}
+
+message SomeSetting {
+    required int64 id = 1;
+    optional int64 number_value1 = 2;
+    optional int64 number_value2 = 3;
 }
 
 message PacerSetting {
