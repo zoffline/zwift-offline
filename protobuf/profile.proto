@@ -6,32 +6,48 @@ message Profile {
     optional string first_name = 4;
     optional string last_name = 5;
     optional bool is_male = 6;
-    optional string f7 = 7;
+    optional string f7 = 7; //empty
+    /* no f8 exists */
     optional uint32 weight_in_grams = 9;
     optional uint32 ftp = 10;
-    optional uint32 f11 = 11;
-    optional uint32 f12 = 12;
-    optional uint32 f13 = 13;
-    optional uint32 f14 = 14;
-    optional uint32 f15 = 15;
-    optional uint32 f16 = 16;
-    optional uint32 f17 = 17;
-    optional uint32 f18 = 18;
-    optional uint32 f19 = 19;
-    optional fixed32 f20 = 20;
-    optional fixed32 f21 = 21;
-    optional fixed32 f22 = 22;
-    optional fixed32 f23 = 23;
-    optional fixed32 f24 = 24;
-    optional fixed32 f25 = 25;
-    optional fixed32 f26 = 26;
-    optional fixed64 f27 = 27;
-    optional fixed64 f28 = 28;
-    optional fixed64 f29 = 29;
-    optional fixed64 f30 = 30;
-    optional fixed64 f31 = 31;
-    optional fixed64 f32 = 32;
-    optional bytes f33 = 33;
+    optional uint32 f11 = 11; //empty
+    optional uint32 body_type = 12;
+    optional uint32 hair_type = 13;
+    optional uint32 facial_hair_type = 14;
+    optional uint32 ride_helmet_type = 15;
+    optional uint32 glasses_type = 16;
+    optional uint32 ride_shoes_type = 17;
+    optional uint32 ride_socks_type = 18;
+    optional uint32 ride_gloves = 19;
+    optional fixed32 ride_jersey = 20;
+    optional fixed32 f21 = 21; //empty
+    optional fixed32 bike_wheel1 = 22;
+    optional fixed32 bike_wheel2 = 23;
+    optional fixed32 bike_frame = 24;
+    optional fixed32 f25 = 25; //empty
+    optional fixed32 f26 = 26; //empty
+    optional fixed64 bike_frame_colour = 27;
+    optional fixed64 f28 = 28; //empty
+    optional fixed64 f29 = 29; //empty
+    optional fixed64 f30 = 30; //empty
+    optional fixed64 f31 = 31; //empty
+    optional fixed64 f32 = 32; //empty
+    /*message Privacy { //does not stored here
+        optional bool approval_required = 1;
+        optional bool display_weight = 2;
+        optional bool minor = 3;
+        optional bool private_messaging = 4;
+        optional bool default_fitness_data_privacy = 5;
+        optional bool suppress_follower_notification = 6;
+        optional bool display_age = 7;
+        enum ActivityPrivacyType {
+            PUBLIC = 0;
+            PRIVATE = 1;
+            FRIENDS = 2;
+        }
+        optional ActivityPrivacyType default_activity_privacy = 8;
+    }*/
+    optional bytes challenge_info = 33;
     optional uint32 country_code = 34;
     optional uint32 total_distance_in_meters = 35;
     optional uint32 elevation_gain_in_meters = 36;
@@ -45,7 +61,7 @@ message Profile {
     optional uint32 max_heart_rate = 44;
     optional bool connected_to_strava = 45;
     optional uint32 total_xp = 46;
-    optional uint32 total_gold = 47; /* drops */
+    optional uint32 total_gold_drops = 47;
     
     optional PlayerType player_type = 48;
     enum PlayerType {
@@ -63,34 +79,34 @@ message Profile {
     
     optional uint32 achievement_level = 49;
     optional bool use_metric = 50;
-    optional bool f51 = 51;
-    optional uint32 f52 = 52;
-    optional uint32 f53 = 53;
-    optional uint32 f54 = 54;
+    optional bool f51 = 51; //empty
+    optional uint32 power_source = 52;
+    optional uint32 f53 = 53; //empty
+    optional uint32 f54 = 54; //empty
     optional uint32 age = 55;
-    optional fixed32 f56 = 56;
-    optional uint32 f57 = 57;
+    optional fixed32 f56 = 56; //empty
+    optional uint32 f57 = 57; //empty
     optional string large_avatar_url = 58;
-    optional fixed64 f59 = 59;
+    optional fixed64 f59 = 59; //empty
     repeated ProfileEntitlement entitlements = 60;
     
-    optional ProfileSocialFacts social_facts = 61;
-    message ProfileSocialFacts {
+    optional SocialFacts social_facts = 61;
+    message SocialFacts {
         optional int64 profile_id = 1;
-        optional int64 followers_count = 2;
-        optional int64 followees_count = 3;
-        optional int64 followees_in_common_with_logged_in_player = 4;
-        optional ProfileFollowStatus follower_status_of_logged_in_player = 5;
-        optional ProfileFollowStatus followee_status_of_logged_in_player = 6;
+        optional int32 followers_count = 2;
+        optional int32 followees_count = 3;
+        optional int32 followees_in_common_with_logged_in_player = 4;
+        optional FollowStatus follower_status_of_logged_in_player = 5;
+        optional FollowStatus followee_status_of_logged_in_player = 6;
         optional bool is_favorite_of_logged_in_player = 7;
     }
     
-    optional ProfileFollowStatus follow_status = 62;
+    optional FollowStatus follow_status = 62;
     optional bool connected_to_training_peaks = 63;
     optional bool connected_to_todays_plan = 64;
     
-    optional ProfileEnrolledProgram enrolled_program = 65;
-    enum ProfileEnrolledProgram {
+    optional EnrolledProgram enrolled_program = 65;
+    enum EnrolledProgram {
         ENROLLEDPROGRAM0 = 0;
         ZWIFT_ACADEMY = 1;
         ENROLLEDPROGRAM2 = 2;
@@ -98,22 +114,22 @@ message Profile {
         ENROLLEDPROGRAM4 = 4;
     }
     
-    optional string f66 = 66;
-    optional uint32 f67 = 67;
-    optional fixed32 f68 = 68;
-    optional fixed32 f69 = 69;
-    optional fixed32 f70 = 70;
-    optional fixed32 f71 = 71;
-    optional fixed32 f72 = 72;
-    optional fixed32 f73 = 73;
+    optional string f66 = 66; //empty
+    optional uint32 f67 = 67; //empty
+    optional fixed32 run_shirt_type = 68;
+    optional fixed32 run_shorts_type = 69;
+    optional fixed32 run_shoes_type = 70;
+    optional fixed32 run_socks_type = 71;
+    optional fixed32 run_helmet_type = 72;
+    optional fixed32 f73 = 73; //empty
     optional uint32 total_run_distance = 74;
     optional uint32 total_run_experience_points = 75;
-    optional fixed32 f76 = 76;
-    optional fixed32 f77 = 77;
-    optional fixed32 f78 = 78;
-    optional fixed32 f79 = 79;
-    optional uint32 f80 = 80;
-    optional uint32 f81 = 81;
+    optional fixed32 f76 = 76; //empty
+    optional fixed32 f77 = 77; //empty
+    optional fixed32 f78 = 78; //empty
+    optional fixed32 f79 = 79; //empty
+    optional uint32 f80 = 80; //empty
+    optional uint32 f81 = 81; //empty
     optional Subscription f82 = 82;
     enum Sport {
         CYCLING = 0;
@@ -124,41 +140,66 @@ message Profile {
     }
     optional string mix_panel_distinct_id = 83;
     optional uint32 run_achievement_level = 84;
-    optional uint32 f85 = 85;
+    optional uint32 f85 = 85; //0 begin run
     optional Sport sport = 86;
-    optional uint32 f87 = 87;
+    optional uint32 f87 = 87; //360?
     optional bool connected_to_under_armour = 88;
     optional string preferred_language = 89;
-    optional uint32 f90 = 90;
-    optional uint32 f91 = 91;
-    optional uint32 f92 = 92;
-    optional uint32 f93 = 93;
-    optional uint32 f94 = 94;
-    optional uint32 f95 = 95;
-    optional uint32 f96 = 96;
-    optional uint32 f97 = 97;
-    optional uint32 f98 = 98;
-    optional uint32 f99 = 99;
-    optional uint32 f100 = 100;
-    optional uint32 f101 = 101;
-    optional uint32 f102 = 102;
-    optional uint32 f103 = 103;
-    optional uint32 f104 = 104;
-    optional bool f105 = 105;
+    optional uint32 hair_colour = 90;
+    optional uint32 facial_hair_colour = 91;
+    optional uint32 f92 = 92; //empty
+    optional uint32 f93 = 93; //empty
+    optional uint32 run_shorts_length = 94;
+    optional uint32 f95 = 95; //empty
+    optional uint32 run_socks_length = 96;
+    optional uint32 f97 = 97; //empty
+    optional uint32 ride_socks_length = 98;
+    optional uint32 f99 = 99; //empty
+    optional uint32 f100 = 100;  //empty
+    optional uint32 f101 = 101; //empty
+    optional uint32 f102 = 102; //empty
+    optional uint32 f103 = 103; //empty
+    optional uint32 f104 = 104; //empty
+    optional bool f105 = 105; //? false
     optional bool connected_to_fitbit = 106;
-    repeated bytes f107 = 107;
+    repeated bytes f107 = 107; //empty
     optional string launched_game_client = 108;
     optional int64 current_activity_id = 109;
     optional bool connected_to_garmin = 110;
-    repeated PacerSetting pacer_settings1 = 113;
-    repeated PacerSetting pacer_settings2 = 114;
+    message Reminder {
+        optional int64 f1 = 1;
+        optional string f2 = 2;
+        optional int64 f3 = 3;
+        message ReminderProperty {
+            optional int64 f1 = 1;
+            optional string f2 = 2;
+            optional string f3 = 3;
+        }
+        repeated ReminderProperty f4 = 4;
+    }
+    repeated Reminder remainder = 111;
+    optional bool f112 = 112; //? false
+    repeated Attribute private_attributes = 113;
+    repeated Attribute public_attributes = 114;
+    optional int32 f115 = 115; //false begin run
+    optional int64 f116 = 116; //empty
     optional int32 run_time_1mi_in_seconds = 117;
     optional int32 run_time_5km_in_seconds = 118;
     optional int32 run_time_10km_in_seconds = 119;
     optional int32 run_time_half_marathon_in_seconds = 120;
     optional int32 run_time_full_marathon_in_seconds = 121;
-    optional int32 f125 = 125;
-    repeated SomeSetting some_settings = 127;
+    optional int32 f122 = 122; //empty
+    enum CyclingOrganization {
+        NO_CYCLING_LICENSE = 0;
+        CYCLING_SOUTH_AFRICA = 1;
+        CYCLING_AUSTRALIA = 2;
+        CYCLING_NEW_ZEALAND = 3;
+    }
+    optional CyclingOrganization cycling_organization = 123;
+    optional string f124 = 124; /* org name? */
+    optional int32 f125 = 125; //? 0
+    /* 126 ? */
+    repeated PropertyChange property_changes = 127;
 }
 
 message Profiles {
@@ -211,7 +252,7 @@ message ProfileEntitlement {
     repeated uint32 f14 = 14;
 }
 
-enum ProfileFollowStatus {
+enum FollowStatus {
     FOLLOWSTATUS0 = 0;
     UNKNOWN = 1;
     REQUESTS_TO_FOLLOW = 2;
@@ -245,15 +286,43 @@ message Subscription {
     }
 }
 
-message SomeSetting {
-    required int64 id = 1;
-    optional int64 number_value1 = 2;
-    optional int64 number_value2 = 3;
+message PropertyChange {
+    enum Id {
+        TYPE0 = 0;
+        DATE_OF_BIRTH = 1;
+        GENDER = 2;
+    }
+    required Id property_name = 1;
+    optional int32 change_count = 2;
+    optional int32 max_changes = 3;
 }
-
-message PacerSetting {
-    required int64 id = 1;
+/*
+Attribute ID is crc32 of it's name. Examples:
+public
+324889996=0x135D6D8C <MAGIC> (0)
+private
+-1575272099="TODAYS_SPORT_SELECT_TYPE" (CYCLIST)
+1169650385="PLAYER_CACHE_BLOB" (000000)
+1025311738="ONBOARD_CUSTOMIZATION_USER_TYPE_ZWIFT_GOAL" (GET IN SHAPE/TRAINING)
+-1482469514="LEVEL50" (1)
+839250175="TRAINING_PLAN_DETAILS" ("")
+1190707182="LAST_RATING_TIME" (1641574907)
+-702503934="XPTODROPSCONVERSIONDONE" (1)
+2076353160="USERRIDECOUNT" (4)
+-2012319163="LAST_WORKOUT_HASH" (1007947233)
+-1001004453="SPORT_SELECT_TYPE" (CYCLIST)
+1857228933="USAGE_HISTOGRAM_1" (0,...)
+2004261226="DROPS_CURRENTSESSION" (0.0)
+1318665884="USERPROFILE_STEERINGTUTORIALSHOWN" (1)
+568968402="MOUNTAIN_TRAIL_STARTED" (7)
+-642877525="MOUNTAIN_TRAIL_COMPLETED" (5)
+-1414690690="USERPROFILE_STEERINGPAIRED" (1)
+-34579778="ONROAD_SURVEY_COMPLETED" (5)
+-1316403440="PACERBOTTUTORIAL" (1)
+*/
+message Attribute {
+    required int32 id = 1;
     optional uint64 number_value = 2;
-    optional fixed32 hex_value = 3;
+    optional float float_value = 3;
     optional string string_value = 5;
 }
