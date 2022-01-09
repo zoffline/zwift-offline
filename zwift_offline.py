@@ -1364,20 +1364,20 @@ def api_profiles():
                     elif seconds < 5259492: span = '%s weeks' % (seconds // 604800)
                     else: span = '%s months' % (seconds // 2629746)
                     p.last_name = span + ' ago [ghost]'
-                    p.f24 = 1456463855 # tron bike
+                    p.bike_frame = 1456463855 # tron bike
                     p.country_code = 0
-                    if p.f20 == 3761002195:
-                        p.f20 = 1869390707 # basic 2 jersey
-                        p.f27 = 80 # green bike
+                    if p.ride_jersey == 3761002195:
+                        p.ride_jersey = 1869390707 # basic 2 jersey
+                        p.bike_frame_colour = 80 # green bike
                     else:
-                        p.f20 = 3761002195 # basic 4 jersey
-                        p.f27 = 125 # blue bike
-                    if p.f68 == 3344420794:
-                        p.f68 = 4197967370 # shirt 11
-                        p.f69 = 3273293920 # shorts 11
+                        p.ride_jersey = 3761002195 # basic 4 jersey
+                        p.bike_frame_colour = 125 # blue bike
+                    if p.run_shirt_type == 3344420794:
+                        p.run_shirt_type = 4197967370 # shirt 11
+                        p.run_shorts_type = 3273293920 # shorts 11
                     else:
-                        p.f68 = 3344420794 # shirt 10
-                        p.f69 = 4269451728 # shorts 10
+                        p.run_shirt_type = 3344420794 # shirt 10
+                        p.run_shorts_type = 4269451728 # shorts 10
         else:
             if p_id > 2000000 and p_id < 3000000:
                 profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
@@ -1402,23 +1402,26 @@ def strava_upload(player_id, activity):
         logger.warn("stravalib is not installed. Skipping Strava upload attempt.")
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    strava_token = '%s/strava_token.txt' % profile_dir
+    if not os.path.exists(strava_token):
+        logger.info("strava_token.txt missing, skip Strava activity update")
+        return
     strava = Client()
     try:
-        with open('%s/strava_token.txt' % profile_dir, 'r') as f:
+        with open(strava_token, 'r') as f:
             client_id = f.readline().rstrip('\r\n')
             client_secret = f.readline().rstrip('\r\n')
             strava.access_token = f.readline().rstrip('\r\n')
             refresh_token = f.readline().rstrip('\r\n')
             expires_at = f.readline().rstrip('\r\n')
     except Exception as exc:
-        logger.warn('strava_token: %s' % repr(exc))
-        logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
+        logger.warn("Failed to read %s. Skipping Strava upload attempt. %s" % (strava_token, repr(exc)))
         return
     try:
         if get_utc_time() > int(expires_at):
             refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
                                                            refresh_token=refresh_token)
-            with open('%s/strava_token.txt' % profile_dir, 'w') as f:
+            with open(strava_token, 'w') as f:
                 f.write(client_id + '\n')
                 f.write(client_secret + '\n')
                 f.write(refresh_response['access_token'] + '\n')
@@ -1442,8 +1445,12 @@ def garmin_upload(player_id, activity):
         logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    garmin_credentials = '%s/garmin_credentials.txt' % profile_dir
+    if not os.path.exists(garmin_credentials):
+        logger.info("garmin_credentials.txt missing, skip Garmin activity update")
+        return
     try:
-        with open('%s/garmin_credentials.txt' % profile_dir, 'r') as f:
+        with open(garmin_credentials, 'r') as f:
             if credentials_key is not None:
                 cipher_suite = Fernet(credentials_key)
                 ciphered_text = f.read()
@@ -1456,7 +1463,7 @@ def garmin_upload(player_id, activity):
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
     except Exception as exc:
-        logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt. $s" % (profile_dir, repr(exc)))
+        logger.warn("Failed to read %s. Skipping Garmin upload attempt. %s" % (garmin_credentials, repr(exc)))
         return
     try:
         with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
@@ -1472,11 +1479,15 @@ def garmin_upload(player_id, activity):
 
 def runalyze_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+    runalyze_token = '%s/runalyze_token.txt' % profile_dir
+    if not os.path.exists(runalyze_token):
+        logger.info("runalyze_token.txt missing, skip Runalyze activity update")
+        return
     try:
-        with open('%s/runalyze_token.txt' % profile_dir, 'r') as f:
+        with open(runalyze_token, 'r') as f:
             runtoken = f.readline().rstrip('\r\n')
     except Exception as exc:
-        logger.warn("Failed to read %s/runalyze_token.txt. Skipping Runalyze upload attempt." % (profile_dir, repr(exc)))
+        logger.warn("Failed to read %s. Skipping Runalyze upload attempt." % (runalyze_token, repr(exc)))
         return
     try:
         with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
@@ -1496,11 +1507,15 @@ def runalyze_upload(player_id, activity):
 def zwift_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+    zwift_credentials = '%s/zwift_credentials.txt' % profile_dir
+    if not os.path.exists(zwift_credentials):
+        logger.info("zwift_credentials.txt missing, skip Zwift activity update")
+        return
     if not os.path.exists(SERVER_IP_FILE):
         logger.info("server_ip.txt missing, skip Zwift activity update")
         return
     try:
-        with open('%s/zwift_credentials.txt' % profile_dir, 'r') as f:
+        with open(zwift_credentials, 'r') as f:
             if credentials_key is not None:
                 cipher_suite = Fernet(credentials_key)
                 ciphered_text = f.read()
@@ -1513,7 +1528,7 @@ def zwift_upload(player_id, activity):
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
     except Exception as exc:
-        logger.warn("Failed to read %s/zwift_credentials.txt. Skipping Zwift upload attempt. %s" % (profile_dir, repr(exc)))
+        logger.warn("Failed to read %s. Skipping Zwift upload attempt. %s" % (zwift_credentials, repr(exc)))
         return
     
     try:
