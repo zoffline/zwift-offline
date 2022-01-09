@@ -131,7 +131,8 @@ try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
         client_id = f.readline().rstrip('\r\n')
         client_secret = f.readline().rstrip('\r\n')
-except:
+except Exception as exc:
+    #logger.warn('strava-client: %s' % repr(exc))
     client_id = '28117'
     client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
@@ -186,7 +187,8 @@ class User(UserMixin, db.Model):
     def verify_token(token):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
-        except:
+        except Exception as exc:
+            logger.warn('jwt.decode: %s' % repr(exc))
             return None
         id = data.get('user')
         if id:
@@ -462,18 +464,37 @@ def forgot():
                         message['From'] = sender_email
                         message['To'] = username
                         message['Subject'] = "Password reset"
-                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
+                        content = "https://us-or-rly101.zwift.com/login/?token=%s" % (user.get_token())
                         message.attach(MIMEText(content, 'plain'))
                         server.sendmail(sender_email, username, message.as_string())
                         server.close()
                         flash("E-mail sent.")
-            except:
+            except Exception as exc:
+                logger.warn('send e-mail: %s' % repr(exc))
                 flash("Could not send e-mail.")
         else:
             flash("Invalid username.")
 
     return render_template("forgot.html")
 
+@app.route("/api/push/fcm/<type>/<token>", methods=["POST", "DELETE"])
+@app.route("/api/push/fcm/<type>/<token>/enables", methods=["PUT"])
+def api_push_fcm_production(type, token):
+    return '', 500
+
+@app.route("/api/users/password-reset/", methods=["POST"])
+@jwt_to_session_cookie
+@login_required
+def api_users_password_reset():
+    #print(request.__dict__)
+    password = request.form.get("password-new")
+    confirm_password = request.form.get("password-confirm")
+    if password != confirm_password:
+        return 'passwords not match', 500
+    hashed_pwd = generate_password_hash(password, 'sha256')
+    current_user.pass_hash = hashed_pwd
+    db.session.commit()
+    return '', 200
 
 @app.route("/reset/<username>/", methods=["GET", "POST"])
 @login_required
@@ -502,7 +523,8 @@ def reset(username):
 def strava():
     try:
         from stravalib.client import Client
-    except ImportError:
+    except ImportError as exc:
+        logger.warn('stravalib: %s' % repr(exc))
         flash("stravalib is not installed. Skipping Strava authorization attempt.")
         return redirect('/user/%s/' % current_user.username)
     client = Client()
@@ -527,7 +549,8 @@ def authorization():
             f.write(token_response['refresh_token'] + '\n');
             f.write(str(token_response['expires_at']) + '\n');
         flash("Strava authorized. Go to \"Upload\" to remove authorization.")
-    except:
+    except Exception as exc:
+        logger.warn('Strava: %s' % repr(exc))
         flash("Strava canceled.")
     flash("Please close this window and return to Zwift Launcher.")
     return render_template("strava.html", username=current_user.username)
@@ -555,7 +578,8 @@ def profile(username):
                 online_sync.logout(session, refresh_token)
                 os.rename('%s/profile.bin' % SCRIPT_DIR, '%s/profile.bin' % profile_dir)
                 flash("Zwift profile installed locally.")
-            except:
+            except Exception as exc:
+                logger.warn('Zwift profile: %s' % repr(exc))
                 flash("Error downloading profile.")
             if request.form.get("safe_zwift", None) != None:
                 try:
@@ -571,9 +595,11 @@ def profile(username):
                             with open(file_path, 'wb') as fw:
                                 fw.write(ciphered_text)
                     flash("Zwift credentials saved.")
-                except:
-                    flash("Error saving 'zwift_credentiasl.txt' file.")
-        except:
+                except Exception as exc:
+                    logger.warn('zwift_credentials: %s' % repr(exc))
+                    flash("Error saving 'zwift_credentials.txt' file.")
+        except Exception as exc:
+            logger.warn('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
     return render_template("profile.html", username=current_user.username)
 
@@ -602,7 +628,8 @@ def garmin(username):
                     with open(file_path, 'wb') as fw:
                         fw.write(ciphered_text)
             flash("Garmin credentials saved.")
-        except:
+        except Exception as exc:
+            logger.warn('garmin_credentials: %s' % repr(exc))
             flash("Error saving 'garmin_credentials.txt' file.")
     return render_template("garmin.html", username=current_user.username)
 
@@ -813,7 +840,8 @@ def update_protobuf_in_db(table_name, msg, id):
         id_field = msg.DESCRIPTOR.fields_by_name['id']
         if id_field.type == id_field.TYPE_UINT64:
             id = str(id)
-    except AttributeError:
+    except AttributeError as exc:
+        logger.warn('update_protobuf_in_db: %s' % repr(exc))
         pass
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
     columns = ', '.join(list(msg_dict.keys()))
@@ -1369,7 +1397,8 @@ def api_profiles():
 def strava_upload(player_id, activity):
     try:
         from stravalib.client import Client
-    except ImportError:
+    except ImportError as exc:
+        logger.warn('stravalib: %s' % repr(exc))
         logger.warn("stravalib is not installed. Skipping Strava upload attempt.")
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
@@ -1381,7 +1410,8 @@ def strava_upload(player_id, activity):
             strava.access_token = f.readline().rstrip('\r\n')
             refresh_token = f.readline().rstrip('\r\n')
             expires_at = f.readline().rstrip('\r\n')
-    except:
+    except Exception as exc:
+        logger.warn('strava_token: %s' % repr(exc))
         logger.warn("Failed to read %s/strava_token.txt. Skipping Strava upload attempt." % profile_dir)
         return
     try:
@@ -1394,22 +1424,22 @@ def strava_upload(player_id, activity):
                 f.write(refresh_response['access_token'] + '\n')
                 f.write(refresh_response['refresh_token'] + '\n')
                 f.write(str(refresh_response['expires_at']) + '\n')
-    except:
-        logger.warn("Failed to refresh token. Skipping Strava upload attempt.")
+    except Exception as exc:
+        logger.warn("Failed to refresh token. Skipping Strava upload attempt: %s." % repr(exc))
         return
     try:
         # See if there's internet to upload to Strava
         strava.upload_activity(BytesIO(activity.fit), data_type='fit', name=activity.name)
         # XXX: assume the upload succeeds on strava's end. not checking on it.
-    except:
-        logger.warn("Strava upload failed. No internet?")
+    except Exception as exc:
+        logger.warn("Strava upload failed. No internet? %s" % repr(exc))
 
 
 def garmin_upload(player_id, activity):
     try:
         from garmin_uploader.workflow import Workflow
-    except ImportError:
-        logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt.")
+    except ImportError as exc:
+        logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
@@ -1425,42 +1455,42 @@ def garmin_upload(player_id, activity):
             else:
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
-    except:
-        logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt." % profile_dir)
+    except Exception as exc:
+        logger.warn("Failed to read %s/garmin_credentials.txt. Skipping Garmin upload attempt. $s" % (profile_dir, repr(exc)))
         return
     try:
         with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
             f.write(activity.fit)
-    except:
-        logger.warn("Failed to save fit file. Skipping Garmin upload attempt.")
+    except Exception as exc:
+        logger.warn("Failed to save fit file. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     try:
         w = Workflow(['%s/last_activity.fit' % profile_dir], activity_name=activity.name, username=username, password=password)
         w.run()
-    except:
-        logger.warn("Garmin upload failed. No internet?")
+    except Exception as exc:
+        logger.warn("Garmin upload failed. No internet? %s" % repr(exc))
 
 def runalyze_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     try:
         with open('%s/runalyze_token.txt' % profile_dir, 'r') as f:
             runtoken = f.readline().rstrip('\r\n')
-    except:
-        logger.warn("Failed to read %s/runalyze_token.txt. Skipping Runalyze upload attempt." % profile_dir)
+    except Exception as exc:
+        logger.warn("Failed to read %s/runalyze_token.txt. Skipping Runalyze upload attempt." % (profile_dir, repr(exc)))
         return
     try:
         with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
             f.write(activity.fit)
-    except:
-        logger.warn("Failed to save fit file. Skipping Runalyze upload attempt.")
+    except Exception as exc:
+        logger.warn("Failed to save fit file. Skipping Runalyze upload attempt. %s" % repr(exc))
         return
     try:
         r = requests.post("https://runalyze.com/api/v1/activities/uploads",
                           files={'file': open('%s/last_activity.fit' % profile_dir, "rb")},
                           headers={"token": runtoken})
         logger.info(r.text)
-    except:
-        logger.warn("Runalyze upload failed. No internet?")
+    except Exception as exc:
+        logger.warn("Runalyze upload failed. No internet? %s" % repr(exc))
 
 
 def zwift_upload(player_id, activity):
@@ -1482,8 +1512,8 @@ def zwift_upload(player_id, activity):
             else:
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
-    except:
-        logger.warn("Failed to read %s/zwift_credentials.txt. Skipping Zwift upload attempt." % profile_dir)
+    except Exception as exc:
+        logger.warn("Failed to read %s/zwift_credentials.txt. Skipping Zwift upload attempt. %s" % (profile_dir, repr(exc)))
         return
     
     try:
@@ -1498,10 +1528,10 @@ def zwift_upload(player_id, activity):
             else:
                 logger.warn("Zwift activity upload failed:%s:" %res)
             online_sync.logout(session, refresh_token)
-        except:
-            logger.warn("Error uploading activity to Zwift Server")
-    except:
-        logger.warn("Zwift upload failed. No internet?")
+        except Exception as exc:
+            logger.warn("Error uploading activity to Zwift Server. %s" % repr(exc))
+    except Exception as exc:
+        logger.warn("Zwift upload failed. No internet? %s" % repr(exc))
 
 
 # With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
@@ -2104,8 +2134,8 @@ def init_database():
     except:
         try:  # Fall back to a temporary dir
             copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(get_utc_time())))
-        except:
-            logging.warn("Failed to create a zoffline database backup prior to upgrading it.")
+        except Exception as exc:
+            logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
     if version < 1:
         # Adjust old world_time values in segment results to new rough estimate of Zwift's
