@@ -11,7 +11,8 @@ profile = profile_pb2.Profile()
 #profile_file = '../../zoffline-helper/profile.bin-sul'
 #profile_file = '../../zoffline-helper/profile.bin'
 #profile_file = '../storage/2/profile.bin'
-profile_file = '../storage/profile4357549.bin'
+#profile_file = '../storage/profile4357549.bin'
+profile_file = '../storage/profile4485018.bin'
 with open(profile_file, 'rb') as fd:
     profile.ParseFromString(fd.read())
 
@@ -49,6 +50,14 @@ def powerSourceModelToStr(val):
     else:
         return "zPower"
 
+def bikeFrameToStr(val):
+    if (val == 0x7d8c357d):
+        return "Zwift Carbon"
+    else:
+        if (val == -722210337):
+            return "Zwift TT"
+    return "---"
+
 def privacy(profile):
     privacy_bits = jsf(profile, 'privacy_bits', 0)
     return {"approvalRequired": bool(privacy_bits & 1), "displayWeight": bool(privacy_bits & 4), "minor": bool(privacy_bits & 2), "privateMessaging": bool(privacy_bits & 8), "defaultFitnessDataPrivacy": bool(privacy_bits & 16), 
@@ -67,7 +76,7 @@ if True:
 "totalRunDistance": jsv0(profile, 'total_run_distance'), "totalRunTimeInMinutes": jsv0(profile, 'total_run_time_in_minutes'), "totalRunExperiencePoints": jsv0(profile, 'total_run_experience_points'), "totalRunCalories": jsv0(profile, 'total_run_calories'), "totalGold": jsv0(profile, 'total_gold_drops'), 
 "profilePropertyChanges": jprofileFull.get('propertyChanges'), "cyclingOrganization": jsf(profile, 'cycling_organization'), "userAgent": "CNL/3.13.0 (Android 11) zwift/1.0.85684 curl/7.78.0-DEV", "stravaPremium": False, "profileChanges": False, "launchedGameClient": "09/19/2021 13:24:19 +0000", 
 "createdOn":"2021-09-19T13:24:17.783+0000", "likelyInGame": False, "address": None, "bt":"f97803d3-efac-4510-a17a-ef44e65d3071", "numberOfFolloweesInCommon": 0, "fundraiserId": None, "source": "Android", "origin": None, "licenseNumber": None, "bigCommerceId": None, "marketingConsent": None, "affiliate": None, 
-"avantlinkId": None, "virtualBikeModel": "Zwift Carbon", "connectedToWithings": jsb0(profile, 'connected_to_withings'), "connectedToRuntastic": jsb0(profile, 'connected_to_runtastic'), "connectedToZwiftPower": False, "powerSourceType": "Power Source", "powerSourceModel": powerSourceModelToStr(profile.power_source_model), "riding": False, "location": "", "publicId": "5a72e9b1-239f-435e-8757-af9467336b40", 
+"avantlinkId": None, "virtualBikeModel": bikeFrameToStr(profile.bike_frame), "connectedToWithings": jsb0(profile, 'connected_to_withings'), "connectedToRuntastic": jsb0(profile, 'connected_to_runtastic'), "connectedToZwiftPower": False, "powerSourceType": "Power Source", "powerSourceModel": powerSourceModelToStr(profile.power_source_model), "riding": False, "location": "", "publicId": "5a72e9b1-239f-435e-8757-af9467336b40", 
 "mixpanelDistinctId": "21304417-af2d-4c9b-8543-8ba7c0500e84"}
 
 copyAttributes(jprofile, jprofileFull, 'publicAttributes')
