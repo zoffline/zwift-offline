@@ -32,21 +32,6 @@ message Profile {
     optional fixed64 f30 = 30; //empty
     optional fixed64 f31 = 31; //empty
     optional fixed64 f32 = 32; //empty
-    /*message Privacy { //does not stored here
-        optional bool approval_required = 1;
-        optional bool display_weight = 2;
-        optional bool minor = 3;
-        optional bool private_messaging = 4;
-        optional bool default_fitness_data_privacy = 5;
-        optional bool suppress_follower_notification = 6;
-        optional bool display_age = 7;
-        enum ActivityPrivacyType {
-            PUBLIC = 0;
-            PRIVATE = 1;
-            FRIENDS = 2;
-        }
-        optional ActivityPrivacyType default_activity_privacy = 8;
-    }*/
     optional bytes challenge_info = 33;
     optional uint32 country_code = 34;
     optional uint32 total_distance_in_meters = 35;
@@ -80,14 +65,14 @@ message Profile {
     optional uint32 achievement_level = 49;
     optional bool use_metric = 50;
     optional bool f51 = 51; //empty
-    optional uint32 power_source = 52;
+    optional uint32 power_source_model = 52;
     optional uint32 f53 = 53; //empty
     optional uint32 f54 = 54; //empty
     optional uint32 age = 55;
     optional fixed32 f56 = 56; //empty
     optional uint32 f57 = 57; //empty
     optional string large_avatar_url = 58;
-    optional fixed64 f59 = 59; //empty
+    optional fixed64 privacy_bits = 59;
     repeated ProfileEntitlement entitlements = 60;
     
     optional SocialFacts social_facts = 61;
@@ -140,7 +125,7 @@ message Profile {
     }
     optional string mix_panel_distinct_id = 83;
     optional uint32 run_achievement_level = 84;
-    optional uint32 f85 = 85; //0 begin run
+    optional uint32 total_run_time_in_minutes = 85;
     optional Sport sport = 86;
     optional uint32 f87 = 87; //360?
     optional bool connected_to_under_armour = 88;
@@ -160,7 +145,7 @@ message Profile {
     optional uint32 f102 = 102; //empty
     optional uint32 f103 = 103; //empty
     optional uint32 f104 = 104; //empty
-    optional bool f105 = 105; //? false
+    optional bool connected_to_withings = 105;
     optional bool connected_to_fitbit = 106;
     repeated bytes f107 = 107; //empty
     optional string launched_game_client = 108;
@@ -181,7 +166,7 @@ message Profile {
     optional bool f112 = 112; //? false
     repeated Attribute private_attributes = 113;
     repeated Attribute public_attributes = 114;
-    optional int32 f115 = 115; //false begin run
+    optional int32 total_run_calories = 115;
     optional int64 f116 = 116; //empty
     optional int32 run_time_1mi_in_seconds = 117;
     optional int32 run_time_5km_in_seconds = 118;
@@ -197,8 +182,13 @@ message Profile {
     }
     optional CyclingOrganization cycling_organization = 123;
     optional string f124 = 124; /* org name? */
-    optional int32 f125 = 125; //? 0
-    /* 126 ? */
+    enum ActivityPrivacyType {
+        PUBLIC = 0;
+        PRIVATE = 1;
+        FRIENDS = 2;
+    }
+    optional ActivityPrivacyType default_activity_privacy = 125;
+    optional bool connected_to_runtastic = 126;
     repeated PropertyChange property_changes = 127;
 }
 
