@@ -1,6 +1,7 @@
 import sys
 from typing import AbstractSet
 sys.path.append('../')
+sys.path.append('../protobuf')
 
 import protobuf.profile_pb2 as profile_pb2
 from flask import Flask, jsonify
