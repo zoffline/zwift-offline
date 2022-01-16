@@ -32,7 +32,7 @@ message Profile {
     optional fixed64 f30 = 30; //??? empty
     optional fixed64 f31 = 31; //??? empty
     optional fixed64 f32 = 32; //??? empty
-    optional bytes challenge_info = 33;
+    optional bytes saved_game = 33;
     optional uint32 country_code = 34;
     optional uint32 total_distance_in_meters = 35;
     optional uint32 elevation_gain_in_meters = 36;
@@ -147,7 +147,7 @@ message Profile {
     optional uint32 f104 = 104; //??? empty
     optional bool connected_to_withings = 105;
     optional bool connected_to_fitbit = 106;
-    repeated bytes f107 = 107; //??? empty
+    repeated bytes f107 = 107; //android game: absent
     optional string launched_game_client = 108;
     optional int64 current_activity_id = 109;
     optional bool connected_to_garmin = 110;
