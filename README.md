@@ -294,7 +294,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 * Create a ``multiplayer.txt`` file in the ``storage`` directory.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
   * TCP ports 80, 443, 3023 and UDP port 3022 will need to be open on the PC running zoffline if its running remotely.
-* Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
+* Start Zwift and create an account in the new Zwift launcher (desktop solution only, for Android go to `<serverIp>/signup/`, in-app registration does not work yet) and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
 </details>
