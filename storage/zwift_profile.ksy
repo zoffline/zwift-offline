@@ -70,8 +70,8 @@ types:
         0x10000001: accessories1_100   #2048bit=0x100 bytes, for example "Humans/Accessories/Gloves/ZwiftKOMGloves01.xml" maps to bit 318
         0x1000000B: accessories1r_100  #=save_type1_100 on read, not saved
 
-        0x10000002: save_type2_40      #512bit = 0x40 (all 0)
-        0x1000000C: save_type2r_40     #=save_type2_40 on read, not saved
+        0x10000002: achiev_badges2_40  #512bit(bagdes) = 0x40
+        0x1000000C: achiev_badges2r_40 #=achiev_badges2_40 on read, not saved
 
         0x10000006: save_type6_var     #garage?
 

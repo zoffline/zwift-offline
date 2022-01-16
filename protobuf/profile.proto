@@ -1,4 +1,12 @@
 syntax = "proto2";
+
+message AchievementEntry { // name from Zwift debug info
+    required int32 id = 1;
+}
+message Achievements {
+    repeated AchievementEntry achievements = 1;
+}
+
 message Profile {
     optional int64 id = 1;
     optional int64 world_id = 2;

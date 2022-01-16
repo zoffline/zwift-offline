@@ -2412,7 +2412,7 @@ def experimentation_v1_variant():
                     ('game_1_17_ble_disable_component_sport_filter', 1, None),
                     ('game_1_18_new_welcome_ride', None, None),
                     ('game_1_19_achievement_service_persist', 1, None),
-                    #('game_1_19_achievement_service_src_of_truth', 1, None),
+                    ('game_1_19_achievement_service_src_of_truth', 1, None),
                     ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
                     ('game_1_19_gender_dob_change', 1, None),
                     ('game_1_18_0_osx_monterey_bluetooth_uart_fix', 1, 0),
@@ -2460,6 +2460,14 @@ def experimentation_v1_variant():
             f2.f4 = variant[2]
     return variants.SerializeToString(), 200
 
+def get_profile_saved_game_achiev2_40_bytes():
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
+    if not os.path.isfile(profile_file):
+        return b''
+    with open(profile_file, 'rb') as fd:
+        profile = profile_pb2.Profile()
+        profile.ParseFromString(fd.read())
+        return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
 
 @app.route('/achievement/loadPlayerAchievements', methods=['GET'])
 @jwt_to_session_cookie
@@ -2467,7 +2475,13 @@ def experimentation_v1_variant():
 def achievement_loadPlayerAchievements():
     achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
     if not os.path.isfile(achievements_file):
-        return '', 200
+        converted = profile_pb2.Achievements()
+        old_achiev_bits = get_profile_saved_game_achiev2_40_bytes()
+        for ach_id in range(8 * len(old_achiev_bits)):
+            if (old_achiev_bits[ach_id // 8] >> (ach_id % 8)) & 0x1:
+                converted.achievements.add().id = ach_id
+        with open(achievements_file, 'wb') as f:
+            f.write(converted.SerializeToString())
     with open(achievements_file, 'rb') as f:
         return f.read(), 200
 
