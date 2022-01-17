@@ -70,17 +70,17 @@ types:
         0x10000001: accessories1_100   #2048bit=0x100 bytes, for example "Humans/Accessories/Gloves/ZwiftKOMGloves01.xml" maps to bit 318
         0x1000000B: accessories1r_100  #=save_type1_100 on read, not saved
 
-        0x10000002: achiev_badges2_40  #512bit(bagdes) = 0x40
+        0x10000002: achiev_badges2_40  #512bit(bagdes deprecated by game_1_19_achievement_service_src_of_truth) = 0x40
         0x1000000C: achiev_badges2r_40 #=achiev_badges2_40 on read, not saved
 
-        0x10000006: save_type6_var     #garage?
+        0x10000006: save_type6_var     #current challenge
 
-        0x10000009: save_type9_50      #(all 0)
+        0x10000009: save_type9_50      #garage?
 
         0x10000007: save_type7_40      #512bit = 0x40 (all 0)
         0x1000000D: save_type7r_40     #=save_type7_040on read, not saved
 
-        0x1000000F: achiev15_var       #AchievementManager chunks
+        0x1000000F: achiev15_var       #AchievementManager chunks - badges in progress?
 
         0x10000010: tracking16_var     #TrackingData
 
