@@ -29,8 +29,8 @@ message Profile {
     optional uint32 ride_gloves = 19;
     optional fixed32 ride_jersey = 20;
     optional fixed32 f21 = 21; //??? empty
-    optional fixed32 bike_wheel1 = 22;
-    optional fixed32 bike_wheel2 = 23;
+    optional fixed32 bike_wheel_front = 22;
+    optional fixed32 bike_wheel_rear = 23;
     optional fixed32 bike_frame = 24;
     optional fixed32 f25 = 25; //??? empty
     optional fixed32 f26 = 26; //??? empty
@@ -170,7 +170,7 @@ message Profile {
         }
         repeated ReminderProperty f4 = 4;
     }
-    repeated Reminder remainders = 111;
+    repeated Reminder reminders = 111;
     optional bool f112 = 112; //??? empty
     repeated Attribute private_attributes = 113;
     repeated Attribute public_attributes = 114;
