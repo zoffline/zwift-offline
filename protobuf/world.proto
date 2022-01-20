@@ -27,6 +27,7 @@ message Player {
 	optional uint32 distance = 4;
 	optional uint32 time = 5;
 	optional uint32 f6 = 6;
+	optional uint32 f7 = 7;
 	optional uint32 f8 = 8;
 	optional uint32 f9 = 9;
 	optional uint32 f10 = 10;
@@ -38,4 +39,5 @@ message Player {
 	optional float y = 16;
 	optional uint64 route = 17;
 	optional uint32 f18 = 18;
+	optional uint32 f19 = 19;
 }

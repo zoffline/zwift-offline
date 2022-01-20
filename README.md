@@ -107,8 +107,8 @@ zoffline can be installed on the same machine as Zwift or another local machine.
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
     * For Windows 7: run ``certutil.exe -importpfx cert-zwift-com.p12`` instead
   * If you're prompted for a password, just leave it blank. There is no password.
-* In the same command prompt run ``type cert-zwift-com.pem >> "C:\Program Files (x86)\Zwift\data\cacert.pem"``
-  * Note: Appending cert-zwift-com.pem via Notepad will not work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
+* Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
+  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Open Notepad as an admin and open ``C:\Windows\System32\Drivers\etc\hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
@@ -134,8 +134,8 @@ to generate your own certificates and do the same.
     * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
     * If you're prompted for a password, just leave it blank. There is no password.
-* In a terminal within the directory ``ssl/cert-zwift-com.pem`` was copied to, run ``cat cert-zwift-com.pem >> ~/Library/Application\ Support/Zwift/data/cacert.pem``
-  * Note: Appending the contents of ``ssl/cert-zwift-com.pem`` with a text editor doesn't work ([#62](https://github.com/zoffline/zwift-offline/issues/62))
+* Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
+  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
   * Append these keys:
     ```
@@ -198,9 +198,9 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
 
 * Install Zwift on the device
 * Open Zwift once to complete installation (i.e download all extra files).
-* Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacerts.pem`` on the device
+* Append the contents of ``ssl/cert-zwift-com.pem`` to ``/data/data/com.zwift.zwiftgame/dataES/cacert.pem`` on the device
   * Note: this file will only exist after the first run of Zwift since it's downloaded after the initial install
-  * Recommended approach for appending the contents (due to [#62](https://github.com/zoffline/zwift-offline/issues/62)):
+  * Simple approach to achieve this if your device doesn't have a text editor:
     * ``adb push ssl/cert-zwift-com.pem /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cd /data/data/com.zwift.zwiftgame/dataES/``
     * In ``adb shell``: ``cat cert-zwift-com.pem >> cacert.pem``
