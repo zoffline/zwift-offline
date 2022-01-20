@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14protobuf/world.proto\"\xa6\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\xf7\x01\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r'
+  serialized_pb=b'\n\x14protobuf/world.proto\"\xa6\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\x90\x02\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x37\x18\x07 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\r'
 )
 
 
@@ -221,78 +221,92 @@ _PLAYER = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f8', full_name='Player.f8', index=6,
+      name='f7', full_name='Player.f7', index=6,
+      number=7, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f8', full_name='Player.f8', index=7,
       number=8, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f9', full_name='Player.f9', index=7,
+      name='f9', full_name='Player.f9', index=8,
       number=9, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f10', full_name='Player.f10', index=8,
+      name='f10', full_name='Player.f10', index=9,
       number=10, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f11', full_name='Player.f11', index=9,
+      name='f11', full_name='Player.f11', index=10,
       number=11, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='power', full_name='Player.power', index=10,
+      name='power', full_name='Player.power', index=11,
       number=12, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f13', full_name='Player.f13', index=11,
+      name='f13', full_name='Player.f13', index=12,
       number=13, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='x', full_name='Player.x', index=12,
+      name='x', full_name='Player.x', index=13,
       number=14, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='altitude', full_name='Player.altitude', index=13,
+      name='altitude', full_name='Player.altitude', index=14,
       number=15, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='y', full_name='Player.y', index=14,
+      name='y', full_name='Player.y', index=15,
       number=16, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='route', full_name='Player.route', index=15,
+      name='route', full_name='Player.route', index=16,
       number=17, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='f18', full_name='Player.f18', index=16,
+      name='f18', full_name='Player.f18', index=17,
       number=18, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='f19', full_name='Player.f19', index=18,
+      number=19, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -310,7 +324,7 @@ _PLAYER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=267,
-  serialized_end=514,
+  serialized_end=539,
 )
 
 _WORLD.fields_by_name['player_states'].message_type = _PLAYER

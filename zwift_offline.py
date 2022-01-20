@@ -901,6 +901,7 @@ def api_events_search():
         event = events.events.add()
         event.id = event_id
         event.title = item[0]
+        event.route_id = item[1]
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
@@ -1489,6 +1490,11 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player = None
             if is_pace_partner:
                 online_player = course_world[course_id].pace_partner_states.add()
+                online_player.route = partial_profile.route
+                if player.sport == 0:
+                    online_player.f18 = player.power
+                else:
+                    online_player.f19 = player.speed
             else:
                 online_player = course_world[course_id].player_states.add()
             online_player.id = player.id
@@ -1502,7 +1508,6 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.x = player.x
             online_player.altitude = player.altitude
             online_player.y = player.y
-            online_player.route = partial_profile.route
             course_world[course_id].f5 += 1
 
 
