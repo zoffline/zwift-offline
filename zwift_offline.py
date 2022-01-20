@@ -987,6 +987,7 @@ def api_events_search():
         event = events.events.add()
         event.id = event_id
         event.title = item[0]
+        event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) worlds
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
@@ -2441,7 +2442,7 @@ def experimentation_v1_variant():
                     ('game_1_21_perf_analytics', 1, None),
                     ('game_1_19_local_activity_persistence', 1, None),
                     ('game_1_18_holiday_mode', None, None),
-                    ('game_1_17_noesis_enabled', None, None),
+                    ('game_1_17_noesis_enabled', 1, None),
                     ('game_1_20_home_screen', 1, None),
                     ('game_1_19_noesis_dummy', None, None),
                     ('game_1_14_settings_refactor', None, None)]
