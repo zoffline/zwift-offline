@@ -1,5 +1,18 @@
 # Only breaking changes in releases will be documented here.
 
+Update to Zwift_1.0.100317:
+  * The Windows client launcher now uses Edge instead of Internet Explorer and the zoffline SSL
+    certificate is no longer accepted. The certificate has been replaced and as a consequence
+    you will need to configure the client again using the new certificate (Step 2 in README.md)
+    after updating zoffline.
+    See https://github.com/zoffline/zwift-offline/issues/154 for details.
+
+
+Update to Zwift_1.0.100133:
+  * Changes were made to Zwift's cacert.pem. You will need to re-append cert-zwift-com.pem
+    to Zwift's cacert.pem.
+
+
 Update to Zwift_1.0.60239:
   * With the update to this Zwift release, zoffline has included significant changes
     to fully support a multiplayer mode, pace partners, and more.
