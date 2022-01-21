@@ -1,26 +1,45 @@
 syntax = "proto2";
 message World {
-	required uint32 id = 1;
+	required uint64 id = 1; //not sure, used VarintParseSlow64 @ libzwiftjni.so zwift::protobuf::World::_InternalParse
 	required string name = 2;
-	required uint32 f3 = 3;
-	/* missing 4 */
+	required uint64 f3 = 3;
+	optional uint64 f4 = 4;
 	required uint64 f5 = 5;
 	required uint64 world_time = 6;
 	required uint64 real_time = 7;
 	repeated Player player_states = 8;
-	repeated Player pace_partner_states = 12;
+	repeated Player pace_partner_states = 12; // ??? could not find this in decompiled code
 }
 
-message Worlds {
+message Worlds { // ??? could not find this in decompiled code (maybe inlined and/or optimized)
 	repeated World worlds = 1;
 }
 
+message WorldAttribute { /* decompiled from libzwiftjni.so */
+	optional uint64 f1 = 1;
+	optional uint64 f2 = 2;
+	optional uint64 f3 = 3;
+	optional string f4 = 4;
+	optional uint64 f5 = 5;
+	optional uint64 f6 = 6;
+	optional uint64 f7 = 7;
+	optional uint64 f8 = 8;
+	optional uint64 f9 = 9;
+	optional uint64 f10 = 10;
+	optional uint32 f11 = 11;
+	optional uint64 f12 = 12;
+	optional uint32 f13 = 13;
+	optional uint64 f14 = 14;
+	optional uint32 f15 = 15;
+	optional uint64 f16 = 16;
+}
+
 message WorldAttributes {
-	/* repeated RiderAttributes riders = 1; */
+	repeated WorldAttribute world_attributes = 1;
 	required int64 world_time = 2;
 }
 
-message Player {
+message Player { // ??? could not find this in decompiled code (but another Player message found, look at udp-node-msgs)
 	required uint32 id = 1;
 	required string firstName = 2;
 	required string lastName = 3;

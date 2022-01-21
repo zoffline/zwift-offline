@@ -1,73 +1,194 @@
 syntax = "proto2";
+import "world.proto"; //WorldAttribute
+import "profile.proto"; //Profile
+
+message DecompiledPlayer { /* decompiled from libzwiftjni.so, class name "zwift::protobuf::Player" != world.proto::Player */
+	optional Profile player_profile = 1;
+	optional PlayerState player_state = 2;
+}
+
 message PlayerState {
-	optional int32 id = 1;
+	optional int64 id = 1;
 	optional int64 worldTime = 2;
 	optional int32 distance = 3;
 	required int32 roadTime = 4;
 	optional int32 laps = 5;
-	optional int32 speed = 6;
+	optional uint32 speed = 6;
+	optional uint32 f7 = 7;
 	optional int32 roadPosition = 8;
 	optional int32 cadenceUHz = 9;
+	optional int32 f10 = 10;
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
-	optional int64 heading = 13;
-	optional int32 lean = 14;
+	optional uint32 heading = 13;
+	optional int64 lean = 14;
 	optional int32 climbing = 15;
 	optional int32 time = 16;
-	optional int32 f19 = 19;
-	optional int32 f20 = 20;
-	optional int32 progress = 21;
+	optional int32 f17 = 17;
+	optional uint32 f18 = 18;
+	optional uint32 f19 = 19;
+	optional uint32 f20 = 20;
+	optional uint32 progress = 21;
 	optional int64 customisationId = 22;
-	optional int32 justWatching = 23;
+	optional bool justWatching = 23;
 	optional int32 calories = 24;
 	optional float x = 25;
 	optional float altitude = 26;
 	optional float y = 27;
-	optional int32 watchingRiderId = 28;
-	optional int32 groupId = 29;
-	optional int64 sport = 31;
+	optional int64 watchingRiderId = 28;
+	optional int64 groupId = 29;
+	/* 30 absent at least in Android Game */
+	optional int32 sport = 31;
+	optional float f32 = 32;
+	optional uint32 f33 = 33;
 	optional float f34 = 34;
 	optional int32 world = 35;
-	optional int32 f38 = 38;
-	optional uint64 route = 39;
+	optional uint32 f36 = 36;
+	optional uint32 f37 = 37;
+	optional bool f38 = 38;
+	optional uint32 route = 39; //VarintParseSlow32 @ libzwiftjni.so 100317
 }
 
 message ClientToServer {
-	required int32 connected = 1;
-	required int32 player_id = 2;
+	required int64 connected = 1;
+	required int64 player_id = 2;
 	required int64 world_time = 3;
-	required int32 seqno = 4;
+	required int64 seqno = 4;
+	optional int64 f5 = 5;
+	optional int64 f6 = 6;
 	required PlayerState state = 7;
 	required int64 f8 = 8;
-	required int64 f9 = 9;
+	optional int64 f9 = 9; // absent @ libzwiftjni.so 100317
 	required int64 last_update = 10;
-	required int64 f11 = 11;
+	optional int64 f11 = 11;
 	required int64 last_player_update = 12;
+	optional int64 f13 = 13;
+	optional bool f14 = 14;
+	repeated int64 f15 = 15;
+	repeated int64 f16 = 16;
 }
 
-message ServerToClient {
-	required int32 f1 = 1;
-	required int32 player_id = 2;
+message PlayerSummary {
+	optional int32 f1 = 1;
+	optional int32 f2 = 2;
+	optional int32 f3 = 3;
+	optional int32 f4 = 4;
+}
+
+message PlayerSummaries {
+	optional sint32 f1 = 1;
+	optional sint32 f2 = 2;
+	optional sint32 f3 = 3;
+	optional sint32 f4 = 4;
+	optional int32 f5 = 5;
+	optional int32 f6 = 6;
+	optional int32 f7 = 7;
+	repeated PlayerSummary player_summaries = 8;
+}
+
+message RelayAddress { // = tcp-node-msgs::ServerDetails ???
+	optional int32 f1 = 1;
+	optional int32 f2 = 2;
+	optional string ip = 3;
+	optional int32 port = 4;
+	optional float f5 = 5; //or fixed
+	optional float f6 = 6; //or fixed
+}
+
+message UdpConfig { // = tcp-node-msgs::ServersType1 ???
+	repeated RelayAddress relay_addresses = 1;
+	optional int32 f2 = 2;
+	optional int32 f3 = 3;
+	optional int32 f4 = 4;
+}
+
+message RelayAddressesVOD { // = tcp-node-msgs::ServerConnectionDetailsWrapper ???
+	optional int32 f1 = 1;
+	optional int32 f2 = 2;
+	repeated RelayAddress relay_address = 3;
+	optional bool f4 = 4;
+}
+
+message UdpConfigVOD { // = tcp-node-msgs::ServersType2 ???
+	repeated RelayAddressesVOD relay_addresses = 1;
+	optional int32 f2 = 2;
+	optional int64 f3 = 3;
+	optional int64 f4 = 4;
+	optional float f5 = 5; //or fixed
+	optional float f6 = 6; //or fixed
+}
+
+message TcpAddress { // = login-response::UDPNode???
+	optional string ip = 1;
+	optional int32 port = 2;
+	optional int32 f3 = 3;
+	optional int32 f4 = 4;
+}
+
+message TcpConfig { // = login-response::UDPNodes???
+	repeated TcpAddress tcp_adresses = 1;
+}
+
+message PlayerRouteDistance {
+	optional int32 f1 = 1;
+	optional float f2 = 2; //or fixed
+	optional int32 f3 = 3;
+}
+
+message EventSubgroupPlacements {
+	optional int32 f1 = 1;
+	repeated PlayerRouteDistance player_rd1 = 2;
+	repeated PlayerRouteDistance player_rd2 = 3;
+	repeated PlayerRouteDistance player_rd3 = 4;
+	repeated PlayerRouteDistance player_rd4 = 5;
+	optional int32 f6 = 6;
+	optional int32 f7 = 7;
+	optional int32 f8 = 8;
+	optional float f9 = 9; //or fixed
+}
+
+message ServerToClient { // = tcp-node-msgs::TCPServerInfo ???
+	required int64 f1 = 1;
+	required int64 player_id = 2;
 	required int64 world_time = 3;
 	optional int32 seqno = 4;
 	optional int32 f5 = 5;
+	/* 6,7: absent */
 	repeated PlayerState states = 8;
-	repeated PlayerUpdate updates = 9;
-	optional int64 f11 = 11;
+	repeated WorldAttribute updates = 9;
+	optional int64 f10 = 10;
+	optional bool f11 = 11;
+	optional string f12 = 12;
+	optional int64 f13 = 13;
+	optional int32 f14 = 14;
+	optional int32 f15 = 15;
+	optional int32 f16 = 16;
+	optional int64 f17 = 17;
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
+	optional bool f20 = 20;
+	optional PlayerSummaries player_summaries = 21; //tag426
+	/* 22 absent */
+	optional EventSubgroupPlacements ev_subgroup_ps = 23; //tag442
+	optional UdpConfig udp_config = 24; //tag450
+	optional UdpConfigVOD udp_config_vod_1 = 25; //tag458
+	optional int32 f26 = 26; //tag464
+	optional UdpConfigVOD udp_config_vod_2 = 27; //tag474
+	repeated PlayerState player_states = 28; //tag482
+	optional TcpConfig tcp_config = 29; //tag490
+	repeated sint64 f30 = 30; //tag496
 }
 
-message Ghost {
+message Ghost { //TODO: find original name
 	required int32 player_id = 1;
 	repeated PlayerState states = 2;
 }
 
-message Ghosts {
+message Ghosts { //TODO: find original name
 	repeated Ghost ghosts = 1;
 }
 
-message PlayerUpdate {
+message PlayerUpdate { //TODO: find original name
     optional int64 f1 = 1; // 587645624533328784, later 5876456 85771834256
     optional int32 f2 = 2; // 1
     required int32 type = 3; // 105 entered world, 5 chat message, 4 ride on
@@ -83,7 +204,7 @@ message PlayerUpdate {
     optional int64 f15 = 15; //6, might be course
 }
 
-message ChatMessage {
+message ChatMessage { //TODO: find original name
     required int32 rider_id = 1;
     required int32 to_rider_id = 2; // 0 if public message
     required int32 f3 = 3; // always value 1 ?
@@ -96,14 +217,14 @@ message ChatMessage {
 }
 
 message RideOn {
-    required int32 rider_id = 1;
-    required int32 to_rider_id = 2;
+    required int64 rider_id = 1;
+    required int64 to_rider_id = 2;
     required string firstName = 3;
     required string lastName = 4;
     required int32 countryCode = 5;
 }
 
-message SegmentComplete {
+message SegmentComplete { //TODO: find original name
     optional int64 f1 = 1;
     required int32 rider_id = 2;
     optional int32 f3 = 3;

@@ -7,7 +7,7 @@ message Achievements {
     repeated AchievementEntry achievements = 1;
 }
 
-message Profile {
+message Profile { // should be renamed (name from Zwift debug info: PlayerProfile)
     optional int64 id = 1;
     optional int64 world_id = 2;
     optional string email = 3;

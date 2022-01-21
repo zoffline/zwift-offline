@@ -8,6 +8,9 @@ import signal
 import platform
 import random
 import sys
+import sys
+sys.path.insert(1, 'protobuf') #otherwise import in .proto does not works
+
 import tempfile
 import time
 import math
