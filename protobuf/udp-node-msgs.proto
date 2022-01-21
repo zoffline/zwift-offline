@@ -1,6 +1,7 @@
 syntax = "proto2";
 import "world.proto"; //WorldAttribute
 import "profile.proto"; //Profile
+import "per-session-info.proto"; //TcpConfig
 
 message DecompiledPlayer { /* decompiled from libzwiftjni.so, class name "zwift::protobuf::Player" != world.proto::Player */
 	optional Profile player_profile = 1;
@@ -116,17 +117,6 @@ message UdpConfigVOD { // = tcp-node-msgs::ServersType2 ???
 	optional int64 f4 = 4;
 	optional float f5 = 5; //or fixed
 	optional float f6 = 6; //or fixed
-}
-
-message TcpAddress { // = login-response::UDPNode???
-	optional string ip = 1;
-	optional int32 port = 2;
-	optional int32 f3 = 3;
-	optional int32 f4 = 4;
-}
-
-message TcpConfig { // = login-response::UDPNodes???
-	repeated TcpAddress tcp_adresses = 1;
 }
 
 message PlayerRouteDistance {
