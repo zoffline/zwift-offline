@@ -1,4 +1,5 @@
 syntax = "proto2";
+// All decompiled. TODO: replace with originals, integrate enums and check
 ////////////////////////////////////////
 // Initial TCP response below
 ////////////////////////////////////////
@@ -63,19 +64,19 @@ message RecurringTCPResponse { //TODO: check if original name = ServerToClient
 }
 
 // Zwift companion protocol
-//TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=?, SOCIAL_TEXT_MESSAGE=?, SOCIAL_FLAG=?, ?=?
-message SocialPlayerAction {
-	optional int64 f1 = 1;
-	optional int64 f2 = 2;
-	optional uint32 f3 = 3;
-	optional string f4 = 4;
-	optional string f5 = 5;
-	optional string f6 = 6;
-	optional string f7 = 7;
-	optional uint32 f8 = 8;
+//TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=0?, SOCIAL_TEXT_MESSAGE=1?, SOCIAL_FLAG=?, ?=?
+message SocialPlayerAction { //=wrong named ChatMessage?
+	optional int64 rider_id = 1;
+	optional int64 to_rider_id = 2; // 0 if public message
+	optional int32 f3 = 3; // SocialPlayerActionType? ChatMessage: always value 1=SOCIAL_TEXT_MESSAGE ?
+	optional string firstName = 4;
+	optional string lastName = 5;
+	optional string message = 6;
+	optional string avatar = 7;
+	optional int32 countryCode = 8;
 	optional int32 f9 = 9;
 	optional int32 f10 = 10;
-	optional int64 f11 = 11;
+	optional int64 eventSubgroup = 11;
 }
 
 message MobileAlertResponse {

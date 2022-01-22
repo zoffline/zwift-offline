@@ -1,60 +1,41 @@
 syntax = "proto2";
-message World {
-	required uint64 id = 1; //not sure, used VarintParseSlow64 @ libzwiftjni.so zwift::protobuf::World::_InternalParse
-	required string name = 2;
-	required uint64 f3 = 3;
-	optional uint64 f4 = 4;
-	required uint64 f5 = 5;
-	required uint64 world_time = 6;
-	required uint64 real_time = 7;
-	repeated Player player_states = 8;
-	repeated Player pace_partner_states = 12; // ??? could not find this in decompiled code
-}
-
-message Worlds { // ??? could not find this in decompiled code (maybe inlined and/or optimized)
-	repeated World worlds = 1;
-}
-
-message WorldAttribute { /* decompiled from libzwiftjni.so */
-	optional uint64 f1 = 1;
-	optional uint64 f2 = 2;
+message DropInWorld { //zwift.protobuf.DropInWorld
+	required uint64 id = 1;
+	optional string name = 2;
 	optional uint64 f3 = 3;
-	optional string f4 = 4;
+	optional bool f4 = 4;
 	optional uint64 f5 = 5;
-	optional uint64 f6 = 6;
-	optional uint64 f7 = 7;
-	optional uint64 f8 = 8;
-	optional uint64 f9 = 9;
-	optional uint64 f10 = 10;
-	optional uint32 f11 = 11;
-	optional uint64 f12 = 12;
-	optional uint32 f13 = 13;
-	optional uint64 f14 = 14;
-	optional uint32 f15 = 15;
-	optional uint64 f16 = 16;
+	optional uint64 world_time = 6;
+	optional uint64 real_time = 7;
+	repeated DropInPlayer player_states = 8;
+	repeated DropInPlayer f9 = 9;
+	repeated DropInPlayer f10 = 10;
+	optional uint64 f11 = 11;
+	repeated DropInPlayer pace_partner_states = 12;
 }
 
-message WorldAttributes {
-	repeated WorldAttribute world_attributes = 1;
-	required int64 world_time = 2;
+message DropInWorldList {
+	repeated DropInWorld worlds = 1;
 }
 
-message Player { // ??? could not find this in decompiled code (but another Player message found, look at udp-node-msgs)
-	required uint32 id = 1;
+message DropInPlayer {
+	required uint64 id = 1;
 	required string firstName = 2;
 	required string lastName = 3;
-	optional uint32 distance = 4;
-	optional uint32 time = 5;
-	optional uint32 f6 = 6;
-	optional uint32 f8 = 8;
-	optional uint32 f9 = 9;
-	optional uint32 f10 = 10;
-	optional uint32 f11 = 11;
-	optional uint32 power = 12;
-	optional uint32 f13 = 13;
+	optional uint64 distance = 4;
+	optional uint64 time = 5;
+	optional uint64 f6 = 6;
+	optional sint64 f7 = 7;
+	optional uint64 f8 = 8; //Sport
+	optional uint64 f9 = 9;
+	optional bool f10 = 10;
+	optional uint64 f11 = 11;
+	optional uint64 power = 12;
+	optional uint64 f13 = 13;
 	optional float x = 14;
 	optional float altitude = 15;
 	optional float y = 16;
-	optional uint64 route = 17;
+	optional uint64 route = 17; //CHECKME: 32 bit in binary code?
 	optional uint32 f18 = 18;
+	optional uint32 f19 = 19;
 }

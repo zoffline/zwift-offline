@@ -1,4 +1,5 @@
 syntax = "proto2";
+//All decompiled. TODO: check
 message HashSeed {
 	required uint32 seed1 = 1;
 	required uint32 seed2 = 2;

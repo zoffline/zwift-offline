@@ -1,9 +1,43 @@
 syntax = "proto2";
-import "world.proto"; //WorldAttribute
 import "profile.proto"; //Profile
 import "per-session-info.proto"; //TcpConfig
 
-message DecompiledPlayer { /* decompiled from libzwiftjni.so, class name "zwift::protobuf::Player" != world.proto::Player */
+message WorldAttribute { /* decompiled from libzwiftjni.so */
+	optional uint64 f1 = 1;
+	optional uint64 f2 = 2;
+	optional uint64 f3 = 3;
+	optional string f4 = 4;
+	optional uint64 f5 = 5;
+	optional uint64 f6 = 6;
+	optional uint64 f7 = 7;
+	optional uint64 f8 = 8;
+	optional uint64 f9 = 9;
+	optional uint64 f10 = 10;
+	optional uint32 f11 = 11;
+	optional uint64 f12 = 12;
+	optional uint32 f13 = 13;
+	optional uint64 f14 = 14;
+	optional uint32 f15 = 15;
+	optional uint64 f16 = 16;
+}
+
+message WorldAttributes {
+	repeated WorldAttribute world_attributes = 1;
+	required int64 world_time = 2;
+}
+
+message World { //zwift.protobuf.World
+	required uint64 id = 1;
+	required string name = 2;
+	required uint64 f3 = 3;
+	optional bool f4 = 4;
+	required uint64 f5 = 5;
+	required uint64 world_time = 6;
+	required uint64 real_time = 7;
+	repeated Player f8 = 8;
+}
+
+message Player {
 	optional Profile player_profile = 1;
 	optional PlayerState player_state = 2;
 }
@@ -47,7 +81,7 @@ message PlayerState {
 	optional uint32 f36 = 36;
 	optional uint32 f37 = 37;
 	optional bool f38 = 38;
-	optional uint32 route = 39; //VarintParseSlow32 @ libzwiftjni.so 100317
+	optional uint64 route = 39; //CHECKME: VarintParseSlow32 @ libzwiftjni.so 100317
 }
 
 message ClientToServer {
@@ -169,16 +203,16 @@ message ServerToClient { // = tcp-node-msgs::TCPServerInfo ???
 	repeated sint64 f30 = 30; //tag496
 }
 
-message Ghost { //TODO: find original name
+message Ghost { //not from game???
 	required int32 player_id = 1;
 	repeated PlayerState states = 2;
 }
 
-message Ghosts { //TODO: find original name
+message Ghosts { //not from game???
 	repeated Ghost ghosts = 1;
 }
 
-message PlayerUpdate { //TODO: find original name
+message PlayerUpdate { //=WorldAttribute???
     optional int64 f1 = 1; // 587645624533328784, later 5876456 85771834256
     optional int32 f2 = 2; // 1
     required int32 type = 3; // 105 entered world, 5 chat message, 4 ride on
@@ -194,7 +228,7 @@ message PlayerUpdate { //TODO: find original name
     optional int64 f15 = 15; //6, might be course
 }
 
-message ChatMessage { //TODO: find original name
+message ChatMessage { //=SocialPlayerAction???
     required int32 rider_id = 1;
     required int32 to_rider_id = 2; // 0 if public message
     required int32 f3 = 3; // always value 1 ?
@@ -214,22 +248,28 @@ message RideOn {
     required int32 countryCode = 5;
 }
 
-message SegmentComplete { //TODO: find original name
+message SegmentComplete { //=SegmentResult!
     optional int64 f1 = 1;
-    required int32 rider_id = 2;
-    optional int32 f3 = 3;
+    required int64 rider_id = 2;
+    optional int64 f3 = 3;
     optional int64 f4 = 4;
     optional int64 segment_id = 5; 
     optional int64 f6 = 6;
     optional string first_name = 7;
     optional string last_name = 8;
     optional int64 world_time = 9;
+    optional string f10 = 10;
     optional int64 milliseconds = 11;
     optional int32 f12 = 12;
     optional int32 weight_in_grams = 13;
     optional int32 f14 = 14;
     optional int32 avg_power = 15;
-    optional int32 f16 = 16;
+    optional bool f16 = 16;
     optional string f7date = 17;
+    optional int64 f18 = 18; TODO: enum PlayerType
     optional int32 f19 = 19;
+    optional int32 f20 = 20; //TODO: enum Sport
+    optional int64 f21 = 21;
+    optional bool f22 = 22;
+    optional string f23 = 23;
 }

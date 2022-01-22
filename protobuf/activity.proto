@@ -1,4 +1,5 @@
 syntax = "proto2";
+//All decompiled. TODO: uncomment all new fields and use in algo
 message NotableMoment {
 	optional uint64 f1 = 1;
 	optional uint32 f2 = 2;

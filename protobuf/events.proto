@@ -1,5 +1,5 @@
 syntax = "proto2";
-
+//All decompiled
 message EventSubgroupProtobuf {
 	required uint64 id = 1; // 2395269
 	optional string description = 2; // "3R True2 Steady Ride [2.0w/kg avg] (C)"
@@ -29,12 +29,12 @@ message EventSubgroupProtobuf {
         /* no 26-28 */
 	optional uint32 startLocation = 29; // 13, tag488
 	optional uint32 label = 30; // 3, tag496
-	optional uint32 f31 = 31; // 1, tag504
+	optional uint32 paceType = 31; // 1, tag504
 	optional fixed32 f32 = 32; // 1076258406, tag645
 	optional fixed32 f33 = 33; // 1078774989, tag653
 	optional uint32 duration = 34; // Duration of event in seconds, tag656
 	optional uint32 f35 = 35; // tag664
-	optional uint64 f36 = 36; // 493134166, tag672
+	optional uint64 jerseyHash = 36; // 493134166, tag672
 	optional bool f37 = 37; // 0, tag680
 	optional uint64 f38 = 38; // tag688
 	optional string audio = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4", tag698

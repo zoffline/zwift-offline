@@ -1,4 +1,5 @@
 syntax = "proto2";
+//All decompiled. TODO: check
 message ZFile { // real name ZFileProto ?
     required uint64 id = 1;
     required string folder = 2;

@@ -1,4 +1,5 @@
 syntax = "proto2";
+//All decompiled. TODO: uncomment and use f14
 message Goal {
 	optional uint64 id = 1;
 	optional uint64 player_id = 2;

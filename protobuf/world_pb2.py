@@ -14,61 +14,41 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bworld.proto\"\xb2\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\x04\x12\n\n\x02\x66\x34\x18\x04 \x01(\x04\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"\xd7\x01\n\x0eWorldAttribute\x12\n\n\x02\x66\x31\x18\x01 \x01(\x04\x12\n\n\x02\x66\x32\x18\x02 \x01(\x04\x12\n\n\x02\x66\x33\x18\x03 \x01(\x04\x12\n\n\x02\x66\x34\x18\x04 \x01(\t\x12\n\n\x02\x66\x35\x18\x05 \x01(\x04\x12\n\n\x02\x66\x36\x18\x06 \x01(\x04\x12\n\n\x02\x66\x37\x18\x07 \x01(\x04\x12\n\n\x02\x66\x38\x18\x08 \x01(\x04\x12\n\n\x02\x66\x39\x18\t \x01(\x04\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\x04\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\x0b\n\x03\x66\x31\x32\x18\x0c \x01(\x04\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\x0b\n\x03\x66\x31\x34\x18\x0e \x01(\x04\x12\x0b\n\x03\x66\x31\x35\x18\x0f \x01(\r\x12\x0b\n\x03\x66\x31\x36\x18\x10 \x01(\x04\"P\n\x0fWorldAttributes\x12)\n\x10world_attributes\x18\x01 \x03(\x0b\x32\x0f.WorldAttribute\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\xf7\x01\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bworld.proto\"\x88\x02\n\x0b\x44ropInWorld\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02\x66\x33\x18\x03 \x01(\x04\x12\n\n\x02\x66\x34\x18\x04 \x01(\x08\x12\n\n\x02\x66\x35\x18\x05 \x01(\x04\x12\x12\n\nworld_time\x18\x06 \x01(\x04\x12\x11\n\treal_time\x18\x07 \x01(\x04\x12$\n\rplayer_states\x18\x08 \x03(\x0b\x32\r.DropInPlayer\x12\x19\n\x02\x66\x39\x18\t \x03(\x0b\x32\r.DropInPlayer\x12\x1a\n\x03\x66\x31\x30\x18\n \x03(\x0b\x32\r.DropInPlayer\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x04\x12*\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\r.DropInPlayer\"/\n\x0f\x44ropInWorldList\x12\x1c\n\x06worlds\x18\x01 \x03(\x0b\x32\x0c.DropInWorld\"\x96\x02\n\x0c\x44ropInPlayer\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\x04\x12\x0c\n\x04time\x18\x05 \x01(\x04\x12\n\n\x02\x66\x36\x18\x06 \x01(\x04\x12\n\n\x02\x66\x37\x18\x07 \x01(\x12\x12\n\n\x02\x66\x38\x18\x08 \x01(\x04\x12\n\n\x02\x66\x39\x18\t \x01(\x04\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\x08\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x04\x12\r\n\x05power\x18\x0c \x01(\x04\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\x04\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\r')
 
 
 
-_WORLD = DESCRIPTOR.message_types_by_name['World']
-_WORLDS = DESCRIPTOR.message_types_by_name['Worlds']
-_WORLDATTRIBUTE = DESCRIPTOR.message_types_by_name['WorldAttribute']
-_WORLDATTRIBUTES = DESCRIPTOR.message_types_by_name['WorldAttributes']
-_PLAYER = DESCRIPTOR.message_types_by_name['Player']
-World = _reflection.GeneratedProtocolMessageType('World', (_message.Message,), {
-  'DESCRIPTOR' : _WORLD,
+_DROPINWORLD = DESCRIPTOR.message_types_by_name['DropInWorld']
+_DROPINWORLDLIST = DESCRIPTOR.message_types_by_name['DropInWorldList']
+_DROPINPLAYER = DESCRIPTOR.message_types_by_name['DropInPlayer']
+DropInWorld = _reflection.GeneratedProtocolMessageType('DropInWorld', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINWORLD,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:World)
+  # @@protoc_insertion_point(class_scope:DropInWorld)
   })
-_sym_db.RegisterMessage(World)
+_sym_db.RegisterMessage(DropInWorld)
 
-Worlds = _reflection.GeneratedProtocolMessageType('Worlds', (_message.Message,), {
-  'DESCRIPTOR' : _WORLDS,
+DropInWorldList = _reflection.GeneratedProtocolMessageType('DropInWorldList', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINWORLDLIST,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:Worlds)
+  # @@protoc_insertion_point(class_scope:DropInWorldList)
   })
-_sym_db.RegisterMessage(Worlds)
+_sym_db.RegisterMessage(DropInWorldList)
 
-WorldAttribute = _reflection.GeneratedProtocolMessageType('WorldAttribute', (_message.Message,), {
-  'DESCRIPTOR' : _WORLDATTRIBUTE,
+DropInPlayer = _reflection.GeneratedProtocolMessageType('DropInPlayer', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINPLAYER,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:WorldAttribute)
+  # @@protoc_insertion_point(class_scope:DropInPlayer)
   })
-_sym_db.RegisterMessage(WorldAttribute)
-
-WorldAttributes = _reflection.GeneratedProtocolMessageType('WorldAttributes', (_message.Message,), {
-  'DESCRIPTOR' : _WORLDATTRIBUTES,
-  '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:WorldAttributes)
-  })
-_sym_db.RegisterMessage(WorldAttributes)
-
-Player = _reflection.GeneratedProtocolMessageType('Player', (_message.Message,), {
-  'DESCRIPTOR' : _PLAYER,
-  '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:Player)
-  })
-_sym_db.RegisterMessage(Player)
+_sym_db.RegisterMessage(DropInPlayer)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _WORLD._serialized_start=16
-  _WORLD._serialized_end=194
-  _WORLDS._serialized_start=196
-  _WORLDS._serialized_end=228
-  _WORLDATTRIBUTE._serialized_start=231
-  _WORLDATTRIBUTE._serialized_end=446
-  _WORLDATTRIBUTES._serialized_start=448
-  _WORLDATTRIBUTES._serialized_end=528
-  _PLAYER._serialized_start=531
-  _PLAYER._serialized_end=778
+  _DROPINWORLD._serialized_start=16
+  _DROPINWORLD._serialized_end=280
+  _DROPINWORLDLIST._serialized_start=282
+  _DROPINWORLDLIST._serialized_end=329
+  _DROPINPLAYER._serialized_start=332
+  _DROPINPLAYER._serialized_end=610
 # @@protoc_insertion_point(module_scope)
