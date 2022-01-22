@@ -1,5 +1,5 @@
 syntax = "proto2";
-message PeriodicInfo {
+message PeriodicInfo { // very similar to TcpAddress, did not found in ZwiftApp.exe yet
 	required string game_server_ip = 1;
 	optional uint32 f2 = 2;
 	optional uint32 f3 = 3;
@@ -8,7 +8,6 @@ message PeriodicInfo {
 	optional uint32 f6 = 6;
 }
 
-
-message PeriodicInfos {
+message PeriodicInfos { // very similar to TcpConfig
 	repeated PeriodicInfo infos = 1;
 }

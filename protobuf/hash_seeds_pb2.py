@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10hash-seeds.proto\"<\n\x08HashSeed\x12\r\n\x05seed1\x18\x01 \x02(\x04\x12\r\n\x05seed2\x18\x02 \x02(\x04\x12\x12\n\nexpiryDate\x18\x03 \x02(\x04\"%\n\tHashSeeds\x12\x18\n\x05seeds\x18\x01 \x03(\x0b\x32\t.HashSeed')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10hash-seeds.proto\"<\n\x08HashSeed\x12\r\n\x05seed1\x18\x01 \x02(\r\x12\r\n\x05seed2\x18\x02 \x02(\r\x12\x12\n\nexpiryDate\x18\x03 \x02(\x04\"%\n\tHashSeeds\x12\x18\n\x05seeds\x18\x01 \x03(\x0b\x32\t.HashSeed')
 
 
 

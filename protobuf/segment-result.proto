@@ -1,5 +1,5 @@
 syntax = "proto2";
-message SegmentResult {
+message SegmentResult { //TODO: find original name
     optional uint64 id = 1;
     required uint64 player_id = 2;
     optional uint32 f3 = 3;
@@ -22,7 +22,7 @@ message SegmentResult {
     optional uint32 f20 = 20;
 }
 
-message SegmentResults {
+message SegmentResults { //TODO: find original name
     required uint32 world_id = 1;
     required uint64 segment_id = 2;
     optional uint64 event_subgroup_id = 3;

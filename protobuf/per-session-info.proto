@@ -9,7 +9,7 @@ message TcpAddress {
 
 message TcpConfig {
 	/* First server: the TCP telemetry server (34.218.60.145) */
-	repeated TcpAddress node = 1;
+	repeated TcpAddress nodes = 1;
 }
 
 message PartnersUrls {

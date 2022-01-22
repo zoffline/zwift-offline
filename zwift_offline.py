@@ -940,7 +940,7 @@ def api_users_login():
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(get_utc_time())
-    udp_node = response.info.nodes.node.add()
+    udp_node = response.info.nodes.nodes.add()
     if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
         udp_node.ip = "127.0.0.1"
     else:
@@ -1803,13 +1803,13 @@ def api_profiles_goals_id(player_id, goal_id):
 @app.route('/api/tcp-config', methods=['GET'])
 @app.route('/relay/tcp-config', methods=['GET'])
 def api_tcp_config():
-    infos = periodic_info_pb2.PeriodicInfos()
-    info = infos.infos.add()
+    infos = per_session_info_pb2.TcpConfig()
+    info = infos.nodes.add()
     if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-        info.game_server_ip = "127.0.0.1"
+        info.ip = "127.0.0.1"
     else:
-        info.game_server_ip = server_ip
-    info.f2 = 3023
+        info.ip = server_ip
+    info.port = 3023
     return infos.SerializeToString(), 200
 
 

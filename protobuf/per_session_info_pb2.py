@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16per-session-info.proto\">\n\nTcpAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\n\n\x02\x66\x34\x18\x04 \x01(\x05\"&\n\tTcpConfig\x12\x19\n\x04node\x18\x01 \x03(\x0b\x32\x0b.TcpAddress\"A\n\x0cPartnersUrls\x12\x16\n\x0etodaysplan_url\x18\x01 \x01(\t\x12\x19\n\x11trainingpeaks_url\x18\x02 \x01(\t\"u\n\x0ePerSessionInfo\x12\x11\n\trelay_url\x18\x01 \x02(\t\x12\x1b\n\x04\x61pis\x18\x02 \x01(\x0b\x32\r.PartnersUrls\x12\x0c\n\x04time\x18\x03 \x01(\x04\x12\x19\n\x05nodes\x18\x04 \x01(\x0b\x32\n.TcpConfig\x12\n\n\x02\x66\x35\x18\x05 \x01(\x05')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16per-session-info.proto\">\n\nTcpAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\n\n\x02\x66\x34\x18\x04 \x01(\x05\"\'\n\tTcpConfig\x12\x1a\n\x05nodes\x18\x01 \x03(\x0b\x32\x0b.TcpAddress\"A\n\x0cPartnersUrls\x12\x16\n\x0etodaysplan_url\x18\x01 \x01(\t\x12\x19\n\x11trainingpeaks_url\x18\x02 \x01(\t\"u\n\x0ePerSessionInfo\x12\x11\n\trelay_url\x18\x01 \x02(\t\x12\x1b\n\x04\x61pis\x18\x02 \x01(\x0b\x32\r.PartnersUrls\x12\x0c\n\x04time\x18\x03 \x01(\x04\x12\x19\n\x05nodes\x18\x04 \x01(\x0b\x32\n.TcpConfig\x12\n\n\x02\x66\x35\x18\x05 \x01(\x05')
 
 
 
@@ -56,9 +56,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TCPADDRESS._serialized_start=26
   _TCPADDRESS._serialized_end=88
   _TCPCONFIG._serialized_start=90
-  _TCPCONFIG._serialized_end=128
-  _PARTNERSURLS._serialized_start=130
-  _PARTNERSURLS._serialized_end=195
-  _PERSESSIONINFO._serialized_start=197
-  _PERSESSIONINFO._serialized_end=314
+  _TCPCONFIG._serialized_end=129
+  _PARTNERSURLS._serialized_start=131
+  _PARTNERSURLS._serialized_end=196
+  _PERSESSIONINFO._serialized_start=198
+  _PERSESSIONINFO._serialized_end=315
 # @@protoc_insertion_point(module_scope)

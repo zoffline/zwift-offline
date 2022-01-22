@@ -1,23 +1,23 @@
 syntax = "proto2";
-message Variant {
+message Variant { //TODO: find original name
 	required string name = 1;
 	optional uint32 value = 2;
 	repeated M3 f3 = 3;
 }
 
-message Variants {
+message Variants { //TODO: find original name
 	repeated Variant variants = 1;
 }
 
-message M3 {
+message M3 { //TODO: find original name
 	repeated M1 f1 = 1;
 }
 
-message M1 {
+message M1 { //TODO: find original name
 	required string name = 1;
 	repeated M2 f2 = 2;
 }
 
-message M2 {
+message M2 { //TODO: find original name
 	required uint32 f4 = 4;
 }

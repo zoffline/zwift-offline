@@ -14,11 +14,12 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0czfiles.proto\"H\n\x05ZFile\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0e\n\x06\x66older\x18\x02 \x02(\t\x12\x10\n\x08\x66ilename\x18\x03 \x02(\t\x12\x11\n\ttimestamp\x18\x04 \x02(\x04')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0czfiles.proto\"H\n\x05ZFile\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0e\n\x06\x66older\x18\x02 \x02(\t\x12\x10\n\x08\x66ilename\x18\x03 \x02(\t\x12\x11\n\ttimestamp\x18\x04 \x02(\x04\"%\n\x0bZFilesProto\x12\x16\n\x06zfiles\x18\x01 \x03(\x0b\x32\x06.ZFile')
 
 
 
 _ZFILE = DESCRIPTOR.message_types_by_name['ZFile']
+_ZFILESPROTO = DESCRIPTOR.message_types_by_name['ZFilesProto']
 ZFile = _reflection.GeneratedProtocolMessageType('ZFile', (_message.Message,), {
   'DESCRIPTOR' : _ZFILE,
   '__module__' : 'zfiles_pb2'
@@ -26,9 +27,18 @@ ZFile = _reflection.GeneratedProtocolMessageType('ZFile', (_message.Message,), {
   })
 _sym_db.RegisterMessage(ZFile)
 
+ZFilesProto = _reflection.GeneratedProtocolMessageType('ZFilesProto', (_message.Message,), {
+  'DESCRIPTOR' : _ZFILESPROTO,
+  '__module__' : 'zfiles_pb2'
+  # @@protoc_insertion_point(class_scope:ZFilesProto)
+  })
+_sym_db.RegisterMessage(ZFilesProto)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _ZFILE._serialized_start=16
   _ZFILE._serialized_end=88
+  _ZFILESPROTO._serialized_start=90
+  _ZFILESPROTO._serialized_end=127
 # @@protoc_insertion_point(module_scope)

@@ -14,12 +14,36 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63tivity.proto\"\xe5\x03\n\x08\x41\x63tivity\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x11\n\tplayer_id\x18\x02 \x02(\x04\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\x0c\n\x04name\x18\x04 \x02(\t\x12\n\n\x02\x66\x35\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\x12\n\nstart_date\x18\x07 \x02(\t\x12\x10\n\x08\x65nd_date\x18\x08 \x01(\t\x12\x10\n\x08\x64istance\x18\t \x01(\x02\x12\x16\n\x0e\x61vg_heart_rate\x18\n \x01(\x02\x12\x16\n\x0emax_heart_rate\x18\x0b \x01(\x02\x12\x11\n\tavg_watts\x18\x0c \x01(\x02\x12\x11\n\tmax_watts\x18\r \x01(\x02\x12\x13\n\x0b\x61vg_cadence\x18\x0e \x01(\x02\x12\x13\n\x0bmax_cadence\x18\x0f \x01(\x02\x12\x11\n\tavg_speed\x18\x10 \x01(\x02\x12\x11\n\tmax_speed\x18\x11 \x01(\x02\x12\x10\n\x08\x63\x61lories\x18\x12 \x01(\x02\x12\x17\n\x0ftotal_elevation\x18\x13 \x01(\x02\x12\x18\n\x10strava_upload_id\x18\x14 \x01(\x04\x12\x1a\n\x12strava_activity_id\x18\x15 \x01(\x04\x12\x0b\n\x03\x66\x32\x33\x18\x17 \x01(\r\x12\x0b\n\x03\x66it\x18\x18 \x01(\x0c\x12\x14\n\x0c\x66it_filename\x18\x19 \x01(\t\x12\x0b\n\x03\x66\x32\x39\x18\x1d \x01(\r\x12\x0c\n\x04\x64\x61te\x18\x1f \x01(\t\"+\n\nActivities\x12\x1d\n\nactivities\x18\x01 \x03(\x0b\x32\t.Activity')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63tivity.proto\"c\n\rNotableMoment\x12\n\n\x02\x66\x31\x18\x01 \x01(\x04\x12\n\n\x02\x66\x32\x18\x02 \x01(\r\x12\n\n\x02\x66\x33\x18\x03 \x01(\r\x12\n\n\x02\x66\x34\x18\x04 \x01(\r\x12\n\n\x02\x66\x35\x18\x05 \x01(\t\x12\n\n\x02\x66\x36\x18\x06 \x01(\t\x12\n\n\x02\x66\x37\x18\x07 \x01(\t\"C\n\x11SocialInteraction\x12\n\n\x02\x66\x31\x18\x01 \x01(\x04\x12\n\n\x02\x66\x32\x18\x02 \x01(\r\x12\n\n\x02\x66\x33\x18\x03 \x01(\x02\x12\n\n\x02\x66\x34\x18\x04 \x01(\t\")\n\x0f\x43lubAttribution\x12\n\n\x02\x66\x31\x18\x01 \x01(\t\x12\n\n\x02\x66\x32\x18\x02 \x01(\x02\"\xd9\x03\n\x08\x41\x63tivity\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x11\n\tplayer_id\x18\x02 \x02(\x04\x12\n\n\x02\x66\x33\x18\x03 \x02(\x04\x12\x0c\n\x04name\x18\x04 \x02(\t\x12\n\n\x02\x66\x35\x18\x05 \x01(\t\x12\x12\n\nstart_date\x18\x07 \x02(\t\x12\x10\n\x08\x65nd_date\x18\x08 \x01(\t\x12\x10\n\x08\x64istance\x18\t \x01(\x02\x12\x16\n\x0e\x61vg_heart_rate\x18\n \x01(\x02\x12\x16\n\x0emax_heart_rate\x18\x0b \x01(\x02\x12\x11\n\tavg_watts\x18\x0c \x01(\x02\x12\x11\n\tmax_watts\x18\r \x01(\x02\x12\x13\n\x0b\x61vg_cadence\x18\x0e \x01(\x02\x12\x13\n\x0bmax_cadence\x18\x0f \x01(\x02\x12\x11\n\tavg_speed\x18\x10 \x01(\x02\x12\x11\n\tmax_speed\x18\x11 \x01(\x02\x12\x10\n\x08\x63\x61lories\x18\x12 \x01(\x02\x12\x17\n\x0ftotal_elevation\x18\x13 \x01(\x02\x12\x18\n\x10strava_upload_id\x18\x14 \x01(\r\x12\x1a\n\x12strava_activity_id\x18\x15 \x01(\r\x12\x0b\n\x03\x66\x32\x33\x18\x17 \x01(\r\x12\x0b\n\x03\x66it\x18\x18 \x01(\x0c\x12\x14\n\x0c\x66it_filename\x18\x19 \x01(\t\x12\x0b\n\x03\x66\x32\x39\x18\x1d \x01(\x12\x12\x0c\n\x04\x64\x61te\x18\x1f \x01(\t\"+\n\nActivities\x12\x1d\n\nactivities\x18\x01 \x03(\x0b\x32\t.Activity')
 
 
 
+_NOTABLEMOMENT = DESCRIPTOR.message_types_by_name['NotableMoment']
+_SOCIALINTERACTION = DESCRIPTOR.message_types_by_name['SocialInteraction']
+_CLUBATTRIBUTION = DESCRIPTOR.message_types_by_name['ClubAttribution']
 _ACTIVITY = DESCRIPTOR.message_types_by_name['Activity']
 _ACTIVITIES = DESCRIPTOR.message_types_by_name['Activities']
+NotableMoment = _reflection.GeneratedProtocolMessageType('NotableMoment', (_message.Message,), {
+  'DESCRIPTOR' : _NOTABLEMOMENT,
+  '__module__' : 'activity_pb2'
+  # @@protoc_insertion_point(class_scope:NotableMoment)
+  })
+_sym_db.RegisterMessage(NotableMoment)
+
+SocialInteraction = _reflection.GeneratedProtocolMessageType('SocialInteraction', (_message.Message,), {
+  'DESCRIPTOR' : _SOCIALINTERACTION,
+  '__module__' : 'activity_pb2'
+  # @@protoc_insertion_point(class_scope:SocialInteraction)
+  })
+_sym_db.RegisterMessage(SocialInteraction)
+
+ClubAttribution = _reflection.GeneratedProtocolMessageType('ClubAttribution', (_message.Message,), {
+  'DESCRIPTOR' : _CLUBATTRIBUTION,
+  '__module__' : 'activity_pb2'
+  # @@protoc_insertion_point(class_scope:ClubAttribution)
+  })
+_sym_db.RegisterMessage(ClubAttribution)
+
 Activity = _reflection.GeneratedProtocolMessageType('Activity', (_message.Message,), {
   'DESCRIPTOR' : _ACTIVITY,
   '__module__' : 'activity_pb2'
@@ -37,8 +61,14 @@ _sym_db.RegisterMessage(Activities)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _ACTIVITY._serialized_start=19
-  _ACTIVITY._serialized_end=504
-  _ACTIVITIES._serialized_start=506
-  _ACTIVITIES._serialized_end=549
+  _NOTABLEMOMENT._serialized_start=18
+  _NOTABLEMOMENT._serialized_end=117
+  _SOCIALINTERACTION._serialized_start=119
+  _SOCIALINTERACTION._serialized_end=186
+  _CLUBATTRIBUTION._serialized_start=188
+  _CLUBATTRIBUTION._serialized_end=229
+  _ACTIVITY._serialized_start=232
+  _ACTIVITY._serialized_end=705
+  _ACTIVITIES._serialized_start=707
+  _ACTIVITIES._serialized_end=750
 # @@protoc_insertion_point(module_scope)
