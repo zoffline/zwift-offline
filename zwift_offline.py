@@ -2090,7 +2090,7 @@ def experimentation_v1_variant():
                     ('game_1_18_0_osx_monterey_bluetooth_uart_fix', 1, 0),
                     ('game_1_19_0_default_rubberbanding', None, None),
                     ('game_1_19_use_tabbed_settings', None, 0),
-                    ('pedal_assist_20', None, None),
+                    ('pedal_assist_20', 1, None),
                     ('game_1_19_segment_results_sub_active', 1, 0),
                     ('game_1_20_hw_experiment_1', 1, None),
                     ('game_1_19_paired_devices_alerts', 1, None),
