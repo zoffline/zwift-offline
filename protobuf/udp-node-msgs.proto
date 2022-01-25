@@ -203,12 +203,12 @@ message ServerToClient { // = tcp-node-msgs::TCPServerInfo ???
 	repeated sint64 f30 = 30; //tag496
 }
 
-message Ghost { //not from game???
+message Ghost { //not from the Zwift game, zoffline-specific!
 	required int32 player_id = 1;
 	repeated PlayerState states = 2;
 }
 
-message Ghosts { //not from game???
+message Ghosts { //not from the Zwift game, zoffline-specific!
 	repeated Ghost ghosts = 1;
 }
 

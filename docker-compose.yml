@@ -6,7 +6,6 @@ services:
              context: .
              dockerfile: Dockerfile
          container_name: zoffline
-         network_mode: host
          environment:
             - TZ=Europe/London
          volumes:
