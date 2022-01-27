@@ -15,6 +15,7 @@ import threading
 import re
 import smtplib, ssl
 import requests
+import subprocess
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -656,7 +657,8 @@ def restart_server():
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
         discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
-        os.system("git pull")
+        p = subprocess.Popen(["git", "pull"], cwd="/home/ubuntu/zwift-offline")
+        p.wait()
     return redirect('/user/%s/' % current_user.username)
 
 
