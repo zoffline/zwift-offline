@@ -2426,7 +2426,7 @@ def experimentation_v1_variant():
                     ('game_1_18_0_osx_monterey_bluetooth_uart_fix', True, False),
                     ('game_1_19_0_default_rubberbanding', None, None),
                     ('game_1_19_use_tabbed_settings', None, False),
-                    ('pedal_assist_20', 1, None),
+                    ('pedal_assist_20', True, None),
                     ('game_1_19_segment_results_sub_active', True, False),
                     ('game_1_20_hw_experiment_1', True, None),
                     ('game_1_19_paired_devices_alerts', True, None),
@@ -2449,8 +2449,8 @@ def experimentation_v1_variant():
                     ('game_1_21_perf_analytics', True, None),
                     ('game_1_19_local_activity_persistence', True, None),
                     ('game_1_18_holiday_mode', None, None),
-                    ('game_1_17_noesis_enabled', True, None),
-                    ('game_1_20_home_screen', True, None),
+                    ('game_1_17_noesis_enabled', None, None),
+                    ('game_1_20_home_screen', None, None),
                     ('game_1_19_noesis_dummy', None, None),
                     ('game_1_14_settings_refactor', None, None)]
 
@@ -2460,12 +2460,6 @@ def experimentation_v1_variant():
         item.name = variant[0]
         if variant[1] is not None:
             item.value = variant[1]
-        #f3 = item.f3.add()
-        #if variant[2] is not None:
-        #    f1 = f3.f1.add()
-        #    f1.name = variant[0]
-        #    f2 = f1.f2.add()
-        #    f2.f4 = variant[2]
         if variant[2] is not None:
             item.values.fields[variant[0]].bool_value = variant[2]
     return variants.SerializeToString(), 200
