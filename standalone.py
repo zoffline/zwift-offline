@@ -259,7 +259,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         ##self.request.sendall(zc_params_payload)
         #print("camera: " + zc_params_payload.hex())
         self.data = self.request.recv(1024)
-        print("TCPHandler hello: %s" % self.data.hex())
+        #print("TCPHandler hello: %s" % self.data.hex())
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
             hello.ParseFromString(self.data[4:-4]) #2 bytes: length, 2 bytes: unrecognised; 4 bytes: CRC?
@@ -311,7 +311,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(payload)
 
         player_id = hello.player_id
-        print("TCPHandler for %d" % player_id)
+        #print("TCPHandler for %d" % player_id)
         msg = tcp_node_msgs_pb2.RecurringTCPResponse()
         msg.player_id = player_id
         msg.f3 = 0
