@@ -337,7 +337,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
-                    print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
+                    #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
                     zwift_offline.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()
