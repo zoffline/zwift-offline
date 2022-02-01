@@ -920,14 +920,14 @@ def api_proto_empty():
 
 @app.route('/api/game_info/version', methods=['GET'])
 def api_gameinfo_version():
-    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         data = json.load(f)
         return '{"version":"%s"}' % data['gameInfoHash']
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():
-    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         return f.read()
 
