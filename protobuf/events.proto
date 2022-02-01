@@ -1,13 +1,14 @@
 syntax = "proto2";
-
-message Category {
+//All decompiled
+message EventSubgroupProtobuf {
 	required uint64 id = 1; // 2395269
 	optional string description = 2; // "3R True2 Steady Ride [2.0w/kg avg] (C)"
 	optional string f3 = 3; // ""
+	optional uint32 f4 = 4; // ""
 	optional uint32 f5 = 5; // 154
 	optional uint32 f6 = 6; // 0
 	optional string f7 = 7; // "PT3600S"
-	optional uint32 rules_id = 8; // 320
+	optional uint64 rules_id = 8; // 320
 	optional uint64 registrationStart = 9;
 	optional uint64 registrationStartWT = 10;
 	optional uint64 registrationEnd = 11;
@@ -18,58 +19,103 @@ message Category {
 	optional uint64 lineUpEndWT = 16;
 	optional uint64 eventSubgroupStart = 17;
 	optional uint64 eventSubgroupStartWT = 18;
-	optional uint32 f21 = 21; // 0
+	optional uint64 f19 = 19;
+	optional uint64 f20 = 20; //tag416
+	optional bool f21 = 21; // 0, tag424
 	required uint64 route_id = 22; // 3366225080
-	repeated uint32 leaders = 23; // or sweepers?
-	optional fixed32 f24 = 24;
-	optional uint32 laps = 25; // 0
-	optional uint32 startLocation = 29; // 13
-	optional uint32 label = 30; // 3
-	optional uint32 f31 = 31; // 1
-	optional fixed32 f32 = 32; // 1076258406
-	optional fixed32 f33 = 33; // 1078774989
-	optional uint32 duration = 34; // Duration of event in seconds
-	optional uint64 f36 = 36; // 493134166
-	optional uint32 f37 = 37; // 0
-	optional string audio = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4"
-	repeated uint32 sweepers = 41; // or leaders?
-	optional string f43 = 43;
-	optional uint32 f44 = 44; // 0
-	optional string tags = 45; // semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
-	optional uint32 lateJoinInMinutes = 46;
-	optional uint32 map_id = 47; // 1
+	repeated uint64 leaders = 23; // or sweepers? tag440
+	optional fixed32 f24 = 24; //tag453
+	optional uint32 laps = 25; // 0, tag456
+        /* no 26-28 */
+	optional uint32 startLocation = 29; // 13, tag488
+	optional uint32 label = 30; // 3, tag496
+	optional uint32 paceType = 31; // 1, tag504
+	optional fixed32 f32 = 32; // 1076258406, tag645
+	optional fixed32 f33 = 33; // 1078774989, tag653
+	optional uint32 duration = 34; // Duration of event in seconds, tag656
+	optional uint32 f35 = 35; // tag664
+	optional uint64 jerseyHash = 36; // 493134166, tag672
+	optional bool f37 = 37; // 0, tag680
+	optional uint64 f38 = 38; // tag688
+	optional string audio = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4", tag698
+	optional uint64 f40 = 40; // tag704
+	repeated uint64 sweepers = 41; // or leaders?, tag712
+	optional uint64 f42 = 42; // tag720
+	optional string f43 = 43; // tag730
+	optional bool f44 = 44; // 0, tag736
+	optional string tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
+	optional uint32 lateJoinInMinutes = 46; //tag752
+	optional uint64 map_id = 47; // 1, tag760
+	optional uint32 f48 = 48; //tag898
+	optional string f49 = 49; //tag906
+	repeated int32 f50 = 50; //tag912
+	optional bool f51 = 51; //tag920
 }
 
-message Event {
+message MicroserviceEventData {
+	optional string f1 = 1;
+	optional string f2 = 2;
+	optional uint64 f3 = 3;
+}
+
+message EventSeriesProtobuf {
+	optional uint64 f1 = 1;
+	optional string f2 = 2;
+	optional string f3 = 3;
+}
+
+message EventTimeTrialOptions {
+	optional uint32 f1 = 1;
+	optional uint32 f2 = 2;
+	optional uint32 f3 = 3;
+	optional uint32 f4 = 4;
+	optional uint64 f5 = 5;
+}
+
+message Event { //real name: EventProtobuf
 	required uint64 id = 1;
 	optional uint32 world_id = 2;
 	required string title = 3;
 	optional string description = 4;
 	optional uint64 eventStart = 5; // Start time (epoch time in ms)
+	optional string f6 = 6;
 	optional fixed32 f7 = 7;
-	optional uint64 laps = 8;
-	optional uint64 f9 = 9;
-	repeated Category category = 10;
+	optional uint32 laps = 8;
+	optional uint32 f9 = 9;
+	repeated EventSubgroupProtobuf category = 10;
 	optional string f11 = 11;
 	optional string pic_url = 12;
 	optional uint32 duration = 13; // Duration in seconds?
 	optional uint64 route_id = 14;
 	optional uint64 rules_id = 15;
-	optional uint64 f16 = 16;
-	optional uint64 f17 = 17;
+	optional uint32 f16 = 16;
+	optional bool f17 = 17;
 	optional uint64 f18 = 18;
 	optional string f19 = 19;
-	optional uint32 f22 = 22;
+	optional string f20 = 20;
+	optional string f21 = 21;
+	optional uint32 f22 = 22; //sport
+	optional uint64 f23 = 23;
 	optional uint32 f24 = 24;
+	optional uint64 f25 = 25;
 	optional string f26 = 26;
 	optional uint32 f27 = 27;
-	optional uint32 f28 = 28;
-	optional uint32 f29 = 29;
+	optional bool f28 = 28;
+	optional bool f29 = 29;
+	optional EventSeriesProtobuf f30 = 30;
 	optional string tags = 31; // semi-colon delimited tags
+	optional uint64 f32 = 32;
+	optional bool f33 = 33;
 	optional uint32 lateJoinInMinutes = 34;
-	optional uint32 map_id = 35;
+	optional uint64 map_id = 35;
+	optional EventTimeTrialOptions f36 = 36;
+	optional string f37 = 37;
+	optional string f38 = 38;
+	optional uint32 f39 = 39;
+	optional MicroserviceEventData f40 = 40;
+	repeated uint32 f41 = 41;
 }
 
-message Events {
+message Events { //real name: EventsProtobuf
 	repeated Event events = 1;
 }

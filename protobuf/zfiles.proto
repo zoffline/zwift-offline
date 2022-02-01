@@ -1,7 +1,12 @@
 syntax = "proto2";
-message ZFile {
+//All decompiled. TODO: check
+message ZFile { // real name ZFileProto ?
     required uint64 id = 1;
     required string folder = 2;
     required string filename = 3;
-    required uint64 timestamp = 4;
+    required uint64 timestamp = 4; // ZFileProto: uint64=5 and string=4...
+}
+
+message ZFilesProto {
+    repeated ZFile zfiles = 1;
 }

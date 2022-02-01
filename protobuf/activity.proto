@@ -1,12 +1,34 @@
 syntax = "proto2";
+//All decompiled. TODO: uncomment all new fields and use in algo
+message NotableMoment {
+	optional uint64 f1 = 1;
+	optional uint32 f2 = 2;
+	optional uint32 f3 = 3;
+	optional uint32 f4 = 4;
+	optional string f5 = 5;
+	optional string f6 = 6;
+	optional string f7 = 7;
+}
+
+message SocialInteraction {
+	optional uint64 f1 = 1;
+	optional uint32 f2 = 2;
+	optional float f3 = 3;
+	optional string f4 = 4;
+}
+
+message ClubAttribution {
+	optional string f1 = 1;
+	optional float f2 = 2;
+}
+
 message Activity {
 	optional uint64 id = 1;
 	required uint64 player_id = 2;
-	required uint32 f3 = 3; /* world_id or player_type_id */
+	required uint64 f3 = 3; /* world_id or player_type_id */
 	required string name = 4;
-	optional uint32 f5 = 5;
-
-	optional uint32 f6 = 6;
+	optional string f5 = 5;
+	//optional bool f6 = 6;
 	required string start_date = 7;
 	optional string end_date = 8;
 	optional float distance = 9; /* in meters */
@@ -20,15 +42,30 @@ message Activity {
 	optional float max_speed = 17; /* in m/s */
 	optional float calories = 18;
 	optional float total_elevation = 19;
-	optional uint64 strava_upload_id = 20;
-	optional uint64 strava_activity_id = 21;
+	optional uint32 strava_upload_id = 20;
+	optional uint32 strava_activity_id = 21;
+	//optional string f22 = 22;
 	optional uint32 f23 = 23;
 	optional bytes fit = 24;
 	optional string fit_filename = 25;
-	optional uint32 f29 = 29;
+	//optional uint64 f26 = 26;
+	//optional uint64 f27 = 27;
+	//optional float f28 = 28;
+	optional sint64 f29 = 29;
+	//repeated string f30 = 30;
 	optional string date = 31;
+	/*optional float f32 = 32;
+	optional string f33 = 33;
+	optional string f34 = 34;
+	repeated NotableMoment f35 = 35;
+	repeated SocialInteraction f36 = 36;
+	optional sint64 f37 = 37;
+	optional sint64 f38 = 38;
+	optional string f39 = 39;
+	optional int64 f40 = 40;
+	repeated ClubAttribution f41 = 41;*/
 }
 
-message Activities {
+message Activities { // real name: ActivityList
 	repeated Activity activities = 1;
 }
