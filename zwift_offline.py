@@ -2420,7 +2420,7 @@ def experimentation_v1_variant():
                     ('game_1_17_ble_disable_component_sport_filter', True, None),
                     ('game_1_18_new_welcome_ride', None, None),
                     ('game_1_19_achievement_service_persist', True, None),
-                    ('game_1_19_achievement_service_src_of_truth', True, None),
+                    #('game_1_19_achievement_service_src_of_truth', True, None),
                     ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', True, None),
                     ('game_1_19_gender_dob_change', True, None),
                     ('game_1_18_0_osx_monterey_bluetooth_uart_fix', True, False),
