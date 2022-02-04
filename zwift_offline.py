@@ -955,7 +955,6 @@ def logout_player(player_id):
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
-@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 @app.route('/api/users/logout', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -2354,6 +2353,11 @@ def auth_realms_zwift_protocol_openid_connect_token():
     else:
         AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
         return FAKE_JWT, 200
+
+@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
+def auth_realms_zwift_protocol_openid_connect_logout():
+    # This is called on ZCA logout, we don't want the game client to logout (anyway jwt.decode would fail)
+    return '', 204
 
 @app.route("/start-zwift" , methods=['POST'])
 @login_required
