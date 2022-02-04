@@ -466,7 +466,7 @@ def forgot():
                         message['From'] = sender_email
                         message['To'] = username
                         message['Subject'] = "Password reset"
-                        content = "https://launcher.zwift.com/login/?token=%s" % (user.get_token())
+                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
                         message.attach(MIMEText(content, 'plain'))
                         server.sendmail(sender_email, username, message.as_string())
                         server.close()
