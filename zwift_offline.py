@@ -8,9 +8,6 @@ import signal
 import platform
 import random
 import sys
-import sys
-sys.path.insert(1, 'protobuf') #otherwise import in .proto does not works
-
 import tempfile
 import time
 import math
@@ -39,6 +36,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+sys.path.insert(1, 'protobuf') # otherwise import in .proto does not work
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
@@ -468,7 +466,7 @@ def forgot():
                         message['From'] = sender_email
                         message['To'] = username
                         message['Subject'] = "Password reset"
-                        content = "https://us-or-rly101.zwift.com/login/?token=%s" % (user.get_token())
+                        content = "https://launcher.zwift.com/login/?token=%s" % (user.get_token())
                         message.attach(MIMEText(content, 'plain'))
                         server.sendmail(sender_email, username, message.as_string())
                         server.close()
@@ -1623,7 +1621,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.method == 'DELETE':
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
         db.session.commit()
-        return '', 204
+        return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
