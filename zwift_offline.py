@@ -1213,6 +1213,12 @@ def api_profiles_me_bin():
         return do_api_profiles_me(True)
     else:
         return do_api_profiles_me(False)
+    
+@app.route('/api/profiles/me/', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_me_json():
+    return do_api_profiles_me(True)
 
 @app.route('/api/partners/garmin/auth', methods=['GET'])
 @app.route('/api/partners/trainingpeaks/auth', methods=['GET'])
