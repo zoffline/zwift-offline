@@ -885,7 +885,7 @@ def world_time():
 
 @app.route('/api/clubs/club/can-create', methods=['GET'])
 def api_clubs_club_cancreate():
-    return '{"result":false}'
+    return {"result":False}
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/notifications', methods=['GET'])
@@ -893,23 +893,23 @@ def api_clubs_club_cancreate():
 @app.route('/api/event-feed', methods=['GET'])
 @app.route('/api/activity-feed/feed/', methods=['GET'])
 def api_empty_arrays():
-    return '[]'
+    return jsonify([])
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
-    return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
+    return {"realm": "zwift","launcher": "https://launcher.zwift.com/launcher","url": "https://secure.zwift.com/auth/"}
 
 @app.route('/api/server', methods=['GET'])
 def api_server():
-    return '{"build":"zwift_1.267.0","version":"1.267.0"}'
+    return {"build":"zwift_1.267.0","version":"1.267.0"}
 
 @app.route('/api/servers', methods=['GET'])
 def api_servers():
-    return '{"baseUrl":"https://us-or-rly101.zwift.com/relay"}'
+    return {"baseUrl":"https://us-or-rly101.zwift.com/relay"}
 
 @app.route('/api/clubs/club/list/my-clubs', methods=['GET'])
 def api_clubs():
-    return '{"total":0,"results":[]}'
+    return {"total":0,"results":[]}
 
 @app.route('/api/clubs/club/list/my-clubs.proto', methods=['GET'])
 @app.route('/api/campaign/proto/campaigns', methods=['GET'])
@@ -921,13 +921,15 @@ def api_gameinfo_version():
     game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         data = json.load(f)
-        return '{"version":"%s"}' % data['gameInfoHash']
+        return {"version": data['gameInfoHash']}
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():
     game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
-        return f.read()
+        r = make_response(f.read())
+        r.mimetype = 'application/json'
+        return r
 
 @app.route('/api/users/login', methods=['POST'])
 def api_users_login():
@@ -1202,18 +1204,26 @@ def do_api_profiles_me(is_json):
         return jsonify(jprofile)
     else:
         return profile.SerializeToString(), 200
-        
+
 @app.route('/api/profiles/me', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me_bin():
-    return do_api_profiles_me(False)
+    if(request.headers['Source'] == "zwift-companion"):
+        return do_api_profiles_me(True)
+    else:
+        return do_api_profiles_me(False)
 
-@app.route('/api/profiles/me/', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def api_profiles_me_json():
-    return do_api_profiles_me(True)
+@app.route('/api/partners/garmin/auth', methods=['GET'])
+@app.route('/api/partners/trainingpeaks/auth', methods=['GET'])
+@app.route('/api/partners/strava/auth', methods=['GET'])
+@app.route('/api/partners/withings/auth', methods=['GET'])
+@app.route('/api/partners/todaysplan/auth', methods=['GET'])
+@app.route('/api/partners/runtastic/auth', methods=['GET'])
+@app.route('/api/partners/underarmour/auth', methods=['GET'])
+@app.route('/api/partners/fitbit/auth', methods=['GET'])
+def api_profiles_partners():
+    return {"status":"notConnected","clientId":"zwift","sandbox":False}
 
 @app.route('/api/profiles/<int:player_id>/privacy', methods=['POST'])
 @jwt_to_session_cookie
@@ -1947,7 +1957,7 @@ def relay_worlds():
 
 @app.route('/relay/worlds/<int:world_id>/aggregate/mobile', methods=['GET'])
 def relay_worlds_id_aggregate_mobile(world_id):
-    return '{"events":[],"goals":[],"activities":null,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":false,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}'
+    return {"events":[],"goals":[],"activities":None,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}
 
 @app.route('/relay/worlds/<int:world_id>', methods=['GET'])
 @app.route('/relay/worlds/<int:world_id>/', methods=['GET'])
@@ -1957,7 +1967,7 @@ def relay_worlds_id(world_id):
 
 @app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
 def relay_worlds_id_join(world_id):
-    return '{"worldTime":%ld}' % world_time()
+    return {"worldTime":world_time()}
 
 
 @app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
@@ -2104,7 +2114,7 @@ def handle_segment_results(request):
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
-        return '{"id": %ld}' % result.id, 200
+        return {"id": result.id}
 
     # request.method == GET
 #    world_id = int(request.args.get('world_id'))
@@ -2155,8 +2165,7 @@ def live_segment_results_service_leaders():
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
 def relay_worlds_leave(world_id):
-    return '{"worldtime":%ld}' % world_time()
-
+    return {"worldtime":world_time()}
 
 @app.teardown_request
 def teardown_request(exception):
@@ -2317,7 +2326,7 @@ def fake_jwt_with_session_cookie(session_cookie):
 
     refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
-    return """{"access_token":"%s","expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":"%s","token_type":"bearer","id_token":"%s","not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}""" % (access_token, refresh_token, ID_TOKEN)
+    return {"access_token":access_token,"expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":refresh_token,"token_type":"bearer","id_token":ID_TOKEN,"not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
@@ -2340,19 +2349,21 @@ def auth_realms_zwift_protocol_openid_connect_token():
             # Original code argument is replaced with session cookie from launcher
             refresh_token = jwt.decode(request.form['code'][19:], options=({'verify_signature': False, 'verify_aud': False}))
             session_cookie = refresh_token['session_cookie']
-            return fake_jwt_with_session_cookie(session_cookie), 200
+            return jsonify(fake_jwt_with_session_cookie(session_cookie)), 200
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
-            return fake_jwt_with_session_cookie(token['session_cookie'])
+            return jsonify(fake_jwt_with_session_cookie(token['session_cookie']))
         else:  # android login
             current_user.enable_ghosts = user.enable_ghosts
             ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
-            return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
+            return jsonify(fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id'])))), 200
     else:
         AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
-        return FAKE_JWT, 200
+        r = make_response(FAKE_JWT)
+        r.mimetype = 'application/json'
+        return r
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_logout():
