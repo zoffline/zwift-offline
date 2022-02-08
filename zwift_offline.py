@@ -1039,7 +1039,7 @@ def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
         online.pop(player_id)
-        discord.send_message('%s riders online' % len(online))
+        discord.change_presence(len(online))
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
@@ -1063,12 +1063,14 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit, sport):
-    events_list = [('Bologna TT', 2843604888, 10),
+    events_list = [('Alpe Du Zwift Downhill', 1480439148, 6),
+                   ('Bologna TT', 2843604888, 10),
                    ('Crit City', 947394567, 12),
                    ('Crit City Reverse', 2875658892, 12),
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
+                   ('Ventop Downhill', 2891361683, 14),
                    ('Watopia Waistband', 1064303857, 6)]
     event_id = 1000
     cnt = 0
@@ -1549,6 +1551,7 @@ def api_profiles_me_id(player_id):
     return api_profiles_me_json()
 
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
+@app.route('/api/profiles/<int:player_id>/in-game-fields', methods=['PUT'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_id(player_id):
@@ -1849,6 +1852,8 @@ def api_profiles_activities_id(player_id, activity_id):
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
+        return response, 200
+    if activity.distance < 300:
         return response, 200
     player_id = current_user.player_id
     if current_user.enable_ghosts:
@@ -2724,13 +2729,34 @@ def handle_segment_results(request):
     if request.method == 'POST':
         if not request.stream:
             return '', 400
+        data = request.stream.read()
         result = segment_result_pb2.SegmentResult()
-        result.ParseFromString(request.stream.read())
+        result.ParseFromString(data)
+        if result.segment_id == 1:
+            return '', 400
         result.id = get_id('segment_result')
         result.world_time = world_time()
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
+
+        # Previously done in /relay/worlds/attributes
+        player_update = udp_node_msgs_pb2.WorldAttribute()
+        player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+        player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SR
+        player_update.payload = data
+        player_update.world_time_born = world_time()
+        player_update.world_time_expire = world_time() + 60000
+        player_update.timestamp = int(get_utc_time() * 1000000)
+        sending_player_id = result.player_id
+        if sending_player_id in online:
+            sending_player = online[sending_player_id]
+            for receiving_player_id in online.keys():
+                if receiving_player_id != sending_player_id:
+                    receiving_player = online[receiving_player_id]
+                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
+                        enqueue_player_update(receiving_player_id, player_update.SerializeToString())
+
         return {"id": result.id}
 
     # request.method == GET
@@ -2749,12 +2775,7 @@ def handle_segment_results(request):
     results.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     results.segment_id = segment_id
 
-    if player_id:
-        #Add players results
-        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results)
-    else:
-        #Top 100 results, player_id = None
-        add_segment_results(segment_id, player_id, only_best, from_date, to_date, results)
+    add_segment_results(segment_id, player_id, only_best, from_date, to_date, results)
 
     return results.SerializeToString(), 200
 
@@ -2777,7 +2798,39 @@ def api_segment_results():
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
 def live_segment_results_service_leaders():
-    return '', 200
+    results = segment_result_pb2.SegmentResults()
+    results.server_realm = 0
+    results.segment_id = 0
+    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+        JOIN (SELECT s.player_id, s.segment_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+            FROM segment_result s WHERE world_time > '%s' GROUP BY s.player_id, s.segment_id) s2
+            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+        GROUP BY s1.player_id, s1.elapsed_ms
+        ORDER BY CAST(s1.segment_id AS INTEGER), CAST(s1.elapsed_ms AS INTEGER)
+        LIMIT 1000""" % (world_time()-(60*60*1000))))
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+    return results.SerializeToString(), 200
+
+
+@app.route('/live-segment-results-service/leaderboard/<segment_id>', methods=['GET'])
+def live_segment_results_service_leaderboard_segment_id(segment_id):
+    id = int(segment_id) & 0xffffffffffffffff
+    results = segment_result_pb2.SegmentResults()
+    results.server_realm = 0
+    results.segment_id = id
+    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+        JOIN (SELECT s.player_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+            FROM segment_result s WHERE segment_id = '%s' AND world_time > '%s' GROUP BY s.player_id) s2
+            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+        GROUP BY s1.player_id, s1.elapsed_ms
+        ORDER BY CAST(s1.elapsed_ms AS INTEGER)
+        LIMIT 1000""" % (id, (world_time()-(60*60*1000)))))
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+    return results.SerializeToString(), 200
 
 
 @app.route('/relay/worlds/<int:server_realm>/leave', methods=['POST'])
