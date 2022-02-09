@@ -313,7 +313,6 @@ To enable support for multiple users perform the steps below. zoffline's previou
 ```
 <zoffline ip> us-or-rly101.zwift.com
 <zoffline ip> secure.zwift.com
-<zoffline ip> cdn.zwift.com
 ```
 * Run "Host Changer", select created ``hosts.txt`` file and press the button
 * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app.
