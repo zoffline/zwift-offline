@@ -489,7 +489,6 @@ def get_empty_message(player_id):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        global discord
         data = self.request[0]
         socket = self.request[1]
         recv = udp_node_msgs_pb2.ClientToServer()
@@ -523,7 +522,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         #Update player online state
         if state.roadTime and t >= last_updates[player_id] + online_update_freq:
             last_updates[player_id] = t
-            if (not player_id in online.keys()) and ('discord' in globals()):
+            if not player_id in online.keys():
                 discord.send_message('%s riders online' % (len(online) + 1))
             online[player_id] = state
 
