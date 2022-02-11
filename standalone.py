@@ -43,7 +43,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
-FAKE_DNS_FILE = "%s/fake_dns.txt" % STORAGE_DIR
+FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 

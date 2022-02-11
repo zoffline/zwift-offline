@@ -317,7 +317,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 <zoffline ip> secure.zwift.com
 ```
 * Run "Host Changer", select created ``hosts.txt`` file and press the button
-* Optionally, instead of using the "Host Changer" app, you can create a ``fake_dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
+* Optionally, instead of using the "Host Changer" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
 * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
 
 </details>
