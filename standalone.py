@@ -8,7 +8,6 @@ import threading
 import time
 import csv
 import math
-import socket
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
@@ -44,6 +43,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+FAKE_DNS_FILE = "%s/fake_dns.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
@@ -655,43 +655,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         message.world_time = zwift_offline.world_time()
         socket.sendto(message.SerializeToString(), client_address)
 
-class DNSQuery:
-    def __init__(self, data):
-        self.data = data
-        self.domain = ''
-        t = (data[2] >> 3) & 15
-        if t == 0:
-            i = 12
-            l = data[i]
-            while l != 0:
-                self.domain += data[i + 1:i + l + 1].decode('utf-8') + '.'
-                i += l + 1
-                l = data[i]
-
-    def response(self, server_ip):
-        packet = b''
-        domains = ['us-or-rly101.zwift.com.', 'secure.zwift.com.']
-        if self.domain:
-            if self.domain in domains:
-                ip = server_ip
-            else:
-                ip = socket.gethostbyname_ex(self.domain)[2][0]
-            packet += self.data[:2] + b'\x81\x80'
-            packet += self.data[4:6] + self.data[4:6] + b'\x00\x00\x00\x00'
-            packet += self.data[12:]
-            packet += b'\xc0\x0c'
-            packet += b'\x00\x01\x00\x01\x00\x00\x00\x3c\x00\x04'
-            packet += bytearray.fromhex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, ip.split('.'))))
-            return packet
-
-def fake_dns(server_ip):
-    udps = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    udps.bind(('', 53))
-    while True:
-        data, addr = udps.recvfrom(1024)
-        p = DNSQuery(data)
-        udps.sendto(p.response(server_ip), addr)
-
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
@@ -724,7 +687,8 @@ botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
 
-if os.path.exists(SERVER_IP_FILE):
+if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
+    from fake_dns import fake_dns
     with open(SERVER_IP_FILE, 'r') as f:
         server_ip = f.read().rstrip('\r\n')
         dnsthreadevent = threading.Event()
