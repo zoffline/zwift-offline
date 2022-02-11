@@ -301,6 +301,8 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 ### Step 7 [OPTIONAL]: Install Zwift Companion App
 
+* Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
@@ -315,7 +317,8 @@ To enable support for multiple users perform the steps below. zoffline's previou
 <zoffline ip> secure.zwift.com
 ```
 * Run "Host Changer", select created ``hosts.txt`` file and press the button
-* Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app.
+* Optionally, instead of using the "Host Changer" app, you can set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
+* Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
 
 </details>
 
