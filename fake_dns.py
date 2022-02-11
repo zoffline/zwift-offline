@@ -1,4 +1,5 @@
 import socket
+import socketserver
 
 class DNSQuery:
     def __init__(self, data):
@@ -13,14 +14,15 @@ class DNSQuery:
                 i += l + 1
                 l = data[i]
 
-    def response(self, server_ip):
-        packet = b''
-        domains = ['us-or-rly101.zwift.com.', 'secure.zwift.com.']
+    def response(self):
         if self.domain:
-            if self.domain in domains:
-                ip = server_ip
+            name = self.domain
+            namemap = DNSServer.namemap
+            if namemap.__contains__(name):
+                ip = namemap[name]
             else:
-                ip = socket.gethostbyname_ex(self.domain)[2][0]
+                ip = socket.gethostbyname_ex(name)[2][0]
+            packet = b''
             packet += self.data[:2] + b'\x81\x80'
             packet += self.data[4:6] + self.data[4:6] + b'\x00\x00\x00\x00'
             packet += self.data[12:]
@@ -29,15 +31,26 @@ class DNSQuery:
             packet += bytearray.fromhex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, ip.split('.'))))
             return packet
 
+class DNSUDPHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        data = self.request[0]
+        socket = self.request[1]
+        query = DNSQuery(data)
+        socket.sendto(query.response(), self.client_address)
+
+class DNSServer:
+    def __init__(self, port=53):
+        DNSServer.namemap = {}
+        self.port = port
+    def addname(self, name, ip):
+        DNSServer.namemap[name] = ip
+    def start(self):
+        HOST, PORT = "0.0.0.0", self.port
+        server = socketserver.UDPServer((HOST, PORT), DNSUDPHandler)
+        server.serve_forever()
+
 def fake_dns(server_ip):
-    while True:
-        udps = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        udps.bind(('', 53))
-        try:
-            while True:
-                data, addr = udps.recvfrom(1024)
-                p = DNSQuery(data)
-                udps.sendto(p.response(server_ip), addr)
-        except Exception as e:
-            print('fake_dns: %s' % repr(e))
-            udps.close()
+    dns = DNSServer()
+    dns.addname('secure.zwift.com.', server_ip)
+    dns.addname('us-or-rly101.zwift.com.', server_ip)
+    dns.start()
