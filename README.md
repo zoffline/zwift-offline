@@ -301,7 +301,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 ### Step 7 [OPTIONAL]: Install Zwift Companion App
 
-* Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 <details><summary>Android (non-rooted device)</summary>
 
@@ -323,6 +323,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 </details>
 
 ### Extra optional steps
+
 <details><summary>Expand</summary>
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
