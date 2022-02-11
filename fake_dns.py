@@ -15,6 +15,7 @@ class DNSQuery:
                 l = data[i]
 
     def response(self):
+        packet = b''
         if self.domain:
             name = self.domain
             namemap = DNSServer.namemap
@@ -22,14 +23,13 @@ class DNSQuery:
                 ip = namemap[name]
             else:
                 ip = socket.gethostbyname_ex(name)[2][0]
-            packet = b''
             packet += self.data[:2] + b'\x81\x80'
             packet += self.data[4:6] + self.data[4:6] + b'\x00\x00\x00\x00'
             packet += self.data[12:]
             packet += b'\xc0\x0c'
             packet += b'\x00\x01\x00\x01\x00\x00\x00\x3c\x00\x04'
             packet += bytearray.fromhex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, ip.split('.'))))
-            return packet
+        return packet
 
 class DNSUDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
