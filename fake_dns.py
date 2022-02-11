@@ -30,9 +30,14 @@ class DNSQuery:
             return packet
 
 def fake_dns(server_ip):
-    udps = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    udps.bind(('', 53))
     while True:
-        data, addr = udps.recvfrom(1024)
-        p = DNSQuery(data)
-        udps.sendto(p.response(server_ip), addr)
+        udps = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udps.bind(('', 53))
+        try:
+            while True:
+                data, addr = udps.recvfrom(1024)
+                p = DNSQuery(data)
+                udps.sendto(p.response(server_ip), addr)
+        except Exception as e:
+            print('fake_dns: %s' % repr(e))
+            udps.close()
