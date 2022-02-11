@@ -35,8 +35,11 @@ class DNSUDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
         socket = self.request[1]
-        query = DNSQuery(data)
-        socket.sendto(query.response(), self.client_address)
+        try:
+            query = DNSQuery(data)
+            socket.sendto(query.response(), self.client_address)
+        except Exception as e:
+            print('fake_dns: %s' % repr(e))
 
 class DNSServer:
     def __init__(self, port=53):

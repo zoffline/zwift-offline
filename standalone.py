@@ -691,7 +691,6 @@ if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
     from fake_dns import fake_dns
     with open(SERVER_IP_FILE, 'r') as f:
         server_ip = f.read().rstrip('\r\n')
-        dnsthreadevent = threading.Event()
         dns = threading.Thread(target=fake_dns, args=(server_ip,))
         dns.start()
 
