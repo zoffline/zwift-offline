@@ -1,4 +1,4 @@
-import socket
+import dns.resolver
 import socketserver
 
 class DNSQuery:
@@ -22,7 +22,7 @@ class DNSQuery:
             if namemap.__contains__(name):
                 ip = namemap[name]
             else:
-                ip = socket.gethostbyname_ex(name)[2][0]
+                ip = DNSServer.resolver.resolve(name)[0].to_text()
             packet += self.data[:2] + b'\x81\x80'
             packet += self.data[4:6] + self.data[4:6] + b'\x00\x00\x00\x00'
             packet += self.data[12:]
@@ -44,6 +44,8 @@ class DNSUDPHandler(socketserver.BaseRequestHandler):
 class DNSServer:
     def __init__(self, port=53):
         DNSServer.namemap = {}
+        DNSServer.resolver = dns.resolver.Resolver()
+        DNSServer.resolver.nameservers = ['8.8.8.8']
         self.port = port
     def addname(self, name, ip):
         DNSServer.namemap[name] = ip
