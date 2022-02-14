@@ -28,7 +28,7 @@ class DNSQuery:
             packet += self.data[12:]
             packet += b'\xc0\x0c'
             packet += b'\x00\x01\x00\x01\x00\x00\x00\x3c\x00\x04'
-            packet += bytearray.fromhex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, ip.split('.'))))
+            packet += bytes(map(int, ip.split('.')))
         return packet
 
 class DNSUDPHandler(socketserver.BaseRequestHandler):
