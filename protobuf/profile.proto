@@ -320,7 +320,7 @@ private
 -1316403440="PACERBOTTUTORIAL" (1)
 */
 message Attribute {
-    required int64 id = 1;
+    required int32 id = 1;
     optional int64 number_value = 2;
     optional float float_value = 3;
     optional string string_value = 5;
