@@ -49,7 +49,7 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
     optional uint32 total_in_kom_jersey = 38;
     optional uint32 total_in_sprinters_jersey = 39;
     optional uint32 total_in_orange_jersey = 40;
-    optional uint32 total_watt_hours = 41;
+    optional uint32 total_watt_hours = 41; // = calories * 0.3256381927080305
     optional uint32 height_in_millimeters = 42;
     optional string dob = 43;
     optional uint32 max_heart_rate = 44;
@@ -73,7 +73,7 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
     
     optional uint32 achievement_level = 49;
     optional bool use_metric = 50;
-    optional bool f51 = 51; //??? empty
+    optional bool f51 = 51; // isRunner ??? -> +45.455 to something (BikeEntity::CreateNamePlate)
     optional uint32 power_source_model = 52;
     optional uint32 f53 = 53; //??? empty
     optional uint32 f54 = 54; //??? empty
@@ -108,14 +108,14 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
         ENROLLEDPROGRAM4 = 4;
     }
     
-    optional string f66 = 66; //??? empty
+    optional string todayplan_url = 66;
     optional uint32 f67 = 67; //??? empty
     optional fixed32 run_shirt_type = 68;
     optional fixed32 run_shorts_type = 69;
     optional fixed32 run_shoes_type = 70;
     optional fixed32 run_socks_type = 71;
     optional fixed32 run_helmet_type = 72;
-    optional fixed32 f73 = 73; //??? empty
+    optional fixed32 run_arm_accessory = 73;
     optional uint32 total_run_distance = 74;
     optional uint32 total_run_experience_points = 75;
     optional fixed32 f76 = 76; //??? empty
@@ -156,7 +156,7 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
     optional uint32 f104 = 104; //??? empty
     optional bool connected_to_withings = 105;
     optional bool connected_to_fitbit = 106;
-    repeated bytes f107 = 107; //android game: absent
+    /* no 107 repeated bytes */
     optional string launched_game_client = 108;
     optional int64 current_activity_id = 109;
     optional bool connected_to_garmin = 110;
@@ -320,8 +320,8 @@ private
 -1316403440="PACERBOTTUTORIAL" (1)
 */
 message Attribute {
-    required int32 id = 1;
-    optional uint64 number_value = 2;
+    required int64 id = 1;
+    optional int64 number_value = 2;
     optional float float_value = 3;
     optional string string_value = 5;
 }

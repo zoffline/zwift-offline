@@ -107,6 +107,7 @@ types:
             'id::tracking16_var': t_tracking
             'id::my_garage9_50': t_garage
             'id::achiev15_var': t_achiev
+            'id::challenge6_var': t_challenge
     enums:
       id:
         0x10000001: accessories1_100   #2048bit=0x100 bytes, for example "Humans/Accessories/Gloves/ZwiftKOMGloves01.xml" maps to bit 318
@@ -115,20 +116,50 @@ types:
         0x10000002: achiev_badges2_40  #512bit(bagdes deprecated by game_1_19_achievement_service_src_of_truth) = 0x40
         0x1000000C: achiev_badges2r_40 #=achiev_badges2_40 on read, not saved
 
-        0x10000006: save_type6_var     #current challenge
+        0x10000006: challenge6_var     #challenges: ChallengeManager::HandleSavedata
 
         0x10000009: my_garage9_50      #garage items
 
-        0x10000007: save_type7_40      #512bit = 0x40 (all 0)
+        0x10000007: save_type7_40      #512bit = 0x40 (all 0) - reserved for future?
         0x1000000D: save_type7r_40     #=save_type7_040on read, not saved
 
-        0x1000000F: achiev15_var       #AchievementManager chunks - badges in progress?
+        0x1000000F: achiev15_var       #AchievementManager chunks - badges in progress
 
         0x10000010: tracking16_var     #TrackingData
 
         0x10000011: old_goals17r_var   #old goals data format
 
         0x10000005: end_mark5          #mark end of all savings, no data
+  t_challenge:
+    seq:
+      - id: cur_challenge_id
+        type: u4
+        enum: e_str_crc32
+      - id: length
+        type: u4
+      - id: items
+        type: t_challenge_item
+        repeat: eos
+    types:
+      t_challenge_item:
+        seq:
+          - id: dummy0a
+            type: u4
+          - id: id
+            type: u4
+            enum: e_chal_hash
+          - id: total       #total counter, in meters (lazy updated)
+            type: f4
+          - id: accumulated #counted when challenge selected, in meters (lazy updated)
+            type: f4
+          - id: selected
+            type: u1
+          - id: dummy0b
+            type: u1
+          - id: garbage #or not?
+            type: u1
+          - id: dummy0c
+            type: u1
   t_achiev:
     seq:
       - id: items
@@ -196,6 +227,11 @@ types:
       - id: f4_val
         type: f4
 enums:
+  e_chal_hash:
+    1231:     climb_mt_everest
+    1234153:  ride_california
+    15313453: tour_italy
+    1234153:  challenge_unk
   e_vt_id:
     1: float
     2: int

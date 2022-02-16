@@ -44,27 +44,34 @@ message Player {
 
 message PlayerState {
 	optional int64 id = 1;
-	optional int64 worldTime = 2;
-	optional int32 distance = 3;
-	required int32 roadTime = 4;
+	optional int64 worldTime = 2; // milliseconds
+	optional int32 distance = 3;  // meters
+	optional int32 roadTime = 4;  // 1/100 sec
 	optional int32 laps = 5;
-	optional uint32 speed = 6;
+	optional uint32 speed = 6;    // millimeters per hour
 	optional uint32 f7 = 7;
 	optional int32 roadPosition = 8;
-	optional int32 cadenceUHz = 9;
-	optional int32 f10 = 10;
+	optional int32 cadenceUHz = 9; // =(cad / 60) * 1000000
+	optional int32 f10 = 10; // BikeEntity.field_B58=0
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
 	optional uint32 heading = 13;
 	optional int64 lean = 14;
-	optional int32 climbing = 15;
-	optional int32 time = 16;
+	optional int32 climbing = 15; // meters
+	optional int32 time = 16;     // seconds
 	optional int32 f17 = 17;
-	optional uint32 f18 = 18;
+	optional uint32 f18 = 18;    // BikeEntity.field_E38 * 255.0
+	//field 19:
+	//byte[0].bits[0,1]: HasPowerMeter, HasPhoneConnected
+	//byte[0].bits[2,3]: RoadDirectionForward, ??? !BikeEntity.field_DCC || BikeEntity.disSteer
+	//byte[0].bits[4]: читается в BikeEntity::ProcessNewPacket, имеет отношение к рулению
+	//byte[1]: =0 ???
+	//byte[2]: fallback for world in getMapRevisionId
+	//byte[3]: realRideons (not counted yet in BikeEntity::m_rideons) @ BikeEntity::UpdateRideOns
 	optional uint32 f19 = 19;
-	optional uint32 f20 = 20;
-	optional uint32 progress = 21;
-	optional int64 customisationId = 22;
+	optional uint32 f20 = 20; //road_id: (f20 & 0xff00) >> 8 (=16777231 -> road_id = 0)
+	optional uint32 progress = 21; // WorkoutMode = progress & 0xF
+	optional int64 customizationId = 22;
 	optional bool justWatching = 23;
 	optional int32 calories = 24;
 	optional float x = 25;
@@ -76,19 +83,19 @@ message PlayerState {
 	optional int32 sport = 31;
 	optional float f32 = 32;
 	optional uint32 f33 = 33;
-	optional float f34 = 34;
+	optional float f34 = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving)
 	optional int32 world = 35;
-	optional uint32 f36 = 36;
-	optional uint32 f37 = 37;
-	optional bool f38 = 38;
-	optional uint64 route = 39; //CHECKME: VarintParseSlow32 @ libzwiftjni.so 100317
+	optional uint32 f36 = 36; // = f(BikeEntity.field_2a28)
+	optional uint32 f37 = 37; // = f(BikeEntity.field_2a28)
+	optional bool canSteer = 38; // = BikeEntity.m_canSteer
+	optional int32 route = 39;
 }
 
 message ClientToServer {
 	required int64 connected = 1;
 	required int64 player_id = 2;
-	required int64 world_time = 3;
-	required int64 seqno = 4;
+	optional int64 world_time = 3;
+	optional int64 seqno = 4;
 	optional int64 f5 = 5;
 	optional int64 f6 = 6;
 	required PlayerState state = 7;
@@ -121,32 +128,32 @@ message PlayerSummaries {
 	repeated PlayerSummary player_summaries = 8;
 }
 
-message RelayAddress { // = tcp-node-msgs::ServerDetails ???
-	optional int32 f1 = 1;
-	optional int32 f2 = 2;
+message RelayAddress {
+	optional int32 f1 = 1; //=1?; =0?
+	optional int32 f2 = 2; //=6?; =0?
 	optional string ip = 3;
 	optional int32 port = 4;
 	optional float f5 = 5; //or fixed
 	optional float f6 = 6; //or fixed
 }
 
-message UdpConfig { // = tcp-node-msgs::ServersType1 ???
+message UdpConfig {
 	repeated RelayAddress relay_addresses = 1;
-	optional int32 f2 = 2;
-	optional int32 f3 = 3;
-	optional int32 f4 = 4;
+	optional int32 f2 = 2; //=10?
+	optional int32 f3 = 3; //=30?
+	optional int32 f4 = 4; //=3?
 }
 
-message RelayAddressesVOD { // = tcp-node-msgs::ServerConnectionDetailsWrapper ???
-	optional int32 f1 = 1;
-	optional int32 f2 = 2;
-	repeated RelayAddress relay_address = 3;
+message RelayAddressesVOD {
+	optional int32 f1 = 1; //=1?; =0?
+	optional int32 f2 = 2; //=6?; =0?
+	repeated RelayAddress relay_addresses = 3;
 	optional bool f4 = 4;
 }
 
-message UdpConfigVOD { // = tcp-node-msgs::ServersType2 ???
-	repeated RelayAddressesVOD relay_addresses = 1;
-	optional int32 f2 = 2;
+message UdpConfigVOD {
+	repeated RelayAddressesVOD relay_addresses_vod = 1;
+	optional int32 port = 2;
 	optional int64 f3 = 3;
 	optional int64 f4 = 4;
 	optional float f5 = 5; //or fixed
@@ -171,22 +178,22 @@ message EventSubgroupPlacements {
 	optional float f9 = 9; //or fixed
 }
 
-message ServerToClient { // = tcp-node-msgs::TCPServerInfo ???
-	required int64 f1 = 1;
-	required int64 player_id = 2;
-	required int64 world_time = 3;
+message ServerToClient {
+	optional int64 f1 = 1;
+	optional int64 player_id = 2;
+	optional int64 world_time = 3;
 	optional int32 seqno = 4;
 	optional int32 f5 = 5;
 	/* 6,7: absent */
 	repeated PlayerState states = 8;
 	repeated WorldAttribute updates = 9;
 	optional int64 f10 = 10;
-	optional bool f11 = 11;
-	optional string f12 = 12;
+	optional bool f11 = 11; //=true???
+	optional string zc_local_ip = 12;
 	optional int64 f13 = 13;
 	optional int32 f14 = 14;
-	optional int32 f15 = 15;
-	optional int32 f16 = 16;
+	optional int32 zc_local_port = 15;
+	optional int32 kind = 16;
 	optional int64 f17 = 17;
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;

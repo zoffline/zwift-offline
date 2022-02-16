@@ -145,29 +145,48 @@ def jsf(obj, field, deflt = 0):
         return getattr(obj, field)
     return deflt
 
-def sync_par(profile_zo, changed_zo, profile_ext, changed_ext, par):
-    print('Syncing %s:' % par)
+def sync_par_max(profile_zo, changed_zo, profile_ext, changed_ext, par):
     zo_val = jsf(profile_zo, par)
     ext_val = jsf(profile_ext, par)
     if (zo_val == ext_val):
-        #print (' eq %s\n' % zo_val)
-        pass
+        print ('SyncMax %s: eq %s' % (par, zo_val))
     else:
         if (zo_val > ext_val):
-            print ('zo=%s > ext=%s\n' % (zo_val, ext_val))
+            print ('SyncMax %s: zo=%s > ext=%s' % (par, zo_val, ext_val))
             setattr(profile_ext, par, zo_val)
             changed_ext = True
         else:
-            print ('zo=%s < ext=%s\n' % (zo_val, ext_val))
+            print ('SyncMax %s: zo=%s < ext=%s' % (par, zo_val, ext_val))
             setattr(profile_zo, par, ext_val)
             changed_zo = True
     return (changed_zo, changed_ext)
 
-def do_sync(profile_zo, profile_ext):
+def sync_par_acc(profile_base, profile_zo, changed_zo, profile_ext, changed_ext, par):
+    base_val = jsf(profile_base, par)
+    zo_val = jsf(profile_zo, par)
+    ext_val = jsf(profile_ext, par)
+    if (zo_val == ext_val):
+        print ('SyncAcc %s: eq %s' % (par, zo_val))
+    else:
+        dzo = zo_val - base_val
+        dext = ext_val - base_val
+        result = base_val + dzo + dext
+        print ('SyncAcc %s: zo=%s dzo=%s ext=%s dext=%s result=%s' % (par, zo_val, dzo, ext_val, dext, result))
+        if (result > ext_val):
+            setattr(profile_ext, par, result)
+            changed_ext = True
+        if (result > zo_val):
+            setattr(profile_zo, par, result)
+            changed_zo = True
+    return (changed_zo, changed_ext)
+
+def do_sync(profile_base, profile_zo, profile_ext):
     changed_zo = False
     changed_ext = False
-    for par in ('ftp','total_distance_in_meters','elevation_gain_in_meters','time_ridden_in_minutes','total_in_kom_jersey','total_in_sprinters_jersey','total_in_orange_jersey', 'total_watt_hours', 'height_in_millimeters', 'max_heart_rate', 'total_xp','total_gold_drops','achievement_level'):
-        changed_zo, changed_ext = sync_par(profile_zo, changed_zo, profile_ext, changed_ext, par)
+    for par in ('ftp','height_in_millimeters','max_heart_rate'):
+        changed_zo, changed_ext = sync_par_max(profile_zo, changed_zo, profile_ext, changed_ext, par)
+    for par in ('total_distance_in_meters','achievement_level','elevation_gain_in_meters','time_ridden_in_minutes','total_in_kom_jersey','total_in_sprinters_jersey','total_in_orange_jersey', 'total_watt_hours', 'total_xp','total_gold_drops'):
+        changed_zo, changed_ext = sync_par_acc(profile_base, profile_zo, changed_zo, profile_ext, changed_ext, par)
     #todo:
     #optional bytes challenge_info = 33;
     return (changed_zo, changed_ext)
@@ -179,8 +198,13 @@ def sync(zo_uid, ext_uid, user, password):
 
     profile_zo = profile_pb2.Profile()
     profile_zo_file = '%s/profile.bin' % zo_uid
-    with open(profile_zo_file, 'rb') as fd:
-        profile_zo.ParseFromString(fd.read())
+    with open(profile_zo_file, 'rb') as f:
+        profile_zo.ParseFromString(f.read())
+
+    profile_base = profile_pb2.Profile()
+    profile_base_file = '../../zoffline-helper/%s/last_synced.bin' % ext_uid
+    with open(profile_base_file, 'rb') as f:
+        profile_base.ParseFromString(f.read())
 
     profile_ext = profile_pb2.Profile()
     profile_ext_bin = query_player_profile(session, access_token)
@@ -188,14 +212,16 @@ def sync(zo_uid, ext_uid, user, password):
         f.write(profile_ext_bin)
     profile_ext.ParseFromString(profile_ext_bin)
 
-    changed_zo, changed_ext = do_sync(profile_zo, profile_ext)
+    changed_zo, changed_ext = do_sync(profile_base, profile_zo, profile_ext)
 
     if(changed_zo):
         with open(profile_zo_file, 'wb') as f:
-            f.write(profile_zo)
+            f.write(profile_zo.SerializeToString())
+
     profile_ext_file = '../../zoffline-helper/%s/tx-%s.bin' % (ext_uid, uuid.uuid4().hex)
     with open(profile_ext_file, 'wb') as f:
         f.write(profile_ext.SerializeToString())
+
     if(changed_ext):
         with open(profile_ext_file, 'rb') as f:
             put_player_profile(session, access_token, f, ext_uid)

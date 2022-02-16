@@ -4,65 +4,6 @@ syntax = "proto2";
 // Initial TCP response below
 ////////////////////////////////////////
 
-message ServerDetails { //TODO: check if original name = RelayAddress
-        required int32 f1 = 1;
-	required int32 f2 = 2;
-	required string ip = 3;
-	required int32 port = 4;
-}
-
-message ServersType1 { //TODO: check if original name = UdpConfig
-	repeated ServerDetails details = 1;
-        optional int32 f2 = 2;
-        optional int32 f3 = 3;
-        optional int32 f4 = 4;
-}
-
-message ServerConnectionDetailsWrapper { //TODO: check if original name = RelayAddressesVOD
-	required int32 f1 = 1;  // Value seems to be the same as ConnDetails' f1
-	required int32 f2 = 2;  // Value seems to be the same as ConnDetails' f2
-	repeated ServerDetails details = 3;
-}
-
-message ServersType2 { //TODO: check if original name = UdpConfigVOD
-	repeated ServerConnectionDetailsWrapper details_wrapper = 1;
-	required int32 port = 2;
-}
-
-message TCPServerInfo { //TODO: check if original name = ServerToClient
-	optional int32 f1 = 1;
-	required int32 player_id = 2;
-	required int32 f3 = 3;
-	repeated ServersType1 servers = 24;
-	repeated ServersType2 other_servers = 25;
-}
-
-message TCPHello { //TODO: check if original name = ServerToClient
-	required int32 player_id = 2;
-	optional int32 f3 = 3; // ?? always 0?
-	optional int32 seqno = 4;
-	optional int32 f13 = 13;
-}
-
-message TCPCompanionConnect { //TODO: check if original name = ServerToClient
-	required int32 player_id = 2;
-	required int32 dummy = 3;
-	required string zc_local_ip = 12;
-	required int32 zc_local_port = 15;
-	required int32 kind = 16;
-}
-
-////////////////////////////////////////
-// Recurring TCP response below
-////////////////////////////////////////
-
-message RecurringTCPResponse { //TODO: check if original name = ServerToClient
-	optional int32 f1 = 1;
-	optional int32 player_id = 2;
-	optional int32 f3 = 3;
-	optional int32 f11 = 11;
-}
-
 // Zwift companion protocol
 //TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=0?, SOCIAL_TEXT_MESSAGE=1?, SOCIAL_FLAG=?, ?=?
 message SocialPlayerAction { //=wrong named ChatMessage?
