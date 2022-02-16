@@ -289,6 +289,9 @@ def get_online():
     return online_in_region
 
 
+def toSigned(n, byte_count):
+    return int.from_bytes(n.to_bytes(byte_count, 'little'), 'little', signed=True)
+
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
         #Read from disk
@@ -309,9 +312,12 @@ def get_partial_profile(player_id):
                     partial_profile.country_code = profile.country_code
                     for f in profile.public_attributes:
                         #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
-                        #TODO: -1021012238: figure out
-                        if f.id == 1766985504 or f.id == -1021012238:  #-1021012238 == 3273955058
-                            partial_profile.route = f.number_value
+                        #TODO: 3273955058: figure out
+                        if f.id == 1766985504 or f.id == 3273955058:
+                            if f.number_value >= 0:
+                                partial_profile.route = toSigned(f.number_value, 4)
+                            else:
+                                partial_profile.route = -toSigned(-f.number_value, 4)
                             break
                     player_partial_profiles[player_id] = partial_profile
             except Exception as exc:
@@ -1836,9 +1842,9 @@ def add_player_to_world(player, course_world, is_pace_partner):
                 online_player = course_world[course_id].pace_partner_states.add()
                 online_player.route = partial_profile.route
                 if player.sport == 0:
-                    online_player.f18 = player.power
+                    online_player.ride_power = player.power
                 else:
-                    online_player.f19 = player.speed
+                    online_player.speed = player.speed
             else:
                 online_player = course_world[course_id].player_states.add()
             online_player.id = player.id
@@ -1846,13 +1852,13 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.lastName = partial_profile.last_name
             online_player.distance = player.distance
             online_player.time = player.time
-            online_player.f6 = partial_profile.country_code
-            online_player.f8 = player.sport
+            online_player.country_code = partial_profile.country_code
+            online_player.sport = player.sport
             online_player.power = player.power
             online_player.x = player.x
             online_player.altitude = player.altitude
             online_player.y = player.y
-            course_world[course_id].f5 += 1
+            course_world[course_id].zwifters += 1
 
 
 def relay_worlds_generic(world_id=None):
@@ -1936,7 +1942,7 @@ def relay_worlds_generic(world_id=None):
             world.f3 = course
             world.world_time = world_time()
             world.real_time = int(get_utc_time())
-            world.f5 = 0
+            world.zwifters = 0
             course_world[course] = world
         for p_id in online.keys():
             player = online[p_id]

@@ -249,31 +249,21 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        #zc_params = tcp_node_msgs_pb2.PhoneToGame()
-        #zc_params.player_id = 1
-        #cmd = zc_params.command.add()
-        #cmd.seqno = 1
-        #cmd.command = 1
-        #cmd.command_copy = 1
-        #zc_params_payload = zc_params.SerializeToString()
-        ##self.request.sendall(struct.pack('!h', len(zc_params_payload)))
-        ##self.request.sendall(zc_params_payload)
-        #print("camera: " + zc_params_payload.hex())
         self.data = self.request.recv(1024)
         #print("TCPHandler hello: %s" % self.data.hex())
-        hello = tcp_node_msgs_pb2.TCPHello()
+        hello = udp_node_msgs_pb2.ClientToServer()
         try:
-            hello.ParseFromString(self.data[4:-4]) #2 bytes: length, 2 bytes: unrecognised; 4 bytes: CRC?
+            hello.ParseFromString(self.data[4:-4]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
+            #type: TcpClient::sayHello(=0x0), TcpClient::sendSubscribeToSegment(=0x1), TcpClient::processSegmentUnsubscription(=0x1)
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
-        msg = tcp_node_msgs_pb2.TCPServerInfo()
+        msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
-        msg.f3 = 0
-        servers = msg.servers.add()
+        msg.world_time = 0
         if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
             udp_node_ip = "127.0.0.1"
         elif os.path.exists(SERVER_IP_FILE):
@@ -281,31 +271,30 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 udp_node_ip = f.read().rstrip('\r\n')
         else:
             udp_node_ip = "127.0.0.1"
-        details1 = servers.details.add()
+        details1 = msg.udp_config.relay_addresses.add()
         details1.f1 = 1
         details1.f2 = 6
         details1.ip = udp_node_ip
         details1.port = 3022
-        details2 = servers.details.add()
+        details2 = msg.udp_config.relay_addresses.add()
         details2.f1 = 0
         details2.f2 = 0
         details2.ip = udp_node_ip
         details2.port = 3022
-        servers.f2 = 10
-        servers.f3 = 30
-        servers.f4 = 3
-        other_servers = msg.other_servers.add()
-        wdetails1 = other_servers.details_wrapper.add()
+        msg.udp_config.f2 = 10
+        msg.udp_config.f3 = 30
+        msg.udp_config.f4 = 3
+        wdetails1 = msg.udp_config_vod_1.relay_addresses_vod.add()
         wdetails1.f1 = 1
         wdetails1.f2 = 6
-        details3 = wdetails1.details.add()
+        details3 = wdetails1.relay_addresses.add()
         details3.CopyFrom(details1)
-        wdetails2 = other_servers.details_wrapper.add()
+        wdetails2 = msg.udp_config_vod_1.relay_addresses_vod.add()
         wdetails2.f1 = 0
         wdetails2.f2 = 0
-        details4 = wdetails2.details.add()
+        details4 = wdetails2.relay_addresses.add()
         details4.CopyFrom(details2)
-        other_servers.port = 3022
+        msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
         # Send size of payload as 2 bytes
         self.request.sendall(struct.pack('!h', len(payload)))
@@ -313,10 +302,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
-        msg = tcp_node_msgs_pb2.RecurringTCPResponse()
+        msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = player_id
-        msg.f3 = 0
-        msg.f11 = 1
+        msg.world_time = 0
+        msg.f11 = True
         payload = msg.SerializeToString()
 
         last_alive_check = int(zwift_offline.get_utc_time())
@@ -328,9 +317,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
                 #if ZC need to be registered
                 if player_id in zwift_offline.zc_connect_queue: # and player_id in online:
-                    zc_params = tcp_node_msgs_pb2.TCPCompanionConnect()
+                    zc_params = udp_node_msgs_pb2.ServerToClient()
                     zc_params.player_id = player_id
-                    zc_params.dummy = 0 #what is it?
+                    zc_params.world_time = 0
                     zc_params.zc_local_ip = zwift_offline.zc_connect_queue[player_id][0]
                     zc_params.zc_local_port = zwift_offline.zc_connect_queue[player_id][1] #21587
                     zc_params.kind = 2 #TCP
