@@ -55,7 +55,7 @@ message PlayerState {
 	optional int32 f10 = 10; // BikeEntity.field_B58=0
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
-	optional uint32 heading = 13;
+	optional int64 heading = 13;
 	optional int64 lean = 14;
 	optional int32 climbing = 15; // meters
 	optional int32 time = 16;     // seconds
@@ -95,11 +95,11 @@ message ClientToServer {
 	required int64 connected = 1;
 	required int64 player_id = 2;
 	optional int64 world_time = 3;
-	optional int64 seqno = 4;
-	optional int64 f5 = 5;
+	optional uint32 seqno = 4;
+	optional uint32 f5 = 5;
 	optional int64 f6 = 6;
 	required PlayerState state = 7;
-	required int64 f8 = 8;
+	optional int64 f8 = 8;
 	optional int64 f9 = 9; // absent @ libzwiftjni.so 100317
 	required int64 last_update = 10;
 	optional int64 f11 = 11;
