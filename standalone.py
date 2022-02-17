@@ -47,12 +47,9 @@ SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 MAP_OVERRIDE = deque(maxlen=16)
 
-online_update_freq = 1
 ghost_update_freq = 3
 pacer_update_freq = 1
 bot_update_freq = 3
-last_updates = {}
-last_online_updates = {}
 last_pp_updates = {}
 last_bot_updates = {}
 global_ghosts = {}
@@ -492,6 +489,18 @@ def get_empty_message(player_id):
     message.msgnum = 1
     return message
 
+global_news = {} #player id to dictionary of peer_player_id->worldTime
+def is_state_new_for(peer_player_state, player_id):
+    if not player_id in global_news.keys():
+        global_news[player_id] = {}
+    for_news = global_news[player_id]
+    if peer_player_state.id in for_news.keys():
+        if for_news[peer_player_state.id] == peer_player_state.worldTime:
+            #print("is_state_new_for guard")
+            return False #already sent
+    for_news[peer_player_state.id] = peer_player_state.worldTime
+    return True
+
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         global discord
@@ -515,10 +524,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         state = recv.state
 
         #Add last updates for player if missing
-        if not player_id in last_updates.keys():
-            last_updates[player_id] = 0
-        if not player_id in last_online_updates.keys():
-            last_online_updates[player_id] = 0
         if not player_id in last_pp_updates.keys():
             last_pp_updates[player_id] = 0
         if not player_id in last_bot_updates.keys():
@@ -527,8 +532,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         t = int(zwift_offline.get_utc_time())
 
         #Update player online state
-        if state.roadTime and t >= last_updates[player_id] + online_update_freq:
-            last_updates[player_id] = t
+        if state.roadTime:
             if (not player_id in online.keys()) and ('discord' in globals()):
                 discord.send_message('%s riders online' % (len(online) + 1))
             online[player_id] = state
@@ -600,12 +604,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Check if online players, pace partners, bots and ghosts are nearby
         nearby = list()
-        if t >= last_online_updates[player_id] + online_update_freq:
-            last_online_updates[player_id] = t
-            for p_id in online.keys():
-                player = online[p_id]
-                if player.id != player_id and zwift_offline.is_nearby(watching_state, player):
-                    nearby.append(p_id)
+        for p_id in online.keys():
+            player = online[p_id]
+            if player.id != player_id and zwift_offline.is_nearby(watching_state, player) and is_state_new_for(player, player_id):
+                nearby.append(p_id)
         if t >= last_pp_updates[player_id] + pacer_update_freq:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
