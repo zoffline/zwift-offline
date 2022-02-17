@@ -312,8 +312,8 @@ def get_partial_profile(player_id):
                     partial_profile.country_code = profile.country_code
                     for f in profile.public_attributes:
                         #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
-                        #TODO: 3273955058: figure out
-                        if f.id == 1766985504 or f.id == 3273955058:
+                        #TODO: -1021012238: figure out
+                        if f.id == 1766985504 or f.id == -1021012238:  #-1021012238 == 3273955058
                             if f.number_value >= 0:
                                 partial_profile.route = toSigned(f.number_value, 4)
                             else:
