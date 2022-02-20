@@ -40,6 +40,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
+import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
 import protobuf.login_response_pb2 as login_response_pb2
@@ -660,10 +661,10 @@ def send_message_to_all_online(message, sender='Server'):
     player_update.f12 = 1
     player_update.f14 = int(get_utc_time()*1000000)
 
-    chat_message = udp_node_msgs_pb2.ChatMessage()
-    chat_message.rider_id = 0
-    chat_message.to_rider_id = 0
-    chat_message.f3 = 1
+    chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
+    chat_message.player_id = 0
+    chat_message.to_player_id = 0
+    chat_message.type = 1
     chat_message.firstName = sender
     chat_message.lastName = ''
     chat_message.message = message
@@ -1672,8 +1673,8 @@ def api_profiles_activities_rideon(recieving_player_id):
         player_update.f14 = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
-        ride_on.rider_id = int(sending_player_id)
-        ride_on.to_rider_id = int(recieving_player_id)
+        ride_on.player_id = int(sending_player_id)
+        ride_on.to_player_id = int(recieving_player_id)
         ride_on.firstName = profile.first_name
         ride_on.lastName = profile.last_name
         ride_on.countryCode = profile.country_code
@@ -1853,7 +1854,7 @@ def relay_worlds_generic(world_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
-            #chat_message = udp_node_msgs_pb2.ChatMessage()
+            #chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
             #serializedMessage = None
             try:
                 player_update = udp_node_msgs_pb2.PlayerUpdate()
@@ -1887,9 +1888,9 @@ def relay_worlds_generic(world_id=None):
                     recieving_player = online[recieving_player_id]
                     #Chat message
                     if player_update.type == 5:
-                        chat_message = udp_node_msgs_pb2.ChatMessage()
+                        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                         chat_message.ParseFromString(player_update.payload)
-                        sending_player_id = chat_message.rider_id
+                        sending_player_id = chat_message.player_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
@@ -1897,9 +1898,9 @@ def relay_worlds_generic(world_id=None):
                                 should_receive = True
                     #Segment complete
                     else:
-                        segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                        segment_complete = segment_result_pb2.SegmentResult()
                         segment_complete.ParseFromString(player_update.payload)
-                        sending_player_id = segment_complete.rider_id
+                        sending_player_id = segment_complete.player_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
                             #Check that players are on same course
@@ -1913,9 +1914,9 @@ def relay_worlds_generic(world_id=None):
                         player_update_queue[recieving_player_id] = list()
                     player_update_queue[recieving_player_id].append(player_update.SerializeToString())
             if player_update.type == 5:
-                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
-                discord.send_message(chat_message.message, chat_message.rider_id)
+                discord.send_message(chat_message.message, chat_message.player_id)
         return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.DropInWorldList()
@@ -2031,18 +2032,18 @@ def relay_worlds_attributes():
             receiving_player = online[receiving_player_id]
             # Chat message
             if player_update.type == 5:
-                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
-                sending_player_id = chat_message.rider_id
+                sending_player_id = chat_message.player_id
                 if sending_player_id in online:
                     sending_player = online[sending_player_id]
                     if is_nearby(sending_player, receiving_player):
                         should_receive = True
             # Segment complete
             else:
-                segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                segment_complete = segment_result_pb2.SegmentResult()
                 segment_complete.ParseFromString(player_update.payload)
-                sending_player_id = segment_complete.rider_id
+                sending_player_id = segment_complete.player_id
                 if sending_player_id in online:
                     sending_player = online[sending_player_id]
                     if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
@@ -2056,9 +2057,9 @@ def relay_worlds_attributes():
             player_update_queue[receiving_player_id].append(player_update.SerializeToString())
     # If it's a chat message, send to Discord
     if player_update.type == 5:
-        chat_message = udp_node_msgs_pb2.ChatMessage()
+        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
         chat_message.ParseFromString(player_update.payload)
-        discord.send_message(chat_message.message, chat_message.rider_id)
+        discord.send_message(chat_message.message, chat_message.player_id)
     return '', 201
 
 

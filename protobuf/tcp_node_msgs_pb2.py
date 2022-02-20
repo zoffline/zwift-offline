@@ -14,19 +14,11 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13tcp-node-msgs.proto\"\xd2\x01\n\x12SocialPlayerAction\x12\x10\n\x08rider_id\x18\x01 \x01(\x03\x12\x13\n\x0bto_rider_id\x18\x02 \x01(\x03\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\x12\x11\n\tfirstName\x18\x04 \x01(\t\x12\x10\n\x08lastName\x18\x05 \x01(\t\x12\x0f\n\x07message\x18\x06 \x01(\t\x12\x0e\n\x06\x61vatar\x18\x07 \x01(\t\x12\x13\n\x0b\x63ountryCode\x18\x08 \x01(\x05\x12\n\n\x02\x66\x39\x18\t \x01(\x05\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\x05\x12\x15\n\reventSubgroup\x18\x0b \x01(\x03\"-\n\x13MobileAlertResponse\x12\n\n\x02\x66\x31\x18\x01 \x01(\x03\x12\n\n\x02\x66\x32\x18\x02 \x01(\x03\"5\n\x1b\x42LEPeripheralCharacteristic\x12\n\n\x02\x66\x31\x18\x01 \x01(\t\x12\n\n\x02\x66\x32\x18\x02 \x01(\x0c\"\x81\x01\n\x15\x42LEPeripheralResponse\x12\n\n\x02\x66\x31\x18\x01 \x01(\r\x12\n\n\x02\x66\x32\x18\x02 \x01(\r\x12\n\n\x02\x66\x33\x18\x03 \x01(\t\x12\x1a\n\x02\x66\x34\x18\x04 \x01(\x0b\x32\x0e.BLEPeripheral\x12(\n\x02\x66\x35\x18\x05 \x01(\x0b\x32\x1c.BLEPeripheralCharacteristic\"5\n\x1b\x42LEAdvertisementDataSection\x12\n\n\x02\x66\x31\x18\x01 \x01(\x05\x12\n\n\x02\x66\x32\x18\x02 \x01(\x0c\"3\n\rBLEPeripheral\x12\n\n\x02\x66\x31\x18\x01 \x01(\t\x12\n\n\x02\x66\x32\x18\x02 \x01(\t\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\"d\n\x10\x42LEAdvertisement\x12\x1a\n\x02\x66\x31\x18\x01 \x01(\x0b\x32\x0e.BLEPeripheral\x12(\n\x02\x66\x32\x18\x02 \x03(\x0b\x32\x1c.BLEAdvertisementDataSection\x12\n\n\x02\x66\x33\x18\x03 \x01(\x05\"\xcf\x02\n\x12PhoneToGameCommand\x12\r\n\x05seqno\x18\x01 \x02(\x05\x12\x0f\n\x07\x63ommand\x18\x02 \x02(\r\x12\n\n\x02\x66\x33\x18\x03 \x01(\x03\x12\n\n\x02\x66\x34\x18\x04 \x01(\t\x12\n\n\x02\x66\x35\x18\x05 \x01(\x03\x12\n\n\x02\x66\x36\x18\x06 \x01(\t\x12\n\n\x02\x66\x37\x18\x07 \x01(\x03\x12\n\n\x02\x66\x38\x18\x08 \x01(\x05\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x14\n\x0c\x63ommand_copy\x18\n \x02(\r\x12 \n\x03\x66\x31\x31\x18\x0b \x01(\x0b\x32\x13.SocialPlayerAction\x12!\n\x03\x66\x31\x33\x18\r \x01(\x0b\x32\x14.MobileAlertResponse\x12#\n\x03\x66\x31\x38\x18\x12 \x01(\x0b\x32\x16.BLEPeripheralResponse\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\x03\x12\x0b\n\x03\x66\x32\x30\x18\x14 \x01(\t\x12\x0b\n\x03\x66\x32\x31\x18\x15 \x01(\x0c\x12\x1e\n\x03\x66\x32\x32\x18\x16 \x01(\x0b\x32\x11.BLEAdvertisement\"\xa7\x01\n\x0bPhoneToGame\x12\x11\n\tplayer_id\x18\x01 \x02(\x03\x12$\n\x07\x63ommand\x18\x02 \x03(\x0b\x32\x13.PhoneToGameCommand\x12\n\n\x02\x66\x33\x18\x03 \x01(\x02\x12\n\n\x02\x66\x34\x18\x04 \x01(\x02\x12\n\n\x02\x66\x35\x18\x05 \x01(\x02\x12\n\n\x02\x66\x36\x18\x06 \x01(\x02\x12\n\n\x02\x66\x37\x18\x07 \x01(\x02\x12\n\n\x02\x66\x38\x18\x08 \x01(\x02\x12\n\n\x02\x66\x39\x18\t \x01(\x01\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\x05')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13tcp-node-msgs.proto\"\xdf\x01\n\x12SocialPlayerAction\x12\x11\n\tplayer_id\x18\x01 \x01(\x03\x12\x14\n\x0cto_player_id\x18\x02 \x01(\x03\x12\x0c\n\x04type\x18\x03 \x01(\x03\x12\x11\n\tfirstName\x18\x04 \x01(\t\x12\x10\n\x08lastName\x18\x05 \x01(\t\x12\x0f\n\x07message\x18\x06 \x01(\t\x12\x0e\n\x06\x61vatar\x18\x07 \x01(\t\x12\x13\n\x0b\x63ountryCode\x18\x08 \x01(\x05\x12\x10\n\x08\x66lagType\x18\t \x01(\x03\x12\x0e\n\x06mgType\x18\n \x01(\x03\x12\x15\n\reventSubgroup\x18\x0b \x01(\x03')
 
 
 
 _SOCIALPLAYERACTION = DESCRIPTOR.message_types_by_name['SocialPlayerAction']
-_MOBILEALERTRESPONSE = DESCRIPTOR.message_types_by_name['MobileAlertResponse']
-_BLEPERIPHERALCHARACTERISTIC = DESCRIPTOR.message_types_by_name['BLEPeripheralCharacteristic']
-_BLEPERIPHERALRESPONSE = DESCRIPTOR.message_types_by_name['BLEPeripheralResponse']
-_BLEADVERTISEMENTDATASECTION = DESCRIPTOR.message_types_by_name['BLEAdvertisementDataSection']
-_BLEPERIPHERAL = DESCRIPTOR.message_types_by_name['BLEPeripheral']
-_BLEADVERTISEMENT = DESCRIPTOR.message_types_by_name['BLEAdvertisement']
-_PHONETOGAMECOMMAND = DESCRIPTOR.message_types_by_name['PhoneToGameCommand']
-_PHONETOGAME = DESCRIPTOR.message_types_by_name['PhoneToGame']
 SocialPlayerAction = _reflection.GeneratedProtocolMessageType('SocialPlayerAction', (_message.Message,), {
   'DESCRIPTOR' : _SOCIALPLAYERACTION,
   '__module__' : 'tcp_node_msgs_pb2'
@@ -34,81 +26,9 @@ SocialPlayerAction = _reflection.GeneratedProtocolMessageType('SocialPlayerActio
   })
 _sym_db.RegisterMessage(SocialPlayerAction)
 
-MobileAlertResponse = _reflection.GeneratedProtocolMessageType('MobileAlertResponse', (_message.Message,), {
-  'DESCRIPTOR' : _MOBILEALERTRESPONSE,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:MobileAlertResponse)
-  })
-_sym_db.RegisterMessage(MobileAlertResponse)
-
-BLEPeripheralCharacteristic = _reflection.GeneratedProtocolMessageType('BLEPeripheralCharacteristic', (_message.Message,), {
-  'DESCRIPTOR' : _BLEPERIPHERALCHARACTERISTIC,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:BLEPeripheralCharacteristic)
-  })
-_sym_db.RegisterMessage(BLEPeripheralCharacteristic)
-
-BLEPeripheralResponse = _reflection.GeneratedProtocolMessageType('BLEPeripheralResponse', (_message.Message,), {
-  'DESCRIPTOR' : _BLEPERIPHERALRESPONSE,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:BLEPeripheralResponse)
-  })
-_sym_db.RegisterMessage(BLEPeripheralResponse)
-
-BLEAdvertisementDataSection = _reflection.GeneratedProtocolMessageType('BLEAdvertisementDataSection', (_message.Message,), {
-  'DESCRIPTOR' : _BLEADVERTISEMENTDATASECTION,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:BLEAdvertisementDataSection)
-  })
-_sym_db.RegisterMessage(BLEAdvertisementDataSection)
-
-BLEPeripheral = _reflection.GeneratedProtocolMessageType('BLEPeripheral', (_message.Message,), {
-  'DESCRIPTOR' : _BLEPERIPHERAL,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:BLEPeripheral)
-  })
-_sym_db.RegisterMessage(BLEPeripheral)
-
-BLEAdvertisement = _reflection.GeneratedProtocolMessageType('BLEAdvertisement', (_message.Message,), {
-  'DESCRIPTOR' : _BLEADVERTISEMENT,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:BLEAdvertisement)
-  })
-_sym_db.RegisterMessage(BLEAdvertisement)
-
-PhoneToGameCommand = _reflection.GeneratedProtocolMessageType('PhoneToGameCommand', (_message.Message,), {
-  'DESCRIPTOR' : _PHONETOGAMECOMMAND,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:PhoneToGameCommand)
-  })
-_sym_db.RegisterMessage(PhoneToGameCommand)
-
-PhoneToGame = _reflection.GeneratedProtocolMessageType('PhoneToGame', (_message.Message,), {
-  'DESCRIPTOR' : _PHONETOGAME,
-  '__module__' : 'tcp_node_msgs_pb2'
-  # @@protoc_insertion_point(class_scope:PhoneToGame)
-  })
-_sym_db.RegisterMessage(PhoneToGame)
-
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _SOCIALPLAYERACTION._serialized_start=24
-  _SOCIALPLAYERACTION._serialized_end=234
-  _MOBILEALERTRESPONSE._serialized_start=236
-  _MOBILEALERTRESPONSE._serialized_end=281
-  _BLEPERIPHERALCHARACTERISTIC._serialized_start=283
-  _BLEPERIPHERALCHARACTERISTIC._serialized_end=336
-  _BLEPERIPHERALRESPONSE._serialized_start=339
-  _BLEPERIPHERALRESPONSE._serialized_end=468
-  _BLEADVERTISEMENTDATASECTION._serialized_start=470
-  _BLEADVERTISEMENTDATASECTION._serialized_end=523
-  _BLEPERIPHERAL._serialized_start=525
-  _BLEPERIPHERAL._serialized_end=576
-  _BLEADVERTISEMENT._serialized_start=578
-  _BLEADVERTISEMENT._serialized_end=678
-  _PHONETOGAMECOMMAND._serialized_start=681
-  _PHONETOGAMECOMMAND._serialized_end=1016
-  _PHONETOGAME._serialized_start=1019
-  _PHONETOGAME._serialized_end=1186
+  _SOCIALPLAYERACTION._serialized_end=247
 # @@protoc_insertion_point(module_scope)
