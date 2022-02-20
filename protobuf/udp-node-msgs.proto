@@ -64,10 +64,10 @@ message PlayerState {
 	//field 19:
 	//byte[0].bits[0,1]: HasPowerMeter, HasPhoneConnected
 	//byte[0].bits[2,3]: RoadDirectionForward, ??? !BikeEntity.field_DCC || BikeEntity.disSteer
-	//byte[0].bits[4]: читается в BikeEntity::ProcessNewPacket, имеет отношение к рулению
+	//byte[0].bits[4]: read in BikeEntity::ProcessNewPacket, steering-related
 	//byte[1]: =0 ???
 	//byte[2]: fallback for world in getMapRevisionId
-	//byte[3]: realRideons (not counted yet in BikeEntity::m_rideons) @ BikeEntity::UpdateRideOns
+	//byte[3]: realRideons (not counted yet in BikeEntity::m_rideons) @ BikeEntity::UpdateRideOns, see also BikeEntity::Update
 	optional uint32 f19 = 19;
 	optional uint32 f20 = 20; //road_id: (f20 & 0xff00) >> 8 (=16777231 -> road_id = 0)
 	optional uint32 progress = 21; // WorkoutMode = progress & 0xF
@@ -85,8 +85,8 @@ message PlayerState {
 	optional uint32 f33 = 33;
 	optional float f34 = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving)
 	optional int32 world = 35;
-	optional uint32 f36 = 36; // = f(BikeEntity.field_2a28)
-	optional uint32 f37 = 37; // = f(BikeEntity.field_2a28)
+	optional uint32 f36 = 36; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
+	optional uint32 f37 = 37; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
 	optional bool canSteer = 38; // = BikeEntity.m_canSteer
 	optional int32 route = 39;
 }
