@@ -73,7 +73,7 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
     
     optional uint32 achievement_level = 49;
     optional bool use_metric = 50;
-    optional bool f51 = 51; // isRunner ??? -> +45.455 to something (BikeEntity::CreateNamePlate)
+    optional bool strava_premium = 51;
     optional uint32 power_source_model = 52;
     optional uint32 f53 = 53; //??? empty
     optional uint32 f54 = 54; //??? empty
@@ -136,7 +136,7 @@ message Profile { // should be renamed (name from Zwift debug info: PlayerProfil
     optional uint32 run_achievement_level = 84;
     optional uint32 total_run_time_in_minutes = 85;
     optional Sport sport = 86;
-    optional uint32 f87 = 87; //??? 360 or -360
+    optional uint32 utc_offset_in_minutes = 87;
     optional bool connected_to_under_armour = 88;
     optional string preferred_language = 89;
     optional uint32 hair_colour = 90;

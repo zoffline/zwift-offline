@@ -5,22 +5,22 @@ syntax = "proto2";
 ////////////////////////////////////////
 
 // Zwift companion protocol
-//TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=0?, SOCIAL_TEXT_MESSAGE=1?, SOCIAL_FLAG=?, ?=?
-message SocialPlayerAction { //=wrong named ChatMessage?
-	optional int64 rider_id = 1;
-	optional int64 to_rider_id = 2; // 0 if public message
-	optional int32 f3 = 3; // SocialPlayerActionType? ChatMessage: always value 1=SOCIAL_TEXT_MESSAGE ?
+//TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=0, SOCIAL_TEXT_MESSAGE=1, SOCIAL_FLAG=3, SOCIAL_RIDE_ON=2
+message SocialPlayerAction {
+	optional int64 player_id = 1;
+	optional int64 to_player_id = 2; // 0 if public message
+	optional int64 type = 3; // SocialPlayerActionType, stored as int32
 	optional string firstName = 4;
 	optional string lastName = 5;
 	optional string message = 6;
 	optional string avatar = 7;
 	optional int32 countryCode = 8;
-	optional int32 f9 = 9;
-	optional int32 f10 = 10;
+	optional int64 flagType = 9; //stored as int32 FLAG_TYPE_BAD_LANGUAGE=3, FLAG_TYPE_FLIER=2, FLAG_TYPE_HARASSMENT=1
+	optional int64 mgType = 10; //enum MessageGroupType: CLUB=4, DIRECT=2, EVENT=3, GLOBAL=1, stored as int32
 	optional int64 eventSubgroup = 11;
 }
 
-message MobileAlertResponse {
+/*message MobileAlertResponse {
 	optional int64 f1 = 1;
 	optional int64 f2 = 2;
 }
@@ -28,17 +28,17 @@ message MobileAlertResponse {
 message BLEPeripheralCharacteristic {
 	optional string f1 = 1;
 	optional bytes f2 = 2;
-}
+}*/
 
 //TODO: PeripheralResponseType UNKNOWN_RESPONSE_TYPE(0), PERIPHERAL_ERROR(1), CHARACTERISTIC_VALUE(2), PERIPHERAL_CONNECTED(3), PERIPHERAL_DISCONNECTED(4), PERIPHERAL_DISCOVERED(5);
 // PeripheralErrorType UNKNOWN_ERROR(0), PERMISSION_DENIED(1), BLE_UNSUPPORTED(2), BLE_POWERED_OFF(3);
-message BLEPeripheralResponse {
+/*message BLEPeripheralResponse {
 	optional uint32 f1 = 1;
 	optional uint32 f2 = 2;
 	optional string f3 = 3;
 	optional BLEPeripheral f4 = 4;
 	optional BLEPeripheralCharacteristic f5 = 5;
-}
+}*/
 
 /*TODO: UNKNOWN(0), FLAGS(1), INCOMPLETE_UUIDS_16_BIT(2), COMPLETE_UUIDS_16_BIT(3), INCOMPLETE_UUIDS_32_BIT(4),
         COMPLETE_UUIDS_32_BIT(5), INCOMPLETE_UUIDS_128_BIT(6), COMPLETE_UUIDS_128_BIT(7), SHORTENED_LOCAL_NAME(8),
@@ -50,7 +50,7 @@ message BLEPeripheralResponse {
         LE_SECURE_CONFIRMATION_VALUE(34), LE_SECURE_RANDOM_VALUE(35), URI(36), INDOOR_POSITIONING(37), TRANSPORT_DISCOVERY_DATA(38),
         LE_SUPPORTED_FEATURES(39), CHANNEL_MAP_UPDATE_INDICATION(40), PB_ADV(41), MESH_MESSAGE(42), MESH_BEACON(43), BIG_INFO(44),
         BROADCAST_CODE(45), INFORMATION_DATA_3D(61), MANUFACTURER_DATA(255); */
-message BLEAdvertisementDataSection {
+/*message BLEAdvertisementDataSection {
 	optional int32 f1 = 1;
 	optional bytes f2 = 2;
 }
@@ -59,11 +59,11 @@ message BLEPeripheral {
 	optional string f1 = 1;
 	optional string f2 = 2;
 	optional int32 f3 = 3;
-}
+}*/
 
 /*TODO: CONNECTABLE_UNDIRECTED(0), CONNECTABLE_DIRECTED(1), SCANNABLE_UNDIRECTED(2), NON_CONNECTABLE_UNDIRECTED(3),
         SCAN_RESPONSE(4), EXTENDED(5); */
-message BLEAdvertisement {
+/*message BLEAdvertisement {
 	optional BLEPeripheral f1 = 1;
 	repeated BLEAdvertisementDataSection f2 = 2;
 	optional int32 f3 = 3;
@@ -81,9 +81,9 @@ message PhoneToGameCommand {
 	optional uint32 f9 = 9;
 	required uint32 command_copy = 10;
 	optional SocialPlayerAction f11 = 11;
-	/* no 12 */
+	// no 12
 	optional MobileAlertResponse f13 = 13;
-	/* no 14-17*/
+	// no 14-17
 	optional BLEPeripheralResponse f18 = 18;
 	optional int64 f19 = 19;
 	optional string f20 = 20;
@@ -102,4 +102,4 @@ message PhoneToGame {
 	optional float f8 = 8;
 	optional double f9 = 9;
 	optional int32 f10 = 10;
-}
+}*/

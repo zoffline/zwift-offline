@@ -38,6 +38,7 @@ from email.mime.text import MIMEText
 
 sys.path.insert(1, 'protobuf') # otherwise import in .proto does not work
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
+import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
 import protobuf.login_response_pb2 as login_response_pb2
@@ -658,10 +659,10 @@ def send_message_to_all_online(message, sender='Server'):
     player_update.f12 = 1
     player_update.f14 = int(get_utc_time()*1000000)
 
-    chat_message = udp_node_msgs_pb2.ChatMessage()
-    chat_message.rider_id = 0
-    chat_message.to_rider_id = 0
-    chat_message.f3 = 1
+    chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
+    chat_message.player_id = 0
+    chat_message.to_player_id = 0
+    chat_message.type = 1
     chat_message.firstName = sender
     chat_message.lastName = ''
     chat_message.message = message
@@ -1031,7 +1032,7 @@ def relay_race_event_starting_line_id(event_id):
 @app.route('/api/zfiles', methods=['POST'])
 def api_zfiles():
     # Don't care about zfiles, but shuts up some errors in Zwift log.
-    zfile = zfiles_pb2.ZFile()
+    zfile = zfiles_pb2.ZFileProto()
     zfile.id = int(random.getrandbits(31))
     zfile.folder = "logfiles"
     zfile.filename = "yep_took_good_care_of_that_file.txt"
@@ -1200,7 +1201,7 @@ def do_api_profiles_me(is_json):
 "runTimeHalfMarathonInSeconds": jsv0(profile, 'run_time_half_marathon_in_seconds'), "runTimeFullMarathonInSeconds": jsv0(profile, 'run_time_full_marathon_in_seconds'), "totalInKomJersey": jsv0(profile, 'total_in_kom_jersey'), "totalInSprintersJersey": jsv0(profile, 'total_in_sprinters_jersey'), 
 "totalInOrangeJersey": jsv0(profile, 'total_in_orange_jersey'), "currentActivityId": jsf(profile, 'current_activity_id'), "enrolledZwiftAcademy": jsv0(profile, 'enrolled_program') == profile.EnrolledProgram.ZWIFT_ACADEMY, "runAchievementLevel": jsv0(profile, 'run_achievement_level'), 
 "totalRunDistance": jsv0(profile, 'total_run_distance'), "totalRunTimeInMinutes": jsv0(profile, 'total_run_time_in_minutes'), "totalRunExperiencePoints": jsv0(profile, 'total_run_experience_points'), "totalRunCalories": jsv0(profile, 'total_run_calories'), "totalGold": jsv0(profile, 'total_gold_drops'), 
-"profilePropertyChanges": jprofileFull.get('propertyChanges'), "cyclingOrganization": jsf(profile, 'cycling_organization'), "userAgent": "CNL/3.13.0 (Android 11) zwift/1.0.85684 curl/7.78.0-DEV", "stravaPremium": False, "profileChanges": False, "launchedGameClient": "09/19/2021 13:24:19 +0000", 
+"profilePropertyChanges": jprofileFull.get('propertyChanges'), "cyclingOrganization": jsf(profile, 'cycling_organization'), "userAgent": "CNL/3.13.0 (Android 11) zwift/1.0.85684 curl/7.78.0-DEV", "stravaPremium": jsb0(profile, 'strava_premium'), "profileChanges": False, "launchedGameClient": "09/19/2021 13:24:19 +0000", 
 "createdOn":"2021-09-19T13:24:17.783+0000", "likelyInGame": False, "address": None, "bt":"f97803d3-efac-4510-a17a-ef44e65d3071", "numberOfFolloweesInCommon": 0, "fundraiserId": None, "source": "Android", "origin": None, "licenseNumber": None, "bigCommerceId": None, "marketingConsent": None, "affiliate": None, 
 "avantlinkId": None, "virtualBikeModel": bikeFrameToStr(profile.bike_frame), "connectedToWithings": jsb0(profile, 'connected_to_withings'), "connectedToRuntastic": jsb0(profile, 'connected_to_runtastic'), "connectedToZwiftPower": False, "powerSourceType": "Power Source", "powerSourceModel": powerSourceModelToStr(profile.power_source_model), "riding": False, "location": "", "publicId": "5a72e9b1-239f-435e-8757-af9467336b40", 
 "mixpanelDistinctId": "21304417-af2d-4c9b-8543-8ba7c0500e84"}
@@ -1685,8 +1686,8 @@ def api_profiles_activities_rideon(recieving_player_id):
         player_update.f14 = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
-        ride_on.rider_id = int(sending_player_id)
-        ride_on.to_rider_id = int(recieving_player_id)
+        ride_on.player_id = int(sending_player_id)
+        ride_on.to_player_id = int(recieving_player_id)
         ride_on.firstName = profile.first_name
         ride_on.lastName = profile.last_name
         ride_on.countryCode = profile.country_code
@@ -1839,14 +1840,14 @@ def add_player_to_world(player, course_world, is_pace_partner):
         if not partial_profile == None:
             online_player = None
             if is_pace_partner:
-                online_player = course_world[course_id].pace_partner_states.add()
+                online_player = course_world[course_id].pacer_bots.add()
                 online_player.route = partial_profile.route
                 if player.sport == 0:
                     online_player.ride_power = player.power
                 else:
                     online_player.speed = player.speed
             else:
-                online_player = course_world[course_id].player_states.add()
+                online_player = course_world[course_id].others.add()
             online_player.id = player.id
             online_player.firstName = partial_profile.first_name
             online_player.lastName = partial_profile.last_name
@@ -1866,7 +1867,7 @@ def relay_worlds_generic(world_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         if request.content_type == 'application/x-protobuf-lite':
-            #chat_message = udp_node_msgs_pb2.ChatMessage()
+            #chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
             #serializedMessage = None
             try:
                 player_update = udp_node_msgs_pb2.PlayerUpdate()
@@ -1900,9 +1901,9 @@ def relay_worlds_generic(world_id=None):
                     recieving_player = online[recieving_player_id]
                     #Chat message
                     if player_update.type == 5:
-                        chat_message = udp_node_msgs_pb2.ChatMessage()
+                        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                         chat_message.ParseFromString(player_update.payload)
-                        sending_player_id = chat_message.rider_id
+                        sending_player_id = chat_message.player_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
                             #Check that players are on same course and close to each other
@@ -1910,9 +1911,9 @@ def relay_worlds_generic(world_id=None):
                                 should_receive = True
                     #Segment complete
                     else:
-                        segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                        segment_complete = segment_result_pb2.SegmentResult()
                         segment_complete.ParseFromString(player_update.payload)
-                        sending_player_id = segment_complete.rider_id
+                        sending_player_id = segment_complete.player_id
                         if sending_player_id in online:
                             sending_player = online[sending_player_id]
                             #Check that players are on same course
@@ -1926,9 +1927,9 @@ def relay_worlds_generic(world_id=None):
                         player_update_queue[recieving_player_id] = list()
                     player_update_queue[recieving_player_id].append(player_update.SerializeToString())
             if player_update.type == 5:
-                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
-                discord.send_message(chat_message.message, chat_message.rider_id)
+                discord.send_message(chat_message.message, chat_message.player_id)
         return '{}', 200
     else:  # protobuf request
         worlds = world_pb2.DropInWorldList()
@@ -1939,7 +1940,7 @@ def relay_worlds_generic(world_id=None):
             world = worlds.worlds.add()
             world.id = 1
             world.name = 'Public Watopia'
-            world.f3 = course
+            world.course_id = course
             world.world_time = world_time()
             world.real_time = int(get_utc_time())
             world.zwifters = 0
@@ -2044,18 +2045,18 @@ def relay_worlds_attributes():
             receiving_player = online[receiving_player_id]
             # Chat message
             if player_update.type == 5:
-                chat_message = udp_node_msgs_pb2.ChatMessage()
+                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
-                sending_player_id = chat_message.rider_id
+                sending_player_id = chat_message.player_id
                 if sending_player_id in online:
                     sending_player = online[sending_player_id]
                     if is_nearby(sending_player, receiving_player):
                         should_receive = True
             # Segment complete
             else:
-                segment_complete = udp_node_msgs_pb2.SegmentComplete()
+                segment_complete = segment_result_pb2.SegmentResult()
                 segment_complete.ParseFromString(player_update.payload)
-                sending_player_id = segment_complete.rider_id
+                sending_player_id = segment_complete.player_id
                 if sending_player_id in online:
                     sending_player = online[sending_player_id]
                     if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
@@ -2069,9 +2070,9 @@ def relay_worlds_attributes():
             player_update_queue[receiving_player_id].append(player_update.SerializeToString())
     # If it's a chat message, send to Discord
     if player_update.type == 5:
-        chat_message = udp_node_msgs_pb2.ChatMessage()
+        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
         chat_message.ParseFromString(player_update.payload)
-        discord.send_message(chat_message.message, chat_message.rider_id)
+        discord.send_message(chat_message.message, chat_message.player_id)
     return '', 201
 
 
