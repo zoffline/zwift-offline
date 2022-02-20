@@ -1826,14 +1826,14 @@ def add_player_to_world(player, course_world, is_pace_partner):
         if not partial_profile == None:
             online_player = None
             if is_pace_partner:
-                online_player = course_world[course_id].pace_partner_states.add()
+                online_player = course_world[course_id].pacer_bots.add()
                 online_player.route = partial_profile.route
                 if player.sport == 0:
                     online_player.ride_power = player.power
                 else:
                     online_player.speed = player.speed
             else:
-                online_player = course_world[course_id].player_states.add()
+                online_player = course_world[course_id].pro_players.add()
             online_player.id = player.id
             online_player.firstName = partial_profile.first_name
             online_player.lastName = partial_profile.last_name
@@ -1926,7 +1926,7 @@ def relay_worlds_generic(world_id=None):
             world = worlds.worlds.add()
             world.id = 1
             world.name = 'Public Watopia'
-            world.f3 = course
+            world.course_id = course
             world.world_time = world_time()
             world.real_time = int(get_utc_time())
             world.zwifters = 0

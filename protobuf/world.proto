@@ -2,16 +2,16 @@ syntax = "proto2";
 message DropInWorld {
 	required uint64 id = 1;
 	optional string name = 2;
-	optional uint64 f3 = 3;
+	optional uint64 course_id = 3;
 	optional bool f4 = 4;
 	optional uint64 zwifters = 5;
 	optional uint64 world_time = 6;
 	optional uint64 real_time = 7;
-	repeated DropInPlayer player_states = 8;
-	repeated DropInPlayer f9 = 9;
-	repeated DropInPlayer f10 = 10;
-	optional uint64 f11 = 11;
-	repeated DropInPlayer pace_partner_states = 12;
+	repeated DropInPlayer pro_players = 8;
+	repeated DropInPlayer followees = 9;
+	repeated DropInPlayer others = 10;
+	optional uint64 max_zwifters = 11; //stored as int32
+	repeated DropInPlayer pacer_bots = 12;
 }
 
 message DropInWorldList {
@@ -25,9 +25,9 @@ message DropInPlayer {
 	optional uint64 distance = 4;
 	optional uint64 time = 5;
 	optional uint64 country_code = 6;
-	optional sint64 f7 = 7;
-	optional uint64 sport = 8;
-	optional uint64 f9 = 9;
+	optional int64 player_type = 7; // PlayerType, stored as int32
+	optional uint64 sport = 8; //stored as int32
+	optional bool f9 = 9; 
 	optional bool f10 = 10;
 	optional uint64 f11 = 11;
 	optional uint64 power = 12;
@@ -37,5 +37,5 @@ message DropInPlayer {
 	optional float y = 16;
 	optional int32 route = 17;
 	optional uint32 ride_power = 18;
-	optional float speed = 19;
+	optional uint32 speed = 19;
 }
