@@ -274,6 +274,7 @@ To obtain your current profile:
   * e.g., on Linux/Mac: ``pip3 install garmin-uploader cryptography``
   * e.g., on Windows in command prompt: ``pip install garmin-uploader cryptography``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
+  * You may need to use the cloudscraper branch if upload fails: ``pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
 * Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
