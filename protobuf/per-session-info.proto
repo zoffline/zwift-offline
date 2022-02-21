@@ -1,5 +1,4 @@
 syntax = "proto2";
-// All decompiled.
 message TcpAddress {
 	optional string ip = 1;
 	optional int32 port = 2;
@@ -8,7 +7,7 @@ message TcpAddress {
 }
 
 message TcpConfig {
-	/* First server: the TCP telemetry server (34.218.60.145) */
+	//First server: the TCP telemetry server (34.218.60.145)
 	repeated TcpAddress nodes = 1;
 }
 

@@ -156,7 +156,7 @@ def get_player_id(session, access_token):
             },
         )
 
-        profile = profile_pb2.Profile()
+        profile = profile_pb2.PlayerProfile()
         profile.ParseFromString(response.content)
         return profile.id
 

@@ -1,5 +1,6 @@
 syntax = "proto2";
-//All decompiled. TODO: incorporate new fields
+//import "profile.proto"; //enums PlayerType and Sport
+//TODO: incorporate new fields, rename db fields
 message SegmentResult {
     optional uint64 id = 1;
     required uint64 player_id = 2;
@@ -18,9 +19,9 @@ message SegmentResult {
     optional uint32 f15 = 15; //avg_power
     optional bool f16 = 16;   //:= isMale
     optional string f17 = 17; //ISO8601 time (magicLeaderboardBirthday := const @ ZNETWORK_Initialize)
-    optional uint64 f18 = 18; //TODO: enum PlayerType, stored as 32 bit
+    optional uint64 f18 = 18; //-> enum PlayerType player_type
     optional uint32 f19 = 19; //avg_hr(ZNETWORK_RaceResultEntrySaveRequest):=m_computer.m_accumHeartRate/m_computer.m_accumTime @ZNETWORK_RegisterLocalPlayersSegmentResult (or 0.0)
-    optional uint64 f20 = 20; //TODO: enum Sport, stored as 32 bit
+    optional int64 f20 = 20;  //-> enum Sport sport
     //optional uint64 f21 = 21; //:=activityId (may be -1)
     //optional bool f22 = 22;
     //optional string f23 = 23;

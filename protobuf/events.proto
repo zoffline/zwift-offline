@@ -1,5 +1,6 @@
 syntax = "proto2";
-//All decompiled
+import "profile.proto"; //enums PlayerType and Sport
+
 message EventSubgroupProtobuf {
 	required uint64 id = 1; // 2395269
 	optional string description = 2; // "3R True2 Steady Ride [2.0w/kg avg] (C)"
@@ -26,7 +27,7 @@ message EventSubgroupProtobuf {
 	repeated uint64 leaders = 23; // or sweepers? tag440
 	optional fixed32 f24 = 24; //tag453
 	optional uint32 laps = 25; // 0, tag456
-        /* no 26-28 */
+        // no 26-28
 	optional uint32 startLocation = 29; // 13, tag488
 	optional uint32 label = 30; // 3, tag496
 	optional uint32 paceType = 31; // 1, tag504
@@ -94,7 +95,7 @@ message Event { //real name: EventProtobuf
 	optional string f19 = 19;
 	optional string f20 = 20;
 	optional string f21 = 21;
-	optional uint32 f22 = 22; //sport
+	optional Sport sport = 22;
 	optional uint64 f23 = 23;
 	optional uint32 f24 = 24;
 	optional uint64 f25 = 25;

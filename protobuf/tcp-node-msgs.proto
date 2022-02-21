@@ -1,25 +1,36 @@
 syntax = "proto2";
-// All decompiled. TODO: replace with originals, integrate enums and check
-////////////////////////////////////////
-// Initial TCP response below
-////////////////////////////////////////
-
-// Zwift companion protocol
-//TODO: enum SocialPlayerActionType 0,1,2,3: SOCIAL_ACTION_UNKNOWN_TYPE=0, SOCIAL_TEXT_MESSAGE=1, SOCIAL_FLAG=3, SOCIAL_RIDE_ON=2
+enum SocialPlayerActionType {
+	SOCIAL_ACTION_UNKNOWN_TYPE = 0;
+	SOCIAL_TEXT_MESSAGE = 1;
+	SOCIAL_RIDE_ON = 2;
+	SOCIAL_FLAG = 3;
+}
+enum FlagType {
+	FLAG_TYPE_UNKNOWN = 0;
+	FLAG_TYPE_HARASSMENT = 1;
+	FLAG_TYPE_FLIER = 2;
+	FLAG_TYPE_BAD_LANGUAGE = 3;
+}
+enum MessageGroupType {
+	MGT_UNKNOWN = 0;
+	MGT_GLOBAL = 1;
+	MGT_DIRECT = 2;
+	MGT_EVENT = 3;
+	MGT_CLUB = 4;
+}
 message SocialPlayerAction {
 	optional int64 player_id = 1;
 	optional int64 to_player_id = 2; // 0 if public message
-	optional int64 type = 3; // SocialPlayerActionType, stored as int32
+	optional SocialPlayerActionType spa_type = 3;
 	optional string firstName = 4;
 	optional string lastName = 5;
 	optional string message = 6;
 	optional string avatar = 7;
 	optional int32 countryCode = 8;
-	optional int64 flagType = 9; //stored as int32 FLAG_TYPE_BAD_LANGUAGE=3, FLAG_TYPE_FLIER=2, FLAG_TYPE_HARASSMENT=1
-	optional int64 mgType = 10; //enum MessageGroupType: CLUB=4, DIRECT=2, EVENT=3, GLOBAL=1, stored as int32
+	optional FlagType flagType = 9;
+	optional MessageGroupType mgType = 10;
 	optional int64 eventSubgroup = 11;
 }
-
 /*message MobileAlertResponse {
 	optional int64 f1 = 1;
 	optional int64 f2 = 2;

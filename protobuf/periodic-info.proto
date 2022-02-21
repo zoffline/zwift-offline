@@ -1,5 +1,5 @@
 syntax = "proto2";
-//TODO: check if PeriodicInfo is TcpAddress
+//TODO: check if used
 message PeriodicInfo { // very similar to TcpAddress, did not found in ZwiftApp.exe yet
 	required string game_server_ip = 1;
 	optional uint32 f2 = 2;
