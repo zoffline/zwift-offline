@@ -1,6 +1,5 @@
 syntax = "proto2";
 /* XXX: This is a first approximation of login response. Not looked into or verified. */
-//All decompiled.
 import "per-session-info.proto";
 
 message LoginResponse {
