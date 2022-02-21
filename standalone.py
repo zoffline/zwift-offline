@@ -44,6 +44,15 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
+if os.path.isfile(DISCORD_CONFIG_FILE):
+    from discord_bot import DiscordThread
+    discord = DiscordThread(DISCORD_CONFIG_FILE)
+else:
+    class DummyDiscord():
+        def send_message(self, msg, sender_id=None):
+            pass
+    discord = DummyDiscord()
+
 MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
@@ -58,6 +67,7 @@ player_update_queue = {}
 global_pace_partners = {}
 global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
+start_time = time.time()
 
 def road_id(state):
     return (state.f20 & 0xff00) >> 8
@@ -492,7 +502,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Update player online state
         if state.roadTime:
-            if not player_id in online.keys():
+            if not player_id in online.keys() and time.time() > start_time + 30:
                 discord.send_message('%s riders online' % (len(online) + 1))
             online[player_id] = state
 
@@ -653,14 +663,5 @@ load_bots()
 botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
-
-if os.path.isfile(DISCORD_CONFIG_FILE):
-    from discord_bot import DiscordThread
-    discord = DiscordThread(DISCORD_CONFIG_FILE)
-else:
-    class DummyDiscord():
-        def send_message(self, msg, sender_id=None):
-            pass
-    discord = DummyDiscord()
 
 zwift_offline.run_standalone(online, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)
