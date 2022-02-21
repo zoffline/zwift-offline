@@ -307,7 +307,7 @@ def get_partial_profile(player_id):
         if os.path.isfile(profile_file):
             try:
                 with open(profile_file, 'rb') as fd:
-                    profile = profile_pb2.Profile()
+                    profile = profile_pb2.PlayerProfile()
                     profile.ParseFromString(fd.read())
                     partial_profile = PartialProfile()
                     partial_profile.first_name = profile.first_name
@@ -655,7 +655,7 @@ def user_home(username):
 def send_message_to_all_online(message, sender='Server'):
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.f2 = 1
-    player_update.type = 5 #chat message type
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SPA
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.f12 = 1
@@ -664,7 +664,7 @@ def send_message_to_all_online(message, sender='Server'):
     chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
     chat_message.player_id = 0
     chat_message.to_player_id = 0
-    chat_message.type = 1
+    chat_message.spa_type = tcp_node_msgs_pb2.SocialPlayerActionType.SOCIAL_TEXT_MESSAGE
     chat_message.firstName = sender
     chat_message.lastName = ''
     chat_message.message = message
@@ -765,7 +765,7 @@ def upload(username):
         stat = os.stat(profile_file)
         profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
         with open(profile_file, 'rb') as fd:
-            p = profile_pb2.Profile()
+            p = profile_pb2.PlayerProfile()
             p.ParseFromString(fd.read())
             name = "%s %s" % (p.first_name, p.last_name)
     token = None
@@ -1125,7 +1125,7 @@ def powerSourceModelToStr(val):
 def privacy(profile):
     privacy_bits = jsf(profile, 'privacy_bits', 0)
     return {"approvalRequired": bool(privacy_bits & 1), "displayWeight": bool(privacy_bits & 4), "minor": bool(privacy_bits & 2), "privateMessaging": bool(privacy_bits & 8), "defaultFitnessDataPrivacy": bool(privacy_bits & 16), 
-"suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.Profile.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
+"suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.PlayerProfile.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
 
 def bikeFrameToStr(val):
     if (val == 0x7d8c357d):
@@ -1159,7 +1159,7 @@ def do_api_profiles_me(is_json):
     except IOError as e:
         logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
         return '', 500
-    profile = profile_pb2.Profile()
+    profile = profile_pb2.PlayerProfile()
     profile_file = '%s/profile.bin' % profile_dir
     if not os.path.isfile(profile_file):
         profile.id = profile_id
@@ -1194,7 +1194,7 @@ def do_api_profiles_me(is_json):
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
         jprofileFull = MessageToDict(profile)
         jprofile = {"id": profile.id, "firstName": jsf(profile, 'first_name'), "lastName": jsf(profile, 'last_name'), "preferredLanguage": jsf(profile, 'preferred_language'), "bodyType":jsv0(profile, 'body_type'), "male": jsb1(profile, 'is_male'), 
-"imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "playerType": profile_pb2.Profile.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
+"imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
 "emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), "ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'),
 "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
 "socialFacts": jprofileFull.get('socialFacts'), "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'world_id'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
@@ -1235,7 +1235,7 @@ def api_profiles_id_privacy(player_id):
         fprivacy.write(json.dumps(jp, ensure_ascii=False))
     #{"displayAge": false, "defaultActivityPrivacy": "PUBLIC", "approvalRequired": false, "privateMessaging": false, "defaultFitnessDataPrivacy": false}
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    profile = profile_pb2.Profile()
+    profile = profile_pb2.PlayerProfile()
     profile_file = '%s/profile.bin' % profile_dir
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -1274,7 +1274,7 @@ def api_search_profiles():
     for row in rows:
         player_id = row[0]
         profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-        profile = profile_pb2.Profile()
+        profile = profile_pb2.PlayerProfile()
         profile_file = '%s/profile.bin' % profile_dir
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
@@ -1311,7 +1311,7 @@ def api_profiles_me_id(player_id):
     if current_user.player_id != player_id:
         return '', 401
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    profile = profile_pb2.Profile()
+    profile = profile_pb2.PlayerProfile()
     profile_file = '%s/profile.bin' % profile_dir
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
@@ -1352,7 +1352,7 @@ def api_profiles_id(player_id):
     stream = request.stream.read()
     with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
-    profile = profile_pb2.Profile()
+    profile = profile_pb2.PlayerProfile()
     profile.ParseFromString(stream)
     if MULTIPLAYER:
         current_user.first_name = profile.first_name
@@ -1410,10 +1410,10 @@ def api_profiles_activities(player_id):
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
     args = request.args.getlist('id')
-    profiles = profile_pb2.Profiles()
+    profiles = profile_pb2.PlayerProfiles()
     for i in args:
         p_id = int(i)
-        profile = profile_pb2.Profile()
+        profile = profile_pb2.PlayerProfile()
         if p_id > 10000000:
             ghostId = math.floor(p_id / 10000000)
             player_id = p_id - ghostId * 10000000
@@ -1667,7 +1667,7 @@ def api_profiles_activities_rideon(recieving_player_id):
     if not profile == None:
         player_update = udp_node_msgs_pb2.WorldAttribute()
         player_update.f2 = 1
-        player_update.type = 4 #ride on type
+        player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
         player_update.world_time_born = world_time()
         player_update.world_time_expire = player_update.world_time_born + 9890
         player_update.f14 = int(get_utc_time() * 1000000)
@@ -1829,12 +1829,12 @@ def add_player_to_world(player, course_world, is_pace_partner):
             if is_pace_partner:
                 online_player = course_world[course_id].pacer_bots.add()
                 online_player.route = partial_profile.route
-                if player.sport == 0:
+                if player.sport == profile_pb2.Sport.CYCLING:
                     online_player.ride_power = player.power
                 else:
                     online_player.speed = player.speed
             else:
-                online_player = course_world[course_id].pro_players.add()
+                online_player = course_world[course_id].others.add()
             online_player.id = player.id
             online_player.firstName = partial_profile.first_name
             online_player.lastName = partial_profile.last_name
@@ -1884,10 +1884,10 @@ def relay_worlds_generic(world_id=None):
             player_update.f14 = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
                 should_receive = False
-                if player_update.type == 5 or player_update.type == 105:
+                if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA or player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SR:
                     recieving_player = online[recieving_player_id]
                     #Chat message
-                    if player_update.type == 5:
+                    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
                         chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                         chat_message.ParseFromString(player_update.payload)
                         sending_player_id = chat_message.player_id
@@ -1913,7 +1913,7 @@ def relay_worlds_generic(world_id=None):
                     if not recieving_player_id in player_update_queue:
                         player_update_queue[recieving_player_id] = list()
                     player_update_queue[recieving_player_id].append(player_update.SerializeToString())
-            if player_update.type == 5:
+            if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
                 chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
                 discord.send_message(chat_message.message, chat_message.player_id)
@@ -2028,10 +2028,10 @@ def relay_worlds_attributes():
     player_update.f14 = int(get_utc_time() * 1000000)
     for receiving_player_id in online.keys():
         should_receive = False
-        if player_update.type in [5, 105]:
+        if player_update.wa_type in [udp_node_msgs_pb2.WA_TYPE.WAT_SPA, udp_node_msgs_pb2.WA_TYPE.WAT_SR]:
             receiving_player = online[receiving_player_id]
             # Chat message
-            if player_update.type == 5:
+            if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
                 chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
                 chat_message.ParseFromString(player_update.payload)
                 sending_player_id = chat_message.player_id
@@ -2056,7 +2056,7 @@ def relay_worlds_attributes():
                 player_update_queue[receiving_player_id] = list()
             player_update_queue[receiving_player_id].append(player_update.SerializeToString())
     # If it's a chat message, send to Discord
-    if player_update.type == 5:
+    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
         chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
         chat_message.ParseFromString(player_update.payload)
         discord.send_message(chat_message.message, chat_message.player_id)
@@ -2182,7 +2182,7 @@ def move_old_profile():
     profile_file = '%s/profile.bin' % STORAGE_DIR
     if os.path.isfile(profile_file):
         with open(profile_file, 'rb') as fd:
-            profile = profile_pb2.Profile()
+            profile = profile_pb2.PlayerProfile()
             profile.ParseFromString(fd.read())
             profile_dir = '%s/%s' % (STORAGE_DIR, profile.id)
             try:
@@ -2484,7 +2484,7 @@ def get_profile_saved_game_achiev2_40_bytes():
     if not os.path.isfile(profile_file):
         return b''
     with open(profile_file, 'rb') as fd:
-        profile = profile_pb2.Profile()
+        profile = profile_pb2.PlayerProfile()
         profile.ParseFromString(fd.read())
         return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
 
