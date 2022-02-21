@@ -1,20 +1,20 @@
 syntax = "proto2";
-//All decompiled. TODO: uncomment and use f14
+//TODO: uncomment and use f14, rename fields in db
 message Goal {
 	optional uint64 id = 1;
 	optional uint64 player_id = 2;
-	optional int64 f3 = 3; /* TODO: rename to sport; int64 on wire, stored as int32 */
+	optional int64 f3 = 3;    //-> enum Sport sport
 	optional string name = 4; // i.e. "Monthly time goal"
-	optional int64 type = 5; /* 0=distance, 1=time; int64 on wire, stored as int32 */
-	optional int64 periodicity = 6; /* 0=weekly, 1=monthly; int64 on wire, stored as int32 */
-	optional float target_distance = 7; /* in meters. set to dur for dur goals */
-	optional float target_duration = 8; /* in minutes. set to dist for dist goals */
-	optional float actual_distance = 9; /* in meters. is also set for dur goals? */
-	optional float actual_duration = 10; /* in minutes. is also set for dist goals? */
-	optional uint64 created_on = 11;  /* in ms since epoch */
+	optional int64 type = 5;  //-> enum GoalType 0=distance, 1=time
+	optional int64 periodicity = 6; //-> enum GoalPeriod 0=weekly, 1=monthly
+	optional float target_distance = 7;  //in meters. set to dur for dur goals
+	optional float target_duration = 8;  //in minutes. set to dist for dist goals
+	optional float actual_distance = 9;  //in meters. is also set for dur goals?
+	optional float actual_duration = 10; //in minutes. is also set for dist goals?
+	optional uint64 created_on = 11;     //in ms since epoch
 	optional uint64 period_end_date = 12;
-	optional uint64 f13 = 13; /* TODO: rename to status (0=active, 1=retired); int64 on wire, stored as int32 */
-	//optional string f14 = 14; /* TODO: find usage: GoalsManager? */
+	optional uint64 f13 = 13;   //-> enum GoalStatus 0=active, 1=retired
+	//optional string f14 = 14; // TODO: find usage: GoalsManager?
 }
 
 message Goals {

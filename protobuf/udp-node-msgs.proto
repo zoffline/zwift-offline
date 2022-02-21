@@ -1,11 +1,11 @@
 syntax = "proto2";
-//import "profile.proto"; //Profile
+import "profile.proto"; //enums PlayerType and Sport
 import "per-session-info.proto"; //TcpConfig
 
 enum WA_TYPE {
 	WAT_LEAVE = 2;   //proto::PlayerLeftWorld
 	WAT_RELOGIN = 3; //proto::PlayerLeftWorld
-	WAT_RIDEON = 4;  //proto::RideOn
+	WAT_RIDE_ON = 4; //proto::RideOn
 	WAT_SPA = 5;     //proto::SocialPlayerAction (chat message)
 	WAT_EVENT = 6;   //proto::Event
 	WAT_JOIN_E = 7;  //proto::PlayerJoinedEvent
@@ -35,7 +35,7 @@ enum WA_TYPE {
 message WorldAttribute {
 	optional int64 f1 = 1;          //587645624533328784, later 5876456 85771834256
 	optional int64 f2 = 2;          //1
-	optional WA_TYPE type = 3;      //stored as int32
+	optional WA_TYPE wa_type = 3;      //stored as int32
 	optional bytes payload = 4;     //not only protobuf
 	optional int64 world_time_born = 5;
 	optional int64 x = 6;           //stored as int32
@@ -68,7 +68,7 @@ message World { //zwift.protobuf.World
 }
 
 message Player {
-	optional Profile player_profile = 1;
+	optional PlayerProfile player_profile = 1;
 	optional PlayerState player_state = 2;
 }*/
 
@@ -110,7 +110,7 @@ message PlayerState {
 	optional int64 watchingRiderId = 28;
 	optional int64 groupId = 29;
 	// 30 absent at least in Android Game
-	optional int32 sport = 31;
+	optional Sport sport = 31;
 	optional float f32 = 32;
 	optional uint32 f33 = 33;
 	optional float f34 = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving)
@@ -223,7 +223,7 @@ message ServerToClient {
 	optional int64 f13 = 13;
 	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
-	optional int32 kind = 16;
+	optional int32 kind = 16; //TODO: enum; 2: TCP
 	optional int64 f17 = 17;
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
