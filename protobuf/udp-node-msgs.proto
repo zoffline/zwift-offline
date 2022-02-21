@@ -2,23 +2,53 @@ syntax = "proto2";
 //import "profile.proto"; //Profile
 import "per-session-info.proto"; //TcpConfig
 
+enum WA_TYPE {
+	WAT_LEAVE = 2;   //proto::PlayerLeftWorld
+	WAT_RELOGIN = 3; //proto::PlayerLeftWorld
+	WAT_RIDEON = 4;  //proto::RideOn
+	WAT_SPA = 5;     //proto::SocialPlayerAction (chat message)
+	WAT_EVENT = 6;   //proto::Event
+	WAT_JOIN_E = 7;  //proto::PlayerJoinedEvent
+	WAT_LEFT_E = 8;  //proto::PlayerLeftEvent
+	WAT_RQ_PROF = 9; //proto::RequestProfileFromServer
+	WAT_INV_W = 10;  //proto::ReceiveInvitationWorldAttribute
+	WAT_KICKED = 11; //no payload
+	WAT_WTIME = 100; //g_WorldTime := payload (GOD message, may be ignored if ZWIFT\CONFIG\IGNOREGODMESSAGES=1)
+	WAT_RTIME = 101; //BlimpEntity::SetRoadTime(payload), also GOD message
+	WAT_B_ACT = 102; //BikeEntity::PerformAction(payload)
+	WAT_GRP_M = 103; //GroupMessage (may be ignored if ZWIFT\CONFIG\SHOWGROUPMSGS=1)
+	WAT_PRI_M = 104; //PrivateMessage
+	WAT_SR    = 105; //proto::SegmentResult
+	WAT_FLAG = 106;  //Leaderboards::FlagSandbagger / Leaderboards::FlagCheater
+	WAT_NONE = 107;  //does nothing
+	WAT_RLA = 108;   //ZNETWORK_BroadcastRideLeaderAction
+	WAT_GE = 109;    //GroupEvents::UserSignedup / GroupEvents::UserRegistered
+	WAT_NM = 110;    //notable moment + Play_Magic_Whoosh_Deep_Sparkle
+	WAT_LATE = 111;  //ZNETWORK_INTERNAL_HandleLateJoinRequest
+	WAT_RH = 112;    //ZNETWORK_INTERNAL_HandleRouteHashRequest
+	WAT_STATS = 113; //GLOBAL_MESSAGE_TYPE_RIDER_FENCE_STATS
+	WAT_FENCE = 114; //GLOBAL_MESSAGE_TYPE_GRFENCE_CONFIG
+	WAT_BN_GE = 115; //ZNETWORK_BroadcastBibNumberForGroupEvent
+	WAT_PPI = 116;   //ZNETWORK_INTERNAL_HandlePacePartnerInfo
+}
+
 message WorldAttribute {
-	optional uint64 f1 = 1;
-	optional uint64 f2 = 2;
-	optional uint64 f3 = 3;
-	optional string f4 = 4;
-	optional uint64 f5 = 5;
-	optional uint64 f6 = 6;
-	optional uint64 f7 = 7;
-	optional uint64 f8 = 8;
-	optional uint64 f9 = 9;
-	optional uint64 f10 = 10;
-	optional uint32 f11 = 11;
-	optional uint64 f12 = 12;
-	optional uint32 f13 = 13;
-	optional uint64 f14 = 14;
-	optional uint32 f15 = 15;
-	optional uint64 f16 = 16;
+	optional int64 f1 = 1;          //587645624533328784, later 5876456 85771834256
+	optional int64 f2 = 2;          //1
+	optional WA_TYPE type = 3;      //stored as int32
+	optional bytes payload = 4;     //not only protobuf
+	optional int64 world_time_born = 5;
+	optional int64 x = 6;           //stored as int32
+	optional int64 altitude = 7;    //stored as int32
+	optional int64 y = 8;           //stored as int32
+	optional int64 world_time_expire = 9;
+	optional int64 rel_id = 10;     //WAT_PPI: pace partner smth; WAT_SPA: to_player_id; WAT_RH: route_id? ...
+	optional int32 f11 = 11;        //importance??? WAT_B_ACT:1000; WAT_NM:50000; WAT_RH:5000000; ... 75000 ?
+	optional int64 f12 = 12;        //Not in package when testing
+	optional int32 f13 = 13;
+	optional int64 f14 = 14;        //'1604516817408239', later '1604516824709874'
+	optional int32 f15 = 15;        //6, might be course
+	optional int64 f16 = 16;        //stored as bool
 }
 
 /*message WorldAttributes {
@@ -52,7 +82,7 @@ message PlayerState {
 	optional uint32 f7 = 7;
 	optional int32 roadPosition = 8;
 	optional int32 cadenceUHz = 9; // =(cad / 60) * 1000000
-	optional int32 f10 = 10; // BikeEntity.field_B58=0
+	optional int32 f10 = 10; // BikeEntity.field_B58; 0
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
 	optional int64 heading = 13;
@@ -60,7 +90,7 @@ message PlayerState {
 	optional int32 climbing = 15; // meters
 	optional int32 time = 16;     // seconds
 	optional int32 f17 = 17;
-	optional uint32 f18 = 18;    // BikeEntity.field_E38 * 255.0
+	optional uint32 frameHue = 18; // BikeEntity::DrawBike m_frameHue * 255.0
 	//field 19:
 	//byte[0].bits[0,1]: HasPowerMeter, HasPhoneConnected
 	//byte[0].bits[2,3]: RoadDirectionForward, ??? !BikeEntity.field_DCC || BikeEntity.disSteer
@@ -79,7 +109,7 @@ message PlayerState {
 	optional float y = 27;
 	optional int64 watchingRiderId = 28;
 	optional int64 groupId = 29;
-	/* 30 absent at least in Android Game */
+	// 30 absent at least in Android Game
 	optional int32 sport = 31;
 	optional float f32 = 32;
 	optional uint32 f33 = 33;
@@ -99,15 +129,15 @@ message ClientToServer {
 	optional uint32 f5 = 5;
 	optional int64 f6 = 6;
 	required PlayerState state = 7;
-	optional int64 f8 = 8;
-	optional int64 f9 = 9; // absent @ libzwiftjni.so 100317
+	optional bool f8 = 8;
+	optional bool f9 = 9;
 	required int64 last_update = 10;
-	optional int64 f11 = 11;
+	optional bool f11 = 11;
 	required int64 last_player_update = 12;
-	optional int64 f13 = 13;
+	optional int64 larg_wa_time = 13; //TcpClient::sayHello: LargestWorldAttributeTimestamp
 	optional bool f14 = 14;
-	repeated int64 f15 = 15;
-	repeated int64 f16 = 16;
+	repeated int64 f15 = 15; //TcpClient::sayHello, TcpClient::sendSubscribeToSegment
+	repeated int64 f16 = 16; //TcpClient::processSegmentUnsubscription
 }
 
 message PlayerSummary {
@@ -118,8 +148,8 @@ message PlayerSummary {
 }
 
 message PlayerSummaries {
-	optional sint32 f1 = 1;
-	optional sint32 f2 = 2;
+	optional sint64 f1 = 1; //stored as int32
+	optional sint64 f2 = 2; //stored as int32
 	optional sint32 f3 = 3;
 	optional sint32 f4 = 4;
 	optional int32 f5 = 5;
@@ -161,20 +191,20 @@ message UdpConfigVOD {
 }
 
 message PlayerRouteDistance {
-	optional int32 f1 = 1;
+	optional int32 bikeId = 1; //BikeManager::FindBikeWithNetworkID
 	optional float f2 = 2; //or fixed
-	optional int32 f3 = 3;
+	optional int32 f3 = 3; //-> m_bikeEntity->field_9C8
 }
 
 message EventSubgroupPlacements {
-	optional int32 f1 = 1;
+	optional int32 f1 = 1; //-> m_bikeEntity->field_9C0
 	repeated PlayerRouteDistance player_rd1 = 2;
 	repeated PlayerRouteDistance player_rd2 = 3;
 	repeated PlayerRouteDistance player_rd3 = 4;
 	repeated PlayerRouteDistance player_rd4 = 5;
-	optional int32 f6 = 6;
-	optional int32 f7 = 7;
-	optional int32 f8 = 8;
+	optional int32 eventTotalRiders = 6;
+	optional int32 bikeNetworkId = 7;
+	optional int32 f8 = 8; //-> BikeWithNetworkID->field_9C8
 	optional float f9 = 9; //or fixed
 }
 
@@ -184,14 +214,14 @@ message ServerToClient {
 	optional int64 world_time = 3;
 	optional int32 seqno = 4;
 	optional int32 f5 = 5;
-	/* 6,7: absent */
+	// 6,7: absent
 	repeated PlayerState states = 8;
 	repeated WorldAttribute updates = 9;
-	optional int64 f10 = 10;
+	repeated int64 f10 = 10;
 	optional bool f11 = 11; //=true???
 	optional string zc_local_ip = 12;
 	optional int64 f13 = 13;
-	optional int32 f14 = 14;
+	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
 	optional int32 kind = 16;
 	optional int64 f17 = 17;
@@ -199,7 +229,7 @@ message ServerToClient {
 	optional int32 msgnum = 19;
 	optional bool f20 = 20;
 	optional PlayerSummaries player_summaries = 21; //tag426
-	/* 22 absent */
+	// 22 absent
 	optional EventSubgroupPlacements ev_subgroup_ps = 23; //tag442
 	optional UdpConfig udp_config = 24; //tag450
 	optional UdpConfigVOD udp_config_vod_1 = 25; //tag458
@@ -207,7 +237,7 @@ message ServerToClient {
 	optional UdpConfigVOD udp_config_vod_2 = 27; //tag474
 	repeated PlayerState player_states = 28; //tag482
 	optional TcpConfig tcp_config = 29; //tag490
-	repeated sint64 f30 = 30; //tag496
+	repeated int64 f30 = 30; //tag496
 }
 
 message Ghost { //not from the Zwift game, zoffline-specific!
@@ -217,22 +247,6 @@ message Ghost { //not from the Zwift game, zoffline-specific!
 
 message Ghosts { //not from the Zwift game, zoffline-specific!
 	repeated Ghost ghosts = 1;
-}
-
-message PlayerUpdate { //=WorldAttribute???
-    optional int64 f1 = 1; // 587645624533328784, later 5876456 85771834256
-    optional int32 f2 = 2; // 1
-    required int32 type = 3; // 105 entered world, 5 chat message, 4 ride on
-    required bytes payload = 4; // protobuf
-    optional int64 world_time1 = 5;
-    optional int64 x = 6;
-    optional int64 altitude = 7;
-    optional int64 y = 8;
-    optional int64 world_time2 = 9;
-    optional int64 f11 = 11; // 75000 ?
-    optional int64 f12 = 12; //Not in package when testing
-    optional int64 f14 = 14; // '1604516817408239', later '1604516824709874'
-    optional int64 f15 = 15; //6, might be course
 }
 
 message RideOn {

@@ -653,11 +653,11 @@ def user_home(username):
 
 
 def send_message_to_all_online(message, sender='Server'):
-    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.f2 = 1
     player_update.type = 5 #chat message type
-    player_update.world_time1 = world_time()
-    player_update.world_time2 = world_time() + 60000
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
     player_update.f12 = 1
     player_update.f14 = int(get_utc_time()*1000000)
 
@@ -1389,7 +1389,7 @@ def api_profiles_activities(player_id):
         return '{"id": %ld}' % activity.id, 200
 
     # request.method == 'GET'
-    activities = activity_pb2.Activities()
+    activities = activity_pb2.ActivityList()
     # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
     rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s" % str(player_id)))
     should_remove = list()
@@ -1665,11 +1665,11 @@ def api_profiles_activities_rideon(recieving_player_id):
     sending_player_id = request.json['profileId']
     profile = get_partial_profile(sending_player_id)
     if not profile == None:
-        player_update = udp_node_msgs_pb2.PlayerUpdate()
+        player_update = udp_node_msgs_pb2.WorldAttribute()
         player_update.f2 = 1
         player_update.type = 4 #ride on type
-        player_update.world_time1 = world_time()
-        player_update.world_time2 = player_update.world_time1 + 9890
+        player_update.world_time_born = world_time()
+        player_update.world_time_expire = player_update.world_time_born + 9890
         player_update.f14 = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
@@ -1857,7 +1857,7 @@ def relay_worlds_generic(world_id=None):
             #chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
             #serializedMessage = None
             try:
-                player_update = udp_node_msgs_pb2.PlayerUpdate()
+                player_update = udp_node_msgs_pb2.WorldAttribute()
                 player_update.ParseFromString(request.data)
                 #chat_message.ParseFromString(request.data[6:])
                 #serializedMessage = chat_message.SerializeToString()
@@ -1879,7 +1879,7 @@ def relay_worlds_generic(world_id=None):
                     return jsonify([ world ])
 
             #PlayerUpdate
-            player_update.world_time2 = world_time() + 60000
+            player_update.world_time_expire = world_time() + 60000
             player_update.f12 = 1
             player_update.f14 = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
@@ -2016,14 +2016,14 @@ def relay_worlds_id_attributes(world_id):
 def relay_worlds_attributes():
 # PlayerUpdate was previously a json request handled in relay_worlds_generic()
 # now it's protobuf posted to this new route (at least in Windows client)
-    player_update = udp_node_msgs_pb2.PlayerUpdate()
+    player_update = udp_node_msgs_pb2.WorldAttribute()
     try:
         player_update.ParseFromString(request.data)
     except Exception as exc:
         logger.warn('player_update_parse: %s' % repr(exc))
         return '', 422
 
-    player_update.world_time2 = world_time() + 60000
+    player_update.world_time_expire = world_time() + 60000
     player_update.f12 = 1
     player_update.f14 = int(get_utc_time() * 1000000)
     for receiving_player_id in online.keys():
