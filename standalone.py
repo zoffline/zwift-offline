@@ -68,6 +68,7 @@ player_update_queue = {}
 global_pace_partners = {}
 global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
+start_time = time.time()
 
 def road_id(state):
     return (state.f20 & 0xff00) >> 8
@@ -524,7 +525,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Update player online state
         if state.roadTime:
-            if not player_id in online.keys():
+            if not player_id in online.keys() and time.time() > start_time + 30:
                 discord.send_message('%s riders online' % (len(online) + 1))
             online[player_id] = state
 
