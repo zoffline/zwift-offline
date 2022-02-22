@@ -122,7 +122,7 @@ message PlayerState {
 }
 
 message ClientToServer {
-	required int64 connected = 1;
+	required int64 serverRealmID = 1; //UdpClient::sendDisconnectedClientToServer: -1
 	required int64 player_id = 2;
 	optional int64 world_time = 3;
 	optional uint32 seqno = 4;
@@ -136,8 +136,8 @@ message ClientToServer {
 	required int64 last_player_update = 12;
 	optional int64 larg_wa_time = 13; //TcpClient::sayHello: LargestWorldAttributeTimestamp
 	optional bool f14 = 14;
-	repeated int64 f15 = 15; //TcpClient::sayHello, TcpClient::sendSubscribeToSegment
-	repeated int64 f16 = 16; //TcpClient::processSegmentUnsubscription
+	repeated int64 subsSegments = 15; //subscribed segment ids? TcpClient::sayHello, TcpClient::sendSubscribeToSegment
+	repeated int64 unsSegments = 16; //unsubscribed segment ids? TcpClient::processSegmentUnsubscription
 }
 
 message PlayerSummary {
@@ -197,7 +197,7 @@ message PlayerRouteDistance {
 }
 
 message EventSubgroupPlacements {
-	optional int32 f1 = 1; //-> m_bikeEntity->field_9C0
+	optional int32 f1 = 1; //-> m_bikeEntity->field_9C0; UdpStatistics::registerFanViewLatestPlayerStateInfo
 	repeated PlayerRouteDistance player_rd1 = 2;
 	repeated PlayerRouteDistance player_rd2 = 3;
 	repeated PlayerRouteDistance player_rd3 = 4;
@@ -213,7 +213,7 @@ message ServerToClient {
 	optional int64 player_id = 2;
 	optional int64 world_time = 3;
 	optional int32 seqno = 4;
-	optional int32 f5 = 5;
+	optional int32 f5 = 5; //read in WorldClockService::calculateOneLegLatency
 	// 6,7: absent
 	repeated PlayerState states = 8;
 	repeated WorldAttribute updates = 9;
@@ -224,20 +224,20 @@ message ServerToClient {
 	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
 	optional int32 kind = 16; //TODO: enum; 2: TCP
-	optional int64 f17 = 17;
+	optional int64 f17 = 17; //read in WorldClockService::calculateOneLegLatency
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
-	optional bool f20 = 20;
+	optional bool hasSimultLogin = 20; //UdpClient::disconnectionRequested due to simultaneous login (1); OR simultaneous login ceased (0)
 	optional PlayerSummaries player_summaries = 21; //tag426
 	// 22 absent
 	optional EventSubgroupPlacements ev_subgroup_ps = 23; //tag442
 	optional UdpConfig udp_config = 24; //tag450
 	optional UdpConfigVOD udp_config_vod_1 = 25; //tag458
-	optional int32 f26 = 26; //tag464
+	optional int32 f26 = 26; //tag464 UdpClient::receivedExpungeReason
 	optional UdpConfigVOD udp_config_vod_2 = 27; //tag474
 	repeated PlayerState player_states = 28; //tag482
 	optional TcpConfig tcp_config = 29; //tag490
-	repeated int64 f30 = 30; //tag496
+	repeated int64 ackSubsSegm = 30; //tag496 TcpClient::processSubscribedSegment
 }
 
 message Ghost { //not from the Zwift game, zoffline-specific!
