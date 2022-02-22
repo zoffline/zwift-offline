@@ -19,6 +19,10 @@ enum PlayerType {
 	PRO_TRIATHLETE = 8;
 	PRO_RUNNER = 9;
 }
+enum PowerType {
+	PT_VIRTUAL = 0;
+	PT_METER = 1;
+}
 message AchievementEntry {
 	required int32 id = 1;
 }
@@ -78,7 +82,7 @@ message PlayerProfile {
 	optional uint32 achievement_level = 49;
 	optional bool use_metric = 50;
 	optional bool strava_premium = 51;
-	optional uint32 power_source_model = 52;
+	optional PowerType power_source_model = 52;
 	optional uint32 f53 = 53; //??? empty
 	optional uint32 f54 = 54; //??? empty
 	optional uint32 age = 55;
