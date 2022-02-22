@@ -196,17 +196,17 @@ def sync(zo_uid, ext_uid, user, password):
     session = requests.session()
     access_token, refresh_token = login(session, user, password)
 
-    profile_zo = profile_pb2.Profile()
+    profile_zo = profile_pb2.PlayerProfile()
     profile_zo_file = '%s/profile.bin' % zo_uid
     with open(profile_zo_file, 'rb') as f:
         profile_zo.ParseFromString(f.read())
 
-    profile_base = profile_pb2.Profile()
+    profile_base = profile_pb2.PlayerProfile()
     profile_base_file = '../../zoffline-helper/%s/last_synced.bin' % ext_uid
     with open(profile_base_file, 'rb') as f:
         profile_base.ParseFromString(f.read())
 
-    profile_ext = profile_pb2.Profile()
+    profile_ext = profile_pb2.PlayerProfile()
     profile_ext_bin = query_player_profile(session, access_token)
     with open('../../zoffline-helper/%s/rx-%s.bin' % (ext_uid, uuid.uuid4().hex), 'wb') as f:
         f.write(profile_ext_bin)
