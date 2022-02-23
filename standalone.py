@@ -253,15 +253,15 @@ class CDNHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Length', len(resp.content))
         self.end_headers()
 
-def dumpProtobuf(fn, dr, msg):
-    with open(fn, 'a') as f:
-        f.write("%s: %s %s %s\n" % (datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
+#def dumpProtobuf(fn, dr, msg):
+#    with open(fn, 'a') as f:
+#        f.write("%s: %s %s %s\n" % (datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
 
-def dumpUdpProtobuf(msg, dr):
-    dumpProtobuf("udp.txt", dr, msg)
+#def dumpUdpProtobuf(msg, dr):
+#    dumpProtobuf("udp.txt", dr, msg)
 
-def dumpTcpProtobuf(msg, dr):
-    dumpProtobuf("tcp.txt", dr, msg)
+#def dumpTcpProtobuf(msg, dr):
+#    dumpProtobuf("tcp.txt", dr, msg)
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -274,7 +274,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
-        dumpTcpProtobuf(hello, "RX")
+#        dumpTcpProtobuf(hello, "RX")
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
@@ -289,26 +289,26 @@ class TCPHandler(socketserver.BaseRequestHandler):
         else:
             udp_node_ip = "127.0.0.1"
         details1 = msg.udp_config.relay_addresses.add()
-        details1.f1 = 1
-        details1.f2 = 6
+        details1.ra_f1 = 1
+        details1.ra_f2 = 6
         details1.ip = udp_node_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
-        details2.f1 = 0
-        details2.f2 = 0
+        details2.ra_f1 = 0
+        details2.ra_f2 = 0
         details2.ip = udp_node_ip
         details2.port = 3022
-        msg.udp_config.f2 = 10
-        msg.udp_config.f3 = 30
-        msg.udp_config.f4 = 3
+        msg.udp_config.uc_f2 = 10
+        msg.udp_config.uc_f3 = 30
+        msg.udp_config.uc_f4 = 3
         wdetails1 = msg.udp_config_vod_1.relay_addresses_vod.add()
-        wdetails1.f1 = 1
-        wdetails1.f2 = 6
+        wdetails1.rav_f1 = 1
+        wdetails1.rav_f2 = 6
         details3 = wdetails1.relay_addresses.add()
         details3.CopyFrom(details1)
         wdetails2 = msg.udp_config_vod_1.relay_addresses_vod.add()
-        wdetails2.f1 = 0
-        wdetails2.f2 = 0
+        wdetails2.rav_f1 = 0
+        wdetails2.rav_f2 = 0
         details4 = wdetails2.relay_addresses.add()
         details4.CopyFrom(details2)
         msg.udp_config_vod_1.port = 3022
@@ -316,14 +316,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
         # Send size of payload as 2 bytes
         self.request.sendall(struct.pack('!h', len(payload)))
         self.request.sendall(payload)
-        dumpTcpProtobuf(msg, "TX")
+#        dumpTcpProtobuf(msg, "TX")
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = player_id
         msg.world_time = 0
-        msg.f11 = True
+        msg.stc_f11 = True
         payload = msg.SerializeToString()
 
         last_alive_check = int(zwift_offline.get_utc_time())
@@ -346,11 +346,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
                     #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
-                    dumpTcpProtobuf(zc_params, "TX")
+                    #TcpProtobuf(zc_params, "TX")
                     zwift_offline.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()
-                message.f1 = 1
+                message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
                 message.player_id = player_id
                 message.world_time = zwift_offline.world_time()
 
@@ -366,10 +366,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message_payload = message.SerializeToString()
                             self.request.sendall(struct.pack('!h', len(message_payload)))
                             self.request.sendall(message_payload)
-                            dumpTcpProtobuf(message, "TX")
+                            #dumpTcpProtobuf(message, "TX")
 
                             message = udp_node_msgs_pb2.ServerToClient()
-                            message.f1 = 1
+                            message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
                             message.player_id = player_id
                             message.world_time = zwift_offline.world_time()
 
@@ -383,7 +383,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     message_payload = message.SerializeToString()
                     self.request.sendall(struct.pack('!h', len(message_payload)))
                     self.request.sendall(message_payload)
-                    dumpTcpProtobuf(message, "TX")
+                    #dumpTcpProtobuf(message, "TX")
                 elif last_alive_check < t - 25:
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
@@ -490,11 +490,11 @@ def remove_inactive():
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
-    message.f1 = 1
+    message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     message.player_id = player_id
     message.seqno = 1
-    message.f5 = 1
-    message.f11 = 1
+    message.stc_f5 = 1
+    message.stc_f11 = 1
     message.msgnum = 1
     return message
 
@@ -525,7 +525,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             except Exception as exc:
                 print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
-        dumpUdpProtobuf(recv, "RX")
+        #dumpUdpProtobuf(recv, "RX")
 
         client_address = self.client_address
         player_id = recv.player_id
@@ -662,7 +662,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
                         socket.sendto(message.SerializeToString(), client_address)
-                        dumpUdpProtobuf(message, "TX")
+                        #dumpUdpProtobuf(message, "TX")
                         message.msgnum += 1
                         del message.states[:]
                     s = message.states.add()
@@ -671,7 +671,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
         socket.sendto(message.SerializeToString(), client_address)
-        dumpUdpProtobuf(message, "TX")
+        #dumpUdpProtobuf(message, "TX")
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
