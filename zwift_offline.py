@@ -1720,17 +1720,19 @@ def unix_time_millis(dt):
 
 
 def fill_in_goal_progress(goal, player_id):
-    now = get_utc_date_time()
+    local_now = datetime.datetime.now()
+    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     if goal.periodicity == 0:  # weekly
-        first_dt, last_dt = get_week_range(now)
+        first_dt, last_dt = get_week_range(local_now)
     else:  # monthly
-        first_dt, last_dt = get_month_range(now)
+        first_dt, last_dt = get_month_range(local_now)
 
     common_sql = ("""FROM activity
                     WHERE player_id = %s
                     AND strftime('%s', start_date) >= strftime('%s', '%s')
                     AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
-                    (player_id, '%s', '%s', first_dt, '%s', '%s', last_dt))
+                    (player_id, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
+    #print(common_sql)
     if goal.type == 0:  # distance
         distance = db.session.execute(sqlalchemy.text('SELECT SUM(distance) %s' % common_sql)).first()[0]
         if distance:
@@ -1750,11 +1752,13 @@ def fill_in_goal_progress(goal, player_id):
             goal.actual_distance = 0.0
 
 
-def set_goal_end_date(goal, now):
+def set_goal_end_date_now(goal):
+    local_now = datetime.datetime.now()
+    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     if goal.periodicity == 0:  # weekly
-        goal.period_end_date = unix_time_millis(get_week_range(now)[1])
+        goal.period_end_date = unix_time_millis(get_week_range(local_now)[1]) - utc_offset
     else:  # monthly
-        goal.period_end_date = unix_time_millis(get_month_range(now)[1])
+        goal.period_end_date = unix_time_millis(get_month_range(local_now)[1]) - utc_offset
 
 
 @app.route('/api/profiles/<int:player_id>/goals', methods=['GET', 'POST'])
@@ -1771,7 +1775,7 @@ def api_profiles_goals(player_id):
         goal.id = get_id('goal')
         now = get_utc_date_time()
         goal.created_on = unix_time_millis(now)
-        set_goal_end_date(goal, now)
+        set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
         insert_protobuf_into_db('goal', goal)
 
@@ -1790,7 +1794,7 @@ def api_profiles_goals(player_id):
             need_update.append(goal)
         fill_in_goal_progress(goal, player_id)
     for goal in need_update:
-        set_goal_end_date(goal, now)
+        set_goal_end_date_now(goal)
         update_protobuf_in_db('goal', goal, goal.id)
 
     return goals.SerializeToString(), 200
