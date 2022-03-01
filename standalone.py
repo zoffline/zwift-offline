@@ -253,15 +253,15 @@ class CDNHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Length', len(resp.content))
         self.end_headers()
 
-#def dumpProtobuf(fn, dr, msg):
-#    with open(fn, 'a') as f:
-#        f.write("%s: %s %s %s\n" % (datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
+def dumpProtobuf(fn, dr, msg):
+    with open(fn, 'a') as f:
+        f.write("%s: %s %s %s\n" % (datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
 
-#def dumpUdpProtobuf(msg, dr):
-#    dumpProtobuf("udp.txt", dr, msg)
+def dumpUdpProtobuf(msg, dr):
+    dumpProtobuf("udp.txt", dr, msg)
 
-#def dumpTcpProtobuf(msg, dr):
-#    dumpProtobuf("tcp.txt", dr, msg)
+def dumpTcpProtobuf(msg, dr):
+    dumpProtobuf("tcp.txt", dr, msg)
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -274,7 +274,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
-#        dumpTcpProtobuf(hello, "RX")
+        dumpTcpProtobuf(hello, "RX")
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
@@ -316,7 +316,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         # Send size of payload as 2 bytes
         self.request.sendall(struct.pack('!h', len(payload)))
         self.request.sendall(payload)
-#        dumpTcpProtobuf(msg, "TX")
+        dumpTcpProtobuf(msg, "TX")
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
@@ -340,13 +340,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     zc_params.world_time = 0
                     zc_params.zc_local_ip = zwift_offline.zc_connect_queue[player_id][0]
                     zc_params.zc_local_port = zwift_offline.zc_connect_queue[player_id][1] #21587
-                    zc_params.kind = 2 #TCP
+                    zc_params.zc_protocol = udp_node_msgs_pb2.IPProtocol.TCP #=2
                     zc_params_payload = zc_params.SerializeToString()
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
                     #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
-                    #TcpProtobuf(zc_params, "TX")
+                    dumpTcpProtobuf(zc_params, "TX")
                     zwift_offline.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()
@@ -366,7 +366,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message_payload = message.SerializeToString()
                             self.request.sendall(struct.pack('!h', len(message_payload)))
                             self.request.sendall(message_payload)
-                            #dumpTcpProtobuf(message, "TX")
+                            dumpTcpProtobuf(message, "TX")
 
                             message = udp_node_msgs_pb2.ServerToClient()
                             message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -383,7 +383,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     message_payload = message.SerializeToString()
                     self.request.sendall(struct.pack('!h', len(message_payload)))
                     self.request.sendall(message_payload)
-                    #dumpTcpProtobuf(message, "TX")
+                    dumpTcpProtobuf(message, "TX")
                 elif last_alive_check < t - 25:
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
@@ -498,17 +498,38 @@ def get_empty_message(player_id):
     message.msgnum = 1
     return message
 
-global_news = {} #player id to dictionary of peer_player_id->worldTime
+global_news = {} #player_id to dictionary of peer_player_id->worldTime
 def is_state_new_for(peer_player_state, player_id):
     if not player_id in global_news.keys():
         global_news[player_id] = {}
     for_news = global_news[player_id]
     if peer_player_state.id in for_news.keys():
-        if for_news[peer_player_state.id] == peer_player_state.worldTime:
+        sent_peer_world_time = for_news[peer_player_state.id]
+        if sent_peer_world_time == peer_player_state.worldTime:
             #print("is_state_new_for guard")
             return False #already sent
+        if sent_peer_world_time > peer_player_state.worldTime:
+            print("is_state_new_for: out of order")
+            return False #filter out
+        #if peer_player_state.worldTime - sent_peer_world_time < 500:
+        #    print("is_state_new_for: less than 500")
+        #    return False #filter out
     for_news[peer_player_state.id] = peer_player_state.worldTime
     return True
+
+global_udp_addresses = {} # player_id to address
+def is_udp_addr_known(p_id):
+    return p_id in global_udp_addresses.keys()
+
+def get_udp_addr(p_id):
+    return global_udp_addresses[p_id]
+
+def set_udp_address(p_id, addr):
+    #if not is_udp_addr_known(p_id):
+    #    print("set_udp_address(%s): new %s" % (p_id, addr))
+    #elif global_udp_addresses[p_id] != addr:
+    #    print("set_udp_address(%s): changed to %s" % (p_id, addr))
+    global_udp_addresses[p_id] = addr
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -525,11 +546,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             except Exception as exc:
                 print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
-        #dumpUdpProtobuf(recv, "RX")
+        dumpUdpProtobuf(recv, "RX")
 
         client_address = self.client_address
         player_id = recv.player_id
         state = recv.state
+        set_udp_address(player_id, client_address)
 
         #Add last updates for player if missing
         if not player_id in last_pp_updates.keys():
@@ -661,8 +683,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
+                        print('dt: %s' % (message.world_time - state.worldTime))
                         socket.sendto(message.SerializeToString(), client_address)
-                        #dumpUdpProtobuf(message, "TX")
+                        dumpUdpProtobuf(message, "TX")
                         message.msgnum += 1
                         del message.states[:]
                     s = message.states.add()
@@ -670,8 +693,23 @@ class UDPHandler(socketserver.BaseRequestHandler):
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
+        print('dt: %s' % (message.world_time - state.worldTime))
         socket.sendto(message.SerializeToString(), client_address)
-        #dumpUdpProtobuf(message, "TX")
+        dumpUdpProtobuf(message, "TX")
+
+        #Send new state immediately to all nearby players
+        for p_id in online.keys():
+            player = online[p_id]
+            if player.id != player_id and zwift_offline.is_nearby(state, player) and is_udp_addr_known(p_id) and is_state_new_for(state, p_id): #always new if ordered
+                peer_address = get_udp_addr(p_id)
+                message = get_empty_message(player.id)
+                message.num_msgs = 1
+                message.world_time = zwift_offline.world_time() #state.worldTime?
+                print('dt: %s' % (message.world_time - state.worldTime))
+                s = message.states.add()
+                s.CopyFrom(state)
+                socket.sendto(message.SerializeToString(), peer_address)
+                dumpUdpProtobuf(message, "TX+")
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)

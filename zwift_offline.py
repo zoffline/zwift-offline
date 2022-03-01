@@ -347,11 +347,11 @@ def is_nearby(player_state1, player_state2, range = 100000):
             x1 = int(player_state1.x)
             x2 = int(player_state2.x)
             if x1 - range <= x2 and x1 + range >= x2:
-                y1 = int(player_state1.y)
-                y2 = int(player_state2.y)
-                if y1 - range <= y2 and y1 + range >= y2:
-                    a1 = int(player_state1.altitude)
-                    a2 = int(player_state2.altitude)
+                z1 = int(player_state1.z)
+                z2 = int(player_state2.z)
+                if z1 - range <= z2 and z1 + range >= z2:
+                    a1 = int(player_state1.y_altitude)
+                    a2 = int(player_state2.y_altitude)
                     if a1 - range <= a2 and a1 + range >= a2:
                         return True
     except Exception as exc:
@@ -659,7 +659,7 @@ def send_message_to_all_online(message, sender='Server'):
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.wa_f14 = int(get_utc_time()*1000000)
+    player_update.timestamp = int(get_utc_time()*1000000)
 
     chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
     chat_message.player_id = 0
@@ -1670,7 +1670,7 @@ def api_profiles_activities_rideon(recieving_player_id):
         player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
         player_update.world_time_born = world_time()
         player_update.world_time_expire = player_update.world_time_born + 9890
-        player_update.wa_f14 = int(get_utc_time() * 1000000)
+        player_update.timestamp = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
         ride_on.player_id = int(sending_player_id)
@@ -1702,9 +1702,10 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0) #datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
      first = d
      last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
+     #print("get_week_range(%s)=(%s, %s)" % (dt, first, last))
      return first, last
 
 def get_month_range(dt):
@@ -1844,14 +1845,14 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.sport = player.sport
             online_player.power = player.power
             online_player.x = player.x
-            online_player.altitude = player.altitude
-            online_player.y = player.y
+            online_player.y_altitude = player.y_altitude
+            online_player.z = player.z
             course_world[course_id].zwifters += 1
 
 
-#def dumpProtobuf(fn, dr, msg):
-#    with open(fn, 'a') as f:
-#        f.write("%s: %s %s %s\n" % (datetime.datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
+def dumpProtobuf(fn, dr, msg):
+    with open(fn, 'a') as f:
+        f.write("%s: %s %s %s\n" % (datetime.datetime.now(), dr, msg.__class__.__name__, text_format.MessageToString(msg, as_one_line=True)))
 
 def relay_worlds_generic(server_realm=None):
     courses = courses_lookup.keys()
@@ -1863,7 +1864,7 @@ def relay_worlds_generic(server_realm=None):
             try:
                 player_update = udp_node_msgs_pb2.WorldAttribute()
                 player_update.ParseFromString(request.data)
-#                dumpProtobuf("rwg.txt", "RX", player_update)
+                dumpProtobuf("rwg.txt", "RX", player_update)
                 #chat_message.ParseFromString(request.data[6:])
                 #serializedMessage = chat_message.SerializeToString()
             except Exception as exc:
@@ -1886,7 +1887,7 @@ def relay_worlds_generic(server_realm=None):
             #PlayerUpdate
             player_update.world_time_expire = world_time() + 60000
             player_update.wa_f12 = 1
-            player_update.wa_f14 = int(get_utc_time()*1000000)
+            player_update.timestamp = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA or player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SR:
@@ -2024,14 +2025,14 @@ def relay_worlds_attributes():
     player_update = udp_node_msgs_pb2.WorldAttribute()
     try:
         player_update.ParseFromString(request.data)
-#        dumpProtobuf("rwa.txt", "RX", player_update)
+        dumpProtobuf("rwa.txt", "RX", player_update)
     except Exception as exc:
         logger.warn('player_update_parse: %s' % repr(exc))
         return '', 422
 
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.wa_f14 = int(get_utc_time() * 1000000)
+    player_update.timestamp = int(get_utc_time() * 1000000)
     for receiving_player_id in online.keys():
         should_receive = False
         if player_update.wa_type in [udp_node_msgs_pb2.WA_TYPE.WAT_SPA, udp_node_msgs_pb2.WA_TYPE.WAT_SR]:

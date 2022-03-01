@@ -37,22 +37,22 @@ enum WA_TYPE {
 }
 
 message WorldAttribute {
-	optional int64 wa_f1 = 1;          //587645624533328784, later 5876456 85771834256
+	optional int64 wa_f1 = 1;          //not r/w by game? 587645624533328784, later 5876456 85771834256
 	optional int64 server_realm = 2;
 	optional WA_TYPE wa_type = 3;
 	optional bytes payload = 4;        //not only protobuf
 	optional int64 world_time_born = 5;
 	optional int64 x = 6;              //stored as int32
-	optional int64 altitude = 7;       //stored as int32
-	optional int64 y = 8;              //stored as int32
+	optional int64 y_altitude = 7;     //stored as int32
+	optional int64 z = 8;              //stored as int32
 	optional int64 world_time_expire = 9;
 	optional int64 rel_id = 10;        //WAT_PPI: pace partner smth; WAT_SPA: to_player_id; WAT_RH: route_id? ...
-	optional int32 wa_f11 = 11;        //importance??? WAT_B_ACT:1000; WAT_NM:50000; WAT_RH:5000000; ... 75000 ?
-	optional int64 wa_f12 = 12;        //Not in package when testing
-	optional int32 wa_f13 = 13;
-	optional int64 wa_f14 = 14;        //'1604516817408239', later '1604516824709874'
-	optional int32 wa_f15 = 15;        //6, might be course
-	optional int64 wa_f16 = 16;        //stored as bool
+	optional int32 importance = 11;    //not read by game??? WAT_B_ACT:1000; WAT_NM:50000; WAT_RH:5000000; ... 75000 ?
+	optional int64 wa_f12 = 12;        //not r/w by game? Not in package when testing
+	optional int32 wa_f13 = 13;        //not r/w by game? 
+	optional int64 timestamp = 14;     //not written by game? (from server) looks like "The Current Epoch Unix Timestamp" in Microseconds
+	optional int32 wa_f15 = 15;        //not r/w by game? 6, might be course
+	optional int64 wa_f16 = 16;        //not r/w by game? stored as bool
 }
 
 /*message WorldAttributes {
@@ -109,8 +109,8 @@ message PlayerState {
 	optional bool justWatching = 23;
 	optional int32 calories = 24;
 	optional float x = 25;
-	optional float altitude = 26;
-	optional float y = 27;
+	optional float y_altitude = 26;
+	optional float z = 27;
 	optional int64 watchingRiderId = 28;
 	optional int64 groupId = 29;
 	// 30 absent at least in Android Game
@@ -211,7 +211,10 @@ message EventSubgroupPlacements {
 	optional int32 esp_f8 = 8; //-> BikeWithNetworkID->field_9C8
 	optional float esp_f9 = 9; //or fixed
 }
-
+enum IPProtocol {
+	UDP = 1;
+	TCP = 2;
+}
 message ServerToClient {
 	optional int64 server_realm = 1;
 	optional int64 player_id = 2;
@@ -227,7 +230,7 @@ message ServerToClient {
 	optional int64 stc_f13 = 13;
 	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
-	optional int32 kind = 16; //TODO: enum; 2: TCP
+	optional IPProtocol zc_protocol = 16; //TODO: enum; 2: TCP
 	optional int64 stc_f17 = 17; //read in WorldClockService::calculateOneLegLatency
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
