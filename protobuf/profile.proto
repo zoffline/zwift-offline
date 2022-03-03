@@ -1,5 +1,10 @@
 syntax = "proto2";
 //TODO: answer ??? questions and saved_game format (zwift_profile.ksy)
+enum ActivityPrivacyType {
+	PUBLIC = 0;
+	PRIVATE = 1;
+	FRIENDS = 2;
+}
 enum Sport {
 	CYCLING = 0;
 	RUNNING = 1;
@@ -32,7 +37,7 @@ message Achievements {
 
 message PlayerProfile {
 	optional int64 id = 1;
-	optional int64 world_id = 2;
+	optional int64 server_realm = 2;
 	optional string email = 3;
 	optional string first_name = 4;
 	optional string last_name = 5;
@@ -192,11 +197,6 @@ message PlayerProfile {
 	}
 	optional CyclingOrganization cycling_organization = 123;
 	optional string f124 = 124; // LICENSE_NUMBER/E_NUMBER
-	enum ActivityPrivacyType {
-		PUBLIC = 0;
-		PRIVATE = 1;
-		FRIENDS = 2;
-	}
 	optional ActivityPrivacyType default_activity_privacy = 125;
 	optional bool connected_to_runtastic = 126;
 	repeated PropertyChange property_changes = 127;
