@@ -166,7 +166,7 @@ def sigint_handler(num, frame):
     tcpserver.server_close()
     udpserver.shutdown()
     udpserver.server_close()
-    sys.exit(0)
+    os._exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
 
