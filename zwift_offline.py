@@ -344,11 +344,11 @@ def is_nearby(player_state1, player_state2, range = 100000):
             x1 = int(player_state1.x)
             x2 = int(player_state2.x)
             if x1 - range <= x2 and x1 + range >= x2:
-                y1 = int(player_state1.y)
-                y2 = int(player_state2.y)
-                if y1 - range <= y2 and y1 + range >= y2:
-                    a1 = int(player_state1.altitude)
-                    a2 = int(player_state2.altitude)
+                z1 = int(player_state1.z)
+                z2 = int(player_state2.z)
+                if z1 - range <= z2 and z1 + range >= z2:
+                    a1 = int(player_state1.y_altitude)
+                    a2 = int(player_state2.y_altitude)
                     if a1 - range <= a2 and a1 + range >= a2:
                         return True
     except Exception as exc:
@@ -649,15 +649,14 @@ def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes, server_ip=os.path.exists(SERVER_IP_FILE))
 
-
 def send_message_to_all_online(message, sender='Server'):
     player_update = udp_node_msgs_pb2.WorldAttribute()
-    player_update.f2 = 1
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SPA
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
-    player_update.f12 = 1
-    player_update.f14 = int(get_utc_time()*1000000)
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
 
     chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
     chat_message.player_id = 0
@@ -996,7 +995,7 @@ def api_events_search():
         event = events.events.add()
         event.id = event_id
         event.title = item[0]
-        event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) worlds
+        event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
@@ -1124,7 +1123,7 @@ def powerSourceModelToStr(val):
 def privacy(profile):
     privacy_bits = jsf(profile, 'privacy_bits', 0)
     return {"approvalRequired": bool(privacy_bits & 1), "displayWeight": bool(privacy_bits & 4), "minor": bool(privacy_bits & 2), "privateMessaging": bool(privacy_bits & 8), "defaultFitnessDataPrivacy": bool(privacy_bits & 16), 
-"suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.PlayerProfile.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
+"suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
 
 def bikeFrameToStr(val):
     if (val == 0x7d8c357d):
@@ -1196,7 +1195,7 @@ def do_api_profiles_me(is_json):
 "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
 "emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), "ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'),
 "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
-"socialFacts": jprofileFull.get('socialFacts'), "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'world_id'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
+"socialFacts": jprofileFull.get('socialFacts'), "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'server_realm'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
 "achievementLevel": jsv0(profile, 'achievement_level'), "totalWattHours": jsv0(profile, 'total_watt_hours'), "runTime1miInSeconds": jsv0(profile, 'run_time_1mi_in_seconds'), "runTime5kmInSeconds": jsv0(profile, 'run_time_5km_in_seconds'), "runTime10kmInSeconds": jsv0(profile, 'run_time_10km_in_seconds'), 
 "runTimeHalfMarathonInSeconds": jsv0(profile, 'run_time_half_marathon_in_seconds'), "runTimeFullMarathonInSeconds": jsv0(profile, 'run_time_full_marathon_in_seconds'), "totalInKomJersey": jsv0(profile, 'total_in_kom_jersey'), "totalInSprintersJersey": jsv0(profile, 'total_in_sprinters_jersey'), 
 "totalInOrangeJersey": jsv0(profile, 'total_in_orange_jersey'), "currentActivityId": jsf(profile, 'current_activity_id'), "enrolledZwiftAcademy": jsv0(profile, 'enrolled_program') == profile.EnrolledProgram.ZWIFT_ACADEMY, "runAchievementLevel": jsv0(profile, 'run_achievement_level'), 
@@ -1679,11 +1678,11 @@ def api_profiles_activities_rideon(recieving_player_id):
     profile = get_partial_profile(sending_player_id)
     if not profile == None:
         player_update = udp_node_msgs_pb2.WorldAttribute()
-        player_update.f2 = 1
+        player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
         player_update.world_time_born = world_time()
         player_update.world_time_expire = player_update.world_time_born + 9890
-        player_update.f14 = int(get_utc_time() * 1000000)
+        player_update.timestamp = int(get_utc_time() * 1000000)
 
         ride_on = udp_node_msgs_pb2.RideOn()
         ride_on.player_id = int(sending_player_id)
@@ -1715,7 +1714,7 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0) #datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
      first = d
      last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
@@ -1732,17 +1731,18 @@ def unix_time_millis(dt):
 
 
 def fill_in_goal_progress(goal, player_id):
-    now = get_utc_date_time()
+    local_now = datetime.datetime.now()
+    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     if goal.periodicity == 0:  # weekly
-        first_dt, last_dt = get_week_range(now)
+        first_dt, last_dt = get_week_range(local_now)
     else:  # monthly
-        first_dt, last_dt = get_month_range(now)
+        first_dt, last_dt = get_month_range(local_now)
 
     common_sql = ("""FROM activity
                     WHERE player_id = %s
                     AND strftime('%s', start_date) >= strftime('%s', '%s')
                     AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
-                    (player_id, '%s', '%s', first_dt, '%s', '%s', last_dt))
+                    (player_id, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
     if goal.type == 0:  # distance
         distance = db.session.execute(sqlalchemy.text('SELECT SUM(distance) %s' % common_sql)).first()[0]
         if distance:
@@ -1762,11 +1762,13 @@ def fill_in_goal_progress(goal, player_id):
             goal.actual_distance = 0.0
 
 
-def set_goal_end_date(goal, now):
+def set_goal_end_date_now(goal):
+    local_now = datetime.datetime.now()
+    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     if goal.periodicity == 0:  # weekly
-        goal.period_end_date = unix_time_millis(get_week_range(now)[1])
+        goal.period_end_date = unix_time_millis(get_week_range(local_now)[1]) - utc_offset
     else:  # monthly
-        goal.period_end_date = unix_time_millis(get_month_range(now)[1])
+        goal.period_end_date = unix_time_millis(get_month_range(local_now)[1]) - utc_offset
 
 
 @app.route('/api/profiles/<int:player_id>/goals', methods=['GET', 'POST'])
@@ -1783,7 +1785,7 @@ def api_profiles_goals(player_id):
         goal.id = get_id('goal')
         now = get_utc_date_time()
         goal.created_on = unix_time_millis(now)
-        set_goal_end_date(goal, now)
+        set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
         insert_protobuf_into_db('goal', goal)
 
@@ -1802,7 +1804,7 @@ def api_profiles_goals(player_id):
             need_update.append(goal)
         fill_in_goal_progress(goal, player_id)
     for goal in need_update:
-        set_goal_end_date(goal, now)
+        set_goal_end_date_now(goal)
         update_protobuf_in_db('goal', goal, goal.id)
 
     return goals.SerializeToString(), 200
@@ -1857,12 +1859,12 @@ def add_player_to_world(player, course_world, is_pace_partner):
             online_player.sport = player.sport
             online_player.power = player.power
             online_player.x = player.x
-            online_player.altitude = player.altitude
-            online_player.y = player.y
+            online_player.y_altitude = player.y_altitude
+            online_player.z = player.z
             course_world[course_id].zwifters += 1
 
 
-def relay_worlds_generic(world_id=None):
+def relay_worlds_generic(server_realm=None):
     courses = courses_lookup.keys()
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
@@ -1880,21 +1882,21 @@ def relay_worlds_generic(world_id=None):
                 world = { 'currentDateTime': int(get_utc_time()),
                         'currentWorldTime': world_time(),
                         'friendsInWorld': [],
-                        'mapId': 1,
+                        'mapId': 1, #maybe, 13 for watopia?
                         'name': 'Public Watopia',
                         'playerCount': 0,
-                        'worldId': 1
+                        'worldId': udp_node_msgs_pb2.ZofflineConstants.RealmID
                         }
-                if world_id:
-                    world['mapId'] = world_id
+                if server_realm:
+                    world['worldId'] = server_realm
                     return jsonify(world)
                 else:
                     return jsonify([ world ])
 
             #PlayerUpdate
             player_update.world_time_expire = world_time() + 60000
-            player_update.f12 = 1
-            player_update.f14 = int(get_utc_time()*1000000)
+            player_update.wa_f12 = 1
+            player_update.timestamp = int(get_utc_time()*1000000)
             for recieving_player_id in online.keys():
                 should_receive = False
                 if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA or player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SR:
@@ -1938,7 +1940,7 @@ def relay_worlds_generic(world_id=None):
 
         for course in courses:
             world = worlds.worlds.add()
-            world.id = 1
+            world.id = udp_node_msgs_pb2.ZofflineConstants.RealmID
             world.name = 'Public Watopia'
             world.course_id = course
             world.world_time = world_time()
@@ -1956,8 +1958,8 @@ def relay_worlds_generic(world_id=None):
             bot_variables = global_bots[p_id]
             bot = bot_variables.route.states[bot_variables.position]
             add_player_to_world(bot, course_world, False)
-        if world_id:
-            world.id = world_id
+        if server_realm:
+            world.id = server_realm
             return world.SerializeToString()
         else:
             return worlds.SerializeToString()
@@ -1968,23 +1970,23 @@ def relay_worlds_generic(world_id=None):
 def relay_worlds():
     return relay_worlds_generic()
 
-@app.route('/relay/worlds/<int:world_id>/aggregate/mobile', methods=['GET'])
-def relay_worlds_id_aggregate_mobile(world_id):
-    return {"events":[],"goals":[],"activities":None,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}
+@app.route('/relay/worlds/<int:server_realm>/aggregate/mobile', methods=['GET'])
+def relay_worlds_id_aggregate_mobile(server_realm):
+    return '{"events":[],"goals":[],"activities":null,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":false,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}'
 
-@app.route('/relay/worlds/<int:world_id>', methods=['GET'])
-@app.route('/relay/worlds/<int:world_id>/', methods=['GET'])
-def relay_worlds_id(world_id):
-    return relay_worlds_generic(world_id)
-
-
-@app.route('/relay/worlds/<int:world_id>/join', methods=['POST'])
-def relay_worlds_id_join(world_id):
-    return {"worldTime":world_time()}
+@app.route('/relay/worlds/<int:server_realm>', methods=['GET'])
+@app.route('/relay/worlds/<int:server_realm>/', methods=['GET'])
+def relay_worlds_id(server_realm):
+    return relay_worlds_generic(server_realm)
 
 
-@app.route('/relay/worlds/<int:world_id>/players/<int:player_id>', methods=['GET'])
-def relay_worlds_id_players_id(world_id, player_id):
+@app.route('/relay/worlds/<int:server_realm>/join', methods=['POST'])
+def relay_worlds_id_join(server_realm):
+    return '{"worldTime":%ld}' % world_time()
+
+
+@app.route('/relay/worlds/<int:server_realm>/players/<int:player_id>', methods=['GET'])
+def relay_worlds_id_players_id(server_realm, player_id):
     if player_id in online.keys():
         player = online[player_id]
         return player.SerializeToString()
@@ -1999,8 +2001,8 @@ def relay_worlds_id_players_id(world_id, player_id):
         return bot.route.states[bot.position].SerializeToString()
     return ""
 
-@app.route('/relay/worlds/<int:world_id>/my-hash-seeds', methods=['GET'])
-def relay_worlds_my_hash_seeds(world_id):
+@app.route('/relay/worlds/<int:server_realm>/my-hash-seeds', methods=['GET'])
+def relay_worlds_my_hash_seeds(server_realm):
     return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
 
 
@@ -2016,13 +2018,13 @@ def relay_worlds_hash_seeds():
 
 
 # XXX: attributes have not been thoroughly investigated
-@app.route('/relay/worlds/<int:world_id>/attributes', methods=['POST'])
-def relay_worlds_id_attributes(world_id):
+@app.route('/relay/worlds/<int:server_realm>/attributes', methods=['POST'])
+def relay_worlds_id_attributes(server_realm):
 # NOTE: This was previously a protobuf message in Zwift client, but later changed.
 #    attribs = world_pb2.WorldAttributes()
 #    attribs.world_time = world_time()
 #    return attribs.SerializeToString(), 200
-    return relay_worlds_generic(world_id)
+    return relay_worlds_generic(server_realm)
 
 
 @app.route('/relay/worlds/attributes', methods=['POST'])
@@ -2037,8 +2039,8 @@ def relay_worlds_attributes():
         return '', 422
 
     player_update.world_time_expire = world_time() + 60000
-    player_update.f12 = 1
-    player_update.f14 = int(get_utc_time() * 1000000)
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time() * 1000000)
     for receiving_player_id in online.keys():
         should_receive = False
         if player_update.wa_type in [udp_node_msgs_pb2.WA_TYPE.WAT_SPA, udp_node_msgs_pb2.WA_TYPE.WAT_SR]:
@@ -2142,7 +2144,7 @@ def handle_segment_results(request):
     to_date = request.args.get('to')
 
     results = segment_result_pb2.SegmentResults()
-    results.world_id = 1
+    results.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     results.segment_id = segment_id
 
     if player_id:
@@ -2176,9 +2178,10 @@ def live_segment_results_service_leaders():
     return '', 200
 
 
-@app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
-def relay_worlds_leave(world_id):
-    return {"worldtime":world_time()}
+@app.route('/relay/worlds/<int:server_realm>/leave', methods=['POST'])
+def relay_worlds_leave(server_realm):
+    return '{"worldtime":%ld}' % world_time()
+
 
 @app.teardown_request
 def teardown_request(exception):
