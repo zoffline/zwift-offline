@@ -1714,7 +1714,7 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0) #datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
      first = d
      last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
