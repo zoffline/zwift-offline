@@ -253,13 +253,18 @@ def get_utc_date_time():
     return datetime.datetime.utcnow()
 
 
-def get_utc_seconds_from_date_time(dt):
+def get_seconds_from_date_time(dt):
     return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
 
 
 def get_utc_time():
     dt = get_utc_date_time()
-    return get_utc_seconds_from_date_time(dt)
+    return get_seconds_from_date_time(dt)
+
+
+def get_time():
+    dt = datetime.datetime.now()
+    return get_seconds_from_date_time(dt)
 
 
 def get_online():
@@ -999,7 +1004,7 @@ def api_events_search():
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            event_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+            event_cat.registrationEnd = int(get_time()) * 1000 + 60000
             event_cat.registrationEndWT = world_time() + 60000
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
@@ -1727,7 +1732,7 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(get_utc_seconds_from_date_time(dt)*1000)
+    return int(get_seconds_from_date_time(dt)*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
@@ -1944,7 +1949,7 @@ def relay_worlds_generic(server_realm=None):
             world.name = 'Public Watopia'
             world.course_id = course
             world.world_time = world_time()
-            world.real_time = int(get_utc_time())
+            world.real_time = int(get_time())
             world.zwifters = 0
             course_world[course] = world
         for p_id in online.keys():
