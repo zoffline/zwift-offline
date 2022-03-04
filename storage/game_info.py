@@ -14,7 +14,7 @@ def downloadImage(url):
         #print('Skipped: %s' % filepath)
     return
 
-with open('game_info.txt', encoding='utf-8-sig') as f:
+with open('../game_info.txt', encoding='utf-8-sig') as f:
     data = json.load(f)
 
 print(data['gameInfoHash'])

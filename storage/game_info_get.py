@@ -114,7 +114,7 @@ def sync(user, password):
     access_token, refresh_token = login(session, user, password)
 
     events = get_gameinfo(session, access_token).decode('utf-8')
-    with open('game_info.txt', 'wb') as f:
+    with open('../game_info.txt', 'wb') as f:
         f.write(events.encode('utf-8-sig'))
 
     logout(session, refresh_token)

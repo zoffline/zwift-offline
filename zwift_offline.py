@@ -8,9 +8,6 @@ import signal
 import platform
 import random
 import sys
-import sys
-sys.path.insert(1, 'protobuf') #otherwise import in .proto does not works
-
 import tempfile
 import time
 import math
@@ -40,6 +37,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+sys.path.insert(1, 'protobuf') # otherwise import in .proto does not work
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
@@ -256,13 +254,18 @@ def get_utc_date_time():
     return datetime.datetime.utcnow()
 
 
-def get_utc_seconds_from_date_time(dt):
+def get_seconds_from_date_time(dt):
     return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
 
 
 def get_utc_time():
     dt = get_utc_date_time()
-    return get_utc_seconds_from_date_time(dt)
+    return get_seconds_from_date_time(dt)
+
+
+def get_time():
+    dt = datetime.datetime.now()
+    return get_seconds_from_date_time(dt)
 
 
 def get_online():
@@ -476,7 +479,7 @@ def forgot():
                         message['From'] = sender_email
                         message['To'] = username
                         message['Subject'] = "Password reset"
-                        content = "https://us-or-rly101.zwift.com/login/?token=%s" % (user.get_token())
+                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
                         message.attach(MIMEText(content, 'plain'))
                         server.sendmail(sender_email, username, message.as_string())
                         server.close()
@@ -894,7 +897,7 @@ def world_time():
 
 @app.route('/api/clubs/club/can-create', methods=['GET'])
 def api_clubs_club_cancreate():
-    return '{"result":false}'
+    return {"result":False}
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/notifications', methods=['GET'])
@@ -902,23 +905,23 @@ def api_clubs_club_cancreate():
 @app.route('/api/event-feed', methods=['GET'])
 @app.route('/api/activity-feed/feed/', methods=['GET'])
 def api_empty_arrays():
-    return '[]'
+    return jsonify([])
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
-    return '{"realm":"zwift","launcher":"https://launcher.zwift.com/launcher","url":"https://secure.zwift.com/auth/"}'
+    return {"realm": "zwift","launcher": "https://launcher.zwift.com/launcher","url": "https://secure.zwift.com/auth/"}
 
 @app.route('/api/server', methods=['GET'])
 def api_server():
-    return '{"build":"zwift_1.267.0","version":"1.267.0"}'
+    return {"build":"zwift_1.267.0","version":"1.267.0"}
 
 @app.route('/api/servers', methods=['GET'])
 def api_servers():
-    return '{"baseUrl":"https://us-or-rly101.zwift.com/relay"}'
+    return {"baseUrl":"https://us-or-rly101.zwift.com/relay"}
 
 @app.route('/api/clubs/club/list/my-clubs', methods=['GET'])
 def api_clubs():
-    return '{"total":0,"results":[]}'
+    return {"total":0,"results":[]}
 
 @app.route('/api/clubs/club/list/my-clubs.proto', methods=['GET'])
 @app.route('/api/campaign/proto/campaigns', methods=['GET'])
@@ -927,16 +930,18 @@ def api_proto_empty():
 
 @app.route('/api/game_info/version', methods=['GET'])
 def api_gameinfo_version():
-    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         data = json.load(f)
-        return '{"version":"%s"}' % data['gameInfoHash']
+        return {"version": data['gameInfoHash']}
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():
-    game_info_file = os.path.join(STORAGE_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
-        return f.read()
+        r = make_response(f.read())
+        r.mimetype = 'application/json'
+        return r
 
 @app.route('/api/users/login', methods=['POST'])
 def api_users_login():
@@ -964,7 +969,6 @@ def logout_player(player_id):
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
-@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 @app.route('/api/users/logout', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -1001,7 +1005,7 @@ def api_events_search():
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            event_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+            event_cat.registrationEnd = int(get_time()) * 1000 + 60000
             event_cat.registrationEndWT = world_time() + 60000
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
@@ -1217,13 +1221,27 @@ def do_api_profiles_me(is_json):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me_bin():
-    return do_api_profiles_me(False)
+    if(request.headers['Source'] == "zwift-companion"):
+        return do_api_profiles_me(True)
+    else:
+        return do_api_profiles_me(False)
 
 @app.route('/api/profiles/me/', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me_json():
     return do_api_profiles_me(True)
+
+@app.route('/api/partners/garmin/auth', methods=['GET'])
+@app.route('/api/partners/trainingpeaks/auth', methods=['GET'])
+@app.route('/api/partners/strava/auth', methods=['GET'])
+@app.route('/api/partners/withings/auth', methods=['GET'])
+@app.route('/api/partners/todaysplan/auth', methods=['GET'])
+@app.route('/api/partners/runtastic/auth', methods=['GET'])
+@app.route('/api/partners/underarmour/auth', methods=['GET'])
+@app.route('/api/partners/fitbit/auth', methods=['GET'])
+def api_profiles_partners():
+    return {"status":"notConnected","clientId":"zwift","sandbox":False}
 
 @app.route('/api/profiles/<int:player_id>/privacy', methods=['POST'])
 @jwt_to_session_cookie
@@ -1630,7 +1648,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.method == 'DELETE':
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
         db.session.commit()
-        return '', 204
+        return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
@@ -1702,7 +1720,7 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0) #datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
      first = d
      last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
      #print("get_week_range(%s)=(%s, %s)" % (dt, first, last))
@@ -1716,7 +1734,7 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(get_utc_seconds_from_date_time(dt)*1000)
+    return int(get_seconds_from_date_time(dt)*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
@@ -1939,7 +1957,7 @@ def relay_worlds_generic(server_realm=None):
             world.name = 'Public Watopia'
             world.course_id = course
             world.world_time = world_time()
-            world.real_time = int(get_utc_time())
+            world.real_time = int(get_time())
             world.zwifters = 0
             course_world[course] = world
         for p_id in online.keys():
@@ -2125,7 +2143,7 @@ def handle_segment_results(request):
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
-        return '{"id": %ld}' % result.id, 200
+        return {"id": result.id}
 
     # request.method == GET
 #    world_id = int(request.args.get('world_id'))
@@ -2338,7 +2356,7 @@ def fake_jwt_with_session_cookie(session_cookie):
 
     refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
-    return """{"access_token":"%s","expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":"%s","token_type":"bearer","id_token":"%s","not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}""" % (access_token, refresh_token, ID_TOKEN)
+    return {"access_token":access_token,"expires_in":1000021600,"refresh_expires_in":611975560,"refresh_token":refresh_token,"token_type":"bearer","id_token":ID_TOKEN,"not-before-policy":1408478984,"session_state":"0846ab9a-765d-4c3f-a20c-6cac9e86e5f3","scope":""}
 
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/token', methods=['POST'])
@@ -2361,19 +2379,26 @@ def auth_realms_zwift_protocol_openid_connect_token():
             # Original code argument is replaced with session cookie from launcher
             refresh_token = jwt.decode(request.form['code'][19:], options=({'verify_signature': False, 'verify_aud': False}))
             session_cookie = refresh_token['session_cookie']
-            return fake_jwt_with_session_cookie(session_cookie), 200
+            return jsonify(fake_jwt_with_session_cookie(session_cookie)), 200
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
-            return fake_jwt_with_session_cookie(token['session_cookie'])
+            return jsonify(fake_jwt_with_session_cookie(token['session_cookie']))
         else:  # android login
             current_user.enable_ghosts = user.enable_ghosts
             ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
-            return fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id']))), 200
+            return jsonify(fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id'])))), 200
     else:
         AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
-        return FAKE_JWT, 200
+        r = make_response(FAKE_JWT)
+        r.mimetype = 'application/json'
+        return r
+
+@app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
+def auth_realms_zwift_protocol_openid_connect_logout():
+    # This is called on ZCA logout, we don't want the game client to logout (anyway jwt.decode would fail)
+    return '', 204
 
 @app.route("/start-zwift" , methods=['POST'])
 @login_required
@@ -2444,7 +2469,7 @@ def experimentation_v1_variant():
                     ('game_1_18_0_osx_monterey_bluetooth_uart_fix', True, False),
                     ('game_1_19_0_default_rubberbanding', None, None),
                     ('game_1_19_use_tabbed_settings', None, False),
-                    ('pedal_assist_20', 1, None),
+                    ('pedal_assist_20', True, None),
                     ('game_1_19_segment_results_sub_active', True, False),
                     ('game_1_20_hw_experiment_1', True, None),
                     ('game_1_19_paired_devices_alerts', True, None),
@@ -2456,18 +2481,18 @@ def experimentation_v1_variant():
                     ('game_1_20_clickable_telemetry_box', True, None),
                     ('game_1_20_0_enable_stages_steering', None, False),
                     ('game_1_21_0_hud_highlighter', None, None),
-                    ('game_1_21_default_activity_name_change', 1, None),
+                    ('game_1_21_default_activity_name_change', True, None),
                     ('game_1_21_android_novus_ble_refactor', None, None),
-                    ('game_1_21_0_gpu_deprecation_warning_message', 1, None),
+                    ('game_1_21_0_gpu_deprecation_warning_message', True, None),
                     ('game_1_21_ftms_set_rider_weight', None, None),
                     ('game_1_21_ble_dll_v2', None, None),
                     ('game_1_22_allow_uturns_at_low_speed', None, None),
                     ('game_1_21_0_ftms_sport_filter', None, None),
-                    ('game_1_21_ftms_bike_trainer_v3', 1, None),
+                    ('game_1_21_ftms_bike_trainer_v3', True, None),
                     ('game_1_22_ble_device_name_hash_v2', None, None),
                     ('log_ble_packets', None, None),
-                    ('game_1_15_assert_disable_abort', 1, None),
-                    ('game_1_21_perf_analytics', 1, None),
+                    ('game_1_15_assert_disable_abort', True, None),
+                    ('game_1_21_perf_analytics', True, None),
                     ('game_1_18_holiday_mode', None, None),
                     ('game_1_17_noesis_enabled', True, None),
                     ('game_1_20_home_screen', True, None),
@@ -2480,12 +2505,6 @@ def experimentation_v1_variant():
         item.name = variant[0]
         if variant[1] is not None:
             item.value = variant[1]
-        #f3 = item.f3.add()
-        #if variant[2] is not None:
-        #    f1 = f3.f1.add()
-        #    f1.name = variant[0]
-        #    f2 = f1.f2.add()
-        #    f2.f4 = variant[2]
         if variant[2] is not None:
             item.values.fields[variant[0]].bool_value = variant[2]
     return variants.SerializeToString(), 200
