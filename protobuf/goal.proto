@@ -14,7 +14,7 @@ message Goal {
 	optional uint64 created_on = 11;     //in ms since epoch
 	optional uint64 period_end_date = 12;
 	optional uint64 f13 = 13;   //-> enum GoalStatus 0=active, 1=retired
-	//optional string f14 = 14; // TODO: find usage: GoalsManager?
+	//optional string f14 = 14; // timezone? (empty)
 }
 
 message Goals {

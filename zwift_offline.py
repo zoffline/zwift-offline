@@ -1746,10 +1746,10 @@ def fill_in_goal_progress(goal, player_id):
         first_dt, last_dt = get_month_range(local_now)
 
     common_sql = ("""FROM activity
-                    WHERE player_id = %s
+                    WHERE player_id = %s AND f29 = %s
                     AND strftime('%s', start_date) >= strftime('%s', '%s')
                     AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
-                    (player_id, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
+                    (player_id, goal.f3, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
     #print(common_sql)
     if goal.type == 0:  # distance
         distance = db.session.execute(sqlalchemy.text('SELECT SUM(distance) %s' % common_sql)).first()[0]
@@ -1772,12 +1772,55 @@ def fill_in_goal_progress(goal, player_id):
 
 def set_goal_end_date_now(goal):
     local_now = datetime.datetime.now()
-    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
+    utc_offset = int((datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)).total_seconds())
     if goal.periodicity == 0:  # weekly
         goal.period_end_date = unix_time_millis(get_week_range(local_now)[1]) - utc_offset
     else:  # monthly
         goal.period_end_date = unix_time_millis(get_month_range(local_now)[1]) - utc_offset
 
+def goalProtobufToJson(goal):
+    if goal.f3 == 1:
+        s_sport = "RUNNING"
+    else:
+        s_sport = "CYCLING"
+    return {"id":goal.id,"profileId":goal.player_id,"sport":s_sport,"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
+"targetDistanceInMeters":goal.target_distance,"targetDurationInMinutes":goal.target_duration,"actualDistanceInMeters":goal.actual_distance,
+"actualDurationInMinutes":goal.actual_duration,"createdOn":datetime.datetime.utcfromtimestamp(goal.created_on/1000).strftime('%Y-%m-%dT%H:%M:%S.000+0000'),
+"periodEndDate":datetime.datetime.utcfromtimestamp(goal.period_end_date/1000).strftime('%Y-%m-%dT%H:%M:%S.000+0000'),"status":int(goal.f13),"timezone":""}
+
+def goalJsonToProtobuf(json_goal):
+    goal = goal_pb2.Goal()
+    if json_goal['sport'] == 'CYCLING':
+        goal.f3 = 0
+    else:
+        goal.f3 = 1 #run
+    goal.id = json_goal['id']
+    goal.name = json_goal['name']
+    goal.periodicity = int(json_goal['periodicity'])
+    goal.type = int(json_goal['type'])
+    goal.f13 = 0 #active
+    goal.target_distance = json_goal['targetDistanceInMeters']
+    goal.target_duration = json_goal['targetDurationInMinutes']
+    goal.actual_distance = json_goal['actualDistanceInMeters']
+    goal.actual_duration = json_goal['actualDurationInMinutes']
+    goal.player_id = json_goal['profileId']
+    return goal
+
+@app.route('/api/profiles/<int:player_id>/goals/<int:goal_id>', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_goals_put(player_id, goal_id):
+    if player_id != current_user.player_id:
+        return '', 401
+    if not request.stream:
+        return '', 400
+    str_goal = request.stream.read()
+    #print(str_goal)
+    json_goal = json.loads(str_goal)
+    goal = goalJsonToProtobuf(json_goal)
+    #print(goal)
+    update_protobuf_in_db('goal', goal, goal.id)
+    return jsonify(json_goal)
 
 @app.route('/api/profiles/<int:player_id>/goals', methods=['GET', 'POST'])
 @jwt_to_session_cookie
@@ -1788,16 +1831,27 @@ def api_profiles_goals(player_id):
     if request.method == 'POST':
         if not request.stream:
             return '', 400
-        goal = goal_pb2.Goal()
-        goal.ParseFromString(request.stream.read())
+        if(request.headers['Content-Type'] == 'application/x-protobuf-lite'):
+            goal = goal_pb2.Goal()
+            goal.ParseFromString(request.stream.read())
+        else:
+            str_goal = request.stream.read()
+            #print(str_goal)
+            json_goal = json.loads(str_goal)
+            goal = goalJsonToProtobuf(json_goal)
+            #print(goal)
         goal.id = get_id('goal')
         now = get_utc_date_time()
         goal.created_on = unix_time_millis(now)
         set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
+        #db.session.execute(sqlalchemy.text("delete FROM goal WHERE name = 'Goal'"))
         insert_protobuf_into_db('goal', goal)
 
-        return goal.SerializeToString(), 200
+        if request.headers['Accept'] == 'application/json':
+            return jsonify(goalProtobufToJson(goal))
+        else:
+            return goal.SerializeToString(), 200
 
     # request.method == 'GET'
     goals = goal_pb2.Goals()
@@ -1815,7 +1869,15 @@ def api_profiles_goals(player_id):
         set_goal_end_date_now(goal)
         update_protobuf_in_db('goal', goal, goal.id)
 
-    return goals.SerializeToString(), 200
+    if request.headers['Accept'] == 'application/json':
+        json_goals = []
+        for goal in goals.goals:
+            json_goal = goalProtobufToJson(goal)
+            #print(json_goal)
+            json_goals.append(json_goal)
+        return jsonify(json_goals) # json for ZCA
+    else:
+        return goals.SerializeToString(), 200 # protobuf for ZG
 
 
 @app.route('/api/profiles/<int:player_id>/goals/<string:goal_id>', methods=['DELETE'])
@@ -2495,7 +2557,7 @@ def experimentation_v1_variant():
                     ('game_1_21_perf_analytics', True, None),
                     ('game_1_18_holiday_mode', None, None),
                     ('game_1_17_noesis_enabled', True, None),
-                    ('game_1_20_home_screen', True, None),
+                    ('game_1_20_home_screen', False, None),
                     ('game_1_19_noesis_dummy', None, None),
                     ('game_1_14_settings_refactor', None, None)]
 
