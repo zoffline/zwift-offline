@@ -903,9 +903,53 @@ def api_clubs_club_cancreate():
 @app.route('/api/notifications', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/event-feed', methods=['GET'])
-@app.route('/api/activity-feed/feed/', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
+
+def activity_moving_time(activity):
+    try:
+        return (datetime.strptime(activity.end_date, '%y-%m-%dT%H:%M:%SZ') - datetime.strptime(activity.start_date, '%y-%m-%dT%H:%M:%SZ')).total_seconds() * 1000
+    except:
+        return 0
+
+def activity_protobuf_to_json(activity):
+    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":"Youry","lastName":"Pershin","imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % activity.player_id,"approvalRequired":None}, \
+    "worldId":activity.f3,"name":activity.name,"sport":str_sport(activity.f29),"startDate":activity.start_date, \
+    "endDate":activity.end_date,"distanceInMeters":activity.distance, \
+    "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"", \
+    "feedImageThumbnailUrl":"", \
+    "lastSaveDate":activity.date,"movingTimeInMs":activity_moving_time(activity), \
+    "avgSpeedInMetersPerSecond":activity.avg_speed,"activityRideOnCount":0,"activityCommentCount":0,"privacy":"PUBLIC", \
+    "eventId":None,"rideOnGiven":False,"id_str":str(activity.id)}
+ 
+@app.route('/api/activity-feed/feed/', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_activity_feed():
+    limit = int(request.args.get('limit'))
+    feed_type = request.args.get('feedType')
+    ret = []
+    cnt = 0
+    if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
+        activities = activity_pb2.ActivityList()
+        # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
+        rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s ORDER BY date desc" % str(current_user.player_id)))
+        allow_empty_end_date = True
+        for row in rows:
+            activity = activities.activities.add()
+            row_to_protobuf(row, activity, exclude_fields=['fit'])
+            if activity.end_date == "":
+                if allow_empty_end_date:
+                    allow_empty_end_date = False
+                else:
+                    continue
+            ret.append(activity_protobuf_to_json(activity))
+            cnt = cnt + 1
+            if cnt >= limit:
+                break
+    else: # todo: FAVORITES, FOLLOWEES
+        pass
+    return jsonify(ret)
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
@@ -1778,22 +1822,30 @@ def set_goal_end_date_now(goal):
     else:  # monthly
         goal.period_end_date = unix_time_millis(get_month_range(local_now)[1]) - utc_offset
 
+def str_sport(int_sport):
+    if int_sport == 1:
+        return "RUNNING"
+    return "CYCLING"
+
+def sport_from_str(str_sport):
+    if str_sport == 'CYCLING':
+        return 0
+    return 1 #running
+
+def str_timestamp(ts):
+    sec = int(ts/1000)
+    ms = ts % 1000
+    return datetime.datetime.utcfromtimestamp(sec).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
+
 def goalProtobufToJson(goal):
-    if goal.f3 == 1:
-        s_sport = "RUNNING"
-    else:
-        s_sport = "CYCLING"
-    return {"id":goal.id,"profileId":goal.player_id,"sport":s_sport,"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
+    return {"id":goal.id,"profileId":goal.player_id,"sport":str_sport(goal.f3),"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
 "targetDistanceInMeters":goal.target_distance,"targetDurationInMinutes":goal.target_duration,"actualDistanceInMeters":goal.actual_distance,
-"actualDurationInMinutes":goal.actual_duration,"createdOn":datetime.datetime.utcfromtimestamp(goal.created_on/1000).strftime('%Y-%m-%dT%H:%M:%S.000+0000'),
-"periodEndDate":datetime.datetime.utcfromtimestamp(goal.period_end_date/1000).strftime('%Y-%m-%dT%H:%M:%S.000+0000'),"status":int(goal.f13),"timezone":""}
+"actualDurationInMinutes":goal.actual_duration,"createdOn":str_timestamp(goal.created_on),
+"periodEndDate":str_timestamp(goal.period_end_date),"status":int(goal.f13),"timezone":""}
 
 def goalJsonToProtobuf(json_goal):
     goal = goal_pb2.Goal()
-    if json_goal['sport'] == 'CYCLING':
-        goal.f3 = 0
-    else:
-        goal.f3 = 1 #run
+    goal.f3 = sport_from_str(json_goal['sport'])
     goal.id = json_goal['id']
     goal.name = json_goal['name']
     goal.periodicity = int(json_goal['periodicity'])

@@ -103,13 +103,13 @@ enum FitnessPrivacy {
 	HIDE_SENSITIVE_DATA = 1;
 	SAME_AS_ACTIVITY = 2;
 }
-message Activity { //field names pinned to db
+message Activity { //field names pinned to db [where is primaryImageUrl, feedImageThumbnailUrl, activityRideOnCount, activityCommentCount, eventId, rideOnGiven, movingTimeInMs]
 	optional uint64 id = 1;
 	required uint64 player_id = 2;
 	required uint64 f3 = 3; //-> rename to course_id
 	required string name = 4;
 	optional string f5 = 5;
-	optional bool f6 = 6;
+	optional bool f6 = 6; //rideOnGiven?
 	required string start_date = 7;
 	optional string end_date = 8;
 	optional float distance = 9; // in meters
