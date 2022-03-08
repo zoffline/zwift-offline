@@ -899,10 +899,21 @@ def world_time():
 def api_clubs_club_cancreate():
     return {"result":False}
 
+@app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
+def api_eventfeed():
+    print(request.headers['Accept'])
+    eventCount = int(request.args.get('limit'))
+    events = get_events(eventCount)
+    json_events = convert_events_to_json(events)
+    json_data = []
+    for e in json_events:
+        json_data.append({"event": e})
+        #print(e)
+    return jsonify({"data":json_data})
+
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/notifications', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
-@app.route('/api/event-feed', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
@@ -921,19 +932,13 @@ def activity_protobuf_to_json(activity):
     "lastSaveDate":activity.date,"movingTimeInMs":activity_moving_time(activity), \
     "avgSpeedInMetersPerSecond":activity.avg_speed,"activityRideOnCount":0,"activityCommentCount":0,"privacy":"PUBLIC", \
     "eventId":None,"rideOnGiven":False,"id_str":str(activity.id)}
- 
-@app.route('/api/activity-feed/feed/', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def api_activity_feed():
-    limit = int(request.args.get('limit'))
-    feed_type = request.args.get('feedType')
+
+def select_activities_json(player_id, limit):
     ret = []
-    cnt = 0
-    if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
+    if limit > 0:
         activities = activity_pb2.ActivityList()
         # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
-        rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s ORDER BY date desc" % str(current_user.player_id)))
+        rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s ORDER BY date desc LIMIT %s" % (str(player_id), limit)))
         allow_empty_end_date = True
         for row in rows:
             activity = activities.activities.add()
@@ -944,11 +949,18 @@ def api_activity_feed():
                 else:
                     continue
             ret.append(activity_protobuf_to_json(activity))
-            cnt = cnt + 1
-            if cnt >= limit:
-                break
+    return ret
+
+@app.route('/api/activity-feed/feed/', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_activity_feed():
+    limit = int(request.args.get('limit'))
+    feed_type = request.args.get('feedType')
+    if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
+        ret = select_activities_json(current_user.player_id, limit)
     else: # todo: FAVORITES, FOLLOWEES
-        pass
+        ret = []
     return jsonify(ret)
 
 @app.route('/api/auth', methods=['GET'])
@@ -1032,31 +1044,63 @@ def api_per_session_info():
     info.relay_url = "https://us-or-rly101.zwift.com/relay"
     return info.SerializeToString(), 200
 
-@app.route('/api/events/search', methods=['POST'])
-def api_events_search():
-    events_list = [('Bologna TT', 2843604888),
-                   ('Crit City CW', 947394567),
-                   ('Crit City CCW', 2875658892),
-                   ('Neokyo Crit', 1127056801),
-                   ('Watopia Waistband', 1064303857)]
+def get_events(limit):
+    events_list = [('Bologna TT', 2843604888, 10),
+                   ('Crit City CW', 947394567, 12),
+                   ('Crit City CCW', 2875658892, 12),
+                   ('Neokyo Crit', 1127056801, 13),
+                   ('Watopia Waistband', 1064303857, 6)]
     event_id = 1000
+    cnt = 0
     events = events_pb2.Events()
     for item in events_list:
         event = events.events.add()
+        event.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         event.id = event_id
-        event.title = item[0]
+        event.name = item[0]
         event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
+        event.course_id = item[2]
+        event.sport = profile_pb2.Sport.CYCLING
+        event.lateJoinInMinutes = 30
+        event.eventStart = int(get_time()) * 1000 + 60000
+        cats = ('?', 'A', 'B', 'C', 'D', 'E', 'F') 
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            event_cat.registrationEnd = int(get_time()) * 1000 + 60000
+            event_cat.registrationStart = event.eventStart - 30000
+            event_cat.registrationStartWT = world_time()
+            event_cat.registrationEnd = event.eventStart
             event_cat.registrationEndWT = world_time() + 60000
+            event_cat.lineUpStart = event.eventStart - 15000
+            event_cat.lineUpEnd = event.eventStart
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
             event_cat.label = cat
+            event_cat.lateJoinInMinutes = 30
+            event_cat.name = "Cat.%s" % cats[event_cat.label]
+            event_cat.description = "#zwiftofficial"
+            event_cat.course_id = event.course_id
+            event_cat.paceType = 1
+            event_cat.fromPaceValue = 1.0
+            event_cat.toPaceValue = 5.0
         event_id += 1000
-    return events.SerializeToString(), 200
+        cnt = cnt + 1
+        if cnt > limit:
+            break
+    return events
 
+@app.route('/api/events/<int:event_id>', methods=['GET'])
+def api_events_id(event_id):
+    return '', 200
+
+@app.route('/api/events/search', methods=['POST'])
+def api_events_search():
+    limit = int(request.args.get('limit'))
+    events = get_events(limit)
+    if request.headers['Accept'] == 'application/json':
+        return jsonify(convert_events_to_json(events))
+    else:
+        return events.SerializeToString(), 200
 
 @app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
 def api_events_subgroups_signup_id(event_id):
@@ -1874,6 +1918,32 @@ def api_profiles_goals_put(player_id, goal_id):
     update_protobuf_in_db('goal', goal, goal.id)
     return jsonify(json_goal)
 
+def select_protobuf_goals(player_id, limit):
+    goals = goal_pb2.Goals()
+    if limit > 0:
+        rows = db.session.execute(sqlalchemy.text("SELECT * FROM goal WHERE player_id = %s LIMIT %s" % (player_id, limit)))
+        need_update = list()
+        for row in rows:
+            goal = goals.goals.add()
+            row_to_protobuf(row, goal)
+            end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
+            now = get_utc_date_time()
+            if end_dt < now:
+                need_update.append(goal)
+            fill_in_goal_progress(goal, player_id)
+        for goal in need_update:
+            set_goal_end_date_now(goal)
+            update_protobuf_in_db('goal', goal, goal.id)
+    return goals
+
+def convert_goals_to_json(goals):
+    json_goals = []
+    for goal in goals.goals:
+        json_goal = goalProtobufToJson(goal)
+        #print(json_goal)
+        json_goals.append(json_goal)
+    return json_goals
+
 @app.route('/api/profiles/<int:player_id>/goals', methods=['GET', 'POST'])
 @jwt_to_session_cookie
 @login_required
@@ -1906,27 +1976,10 @@ def api_profiles_goals(player_id):
             return goal.SerializeToString(), 200
 
     # request.method == 'GET'
-    goals = goal_pb2.Goals()
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM goal WHERE player_id = %s" % player_id))
-    need_update = list()
-    for row in rows:
-        goal = goals.goals.add()
-        row_to_protobuf(row, goal)
-        end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-        now = get_utc_date_time()
-        if end_dt < now:
-            need_update.append(goal)
-        fill_in_goal_progress(goal, player_id)
-    for goal in need_update:
-        set_goal_end_date_now(goal)
-        update_protobuf_in_db('goal', goal, goal.id)
+    goals = select_protobuf_goals(player_id, 100)
 
     if request.headers['Accept'] == 'application/json':
-        json_goals = []
-        for goal in goals.goals:
-            json_goal = goalProtobufToJson(goal)
-            #print(json_goal)
-            json_goals.append(json_goal)
+        json_goals = convert_goals_to_json(goals)
         return jsonify(json_goals) # json for ZCA
     else:
         return goals.SerializeToString(), 200 # protobuf for ZG
@@ -2097,9 +2150,62 @@ def relay_worlds_generic(server_realm=None):
 def relay_worlds():
     return relay_worlds_generic()
 
+def iterableToJson(it):
+    if it == None:
+        return None
+    ret = []
+    for i in it:
+        ret.append(i)
+    return ret
+
+def eventProtobufToJson(event):
+    esgs = []
+    for event_cat in event.category:
+        esgs.append({"id":event_cat.id,"name":event_cat.name,"description":event_cat.description,"label":event_cat.label, \
+"subgroupLabel":event_cat.name[-1],"rulesId":event_cat.rules_id,"mapId":event_cat.course_id,"routeId":event_cat.route_id,"routeUrl":event_cat.routeUrl, \
+"jerseyHash":event_cat.jerseyHash,"bikeHash":event_cat.bikeHash,"startLocation":event_cat.startLocation,"invitedLeaders":iterableToJson(event_cat.invitedLeaders), \
+"invitedSweepers":iterableToJson(event_cat.invitedSweepers),"paceType":event_cat.paceType,"fromPaceValue":event_cat.fromPaceValue,"toPaceValue":event_cat.toPaceValue, \
+"fieldLimit":None,"registrationStart":event_cat.registrationStart,"registrationEnd":event_cat.registrationEnd,"lineUpStart":event_cat.lineUpStart, \
+"lineUpEnd":event_cat.lineUpEnd,"eventSubgroupStart":event_cat.eventSubgroupStart,"durationInSeconds":event_cat.durationInSeconds,"laps":event_cat.laps, \
+"distanceInMeters":event_cat.distanceInMeters,"signedUp":False,"signupStatus":1,"registered":False,"registrationStatus":1,"followeeEntrantCount":0, \
+"totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0,"auxiliaryUrl":"", \
+"rulesSet":["ALLOWS_LATE_JOIN"],"workoutHash":None,"customUrl":event_cat.customUrl,"overrideMapPreferences":False, \
+"tags":[""],"lateJoinInMinutes":event_cat.lateJoinInMinutes,"timeTrialOptions":None,"qualificationRuleIds":None,"accessValidationResult":None})
+    return {"id":event.id,"worldId":event.server_realm,"name":event.name,"description":event.description,"shortName":None,"mapId":event.course_id, \
+"shortDescription":None,"imageUrl":event.imageUrl,"routeId":event.route_id,"rulesId":event.rules_id,"rulesSet":["ALLOWS_LATE_JOIN"], \
+"routeUrl":None,"jerseyHash":event.jerseyHash,"bikeHash":None,"visible":event.visible,"overrideMapPreferences":event.overrideMapPreferences,"eventStart":event.eventStart, "tags":[""], \
+"durationInSeconds":event.durationInSeconds,"distanceInMeters":event.distanceInMeters,"laps":event.laps,"privateEvent":False,"invisibleToNonParticipants":event.invisibleToNonParticipants, \
+"followeeEntrantCount":0,"totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0, \
+"eventSeries":None,"auxiliaryUrl":"","imageS3Name":None,"imageS3Bucket":None,"sport":str_sport(event.sport),"cullingType":"CULLING_EVERYBODY", \
+"recurring":True,"recurringOffset":None,"publishRecurring":True,"parentId":None,"type":events_pb2._EVENTTYPEV2.values_by_number[int(event.eventType)].name,"eventType":str(event.eventType), \
+"workoutHash":None,"customUrl":"","restricted":False,"unlisted":False,"eventSecret":None,"accessExpression":None,"qualificationRuleIds":None, \
+"lateJoinInMinutes":event.lateJoinInMinutes,"timeTrialOptions":None,"microserviceName":None,"microserviceExternalResourceId":None, \
+"microserviceEventVisibility":None, "minGameVersion":None,"recordable":True,"imported":False,"eventTemplateId":None, "eventSubgroups": esgs }
+
+def convert_events_to_json(events):
+    json_events = []
+    for e in events.events:
+        json_event = eventProtobufToJson(e)
+        #print(json_event)
+        json_events.append(json_event)
+    return json_events
+
+
+#todo: followingCount=3&pendingEventInviteCount=50&acceptedEventInviteCount=3&playerTotal=true&playerSport=all&eventSport=CYCLING&fetchCampaign=true
 @app.route('/relay/worlds/<int:server_realm>/aggregate/mobile', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
 def relay_worlds_id_aggregate_mobile(server_realm):
-    return '{"events":[],"goals":[],"activities":null,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":false,"worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]}'
+    goalCount = int(request.args.get('goalCount'))
+    goals = select_protobuf_goals(current_user.player_id, goalCount)
+    json_goals = convert_goals_to_json(goals)
+    activityCount = int(request.args.get('activityCount'))
+    json_activities = select_activities_json(current_user.player_id, activityCount)
+    eventCount = int(request.args.get('eventCount'))
+    events = get_events(eventCount)
+    json_events = convert_events_to_json(events)
+    return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False, \
+    "worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]})
 
 @app.route('/relay/worlds/<int:server_realm>', methods=['GET'])
 @app.route('/relay/worlds/<int:server_realm>/', methods=['GET'])
