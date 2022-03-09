@@ -1,5 +1,5 @@
 syntax = "proto2";
-//import "profile.proto"; //enum ActivityPrivacyType
+import "profile.proto"; //enum ActivityPrivacyType, Sport
 //All decompiled. TODO: uncomment all new fields and use in algo
 enum NotableMomentTypeZCA {
 	NMTC_ACHIEVEMENT_UNLOCKED = 1;
@@ -71,16 +71,16 @@ message NotableMoment {
 	optional uint64 activity_id = 1;
 	optional NotableMomentTypeZG type = 2;
 	optional uint32 priority = 3;
-	optional uint64 time = 4;
-	optional string aux1 = 5;
-	optional string aux2 = 6;
+	optional uint64 incidentTime = 4;
+	optional string aux1 = 5; // example: {\"achievementId\":35,\"name\":\"PAIRED\",\"description\":\"Paired a phone through Zwift Companion\"}
+	optional string aux2 = 6; // empty string
 	optional string largeImageUrl = 7;
 }
 
 message SocialInteraction {
 	optional uint64 player_id = 1;
-	optional uint32 seconds = 2;
-	optional float score = 3;
+	optional uint32 timeDuration = 2;
+	optional float proximityTimeScore = 3;
 	optional string si_f4 = 4;
 }
 
@@ -103,7 +103,51 @@ enum FitnessPrivacy {
 	HIDE_SENSITIVE_DATA = 1;
 	SAME_AS_ACTIVITY = 2;
 }
-message Activity { //field names pinned to db
+
+message ActivityFull {  //where is primaryImageUrl, feedImageThumbnailUrl, activityRideOnCount, activityCommentCount, eventId, rideOnGiven
+	optional uint64 id = 1;
+	required uint64 player_id = 2;
+	required uint64 course_id = 3;
+	required string name = 4;
+	optional string f5 = 5;
+	optional bool privateActivity = 6;
+	required string start_date = 7;
+	optional string end_date = 8;
+	optional float distanceInMeters = 9;
+	optional float avg_heart_rate = 10;
+	optional float max_heart_rate = 11;
+	optional float avg_watts = 12;
+	optional float max_watts = 13;
+	optional float avg_cadence = 14;
+	optional float max_cadence = 15;
+	optional float avg_speed = 16; // in m/s
+	optional float max_speed = 17; // in m/s
+	optional float calories = 18;
+	optional float total_elevation = 19;
+	optional uint32 strava_upload_id = 20; //uint64 stored as int32
+	optional uint32 strava_activity_id = 21; //uint64 stored as int32
+	optional string f22 = 22;
+	optional uint32 f23 = 23; //empty; stored as int32; enum up to 5 - ProfileFollowStatus?
+	optional bytes fit = 24;
+	optional string fit_filename = 25;
+	optional uint64 subgroupId = 26;
+	optional uint64 workoutHash = 27;
+	optional float progressPercentage = 28;
+	optional Sport sport = 29;
+	repeated string act_f30 = 30;
+	optional string date = 31;
+	optional float act_f32 = 32;
+	optional string act_f33 = 33;
+	optional string act_f34 = 34;
+	repeated NotableMoment notables = 35;
+	repeated SocialInteraction socials = 36;
+	optional ActivityPrivacyType privacy = 37;
+	optional FitnessPrivacy fitness_privacy = 38;
+	optional string club_name = 39;
+	optional int64 movingTimeInMs = 40;
+	repeated ClubAttribution cas = 41;
+}
+message Activity { //field names pinned to db 
 	optional uint64 id = 1;
 	required uint64 player_id = 2;
 	required uint64 f3 = 3; //-> rename to course_id
@@ -149,4 +193,7 @@ message Activity { //field names pinned to db
 
 message ActivityList {
 	repeated Activity activities = 1;
+}
+message ActivityListFull {
+	repeated ActivityFull activities = 1;
 }
