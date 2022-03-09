@@ -1,15 +1,17 @@
 syntax = "proto2";
 import "profile.proto"; //enums PlayerType and Sport
 
-message EventSubgroupProtobuf {
+message EventSubgroupProtobuf { //where is fieldLimit, signedUp, signupStatus, registered, registrationStatus, followeeEntrantCount
+//totalEntrantCount, followeeSignedUpCount, totalSignedUpCount, followeeJoinedCount, totalJoinedCount, rulesSet, workoutHash, overrideMapPreferences
+//qualificationRuleIds, accessValidationResult
 	required uint64 id = 1; // 2395269
-	optional string description = 2; // "3R True2 Steady Ride [2.0w/kg avg] (C)"
-	optional string evs_f3 = 3; // ""
+	optional string name = 2; // ex: "3R True2 Steady Ride [2.0w/kg avg] (C)"
+	optional string description = 3; // ex: "Welcome to our sociable early morning/evening social group ride."
 	optional uint32 evs_f4 = 4; // ""
-	optional uint32 evs_f5 = 5; // 154
+	optional uint32 evs_f5 = 5; // 154 and others
 	optional uint32 evs_f6 = 6; // 0
-	optional string evs_f7 = 7; // "PT3600S"
-	optional uint64 rules_id = 8; // 320
+	optional string scode = 7; // ex: "PT3600S"
+	optional uint64 rules_id = 8; // 320 and others
 	optional uint64 registrationStart = 9;
 	optional uint64 registrationStartWT = 10;
 	optional uint64 registrationEnd = 11;
@@ -22,93 +24,124 @@ message EventSubgroupProtobuf {
 	optional uint64 eventSubgroupStartWT = 18;
 	optional uint64 evs_f19 = 19;
 	optional uint64 evs_f20 = 20; //tag416
-	optional bool evs_f21 = 21; // 0, tag424
+	optional bool evs_f21 = 21; // false, tag424
 	required uint64 route_id = 22; // 3366225080
-	repeated uint64 leaders = 23; // or sweepers? tag440
-	optional fixed32 evs_f24 = 24; //tag453
-	optional uint32 laps = 25; // 0, tag456
-        // no 26-28
+	repeated uint64 invitedLeaders = 23; // tag440
+	optional float distanceInMeters = 24; // tag453
+	optional uint32 laps = 25; // tag456
+	// no 26-28
 	optional uint64 startLocation = 29; // 13, tag488 [>=6 -> 'bad start location'] valid values: 1..5 (0->1)
-	optional uint32 label = 30; // 3, tag496
-	optional uint32 paceType = 31; // 1, tag504
-	optional fixed32 evs_f32 = 32; // 1076258406, tag645
-	optional fixed32 evs_f33 = 33; // 1078774989, tag653
-	optional uint32 duration = 34; // Duration of event in seconds, tag656
+	optional uint32 label = 30; // A:1, B:2, C:3, D:4, E:5 etc, tag496
+	optional uint32 paceType = 31; // 1 everywhere, tag504
+	optional float fromPaceValue = 32; // tag645
+	optional float toPaceValue = 33; // tag653
+	optional uint32 durationInSeconds = 34; // Duration of event in seconds, tag656
 	optional uint32 evs_f35 = 35; // tag664
 	optional uint64 jerseyHash = 36; // 493134166, tag672
 	optional bool evs_f37 = 37; // 0, tag680
 	optional uint32 evs_f38 = 38; // tag688
-	optional string audio = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4", tag698
-	optional uint64 evs_f40 = 40; // tag704
-	repeated uint64 sweepers = 41; // or leaders?, tag712
+	optional string auxiliaryUrl = 39; // "https://cdn.zwift.com/AudioBroadcasts/wbrgrouprideaudiov4", tag698
+	optional uint64 bikeHash = 40; // 4208139356, tag704
+	repeated uint64 invitedSweepers = 41; // tag712
 	optional uint64 evs_f42 = 42; // tag720
-	optional string evs_f43 = 43; // tag730
-	optional bool evs_f44 = 44; // 0, tag736
+	optional string customUrl = 43; // https://cdn.zwift.com/events/upload/workouts/CafeRide1.zwo, tag730
+	optional bool evs_f44 = 44; // false, tag736
 	optional string tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
 	optional uint32 lateJoinInMinutes = 46; //tag752
-	optional uint64 map_id = 47; // 1, tag760
+	optional uint64 course_id = 47; // 1 and others: course?, tag760
 	optional uint64 evs_f48 = 48; //tag898
-	optional string evs_f49 = 49; //tag906
+	optional string routeUrl = 49; //tag906
 	repeated int32 evs_f50 = 50; //tag912
 	optional bool evs_f51 = 51; //tag920
 }
 
+enum EventVisibility {
+	EV_NULL = 0;
+	EV_PUB_SHARE = 1;   // event public shareable
+	EV_BY_RESOURCE = 2; // event defined by resource
+	EV_SHAREABLE = 3;
+}
 message MicroserviceEventData {
-	optional string msed_f1 = 1;
-	optional string msed_f2 = 2;
-	optional uint64 msed_f3 = 3;
+	optional string name = 1;				// "clubs" everywhere (json: microserviceName)
+	optional bytes externalResourceId = 2;   // different 16-byte bb4538bfd13346c99a4df2b3cc3b5d95 (json: microserviceExternalResourceId)
+	optional EventVisibility visibility = 3; // enum 1 (json: microserviceEventVisibility)
 }
 
-message EventSeriesProtobuf {
-	optional uint64 es_f1 = 1;
-	optional string es_f2 = 2;
-	optional string es_f3 = 3;
+message EventSeriesProtobuf { //{"id":4531,"name":"Zwift Academy Triathlon - Baseline TT","description":null,"imported":false}
+	optional uint64 id = 1;		  //5445 or 1485
+	optional string name = 2;		//INEOSVTC or "Fast Friday"
+	optional string description = 3; //"" or "Congratulations, you crushed another week of workouts! ..."
 }
 
-message EventTimeTrialOptions {
-	optional uint32 evt_f1 = 1;
-	optional uint32 evt_f2 = 2;
-	optional uint32 evt_f3 = 3;
+message EventTimeTrialOptions { //{"timeGapBetweenRowsMs":15000,"maxRows":50,"maxRidersPerRow":10}
+	optional uint32 timeGapBetweenRowsMs = 1;  //15000 everywhere
+	optional uint32 maxRows = 2;			   //50 or 25
+	optional uint32 maxRidersPerRow = 3;	   //10 everywhere
 	optional uint32 evt_f4 = 4;
 	optional uint64 evt_f5 = 5;
 }
 
-message Event { //real name: EventProtobuf
+enum EventTypeV2 {
+	EVENT_TYPE_UNKNOWN = 0;
+	EVENT_TYPE_EFONDO = 1;
+	EVENT_TYPE_RACE = 2;
+	EVENT_TYPE_GROUP_RIDE = 3;
+	EVENT_TYPE_GROUP_WORKOUT = 4;
+	EVENT_TYPE_TIME_TRIAL = 5;
+}
+enum EventType {
+	ET_UNKNOWN = 0;
+	EFONDO = 1;
+	RACE = 2;
+	GROUP_RIDE = 3;
+	GROUP_WORKOUT = 4;
+	TIME_TRIAL = 5;
+}
+enum EventCulling {
+	CULLING_UNDEFINED = 0;
+	CULLING_EVERYBODY = 1;
+	CULLING_EVENT_ONLY = 2;
+	CULLING_SUBGROUP_ONLY = 3;
+}
+message Event { //real name: EventProtobuf; where is shortName, shortDescription, rulesSet, routeUrl, bikeHash, 
+//privateEvent, followeeEntrantCount, totalEntrantCount, followeeSignedUpCount, totalSignedUpCount, followeeJoinedCount,
+//totalJoinedCount, auxiliaryUrl, imageS3Name, imageS3Bucket, cullingType, recurring, recurringOffset, publishRecurring, parentId, type, workoutHash,
+//customUrl, restricted, unlisted, eventSecret, accessExpression, qualificationRuleIds, minGameVersion, recordable, imported, eventTemplateId
 	required uint64 id = 1;
 	optional uint64 server_realm = 2;
-	required string title = 3;
+	required string name = 3;
 	optional string description = 4;
 	optional uint64 eventStart = 5; // Start time (epoch time in ms)
 	optional string e_f6 = 6;
-	optional fixed32 e_f7 = 7;
+	optional float distanceInMeters = 7;
 	optional uint32 laps = 8;
 	optional uint32 e_f9 = 9;
 	repeated EventSubgroupProtobuf category = 10; //event_subgroup_size() <= MAX_SUBGROUPS(6)
 	optional string e_f11 = 11;
-	optional string pic_url = 12;
-	optional uint32 duration = 13; // Duration in seconds?
+	optional string imageUrl = 12;
+	optional uint32 durationInSeconds = 13;
 	optional uint64 route_id = 14;
 	optional uint64 rules_id = 15;
 	optional uint32 e_f16 = 16;
-	optional bool e_f17 = 17;
-	optional uint64 e_f18 = 18;
+	optional bool visible = 17;
+	optional uint64 jerseyHash = 18;
 	optional string e_f19 = 19;
 	optional string e_f20 = 20;
 	optional string e_f21 = 21;
 	optional Sport sport = 22;
 	optional uint64 e_f23 = 23;
-	optional uint64 e_f24 = 24; //stored as int32
+	optional EventType eventType = 24;
 	optional uint64 e_f25 = 25;
 	optional string e_f26 = 26;
 	optional uint64 e_f27 = 27; //<=4, ENUM?
-	optional bool e_f28 = 28;
-	optional bool e_f29 = 29;
+	optional bool overrideMapPreferences = 28;
+	optional bool invisibleToNonParticipants = 29;
 	optional EventSeriesProtobuf evSeries = 30;
 	optional string tags = 31; // semi-colon delimited tags
 	optional uint64 e_f32 = 32;
-	optional bool e_f33 = 33;
+	optional bool e_wtrl = 33; //WTRL (World Tactical Racing Leagues)
 	optional uint32 lateJoinInMinutes = 34;
-	optional uint64 map_id = 35;
+	optional uint64 course_id = 35;
 	optional EventTimeTrialOptions tto = 36;
 	optional string e_f37 = 37;
 	optional string e_f38 = 38;
