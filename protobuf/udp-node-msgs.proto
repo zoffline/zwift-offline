@@ -163,8 +163,8 @@ message PlayerSummaries {
 }
 
 message RelayAddress {
-	optional int32 ra_f1 = 1; //=1?; =0?
-	optional int32 ra_f2 = 2; //=6?; =0?
+	optional int32 lb_realm = 1;  // load balancing cluster: server realm or 0 (generic)
+	optional int32 lb_course = 2; // load balancing cluster: course id
 	optional string ip = 3;
 	optional int32 port = 4;
 	optional float ra_f5 = 5; //or fixed
@@ -179,8 +179,8 @@ message UdpConfig {
 }
 
 message RelayAddressesVOD {
-	optional int32 rav_f1 = 1; //=1?; =0?
-	optional int32 rav_f2 = 2; //=6?; =0?
+	optional int32 lb_realm = 1;  // load balancing cluster: server realm or 0 (generic)
+	optional int32 lb_course = 2; // load balancing cluster: course id
 	repeated RelayAddress relay_addresses = 3;
 	optional bool rav_f4 = 4;
 }

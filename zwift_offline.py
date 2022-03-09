@@ -901,7 +901,7 @@ def api_clubs_club_cancreate():
 
 @app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
 def api_eventfeed():
-    print(request.headers['Accept'])
+    #print(request.headers['Accept'])
     eventCount = int(request.args.get('limit'))
     events = get_events(eventCount)
     json_events = convert_events_to_json(events)
@@ -1489,7 +1489,10 @@ def api_profiles_activities(player_id):
         if current_user.player_id != player_id:
             return '', 401
         activity = activity_pb2.Activity()
-        activity.ParseFromString(request.stream.read())
+        raw_act = request.stream.read()
+        #with open('act-%s.bin' % world_time(), 'wb') as act_file:
+        #    act_file.write(raw_act)
+        activity.ParseFromString(raw_act)
         activity.id = get_id('activity')
         insert_protobuf_into_db('activity', activity)
         return '{"id": %ld}' % activity.id, 200
@@ -1739,7 +1742,10 @@ def api_profiles_activities_id(player_id, activity_id):
         return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
-    activity.ParseFromString(request.stream.read())
+    raw_act = request.stream.read()
+    #with open('act-%s.bin' % world_time(), 'wb') as act_file:
+    #    act_file.write(raw_act)
+    activity.ParseFromString(raw_act)
     update_protobuf_in_db('activity', activity, activity_id)
 
     response = '{"id":%s}' % activity_id
