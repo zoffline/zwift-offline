@@ -43,6 +43,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
@@ -93,8 +94,8 @@ def save_ghost(name, player_id):
         try:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
-        except:
-            return
+        except Exception as exc:
+            print('save_ghost: %s' % repr(exc))
         f = '%s/%s-%s.bin' % (folder, zwift_offline.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
@@ -116,8 +117,8 @@ def organize_ghosts(player_id):
                 try:
                     if not os.path.isdir(dest):
                         os.makedirs(dest)
-                except:
-                    return
+                except Exception as exc:
+                    print('organize_ghosts: %s' % repr(exc))
             os.rename(file, os.path.join(dest, f))
 
 def load_ghosts(player_id, state, ghosts):
@@ -227,9 +228,10 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 url = 'http://{}{}'.format(hostname, self.path)
                 req_header = self.parse_headers()
                 resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            except:
-                    self.send_error(404, 'error trying to proxy')
-                    return
+            except Exception as exc:
+                print('Error trying to proxy: %s' % repr(exc))
+                self.send_error(404, 'error trying to proxy')
+                return
             self.send_response(resp.status_code)
             self.send_resp_headers(resp)
             self.wfile.write(resp.content)
@@ -256,58 +258,61 @@ class CDNHandler(SimpleHTTPRequestHandler):
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
-        hello = tcp_node_msgs_pb2.TCPHello()
+        #print("TCPHandler hello: %s" % self.data.hex())
+        hello = udp_node_msgs_pb2.ClientToServer()
         try:
-            hello.ParseFromString(self.data[4:-4])
-        except:
+            hello.ParseFromString(self.data[4:-4]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
+            #type: TcpClient::sayHello(=0x0), TcpClient::sendSubscribeToSegment(=0x1), TcpClient::processSegmentUnsubscription(=0x1)
+        except Exception as exc:
+            print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
-        msg = tcp_node_msgs_pb2.TCPServerInfo()
+        msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
-        msg.f3 = 0
+        msg.world_time = 0
         servers = msg.servers.add()
         if os.path.exists(SERVER_IP_FILE):
             with open(SERVER_IP_FILE, 'r') as f:
                 udp_node_ip = f.read().rstrip('\r\n')
         else:
             udp_node_ip = "127.0.0.1"
-        details1 = servers.details.add()
-        details1.f1 = 1
-        details1.f2 = 6
+        details1 = msg.udp_config.relay_addresses.add()
+        details1.ra_f1 = 1
+        details1.ra_f2 = 6
         details1.ip = udp_node_ip
         details1.port = 3022
-        details2 = servers.details.add()
-        details2.f1 = 0
-        details2.f2 = 0
+        details2 = msg.udp_config.relay_addresses.add()
+        details2.ra_f1 = 0
+        details2.ra_f2 = 0
         details2.ip = udp_node_ip
         details2.port = 3022
-        servers.f2 = 10
-        servers.f3 = 30
-        servers.f4 = 3
-        other_servers = msg.other_servers.add()
-        wdetails1 = other_servers.details_wrapper.add()
-        wdetails1.f1 = 1
-        wdetails1.f2 = 6
-        details3 = wdetails1.details.add()
+        msg.udp_config.uc_f2 = 10
+        msg.udp_config.uc_f3 = 30
+        msg.udp_config.uc_f4 = 3
+        wdetails1 = msg.udp_config_vod_1.relay_addresses_vod.add()
+        wdetails1.rav_f1 = 1
+        wdetails1.rav_f2 = 6
+        details3 = wdetails1.relay_addresses.add()
         details3.CopyFrom(details1)
-        wdetails2 = other_servers.details_wrapper.add()
-        wdetails2.f1 = 0
-        wdetails2.f2 = 0
-        details4 = wdetails2.details.add()
+        wdetails2 = msg.udp_config_vod_1.relay_addresses_vod.add()
+        wdetails2.rav_f1 = 0
+        wdetails2.rav_f2 = 0
+        details4 = wdetails2.relay_addresses.add()
         details4.CopyFrom(details2)
-        other_servers.port = 3022
+        msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
         # Send size of payload as 2 bytes
         self.request.sendall(struct.pack('!h', len(payload)))
         self.request.sendall(payload)
 
         player_id = hello.player_id
-        msg = tcp_node_msgs_pb2.RecurringTCPResponse()
+        #print("TCPHandler for %d" % player_id)
+        msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = player_id
-        msg.f3 = 0
-        msg.f11 = 1
+        msg.world_time = 0
+        msg.stc_f11 = True
         payload = msg.SerializeToString()
 
         last_alive_check = int(zwift_offline.get_utc_time())
@@ -315,8 +320,25 @@ class TCPHandler(socketserver.BaseRequestHandler):
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
             try:
+                t = int(zwift_offline.get_utc_time())
+
+                #if ZC need to be registered
+                if player_id in zwift_offline.zc_connect_queue: # and player_id in online:
+                    zc_params = udp_node_msgs_pb2.ServerToClient()
+                    zc_params.player_id = player_id
+                    zc_params.world_time = 0
+                    zc_params.zc_local_ip = zwift_offline.zc_connect_queue[player_id][0]
+                    zc_params.zc_local_port = zwift_offline.zc_connect_queue[player_id][1] #21587
+                    zc_params.zc_protocol = udp_node_msgs_pb2.IPProtocol.TCP #=2
+                    zc_params_payload = zc_params.SerializeToString()
+                    last_alive_check = t
+                    self.request.sendall(struct.pack('!h', len(zc_params_payload)))
+                    self.request.sendall(zc_params_payload)
+                    #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
+                    zwift_offline.zc_connect_queue.pop(player_id)
+
                 message = udp_node_msgs_pb2.ServerToClient()
-                message.f1 = 1
+                message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
                 message.player_id = player_id
                 message.world_time = zwift_offline.world_time()
 
@@ -334,15 +356,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             self.request.sendall(message_payload)
 
                             message = udp_node_msgs_pb2.ServerToClient()
-                            message.f1 = 1
+                            message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
                             message.player_id = player_id
                             message.world_time = zwift_offline.world_time()
 
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
                         player_update_queue[player_id].remove(player_update_proto)
-
-                t = int(zwift_offline.get_utc_time())
 
                 #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
                 if len(message.updates) > 0:
@@ -354,7 +374,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
                     self.request.sendall(payload)
-            except:
+            except Exception as exc:
+                print('TCPHandler loop exception: %s' % repr(exc))
                 break
 
 class GhostsVariables:
@@ -455,11 +476,11 @@ def remove_inactive():
 
 def get_empty_message(player_id):
     message = udp_node_msgs_pb2.ServerToClient()
-    message.f1 = 1
+    message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     message.player_id = player_id
     message.seqno = 1
-    message.f5 = 1
-    message.f11 = 1
+    message.stc_f5 = 1
+    message.stc_f11 = 1
     message.msgnum = 1
     return message
 
@@ -485,7 +506,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
             try:
                 #If no sensors connected, first byte must be skipped
                 recv.ParseFromString(data[1:-4])
-            except:
+            except Exception as exc:
+                print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
 
         client_address = self.client_address
@@ -663,5 +685,12 @@ load_bots()
 botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
+
+if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
+    from fake_dns import fake_dns
+    with open(SERVER_IP_FILE, 'r') as f:
+        server_ip = f.read().rstrip('\r\n')
+        dns = threading.Thread(target=fake_dns, args=(server_ip,))
+        dns.start()
 
 zwift_offline.run_standalone(online, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)

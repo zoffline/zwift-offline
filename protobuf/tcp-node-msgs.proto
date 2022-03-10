@@ -1,53 +1,116 @@
 syntax = "proto2";
-////////////////////////////////////////
-// Initial TCP response below
-////////////////////////////////////////
-
-message ServerDetails {
-        required int32 f1 = 1;
-	required int32 f2 = 2;
-	required string ip = 3;
-	required int32 port = 4;
+enum SocialPlayerActionType {
+	SOCIAL_ACTION_UNKNOWN_TYPE = 0;
+	SOCIAL_TEXT_MESSAGE = 1;
+	SOCIAL_RIDE_ON = 2;
+	SOCIAL_FLAG = 3;
+}
+enum FlagType {
+	FLAG_TYPE_UNKNOWN = 0;
+	FLAG_TYPE_HARASSMENT = 1;
+	FLAG_TYPE_FLIER = 2;
+	FLAG_TYPE_BAD_LANGUAGE = 3;
+}
+enum MessageGroupType {
+	MGT_UNKNOWN = 0;
+	MGT_GLOBAL = 1;
+	MGT_DIRECT = 2;
+	MGT_EVENT = 3;
+	MGT_CLUB = 4;
+}
+message SocialPlayerAction {
+	optional int64 player_id = 1;
+	optional int64 to_player_id = 2; // 0 if public message
+	optional SocialPlayerActionType spa_type = 3;
+	optional string firstName = 4;
+	optional string lastName = 5;
+	optional string message = 6;
+	optional string avatar = 7;
+	optional int32 countryCode = 8;
+	optional FlagType flagType = 9;
+	optional MessageGroupType mgType = 10;
+	optional int64 eventSubgroup = 11;
+}
+/*message MobileAlertResponse {
+	optional int64 f1 = 1;
+	optional int64 f2 = 2;
 }
 
-message ServersType1 {
-	repeated ServerDetails details = 1;
-        optional int32 f2 = 2;
-        optional int32 f3 = 3;
-        optional int32 f4 = 4;
-}
+message BLEPeripheralCharacteristic {
+	optional string f1 = 1;
+	optional bytes f2 = 2;
+}*/
 
-message ServerConnectionDetailsWrapper {
-	required int32 f1 = 1;  // Value seems to be the same as ConnDetails' f1
-	required int32 f2 = 2;  // Value seems to be the same as ConnDetails' f2
-	repeated ServerDetails details = 3;
-}
+//TODO: PeripheralResponseType UNKNOWN_RESPONSE_TYPE(0), PERIPHERAL_ERROR(1), CHARACTERISTIC_VALUE(2), PERIPHERAL_CONNECTED(3), PERIPHERAL_DISCONNECTED(4), PERIPHERAL_DISCOVERED(5);
+// PeripheralErrorType UNKNOWN_ERROR(0), PERMISSION_DENIED(1), BLE_UNSUPPORTED(2), BLE_POWERED_OFF(3);
+/*message BLEPeripheralResponse {
+	optional uint32 f1 = 1;
+	optional uint32 f2 = 2;
+	optional string f3 = 3;
+	optional BLEPeripheral f4 = 4;
+	optional BLEPeripheralCharacteristic f5 = 5;
+}*/
 
-message ServersType2 {
-	repeated ServerConnectionDetailsWrapper details_wrapper = 1;
-	required int32 port = 2;
-}
-
-// login-response.proto already defines ServerInfo and Python 3 doesn't like reusing it
-message TCPServerInfo {
+/*TODO: UNKNOWN(0), FLAGS(1), INCOMPLETE_UUIDS_16_BIT(2), COMPLETE_UUIDS_16_BIT(3), INCOMPLETE_UUIDS_32_BIT(4),
+        COMPLETE_UUIDS_32_BIT(5), INCOMPLETE_UUIDS_128_BIT(6), COMPLETE_UUIDS_128_BIT(7), SHORTENED_LOCAL_NAME(8),
+        COMPLETE_LOCAL_NAME(9), TX_POWER_LEVEL(10), CLASS_OF_DEVICE(13), SIMPLE_PAIRING_HASH(14), SIMPLE_PAIRING_RANDOMIZER(15),
+        DEVICE_ID(16), SECURITY_MANAGER_OOB_FLAGS(17), SLAVE_CONNECTION_INTERVAL(18), SOLICITATION_UUIDS_16_BIT(20),
+        SOLICITATION_UUIDS_128_BIT(21), SERVICE_DATA_16_BIT(22), PUBLIC_TARGET_ADDRESS(23), RANDOM_TARGET_ADDRESS(24),
+        APPEARANCE(25), ADVERTISING_INTERVAL(26), LE_BLUETOOTH_DEVICE_ADDRESS(27), LE_ROLE(28), SIMPLE_PAIRING_HASH_C256(29),
+        SIMPLE_PAIRING_RANDOMIZER_R256(30), SOLICITATION_UUIDS_32_BIT(31), SERVICE_DATA_32_BIT(32), SERVICE_DATA_128_BIT(33),
+        LE_SECURE_CONFIRMATION_VALUE(34), LE_SECURE_RANDOM_VALUE(35), URI(36), INDOOR_POSITIONING(37), TRANSPORT_DISCOVERY_DATA(38),
+        LE_SUPPORTED_FEATURES(39), CHANNEL_MAP_UPDATE_INDICATION(40), PB_ADV(41), MESH_MESSAGE(42), MESH_BEACON(43), BIG_INFO(44),
+        BROADCAST_CODE(45), INFORMATION_DATA_3D(61), MANUFACTURER_DATA(255); */
+/*message BLEAdvertisementDataSection {
 	optional int32 f1 = 1;
-	required int32 player_id = 2;
-	required int32 f3 = 3;
-	repeated ServersType1 servers = 24;
-	repeated ServersType2 other_servers = 25;
+	optional bytes f2 = 2;
 }
 
-message TCPHello {
-	required int32 player_id = 2;
-}
-
-////////////////////////////////////////
-// Recurring TCP response below
-////////////////////////////////////////
-
-message RecurringTCPResponse {
-	optional int32 f1 = 1;
-	optional int32 player_id = 2;
+message BLEPeripheral {
+	optional string f1 = 1;
+	optional string f2 = 2;
 	optional int32 f3 = 3;
-	optional int32 f11 = 11;
+}*/
+
+/*TODO: CONNECTABLE_UNDIRECTED(0), CONNECTABLE_DIRECTED(1), SCANNABLE_UNDIRECTED(2), NON_CONNECTABLE_UNDIRECTED(3),
+        SCAN_RESPONSE(4), EXTENDED(5); */
+/*message BLEAdvertisement {
+	optional BLEPeripheral f1 = 1;
+	repeated BLEAdvertisementDataSection f2 = 2;
+	optional int32 f3 = 3;
 }
+
+message PhoneToGameCommand {
+	required int32 seqno = 1;
+	required uint32 command = 2;
+	optional int64 f3 = 3;
+	optional string f4 = 4;
+	optional int64 f5 = 5;
+	optional string f6 = 6;
+	optional int64 f7 = 7;
+	optional int32 f8 = 8;
+	optional uint32 f9 = 9;
+	required uint32 command_copy = 10;
+	optional SocialPlayerAction f11 = 11;
+	// no 12
+	optional MobileAlertResponse f13 = 13;
+	// no 14-17
+	optional BLEPeripheralResponse f18 = 18;
+	optional int64 f19 = 19;
+	optional string f20 = 20;
+	optional bytes f21 = 21;
+	optional BLEAdvertisement f22 = 22;
+}
+
+message PhoneToGame {
+	required int64 player_id = 1;
+	repeated PhoneToGameCommand command = 2;
+	optional float f3 = 3;
+	optional float f4 = 4;
+	optional float f5 = 5;
+	optional float f6 = 6;
+	optional float f7 = 7;
+	optional float f8 = 8;
+	optional double f9 = 9;
+	optional int32 f10 = 10;
+}*/

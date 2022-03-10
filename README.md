@@ -299,7 +299,32 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 </details>
 
+### Step 7 [OPTIONAL]: Install Zwift Companion App
+
+Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+
+<details><summary>Android (non-rooted device)</summary>
+
+* Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
+* Copy the file ``ssl/cert-zwift-com.pem`` in this repo and the Zwift Companion apk (e.g. ``zca.apk``) to a known location
+* Open Command Prompt, cd to that location and run
+  * ``apk-mitm --certificate cert-zwift-com.pem zca.apk``
+* Copy ``zca-patched.apk`` to your phone and install it
+* Download "#1 HOST CHANGER - BEST FOR GAMING" from Google Play ([link](https://play.google.com/store/apps/details?id=best.see.world.company))
+* Create a ``hosts.txt`` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
+```
+<zoffline ip> us-or-rly101.zwift.com
+<zoffline ip> secure.zwift.com
+```
+* Run "Host Changer", select created ``hosts.txt`` file and press the button
+* Optionally, instead of using the "Host Changer" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
+  * If running from source, install the required module with ``pip3 install dnspython``
+* Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
+
+</details>
+
 ### Extra optional steps
+
 <details><summary>Expand</summary>
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.

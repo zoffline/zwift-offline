@@ -1,7 +1,12 @@
 syntax = "proto2";
-message ZFile {
+message ZFileProto {
     required uint64 id = 1;
     required string folder = 2;
     required string filename = 3;
-    required uint64 timestamp = 4;
+    optional string f4 = 4; //NetworkClientImpl::generateZFileGzip: empty
+    required uint64 timestamp = 5;
+}
+
+message ZFilesProto {
+    repeated ZFileProto zfiles = 1;
 }

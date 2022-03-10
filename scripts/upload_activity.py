@@ -134,7 +134,7 @@ def get_player_id(session, access_token):
             print('Response HTTP Status Code: {status_code}'.format(
                 status_code=response.status_code))
 
-        profile = profile_pb2.Profile()
+        profile = profile_pb2.PlayerProfile()
         profile.ParseFromString(response.content)
         return profile.id
 
