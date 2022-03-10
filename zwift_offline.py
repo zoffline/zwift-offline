@@ -35,7 +35,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-sys.path.insert(1, 'protobuf') # otherwise import in .proto does not work
+sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2
