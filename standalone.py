@@ -272,7 +272,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
-        servers = msg.servers.add()
         if os.path.exists(SERVER_IP_FILE):
             with open(SERVER_IP_FILE, 'r') as f:
                 udp_node_ip = f.read().rstrip('\r\n')
