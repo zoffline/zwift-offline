@@ -272,9 +272,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
-        if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
-            udp_node_ip = "127.0.0.1"
-        elif os.path.exists(SERVER_IP_FILE):
+        servers = msg.servers.add()
+        if os.path.exists(SERVER_IP_FILE):
             with open(SERVER_IP_FILE, 'r') as f:
                 udp_node_ip = f.read().rstrip('\r\n')
         else:
@@ -656,7 +655,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         socket.sendto(message.SerializeToString(), client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
-httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
+httpd = socketserver.ThreadingTCPServer(('', 8080), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
