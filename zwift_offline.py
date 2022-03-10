@@ -27,6 +27,7 @@ from flask import Flask, request, jsonify, redirect, render_template, url_for, f
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
+from google.protobuf.json_format import Parse
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -245,13 +246,18 @@ def get_utc_date_time():
     return datetime.datetime.utcnow()
 
 
-def get_utc_seconds_from_date_time(dt):
+def get_seconds_from_date_time(dt):
     return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
 
 
 def get_utc_time():
     dt = get_utc_date_time()
-    return get_utc_seconds_from_date_time(dt)
+    return get_seconds_from_date_time(dt)
+
+
+def get_time():
+    dt = datetime.datetime.now()
+    return get_seconds_from_date_time(dt)
 
 
 def get_online():
@@ -905,7 +911,7 @@ def api_events_search():
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            event_cat.registrationEnd = int(get_utc_time()) * 1000 + 60000
+            event_cat.registrationEnd = int(get_time()) * 1000 + 60000
             event_cat.registrationEndWT = world_time() + 60000
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
@@ -1364,7 +1370,7 @@ def api_profiles_followees(player_id):
 
 
 def get_week_range(dt):
-     d = datetime.datetime(dt.year,dt.month,dt.day - dt.weekday())
+     d = (dt - datetime.timedelta(days = dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
      first = d
      last = d + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
      return first, last
@@ -1377,7 +1383,7 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(get_utc_seconds_from_date_time(dt)*1000)
+    return int(get_seconds_from_date_time(dt)*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
@@ -1587,7 +1593,7 @@ def relay_worlds_generic(world_id=None):
             world.name = 'Public Watopia'
             world.f3 = course
             world.world_time = world_time()
-            world.real_time = int(get_utc_time())
+            world.real_time = int(get_time())
             world.f5 = 0
             course_world[course] = world
         for p_id in online.keys():
@@ -2059,73 +2065,9 @@ def auth_realms_zwift_tokens_access_codes():
 
 @app.route('/experimentation/v1/variant', methods=['POST'])
 def experimentation_v1_variant():
-    variant_list = [('game_1_12_pc_skip_activity_save_retry', None, None),
-                    ('return_to_home', 1, None),
-                    ('game_1_12_nhd_v1', 1, None),
-                    ('game_1_12_1_retire_client_chat_culling', 1, None),
-                    ('game_1_14_draftlock_fix', None, None),
-                    ('xplatform_partner_connection_vitality', None, None),
-                    ('game_1_21_flickery_avatar_fix', 1, None),
-                    ('pack_dynamics_30_global', 1, None),
-                    ('pack_dynamics_30_makuri', 1, None),
-                    ('pack_dynamics_30_london', 1, None),
-                    ('pack_dynamics_30_watopia', 1, None),
-                    ('pack_dynamics_30_exclude_events', None, None),
-                    #('game_1_19_system_alerts', 1, None),
-                    ('game_1_16_2_ble_alternate_unpair_all_paired_devices', 1, None),
-                    ('game_1_17_game_client_activity_event', None, None),
-                    ('game_1_17_1_tdf_femmes_yellow_jersey', None, None),
-                    ('game_1_17_ble_disable_component_sport_filter', 1, None),
-                    ('game_1_18_new_welcome_ride', None, None),
-                    ('game_1_19_achievement_service_persist', 1, None),
-                    #('game_1_19_achievement_service_src_of_truth', 1, None),
-                    ('game_1_18_0_pack_dynamics_2_5_collision_push_back_removal', 1, None),
-                    ('game_1_19_gender_dob_change', 1, None),
-                    ('game_1_18_0_osx_monterey_bluetooth_uart_fix', 1, 0),
-                    ('game_1_19_0_default_rubberbanding', None, None),
-                    ('game_1_19_use_tabbed_settings', None, 0),
-                    ('pedal_assist_20', 1, None),
-                    ('game_1_19_segment_results_sub_active', 1, 0),
-                    ('game_1_20_hw_experiment_1', 1, None),
-                    ('game_1_19_paired_devices_alerts', 1, None),
-                    ('game_1_19_real_time_unlocks', 1, None),
-                    ('game_1_20_apple_novus_ble_refactor', None, None),
-                    ('game_1_21_ble_data_guard_v2', None, None),
-                    ('game_1_20_disable_high_volume_send_mixpanel', None, None),
-                    ('game_1_20_steering_mode_cleanup', None, None),
-                    ('game_1_20_clickable_telemetry_box', None, None),
-                    ('game_1_20_0_enable_stages_steering', None, 0),
-                    ('game_1_21_0_hud_highlighter', None, None),
-                    ('game_1_21_default_activity_name_change', 1, None),
-                    ('game_1_21_android_novus_ble_refactor', None, None),
-                    ('game_1_21_0_gpu_deprecation_warning_message', 1, None),
-                    ('game_1_21_ftms_set_rider_weight', None, None),
-                    ('game_1_21_ble_dll_v2', None, None),
-                    ('game_1_22_allow_uturns_at_low_speed', None, None),
-                    ('game_1_21_0_ftms_sport_filter', None, None),
-                    ('game_1_21_ftms_bike_trainer_v3', 1, None),
-                    ('game_1_22_ble_device_name_hash_v2', None, None),
-                    ('log_ble_packets', None, None),
-                    ('game_1_15_assert_disable_abort', 1, None),
-                    ('game_1_21_perf_analytics', 1, None),
-                    ('game_1_18_holiday_mode', None, None),
-                    ('game_1_17_noesis_enabled', None, None),
-                    ('game_1_20_home_screen', None, None),
-                    ('game_1_19_noesis_dummy', None, None),
-                    ('game_1_14_settings_refactor', None, None)]
-
-    variants = variants_pb2.Variants()
-    for variant in variant_list:
-        item = variants.variants.add()
-        item.name = variant[0]
-        if variant[1] is not None:
-            item.value = variant[1]
-        f3 = item.f3.add()
-        if variant[2] is not None:
-            f1 = f3.f1.add()
-            f1.name = variant[0]
-            f2 = f1.f2.add()
-            f2.f4 = variant[2]
+    variants = variants_pb2.FeatureResponse()
+    with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
+        Parse(f.read(), variants)
     return variants.SerializeToString(), 200
 
 
