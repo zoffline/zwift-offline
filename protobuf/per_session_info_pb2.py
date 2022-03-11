@@ -14,11 +14,35 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16per-session-info.proto\"#\n\x0ePerSessionInfo\x12\x11\n\trelay_url\x18\x01 \x02(\t')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16per-session-info.proto\"K\n\nTcpAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12\x10\n\x08lb_realm\x18\x03 \x01(\x05\x12\x11\n\tlb_course\x18\x04 \x01(\x05\"\'\n\tTcpConfig\x12\x1a\n\x05nodes\x18\x01 \x03(\x0b\x32\x0b.TcpAddress\"A\n\x0cPartnersUrls\x12\x16\n\x0etodaysplan_url\x18\x01 \x01(\t\x12\x19\n\x11trainingpeaks_url\x18\x02 \x01(\t\"\x81\x01\n\x0ePerSessionInfo\x12\x11\n\trelay_url\x18\x01 \x02(\t\x12\x1b\n\x04\x61pis\x18\x02 \x01(\x0b\x32\r.PartnersUrls\x12\x0c\n\x04time\x18\x03 \x01(\x04\x12\x19\n\x05nodes\x18\x04 \x01(\x0b\x32\n.TcpConfig\x12\x16\n\x0emaxSegmSubscrs\x18\x05 \x01(\x05')
 
 
 
+_TCPADDRESS = DESCRIPTOR.message_types_by_name['TcpAddress']
+_TCPCONFIG = DESCRIPTOR.message_types_by_name['TcpConfig']
+_PARTNERSURLS = DESCRIPTOR.message_types_by_name['PartnersUrls']
 _PERSESSIONINFO = DESCRIPTOR.message_types_by_name['PerSessionInfo']
+TcpAddress = _reflection.GeneratedProtocolMessageType('TcpAddress', (_message.Message,), {
+  'DESCRIPTOR' : _TCPADDRESS,
+  '__module__' : 'per_session_info_pb2'
+  # @@protoc_insertion_point(class_scope:TcpAddress)
+  })
+_sym_db.RegisterMessage(TcpAddress)
+
+TcpConfig = _reflection.GeneratedProtocolMessageType('TcpConfig', (_message.Message,), {
+  'DESCRIPTOR' : _TCPCONFIG,
+  '__module__' : 'per_session_info_pb2'
+  # @@protoc_insertion_point(class_scope:TcpConfig)
+  })
+_sym_db.RegisterMessage(TcpConfig)
+
+PartnersUrls = _reflection.GeneratedProtocolMessageType('PartnersUrls', (_message.Message,), {
+  'DESCRIPTOR' : _PARTNERSURLS,
+  '__module__' : 'per_session_info_pb2'
+  # @@protoc_insertion_point(class_scope:PartnersUrls)
+  })
+_sym_db.RegisterMessage(PartnersUrls)
+
 PerSessionInfo = _reflection.GeneratedProtocolMessageType('PerSessionInfo', (_message.Message,), {
   'DESCRIPTOR' : _PERSESSIONINFO,
   '__module__' : 'per_session_info_pb2'
@@ -29,6 +53,12 @@ _sym_db.RegisterMessage(PerSessionInfo)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _PERSESSIONINFO._serialized_start=26
-  _PERSESSIONINFO._serialized_end=61
+  _TCPADDRESS._serialized_start=26
+  _TCPADDRESS._serialized_end=101
+  _TCPCONFIG._serialized_start=103
+  _TCPCONFIG._serialized_end=142
+  _PARTNERSURLS._serialized_start=144
+  _PARTNERSURLS._serialized_end=209
+  _PERSESSIONINFO._serialized_start=212
+  _PERSESSIONINFO._serialized_end=341
 # @@protoc_insertion_point(module_scope)

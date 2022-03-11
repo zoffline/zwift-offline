@@ -12,53 +12,44 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+import profile_pb2 as profile__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bworld.proto\"\xa6\x01\n\x05World\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\x04\x12\x12\n\nworld_time\x18\x06 \x02(\x04\x12\x11\n\treal_time\x18\x07 \x02(\x04\x12\x1e\n\rplayer_states\x18\x08 \x03(\x0b\x32\x07.Player\x12$\n\x13pace_partner_states\x18\x0c \x03(\x0b\x32\x07.Player\" \n\x06Worlds\x12\x16\n\x06worlds\x18\x01 \x03(\x0b\x32\x06.World\"%\n\x0fWorldAttributes\x12\x12\n\nworld_time\x18\x02 \x02(\x03\"\x90\x02\n\x06Player\x12\n\n\x02id\x18\x01 \x02(\r\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\r\x12\x0c\n\x04time\x18\x05 \x01(\r\x12\n\n\x02\x66\x36\x18\x06 \x01(\r\x12\n\n\x02\x66\x37\x18\x07 \x01(\r\x12\n\n\x02\x66\x38\x18\x08 \x01(\r\x12\n\n\x02\x66\x39\x18\t \x01(\r\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\r\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\r\x12\r\n\x05power\x18\x0c \x01(\r\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\r\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x0f \x01(\x02\x12\t\n\x01y\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x04\x12\x0b\n\x03\x66\x31\x38\x18\x12 \x01(\r\x12\x0b\n\x03\x66\x31\x39\x18\x13 \x01(\r')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bworld.proto\x1a\rprofile.proto\"\x9d\x02\n\x0b\x44ropInWorld\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tcourse_id\x18\x03 \x01(\x04\x12\n\n\x02\x66\x34\x18\x04 \x01(\x08\x12\x10\n\x08zwifters\x18\x05 \x01(\x04\x12\x12\n\nworld_time\x18\x06 \x01(\x04\x12\x11\n\treal_time\x18\x07 \x01(\x04\x12\"\n\x0bpro_players\x18\x08 \x03(\x0b\x32\r.DropInPlayer\x12 \n\tfollowees\x18\t \x03(\x0b\x32\r.DropInPlayer\x12\x1d\n\x06others\x18\n \x03(\x0b\x32\r.DropInPlayer\x12\x14\n\x0cmax_zwifters\x18\x0b \x01(\x04\x12!\n\npacer_bots\x18\x0c \x03(\x0b\x32\r.DropInPlayer\"/\n\x0f\x44ropInWorldList\x12\x1c\n\x06worlds\x18\x01 \x03(\x0b\x32\x0c.DropInWorld\"\xcc\x02\n\x0c\x44ropInPlayer\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x11\n\tfirstName\x18\x02 \x02(\t\x12\x10\n\x08lastName\x18\x03 \x02(\t\x12\x10\n\x08\x64istance\x18\x04 \x01(\x04\x12\x0c\n\x04time\x18\x05 \x01(\x04\x12\x14\n\x0c\x63ountry_code\x18\x06 \x01(\x04\x12 \n\x0bplayer_type\x18\x07 \x01(\x0e\x32\x0b.PlayerType\x12\x15\n\x05sport\x18\x08 \x01(\x0e\x32\x06.Sport\x12\n\n\x02\x66\x39\x18\t \x01(\x08\x12\x0b\n\x03\x66\x31\x30\x18\n \x01(\x08\x12\x0b\n\x03\x66\x31\x31\x18\x0b \x01(\x04\x12\r\n\x05power\x18\x0c \x01(\x04\x12\x0b\n\x03\x66\x31\x33\x18\r \x01(\x04\x12\t\n\x01x\x18\x0e \x01(\x02\x12\x12\n\ny_altitude\x18\x0f \x01(\x02\x12\t\n\x01z\x18\x10 \x01(\x02\x12\r\n\x05route\x18\x11 \x01(\x05\x12\x12\n\nride_power\x18\x12 \x01(\r\x12\r\n\x05speed\x18\x13 \x01(\r')
 
 
 
-_WORLD = DESCRIPTOR.message_types_by_name['World']
-_WORLDS = DESCRIPTOR.message_types_by_name['Worlds']
-_WORLDATTRIBUTES = DESCRIPTOR.message_types_by_name['WorldAttributes']
-_PLAYER = DESCRIPTOR.message_types_by_name['Player']
-World = _reflection.GeneratedProtocolMessageType('World', (_message.Message,), {
-  'DESCRIPTOR' : _WORLD,
+_DROPINWORLD = DESCRIPTOR.message_types_by_name['DropInWorld']
+_DROPINWORLDLIST = DESCRIPTOR.message_types_by_name['DropInWorldList']
+_DROPINPLAYER = DESCRIPTOR.message_types_by_name['DropInPlayer']
+DropInWorld = _reflection.GeneratedProtocolMessageType('DropInWorld', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINWORLD,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:World)
+  # @@protoc_insertion_point(class_scope:DropInWorld)
   })
-_sym_db.RegisterMessage(World)
+_sym_db.RegisterMessage(DropInWorld)
 
-Worlds = _reflection.GeneratedProtocolMessageType('Worlds', (_message.Message,), {
-  'DESCRIPTOR' : _WORLDS,
+DropInWorldList = _reflection.GeneratedProtocolMessageType('DropInWorldList', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINWORLDLIST,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:Worlds)
+  # @@protoc_insertion_point(class_scope:DropInWorldList)
   })
-_sym_db.RegisterMessage(Worlds)
+_sym_db.RegisterMessage(DropInWorldList)
 
-WorldAttributes = _reflection.GeneratedProtocolMessageType('WorldAttributes', (_message.Message,), {
-  'DESCRIPTOR' : _WORLDATTRIBUTES,
+DropInPlayer = _reflection.GeneratedProtocolMessageType('DropInPlayer', (_message.Message,), {
+  'DESCRIPTOR' : _DROPINPLAYER,
   '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:WorldAttributes)
+  # @@protoc_insertion_point(class_scope:DropInPlayer)
   })
-_sym_db.RegisterMessage(WorldAttributes)
-
-Player = _reflection.GeneratedProtocolMessageType('Player', (_message.Message,), {
-  'DESCRIPTOR' : _PLAYER,
-  '__module__' : 'world_pb2'
-  # @@protoc_insertion_point(class_scope:Player)
-  })
-_sym_db.RegisterMessage(Player)
+_sym_db.RegisterMessage(DropInPlayer)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _WORLD._serialized_start=16
-  _WORLD._serialized_end=182
-  _WORLDS._serialized_start=184
-  _WORLDS._serialized_end=216
-  _WORLDATTRIBUTES._serialized_start=218
-  _WORLDATTRIBUTES._serialized_end=255
-  _PLAYER._serialized_start=258
-  _PLAYER._serialized_end=530
+  _DROPINWORLD._serialized_start=31
+  _DROPINWORLD._serialized_end=316
+  _DROPINWORLDLIST._serialized_start=318
+  _DROPINWORLDLIST._serialized_end=365
+  _DROPINPLAYER._serialized_start=368
+  _DROPINPLAYER._serialized_end=700
 # @@protoc_insertion_point(module_scope)

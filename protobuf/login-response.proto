@@ -1,29 +1,8 @@
 syntax = "proto2";
 /* XXX: This is a first approximation of login response. Not looked into or verified. */
-
-message UDPNode {
-	required string ip = 1;
-	required uint32 port = 2;
-}
-
-message UDPNodes {
-	/* First server here is not a UDP node, it's the TCP telemetry server (34.218.60.145) */
-	repeated UDPNode node = 1;
-}
-
-message APIs {
-	optional string todaysplan_url = 1;
-	optional string trainingpeaks_url = 2;
-}
-
-message ServerInfo {
-	required string relay_url = 1;
-	required APIs apis = 2;
-	required uint64 time = 3;
-	optional UDPNodes nodes = 4;
-}
+import "per-session-info.proto";
 
 message LoginResponse {
 	required string session_state = 1;
-	required ServerInfo info = 2;
+	required PerSessionInfo info = 2;
 }
