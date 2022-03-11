@@ -43,6 +43,7 @@ BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
@@ -665,5 +666,12 @@ load_bots()
 botthreadevent = threading.Event()
 bot = threading.Thread(target=play_bots)
 bot.start()
+
+if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
+    from fake_dns import fake_dns
+    with open(SERVER_IP_FILE, 'r') as f:
+        server_ip = f.read().rstrip('\r\n')
+        dns = threading.Thread(target=fake_dns, args=(server_ip,))
+        dns.start()
 
 zwift_offline.run_standalone(online, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)
