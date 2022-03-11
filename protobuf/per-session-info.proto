@@ -2,8 +2,8 @@ syntax = "proto2";
 message TcpAddress {
 	optional string ip = 1;
 	optional int32 port = 2;
-	optional int32 f3 = 3; //TcpAddressService::updateAddresses
-	optional int32 f4 = 4; //TcpAddressService::updateAddresses: cluster id?
+	optional int32 lb_realm = 3;  //load balancing cluster: server realm or 0 (generic)
+	optional int32 lb_course = 4; //load balancing cluster: course id (see also TcpAddressService::updateAddresses)
 }
 
 message TcpConfig {
