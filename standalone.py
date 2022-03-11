@@ -278,26 +278,26 @@ class TCPHandler(socketserver.BaseRequestHandler):
         else:
             udp_node_ip = "127.0.0.1"
         details1 = msg.udp_config.relay_addresses.add()
-        details1.ra_f1 = 1
-        details1.ra_f2 = 6
+        details1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+        details1.lb_course = 6 # watopia crowd
         details1.ip = udp_node_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
-        details2.ra_f1 = 0
-        details2.ra_f2 = 0
+        details2.lb_realm = 0 #generic load balancing realm
+        details2.lb_course = 0 #generic load balancing course
         details2.ip = udp_node_ip
         details2.port = 3022
         msg.udp_config.uc_f2 = 10
         msg.udp_config.uc_f3 = 30
         msg.udp_config.uc_f4 = 3
         wdetails1 = msg.udp_config_vod_1.relay_addresses_vod.add()
-        wdetails1.rav_f1 = 1
-        wdetails1.rav_f2 = 6
+        wdetails1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+        wdetails1.lb_course = 6 # watopia crowd
         details3 = wdetails1.relay_addresses.add()
         details3.CopyFrom(details1)
         wdetails2 = msg.udp_config_vod_1.relay_addresses_vod.add()
-        wdetails2.rav_f1 = 0
-        wdetails2.rav_f2 = 0
+        wdetails2.lb_realm = 0  #generic load balancing realm
+        wdetails2.lb_course = 0 #generic load balancing course
         details4 = wdetails2.relay_addresses.add()
         details4.CopyFrom(details2)
         msg.udp_config_vod_1.port = 3022
