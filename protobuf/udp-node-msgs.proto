@@ -1,124 +1,265 @@
 syntax = "proto2";
+import "profile.proto"; //enums PlayerType and Sport
+import "per-session-info.proto"; //TcpConfig
+
+enum ZofflineConstants {
+	RealmID = 1;   // hardcoded in ZwiftApp=1 (g_CurrentServerRealmID, 0: never connected; -1: disconnected)
+}
+
+enum WA_TYPE {
+	WAT_LEAVE = 2;   //proto::PlayerLeftWorld
+	WAT_RELOGIN = 3; //proto::PlayerLeftWorld
+	WAT_RIDE_ON = 4; //proto::RideOn
+	WAT_SPA = 5;     //proto::SocialPlayerAction (chat message)
+	WAT_EVENT = 6;   //proto::Event
+	WAT_JOIN_E = 7;  //proto::PlayerJoinedEvent
+	WAT_LEFT_E = 8;  //proto::PlayerLeftEvent
+	WAT_RQ_PROF = 9; //proto::RequestProfileFromServer
+	WAT_INV_W = 10;  //proto::ReceiveInvitationWorldAttribute
+	WAT_KICKED = 11; //no payload
+	WAT_WTIME = 100; //g_WorldTime := payload (GOD message, may be ignored if ZWIFT\CONFIG\IGNOREGODMESSAGES=1)
+	WAT_RTIME = 101; //BlimpEntity::SetRoadTime(payload), also GOD message
+	WAT_B_ACT = 102; //BikeEntity::PerformAction(payload)
+	WAT_GRP_M = 103; //GroupMessage (may be ignored if ZWIFT\CONFIG\SHOWGROUPMSGS=1)
+	WAT_PRI_M = 104; //PrivateMessage
+	WAT_SR    = 105; //proto::SegmentResult
+	WAT_FLAG = 106;  //Leaderboards::FlagSandbagger / Leaderboards::FlagCheater
+	WAT_NONE = 107;  //does nothing
+	WAT_RLA = 108;   //ZNETWORK_BroadcastRideLeaderAction
+	WAT_GE = 109;    //GroupEvents::UserSignedup / GroupEvents::UserRegistered
+	WAT_NM = 110;    //notable moment + Play_Magic_Whoosh_Deep_Sparkle
+	WAT_LATE = 111;  //ZNETWORK_INTERNAL_HandleLateJoinRequest
+	WAT_RH = 112;    //ZNETWORK_INTERNAL_HandleRouteHashRequest
+	WAT_STATS = 113; //GLOBAL_MESSAGE_TYPE_RIDER_FENCE_STATS
+	WAT_FENCE = 114; //GLOBAL_MESSAGE_TYPE_GRFENCE_CONFIG
+	WAT_BN_GE = 115; //ZNETWORK_BroadcastBibNumberForGroupEvent
+	WAT_PPI = 116;   //ZNETWORK_INTERNAL_HandlePacePartnerInfo
+}
+
+message WorldAttribute {
+	optional int64 wa_f1 = 1;          //not r/w by game? 587645624533328784, later 5876456 85771834256
+	optional int64 server_realm = 2;
+	optional WA_TYPE wa_type = 3;
+	optional bytes payload = 4;        //not only protobuf
+	optional int64 world_time_born = 5;
+	optional int64 x = 6;              //stored as int32
+	optional int64 y_altitude = 7;     //stored as int32
+	optional int64 z = 8;              //stored as int32
+	optional int64 world_time_expire = 9;
+	optional int64 rel_id = 10;        //WAT_PPI: pace partner smth; WAT_SPA: to_player_id; WAT_RH: route_id? ...
+	optional int32 importance = 11;    //not read by game??? WAT_B_ACT:1000; WAT_NM:50000; WAT_RH:5000000; ... 75000 ?
+	optional int64 wa_f12 = 12;        //not r/w by game? Not in package when testing
+	optional int32 wa_f13 = 13;        //not r/w by game? 
+	optional int64 timestamp = 14;     //not written by game? (from server) looks like "The Current Epoch Unix Timestamp" in Microseconds
+	optional int32 wa_f15 = 15;        //not r/w by game? 6, might be course
+	optional int64 wa_f16 = 16;        //not r/w by game? stored as bool
+}
+
+/*message WorldAttributes {
+	repeated WorldAttribute world_attributes = 1;
+	required int64 world_time = 2;
+}
+
+message World { //zwift.protobuf.World
+	required uint64 id = 1;
+	required string name = 2;
+	required uint64 w_f3 = 3;
+	optional bool w_f4 = 4;
+	required uint64 w_f5 = 5;
+	required uint64 world_time = 6;
+	required uint64 real_time = 7;
+	repeated Player w_f8 = 8;
+}
+
+message Player {
+	optional PlayerProfile player_profile = 1;
+	optional PlayerState player_state = 2;
+}*/
+
 message PlayerState {
-	optional int32 id = 1;
-	optional int64 worldTime = 2;
-	optional int32 distance = 3;
-	required int32 roadTime = 4;
+	optional int64 id = 1;
+	optional int64 worldTime = 2; // milliseconds
+	optional int32 distance = 3;  // meters
+	optional int32 roadTime = 4;  // 1/100 sec
 	optional int32 laps = 5;
-	optional int32 speed = 6;
+	optional uint32 speed = 6;    // millimeters per hour
+	optional uint32 ps_f7 = 7;
 	optional int32 roadPosition = 8;
-	optional int32 cadenceUHz = 9;
+	optional int32 cadenceUHz = 9; // =(cad / 60) * 1000000
+	optional int32 ps_f10 = 10; // BikeEntity.field_B58; 0
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
 	optional int64 heading = 13;
-	optional int32 lean = 14;
-	optional int32 climbing = 15;
-	optional int32 time = 16;
-	optional int32 f19 = 19;
-	optional int32 f20 = 20;
-	optional int32 progress = 21;
-	optional int64 customisationId = 22;
-	optional int32 justWatching = 23;
+	optional int64 lean = 14;
+	optional int32 climbing = 15; // meters
+	optional int32 time = 16;     // seconds
+	optional int32 ps_f17 = 17;
+	optional uint32 frameHue = 18; // BikeEntity::DrawBike m_frameHue * 255.0
+	//field 19:
+	//byte[0].bits[0,1]: HasPowerMeter, HasPhoneConnected
+	//byte[0].bits[2,3]: RoadDirectionForward, ??? !BikeEntity.field_DCC || BikeEntity.disSteer
+	//byte[0].bits[4]: read in BikeEntity::ProcessNewPacket, steering-related
+	//byte[1]: =0 ???
+	//byte[2]: fallback course/getMapRevisionId
+	//byte[3]: realRideons (not counted yet in BikeEntity::m_rideons) @ BikeEntity::UpdateRideOns, see also BikeEntity::Update
+	optional uint32 f19 = 19;
+	optional uint32 f20 = 20; //road_id: (f20 & 0xff00) >> 8 (=16777231 -> road_id = 0)
+	optional uint32 progress = 21; // WorkoutMode = progress & 0xF
+	optional int64 customizationId = 22;
+	optional bool justWatching = 23;
 	optional int32 calories = 24;
 	optional float x = 25;
-	optional float altitude = 26;
-	optional float y = 27;
-	optional int32 watchingRiderId = 28;
-	optional int32 groupId = 29;
-	optional int64 sport = 31;
-	optional float f34 = 34;
+	optional float y_altitude = 26;
+	optional float z = 27;
+	optional int64 watchingRiderId = 28;
+	optional int64 groupId = 29;
+	// 30 absent at least in Android Game
+	optional Sport sport = 31;
+	optional float ps_f32 = 32;
+	optional uint32 ps_f33 = 33;
+	optional float ps_f34 = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving)
 	optional int32 world = 35;
-	optional int32 f38 = 38;
-	optional uint64 route = 39;
+	optional uint32 ps_f36 = 36; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
+	optional uint32 ps_f37 = 37; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
+	optional bool canSteer = 38; // = BikeEntity.m_canSteer
+	optional int32 route = 39;
 }
 
 message ClientToServer {
-	required int32 connected = 1;
-	required int32 player_id = 2;
-	required int64 world_time = 3;
-	required int32 seqno = 4;
+	required int64 server_realm = 1; //UdpClient::sendDisconnectedClientToServer: -1. Otherwise g_CurrentServerRealmID (RealmID or 0 if not connected yet)
+	required int64 player_id = 2;
+	optional int64 world_time = 3;
+	optional uint32 seqno = 4;
+	optional uint32 cts_f5 = 5;
+	optional int64 cts_f6 = 6;
 	required PlayerState state = 7;
-	required int64 f8 = 8;
-	required int64 f9 = 9;
+	optional bool cts_f8 = 8;
+	optional bool cts_f9 = 9;
 	required int64 last_update = 10;
-	required int64 f11 = 11;
+	optional bool cts_f11 = 11;
 	required int64 last_player_update = 12;
+	optional int64 larg_wa_time = 13; //TcpClient::sayHello: LargestWorldAttributeTimestamp
+	optional bool cts_f14 = 14;
+	repeated int64 subsSegments = 15; //subscribed segment ids? TcpClient::sayHello, TcpClient::sendSubscribeToSegment
+	repeated int64 unsSegments = 16; //unsubscribed segment ids? TcpClient::processSegmentUnsubscription
 }
 
+message PlayerSummary {
+	optional int32 plsu_f1 = 1;
+	optional int32 plsu_f2 = 2;
+	optional int32 plsu_f3 = 3;
+	optional int32 plsu_f4 = 4;
+}
+
+message PlayerSummaries {
+	optional sint64 plsus_f1 = 1; //stored as int32
+	optional sint64 plsus_f2 = 2; //stored as int32
+	optional sint32 plsus_f3 = 3;
+	optional sint32 plsus_f4 = 4;
+	optional int32 plsus_f5 = 5;
+	optional int32 plsus_f6 = 6;
+	optional int32 plsus_f7 = 7;
+	repeated PlayerSummary player_summaries = 8;
+}
+
+message RelayAddress {
+	optional int32 lb_realm = 1;  // load balancing cluster: server realm or 0 (generic)
+	optional int32 lb_course = 2; // load balancing cluster: course id
+	optional string ip = 3;
+	optional int32 port = 4;
+	optional float ra_f5 = 5; //or fixed
+	optional float ra_f6 = 6; //or fixed
+}
+
+message UdpConfig {
+	repeated RelayAddress relay_addresses = 1;
+	optional int32 uc_f2 = 2; //=10?
+	optional int32 uc_f3 = 3; //=30?
+	optional int32 uc_f4 = 4; //=3?
+}
+
+message RelayAddressesVOD {
+	optional int32 lb_realm = 1;  // load balancing cluster: server realm or 0 (generic)
+	optional int32 lb_course = 2; // load balancing cluster: course id
+	repeated RelayAddress relay_addresses = 3;
+	optional bool rav_f4 = 4;
+}
+
+message UdpConfigVOD {
+	repeated RelayAddressesVOD relay_addresses_vod = 1;
+	optional int32 port = 2;
+	optional int64 ucv_f3 = 3;
+	optional int64 ucv_f4 = 4;
+	optional float ucv_f5 = 5; //or fixed
+	optional float ucv_f6 = 6; //or fixed
+}
+
+message PlayerRouteDistance {
+	optional int32 bikeId = 1; //BikeManager::FindBikeWithNetworkID
+	optional float prd_f2 = 2; //or fixed
+	optional int32 prd_f3 = 3; //-> m_bikeEntity->field_9C8
+}
+
+message EventSubgroupPlacements {
+	optional int32 esp_f1 = 1; //-> m_bikeEntity->field_9C0; UdpStatistics::registerFanViewLatestPlayerStateInfo
+	repeated PlayerRouteDistance player_rd1 = 2;
+	repeated PlayerRouteDistance player_rd2 = 3;
+	repeated PlayerRouteDistance player_rd3 = 4;
+	repeated PlayerRouteDistance player_rd4 = 5;
+	optional int32 eventTotalRiders = 6;
+	optional int32 bikeNetworkId = 7;
+	optional int32 esp_f8 = 8; //-> BikeWithNetworkID->field_9C8
+	optional float esp_f9 = 9; //or fixed
+}
+enum IPProtocol {
+	UDP = 1;
+	TCP = 2;
+}
 message ServerToClient {
-	required int32 f1 = 1;
-	required int32 player_id = 2;
-	required int64 world_time = 3;
+	optional int64 server_realm = 1;
+	optional int64 player_id = 2;
+	optional int64 world_time = 3;
 	optional int32 seqno = 4;
-	optional int32 f5 = 5;
+	optional int32 stc_f5 = 5; //read in WorldClockService::calculateOneLegLatency
+	// 6,7: absent
 	repeated PlayerState states = 8;
-	repeated PlayerUpdate updates = 9;
-	optional int64 f11 = 11;
+	repeated WorldAttribute updates = 9;
+	repeated int64 stc_f10 = 10;
+	optional bool stc_f11 = 11; //=true???
+	optional string zc_local_ip = 12;
+	optional int64 stc_f13 = 13;
+	optional int32 zwifters = 14;
+	optional int32 zc_local_port = 15;
+	optional IPProtocol zc_protocol = 16; //TODO: enum; 2: TCP
+	optional int64 stc_f17 = 17; //read in WorldClockService::calculateOneLegLatency
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
+	optional bool hasSimultLogin = 20; //UdpClient::disconnectionRequested due to simultaneous login (1); OR simultaneous login ceased (0)
+	optional PlayerSummaries player_summaries = 21; //tag426
+	// 22 absent
+	optional EventSubgroupPlacements ev_subgroup_ps = 23; //tag442
+	optional UdpConfig udp_config = 24; //tag450
+	optional UdpConfigVOD udp_config_vod_1 = 25; //tag458
+	optional int32 stc_f26 = 26; //tag464 UdpClient::receivedExpungeReason
+	optional UdpConfigVOD udp_config_vod_2 = 27; //tag474
+	repeated PlayerState player_states = 28; //tag482
+	optional TcpConfig tcp_config = 29; //tag490
+	repeated int64 ackSubsSegm = 30; //tag496 TcpClient::processSubscribedSegment
 }
 
-message Ghost {
+message Ghost { //not from the Zwift game, zoffline-specific!
 	required int32 player_id = 1;
 	repeated PlayerState states = 2;
 }
 
-message Ghosts {
+message Ghosts { //not from the Zwift game, zoffline-specific!
 	repeated Ghost ghosts = 1;
 }
 
-message PlayerUpdate {
-    optional int64 f1 = 1; // 587645624533328784, later 5876456 85771834256
-    optional int32 f2 = 2; // 1
-    required int32 type = 3; // 105 entered world, 5 chat message, 4 ride on
-    required bytes payload = 4; // protobuf
-    optional int64 world_time1 = 5;
-    optional int64 x = 6;
-    optional int64 altitude = 7;
-    optional int64 y = 8;
-    optional int64 world_time2 = 9;
-    optional int64 f11 = 11; // 75000 ?
-    optional int64 f12 = 12; //Not in package when testing
-    optional int64 f14 = 14; // '1604516817408239', later '1604516824709874'
-    optional int64 f15 = 15; //6, might be course
-}
-
-message ChatMessage {
-    required int32 rider_id = 1;
-    required int32 to_rider_id = 2; // 0 if public message
-    required int32 f3 = 3; // always value 1 ?
-    required string firstName = 4;
-    required string lastName = 5;
-    required string message = 6;
-    optional string avatar = 7;
-    required int32 countryCode = 8;
-    optional int32 eventSubgroup = 11;
-}
-
 message RideOn {
-    required int32 rider_id = 1;
-    required int32 to_rider_id = 2;
+    required int64 player_id = 1;
+    required int64 to_player_id = 2;
     required string firstName = 3;
     required string lastName = 4;
     required int32 countryCode = 5;
-}
-
-message SegmentComplete {
-    optional int64 f1 = 1;
-    required int32 rider_id = 2;
-    optional int32 f3 = 3;
-    optional int64 f4 = 4;
-    optional int64 segment_id = 5; 
-    optional int64 f6 = 6;
-    optional string first_name = 7;
-    optional string last_name = 8;
-    optional int64 world_time = 9;
-    optional int64 milliseconds = 11;
-    optional int32 f12 = 12;
-    optional int32 weight_in_grams = 13;
-    optional int32 f14 = 14;
-    optional int32 avg_power = 15;
-    optional int32 f16 = 16;
-    optional string f7date = 17;
-    optional int32 f19 = 19;
 }

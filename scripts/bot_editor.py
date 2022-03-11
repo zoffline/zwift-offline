@@ -48,7 +48,7 @@ def file_exists(file):
 
 PROFILE_FILE = 'profile.bin'
 if file_exists(PROFILE_FILE):
-    p = profile_pb2.Profile()
+    p = profile_pb2.PlayerProfile()
     with open(PROFILE_FILE, 'rb') as f:
         p.ParseFromString(f.read())
     p.first_name = input("First name: ")

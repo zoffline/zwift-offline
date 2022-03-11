@@ -12,45 +12,14 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+import per_session_info_pb2 as per__session__info__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14login-response.proto\"#\n\x07UDPNode\x12\n\n\x02ip\x18\x01 \x02(\t\x12\x0c\n\x04port\x18\x02 \x02(\r\"\"\n\x08UDPNodes\x12\x16\n\x04node\x18\x01 \x03(\x0b\x32\x08.UDPNode\"9\n\x04\x41PIs\x12\x16\n\x0etodaysplan_url\x18\x01 \x01(\t\x12\x19\n\x11trainingpeaks_url\x18\x02 \x01(\t\"\\\n\nServerInfo\x12\x11\n\trelay_url\x18\x01 \x02(\t\x12\x13\n\x04\x61pis\x18\x02 \x02(\x0b\x32\x05.APIs\x12\x0c\n\x04time\x18\x03 \x02(\x04\x12\x18\n\x05nodes\x18\x04 \x01(\x0b\x32\t.UDPNodes\"A\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x19\n\x04info\x18\x02 \x02(\x0b\x32\x0b.ServerInfo')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14login-response.proto\x1a\x16per-session-info.proto\"E\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x1d\n\x04info\x18\x02 \x02(\x0b\x32\x0f.PerSessionInfo')
 
 
 
-_UDPNODE = DESCRIPTOR.message_types_by_name['UDPNode']
-_UDPNODES = DESCRIPTOR.message_types_by_name['UDPNodes']
-_APIS = DESCRIPTOR.message_types_by_name['APIs']
-_SERVERINFO = DESCRIPTOR.message_types_by_name['ServerInfo']
 _LOGINRESPONSE = DESCRIPTOR.message_types_by_name['LoginResponse']
-UDPNode = _reflection.GeneratedProtocolMessageType('UDPNode', (_message.Message,), {
-  'DESCRIPTOR' : _UDPNODE,
-  '__module__' : 'login_response_pb2'
-  # @@protoc_insertion_point(class_scope:UDPNode)
-  })
-_sym_db.RegisterMessage(UDPNode)
-
-UDPNodes = _reflection.GeneratedProtocolMessageType('UDPNodes', (_message.Message,), {
-  'DESCRIPTOR' : _UDPNODES,
-  '__module__' : 'login_response_pb2'
-  # @@protoc_insertion_point(class_scope:UDPNodes)
-  })
-_sym_db.RegisterMessage(UDPNodes)
-
-APIs = _reflection.GeneratedProtocolMessageType('APIs', (_message.Message,), {
-  'DESCRIPTOR' : _APIS,
-  '__module__' : 'login_response_pb2'
-  # @@protoc_insertion_point(class_scope:APIs)
-  })
-_sym_db.RegisterMessage(APIs)
-
-ServerInfo = _reflection.GeneratedProtocolMessageType('ServerInfo', (_message.Message,), {
-  'DESCRIPTOR' : _SERVERINFO,
-  '__module__' : 'login_response_pb2'
-  # @@protoc_insertion_point(class_scope:ServerInfo)
-  })
-_sym_db.RegisterMessage(ServerInfo)
-
 LoginResponse = _reflection.GeneratedProtocolMessageType('LoginResponse', (_message.Message,), {
   'DESCRIPTOR' : _LOGINRESPONSE,
   '__module__' : 'login_response_pb2'
@@ -61,14 +30,6 @@ _sym_db.RegisterMessage(LoginResponse)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _UDPNODE._serialized_start=24
-  _UDPNODE._serialized_end=59
-  _UDPNODES._serialized_start=61
-  _UDPNODES._serialized_end=95
-  _APIS._serialized_start=97
-  _APIS._serialized_end=154
-  _SERVERINFO._serialized_start=156
-  _SERVERINFO._serialized_end=248
-  _LOGINRESPONSE._serialized_start=250
-  _LOGINRESPONSE._serialized_end=315
+  _LOGINRESPONSE._serialized_start=48
+  _LOGINRESPONSE._serialized_end=117
 # @@protoc_insertion_point(module_scope)

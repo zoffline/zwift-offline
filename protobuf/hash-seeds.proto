@@ -1,7 +1,7 @@
 syntax = "proto2";
 message HashSeed {
-	required uint64 seed1 = 1;
-	required uint64 seed2 = 2;
+	required uint32 seed1 = 1;
+	required uint32 seed2 = 2;
 	required uint64 expiryDate = 3;
 }
 
