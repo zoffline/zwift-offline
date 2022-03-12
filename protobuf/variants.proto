@@ -58,24 +58,9 @@ message ListValue {
 message FeatureResponse_Params {
 	required string name = 1;
 	optional bool value = 2;
-	//repeated M3 f3 = 3; // google::protobuf::Struct simulation?
 	optional Struct values = 3;
 }
 
 message FeatureResponse {
 	repeated FeatureResponse_Params variants = 1;
 }
-
-/*message M3 {
-	repeated M1 f1 = 1;
-}
-
-message M1 {
-	required string name = 1;
-	repeated M2 f2 = 2;
-}
-
-message M2 {
-	required uint32 f4 = 4;
-}
-*/

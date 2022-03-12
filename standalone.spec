@@ -6,9 +6,9 @@ import sys
 sys.modules['FixTk'] = None
 
 a = Analysis(['standalone.py'],
-             pathex=['protobuf'],
+             pathex=['/home/alexvh/Code/zoffline'],
              binaries=[],
-             datas=[('ssl/*', 'ssl'), ('initialize_db.sql', '.'), ('start_lines.csv', '.'), ('game_info.txt', '.')],
+             datas=[('ssl/*', 'ssl'), ('initialize_db.sql', '.'), ('start_lines.csv', '.'), ('variants.txt', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
