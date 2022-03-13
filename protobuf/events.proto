@@ -32,7 +32,7 @@ message EventSubgroupProtobuf { //where is fieldLimit, signedUp, signupStatus, r
 	// no 26-28
 	optional uint64 startLocation = 29; // 13, tag488 [>=6 -> 'bad start location'] valid values: 1..5 (0->1)
 	optional uint32 label = 30; // A:1, B:2, C:3, D:4, E:5 etc, tag496
-	optional uint32 paceType = 31; // 1 everywhere, tag504
+	optional uint32 paceType = 31; // 1 almost everywhere, 2 sometimes; tag504
 	optional float fromPaceValue = 32; // tag645
 	optional float toPaceValue = 33; // tag653
 	optional uint32 durationInSeconds = 34; // Duration of event in seconds, tag656
@@ -48,7 +48,7 @@ message EventSubgroupProtobuf { //where is fieldLimit, signedUp, signupStatus, r
 	optional bool evs_f44 = 44; // false, tag736
 	optional string tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
 	optional uint32 lateJoinInMinutes = 46; //tag752
-	optional uint64 course_id = 47; // 1 and others: course?, tag760
+	optional uint64 course_id = 47; // tag760
 	optional uint64 evs_f48 = 48; //tag898
 	optional string routeUrl = 49; //tag906
 	repeated int32 evs_f50 = 50; //tag912
