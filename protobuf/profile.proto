@@ -238,3 +238,11 @@ message PacerSetting {
     optional fixed32 hex_value = 3;
     optional string string_value = 5;
 }
+
+message AchievementEntry {
+	required int32 id = 1;
+}
+
+message Achievements {
+	repeated AchievementEntry achievements = 1;
+}

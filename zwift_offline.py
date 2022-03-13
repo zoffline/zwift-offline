@@ -2077,13 +2077,32 @@ def experimentation_v1_variant():
     return variants.SerializeToString(), 200
 
 
+def get_profile_saved_game_achiev2_40_bytes():
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
+    if not os.path.isfile(profile_file):
+        return b''
+    with open(profile_file, 'rb') as fd:
+        profile = profile_pb2.Profile()
+        profile.ParseFromString(fd.read())
+        if len(profile.f33) > 0x150 and profile.f33[0x108] == 2:
+            return profile.f33[0x110:0x110+0x40]
+        else:
+            return b''
+
+
 @app.route('/achievement/loadPlayerAchievements', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def achievement_loadPlayerAchievements():
     achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
     if not os.path.isfile(achievements_file):
-        return '', 200
+        converted = profile_pb2.Achievements()
+        old_achiev_bits = get_profile_saved_game_achiev2_40_bytes()
+        for ach_id in range(8 * len(old_achiev_bits)):
+            if (old_achiev_bits[ach_id // 8] >> (ach_id % 8)) & 0x1:
+                converted.achievements.add().id = ach_id
+        with open(achievements_file, 'wb') as f:
+            f.write(converted.SerializeToString())
     with open(achievements_file, 'rb') as f:
         return f.read(), 200
 
