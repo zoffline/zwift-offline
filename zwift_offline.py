@@ -2648,7 +2648,10 @@ def get_profile_saved_game_achiev2_40_bytes():
     with open(profile_file, 'rb') as fd:
         profile = profile_pb2.PlayerProfile()
         profile.ParseFromString(fd.read())
-        return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
+        if len(profile.saved_game) > 0x150 and profile.saved_game[0x108] == 2: #checking 2 from 0x10000002: achiev_badges2_40
+            return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
+        else:
+            return b''
 
 @app.route('/achievement/loadPlayerAchievements', methods=['GET'])
 @jwt_to_session_cookie
