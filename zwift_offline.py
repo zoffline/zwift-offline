@@ -927,7 +927,9 @@ def activity_moving_time(activity):
         return 0
 
 def activity_protobuf_to_json(activity):
-    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":"Youry","lastName":"Pershin","imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % activity.player_id,"approvalRequired":None}, \
+    profile = get_partial_profile(activity.player_id)
+    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":profile.first_name,"lastName":profile.last_name, \
+    "imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % activity.player_id,"approvalRequired":None}, \
     "worldId":activity.f3,"name":activity.name,"sport":str_sport(activity.f29),"startDate":activity.start_date, \
     "endDate":activity.end_date,"distanceInMeters":activity.distance, \
     "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"", \
