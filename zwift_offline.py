@@ -904,8 +904,9 @@ def api_clubs_club_cancreate():
 @app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
 def api_eventfeed():
     #print(request.headers['Accept'])
-    eventCount = int(request.args.get('limit'))
-    events = get_events(eventCount)
+    eventCount = int(request.args.get('limit', 50))
+    sport = request.args.get('sport', 'CYCLING')
+    events = get_events(eventCount, sport)
     json_events = convert_events_to_json(events)
     json_data = []
     for e in json_events:
@@ -1046,7 +1047,7 @@ def api_per_session_info():
     info.relay_url = "https://us-or-rly101.zwift.com/relay"
     return info.SerializeToString(), 200
 
-def get_events(limit):
+def get_events(limit, sport):
     events_list = [('Bologna TT', 2843604888, 10),
                    ('Crit City CW', 947394567, 12),
                    ('Crit City CCW', 2875658892, 12),
@@ -1056,6 +1057,11 @@ def get_events(limit):
     cnt = 0
     events = events_pb2.Events()
     const_delay_ms = 60000
+    if sport == 'CYCLING':
+        sport = profile_pb2.Sport.CYCLING
+    else:
+        sport = profile_pb2.Sport.RUNNING
+        event_id = 1001 #to get sport back from id
     for item in events_list:
         event = events.events.add()
         event.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -1063,7 +1069,7 @@ def get_events(limit):
         event.name = item[0]
         event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
         event.course_id = item[2]
-        event.sport = profile_pb2.Sport.CYCLING
+        event.sport = sport
         event.lateJoinInMinutes = 30
         event.eventStart = int(get_time()) * 1000 + const_delay_ms
         event.visible = True
@@ -1079,7 +1085,8 @@ def get_events(limit):
         #event.e_f27 = 27; //<=4, ENUM?
         #event.tags = 31; // semi-colon delimited tags
         event.e_wtrl = False # WTRL (World Tactical Racing Leagues)
-        cats = ('?', 'A', 'B', 'C', 'D', 'E', 'F') 
+        cats = ('A', 'B', 'C', 'D', 'E', 'F') 
+        paceValues = ((4,15), (3,4), (2,3), (1,2), (0.1,1))
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
@@ -1097,12 +1104,12 @@ def get_events(limit):
             event_cat.startLocation = cat
             event_cat.label = cat
             event_cat.lateJoinInMinutes = 30
-            event_cat.name = "Cat.%s" % cats[event_cat.label]
-            event_cat.description = "#zwiftofficial"
+            event_cat.name = "Cat.%s" % cats[cat - 1]
+            event_cat.description = "#zwiftoffline"
             event_cat.course_id = event.course_id
             event_cat.paceType = 1 #1 almost everywhere, 2 sometimes
-            event_cat.fromPaceValue = 1.0
-            event_cat.toPaceValue = 5.0
+            event_cat.fromPaceValue = paceValues[cat - 1][0]
+            event_cat.toPaceValue = paceValues[cat - 1][1]
             #event_cat.scode = 7; // ex: "PT3600S"
             #event_cat.rules_id = 8; // 320 and others
             event_cat.distanceInMeters = 0
@@ -1119,12 +1126,21 @@ def get_events(limit):
 
 @app.route('/api/events/<int:event_id>', methods=['GET'])
 def api_events_id(event_id):
+    if event_id % 1 == 0:
+        sport = 'CYCLING'
+    else:
+        sport = 'RUNNING'
+    events = get_events(50, sport)
+    for e in events.events:
+        if e.id == event_id:
+            return jsonify(convert_event_to_json(e))
     return '', 200
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
     limit = int(request.args.get('limit'))
-    events = get_events(limit)
+    sport = request.args.get('sport', 'CYCLING')
+    events = get_events(limit, sport)
     if request.headers['Accept'] == 'application/json':
         return jsonify(convert_events_to_json(events))
     else:
@@ -1142,8 +1158,15 @@ def api_events_subgroups_register_id(event_id):
 
 @app.route('/api/events/subgroups/entrants/<int:event_id>', methods=['GET'])
 def api_events_subgroups_entrants_id(event_id):
-    return '', 200
+    return '[]', 200
 
+@app.route('/api/events/subgroups/invited_ride_sweepers/<int:event_id>', methods=['GET'])
+def api_events_subgroups_invited_ride_sweepers_id(event_id):
+    return '[]', 200
+
+@app.route('/api/events/subgroups/invited_ride_leaders/<int:event_id>', methods=['GET'])
+def api_events_subgroups_invited_ride_leaders_id(event_id):
+    return '[]', 200
 
 @app.route('/relay/race/event_starting_line/<int:event_id>', methods=['POST'])
 def relay_race_event_starting_line_id(event_id):
@@ -2192,7 +2215,7 @@ def iterableToJson(it):
         ret.append(i)
     return ret
 
-def eventProtobufToJson(event):
+def convert_event_to_json(event):
     esgs = []
     for event_cat in event.category:
         esgs.append({"id":event_cat.id,"name":event_cat.name,"description":event_cat.description,"label":event_cat.label, \
@@ -2220,7 +2243,7 @@ def eventProtobufToJson(event):
 def convert_events_to_json(events):
     json_events = []
     for e in events.events:
-        json_event = eventProtobufToJson(e)
+        json_event = convert_event_to_json(e)
         #print(json_event)
         json_events.append(json_event)
     return json_events
@@ -2237,7 +2260,7 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     activityCount = int(request.args.get('activityCount'))
     json_activities = select_activities_json(current_user.player_id, activityCount)
     eventCount = int(request.args.get('eventCount'))
-    events = get_events(eventCount)
+    events = get_events(eventCount, 'CYCLING') #runners, sorry!
     json_events = convert_events_to_json(events)
     return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False, \
     "worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]})
