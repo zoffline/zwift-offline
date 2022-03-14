@@ -901,13 +901,14 @@ def api_clubs_club_cancreate():
 
 @app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
 def api_eventfeed():
-    eventCount = int(request.args.get('limit'))
-    events = get_events(eventCount)
+    eventCount = int(request.args.get('limit', 50))
+    sport = request.args.get('sport', 'CYCLING')
+    events = get_events(eventCount, sport)
     json_events = convert_events_to_json(events)
     json_data = []
     for e in json_events:
         json_data.append({"event": e})
-    return jsonify({"data":json_data})
+    return jsonify({"data":json_data,"cursor":None})
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/notifications', methods=['GET'])
@@ -1039,7 +1040,7 @@ def api_per_session_info():
     info.relay_url = "https://us-or-rly101.zwift.com/relay"
     return info.SerializeToString(), 200
 
-def get_events(limit):
+def get_events(limit, sport):
     events_list = [('Bologna TT', 2843604888, 10),
                    ('Crit City CW', 947394567, 12),
                    ('Crit City CCW', 2875658892, 12),
@@ -1048,6 +1049,12 @@ def get_events(limit):
     event_id = 1000
     cnt = 0
     events = events_pb2.Events()
+    const_delay_ms = 60000
+    if sport == 'CYCLING':
+        sport = profile_pb2.Sport.CYCLING
+    else:
+        sport = profile_pb2.Sport.RUNNING
+        event_id = 1001 #to get sport back from id
     for item in events_list:
         event = events.events.add()
         event.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -1055,29 +1062,55 @@ def get_events(limit):
         event.name = item[0]
         event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
         event.course_id = item[2]
-        event.sport = profile_pb2.Sport.CYCLING
+        event.sport = sport
         event.lateJoinInMinutes = 30
-        event.eventStart = int(get_time()) * 1000 + 60000
-        cats = ('?', 'A', 'B', 'C', 'D', 'E', 'F') 
+        event.eventStart = int(get_time()) * 1000 + const_delay_ms
+        event.visible = True
+        event.overrideMapPreferences = False
+        event.invisibleToNonParticipants = False
+        event.description = "Auto-generated event"
+        event.distanceInMeters = 0
+        event.laps = 0
+        event.durationInSeconds = 0
+        #event.rules_id = 
+        #event.jerseyHash = 
+        event.eventType = events_pb2.EventType.RACE
+        #event.e_f27 = 27; //<=4, ENUM?
+        #event.tags = 31; // semi-colon delimited tags
+        event.e_wtrl = False # WTRL (World Tactical Racing Leagues)
+        cats = ('A', 'B', 'C', 'D', 'E', 'F') 
+        paceValues = ((4,15), (3,4), (2,3), (1,2), (0.1,1))
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
             event_cat.registrationStart = event.eventStart - 30000
             event_cat.registrationStartWT = world_time()
             event_cat.registrationEnd = event.eventStart
-            event_cat.registrationEndWT = world_time() + 60000
+            event_cat.registrationEndWT = world_time() + const_delay_ms
             event_cat.lineUpStart = event.eventStart - 15000
+            event_cat.lineUpStartWT = world_time() + const_delay_ms - 15000
             event_cat.lineUpEnd = event.eventStart
+            event_cat.lineUpEndWT = world_time() + const_delay_ms
+            event_cat.eventSubgroupStart = event.eventStart
+            event_cat.eventSubgroupStartWT = world_time() + const_delay_ms
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
             event_cat.label = cat
             event_cat.lateJoinInMinutes = 30
-            event_cat.name = "Cat.%s" % cats[event_cat.label]
-            event_cat.description = "#zwiftofficial"
+            event_cat.name = "Cat.%s" % cats[cat - 1]
+            event_cat.description = "#zwiftoffline"
             event_cat.course_id = event.course_id
-            event_cat.paceType = 1
-            event_cat.fromPaceValue = 1.0
-            event_cat.toPaceValue = 5.0
+            event_cat.paceType = 1 #1 almost everywhere, 2 sometimes
+            event_cat.fromPaceValue = paceValues[cat - 1][0]
+            event_cat.toPaceValue = paceValues[cat - 1][1]
+            #event_cat.scode = 7; // ex: "PT3600S"
+            #event_cat.rules_id = 8; // 320 and others
+            event_cat.distanceInMeters = 0
+            event_cat.laps = 0
+            event_cat.startLocation = 0 # 13, tag488 [>=6 -> 'bad start location'] valid values: 1..5 (0->1)
+            event_cat.durationInSeconds = 0
+            #event_cat.jerseyHash = 36; // 493134166, tag672
+            #event_cat.tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
         event_id += 1000
         cnt = cnt + 1
         if cnt > limit:
@@ -1086,12 +1119,21 @@ def get_events(limit):
 
 @app.route('/api/events/<int:event_id>', methods=['GET'])
 def api_events_id(event_id):
+    if event_id % 1 == 0:
+        sport = 'CYCLING'
+    else:
+        sport = 'RUNNING'
+    events = get_events(50, sport)
+    for e in events.events:
+        if e.id == event_id:
+            return jsonify(convert_event_to_json(e))
     return '', 200
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
     limit = int(request.args.get('limit'))
-    events = get_events(limit)
+    sport = request.args.get('sport', 'CYCLING')
+    events = get_events(limit, sport)
     if request.headers['Accept'] == 'application/json':
         return jsonify(convert_events_to_json(events))
     else:
@@ -1109,8 +1151,15 @@ def api_events_subgroups_register_id(event_id):
 
 @app.route('/api/events/subgroups/entrants/<int:event_id>', methods=['GET'])
 def api_events_subgroups_entrants_id(event_id):
-    return '', 200
+    return '[]', 200
 
+@app.route('/api/events/subgroups/invited_ride_sweepers/<int:event_id>', methods=['GET'])
+def api_events_subgroups_invited_ride_sweepers_id(event_id):
+    return '[]', 200
+
+@app.route('/api/events/subgroups/invited_ride_leaders/<int:event_id>', methods=['GET'])
+def api_events_subgroups_invited_ride_leaders_id(event_id):
+    return '[]', 200
 
 @app.route('/relay/race/event_starting_line/<int:event_id>', methods=['POST'])
 def relay_race_event_starting_line_id(event_id):
@@ -2135,26 +2184,27 @@ def iterableToJson(it):
         ret.append(i)
     return ret
 
-def eventProtobufToJson(event):
+def convert_event_to_json(event):
     esgs = []
     for event_cat in event.category:
         esgs.append({"id":event_cat.id,"name":event_cat.name,"description":event_cat.description,"label":event_cat.label, \
 "subgroupLabel":event_cat.name[-1],"rulesId":event_cat.rules_id,"mapId":event_cat.course_id,"routeId":event_cat.route_id,"routeUrl":event_cat.routeUrl, \
 "jerseyHash":event_cat.jerseyHash,"bikeHash":event_cat.bikeHash,"startLocation":event_cat.startLocation,"invitedLeaders":iterableToJson(event_cat.invitedLeaders), \
 "invitedSweepers":iterableToJson(event_cat.invitedSweepers),"paceType":event_cat.paceType,"fromPaceValue":event_cat.fromPaceValue,"toPaceValue":event_cat.toPaceValue, \
-"fieldLimit":None,"registrationStart":event_cat.registrationStart,"registrationEnd":event_cat.registrationEnd,"lineUpStart":event_cat.lineUpStart, \
-"lineUpEnd":event_cat.lineUpEnd,"eventSubgroupStart":event_cat.eventSubgroupStart,"durationInSeconds":event_cat.durationInSeconds,"laps":event_cat.laps, \
+"fieldLimit":None,"registrationStart":str_timestamp(event_cat.registrationStart),"registrationEnd":str_timestamp(event_cat.registrationEnd),"lineUpStart":str_timestamp(event_cat.lineUpStart), \
+"lineUpEnd":str_timestamp(event_cat.lineUpEnd),"eventSubgroupStart":str_timestamp(event_cat.eventSubgroupStart),"durationInSeconds":event_cat.durationInSeconds,"laps":event_cat.laps, \
 "distanceInMeters":event_cat.distanceInMeters,"signedUp":False,"signupStatus":1,"registered":False,"registrationStatus":1,"followeeEntrantCount":0, \
 "totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0,"auxiliaryUrl":"", \
 "rulesSet":["ALLOWS_LATE_JOIN"],"workoutHash":None,"customUrl":event_cat.customUrl,"overrideMapPreferences":False, \
 "tags":[""],"lateJoinInMinutes":event_cat.lateJoinInMinutes,"timeTrialOptions":None,"qualificationRuleIds":None,"accessValidationResult":None})
     return {"id":event.id,"worldId":event.server_realm,"name":event.name,"description":event.description,"shortName":None,"mapId":event.course_id, \
 "shortDescription":None,"imageUrl":event.imageUrl,"routeId":event.route_id,"rulesId":event.rules_id,"rulesSet":["ALLOWS_LATE_JOIN"], \
-"routeUrl":None,"jerseyHash":event.jerseyHash,"bikeHash":None,"visible":event.visible,"overrideMapPreferences":event.overrideMapPreferences,"eventStart":event.eventStart, "tags":[""], \
+"routeUrl":None,"jerseyHash":event.jerseyHash,"bikeHash":None,"visible":event.visible,"overrideMapPreferences":event.overrideMapPreferences,"eventStart":str_timestamp(event.eventStart), "tags":[""], \
 "durationInSeconds":event.durationInSeconds,"distanceInMeters":event.distanceInMeters,"laps":event.laps,"privateEvent":False,"invisibleToNonParticipants":event.invisibleToNonParticipants, \
 "followeeEntrantCount":0,"totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0, \
 "eventSeries":None,"auxiliaryUrl":"","imageS3Name":None,"imageS3Bucket":None,"sport":str_sport(event.sport),"cullingType":"CULLING_EVERYBODY", \
-"recurring":True,"recurringOffset":None,"publishRecurring":True,"parentId":None,"type":events_pb2._EVENTTYPEV2.values_by_number[int(event.eventType)].name,"eventType":str(event.eventType), \
+"recurring":True,"recurringOffset":None,"publishRecurring":True,"parentId":None,"type":events_pb2._EVENTTYPEV2.values_by_number[int(event.eventType)].name, \
+"eventType":events_pb2._EVENTTYPE.values_by_number[int(event.eventType)].name, \
 "workoutHash":None,"customUrl":"","restricted":False,"unlisted":False,"eventSecret":None,"accessExpression":None,"qualificationRuleIds":None, \
 "lateJoinInMinutes":event.lateJoinInMinutes,"timeTrialOptions":None,"microserviceName":None,"microserviceExternalResourceId":None, \
 "microserviceEventVisibility":None, "minGameVersion":None,"recordable":True,"imported":False,"eventTemplateId":None, "eventSubgroups": esgs }
@@ -2162,7 +2212,7 @@ def eventProtobufToJson(event):
 def convert_events_to_json(events):
     json_events = []
     for e in events.events:
-        json_event = eventProtobufToJson(e)
+        json_event = convert_event_to_json(e)
         json_events.append(json_event)
     return json_events
 
@@ -2178,7 +2228,7 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     activityCount = int(request.args.get('activityCount'))
     json_activities = select_activities_json(current_user.player_id, activityCount)
     eventCount = int(request.args.get('eventCount'))
-    events = get_events(eventCount)
+    events = get_events(eventCount, 'CYCLING') #runners, sorry!
     json_events = convert_events_to_json(events)
     return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False, \
     "worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]})
