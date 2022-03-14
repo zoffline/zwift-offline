@@ -180,6 +180,7 @@
     },
     {
       "name": "game_1_21_android_novus_ble_refactor",
+      "value": true,
       "values": {}
     },
     {
@@ -262,14 +263,14 @@
           "reenableERGPowerThreshold": {
             "numberValue": 10.0
           },
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
           },
           "rampUpTime": {
             "numberValue": 10.0
           },
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
           }
         }
       }
