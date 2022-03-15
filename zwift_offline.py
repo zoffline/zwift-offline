@@ -1148,8 +1148,30 @@ def api_events_search():
     else:
         return events.SerializeToString(), 200
 
-@app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
+@app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST']) # +DELETE
+@jwt_to_session_cookie
+@login_required
 def api_events_subgroups_signup_id(event_id):
+    #empty request.data
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
+
+    pje = events_pb2.PlayerJoinedEvent()
+    pje.ev_sg_id = event_id;
+    pje.player_id = 0
+    #optional uint64 pje_f3 = 3;
+    player_update.payload = pje.SerializeToString()
+
+    for recieving_player_id in online.keys():
+        if not recieving_player_id in player_update_queue:
+            player_update_queue[recieving_player_id] = list()
+        player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+
     return '{"signedUp":true}', 200
 
 
