@@ -685,7 +685,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
-                        print('dt: %s' % (message.world_time - state.worldTime))
+                        #print('dt: %s' % (message.world_time - state.worldTime))
                         socket.sendto(message.SerializeToString(), client_address)
                         dumpUdpProtobuf(message, "TX")
                         message.msgnum += 1
@@ -695,7 +695,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
-        print('dt: %s' % (message.world_time - state.worldTime))
+        #print('dt: %s' % (message.world_time - state.worldTime))
         socket.sendto(message.SerializeToString(), client_address)
         dumpUdpProtobuf(message, "TX")
 
@@ -707,7 +707,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 message = get_empty_message(player.id)
                 message.num_msgs = 1
                 message.world_time = zwift_offline.world_time() #state.worldTime?
-                print('dt: %s' % (message.world_time - state.worldTime))
+                #print('dt: %s' % (message.world_time - state.worldTime))
                 s = message.states.add()
                 s.CopyFrom(state)
                 socket.sendto(message.SerializeToString(), peer_address)
