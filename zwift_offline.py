@@ -1156,9 +1156,11 @@ def api_events_subgroups_signup_id(event_id):
     if request.method == 'POST':
         wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E
         pe = events_pb2.PlayerJoinedEvent()
+        ret = True
     else:
         wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_LEFT_E
         pe = events_pb2.PlayerLeftEvent()
+        ret = False
     #empty request.data
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -1178,7 +1180,7 @@ def api_events_subgroups_signup_id(event_id):
             player_update_queue[recieving_player_id] = list()
         player_update_queue[recieving_player_id].append(player_update.SerializeToString())
 
-    return '{"signedUp":true}', 200
+    return jsonify({"signedUp":ret})
 
 
 @app.route('/api/events/subgroups/register/<int:event_id>', methods=['POST'])
