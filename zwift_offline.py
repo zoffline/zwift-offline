@@ -1238,17 +1238,10 @@ def cdn_phoneicons(filename):
 def api_zfiles_list():
     return '', 200
 
-
-# Probably don't need, haven't investigated
-@app.route('/api/private_event/feed', methods=['GET', 'POST'])
-def api_private_event_feed():
-    return '', 200
-
-
 # Disable telemetry (shuts up some errors in log)
 @app.route('/api/telemetry/config', methods=['GET'])
 def api_telemetry_config():
-    return '{"isEnabled":false}'
+    return jsonify({"isEnabled": False})
 
 def age(dob):
     today = datetime.date.today()
@@ -1304,8 +1297,7 @@ def bikeFrameToStr(val):
             return "Zwift TT"
     return "---"
 
-def do_api_profiles_me(is_json):
-    profile_id = current_user.player_id
+def do_api_profiles(profile_id, is_json):
     if MULTIPLAYER:
         profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     else:
@@ -1386,15 +1378,21 @@ def do_api_profiles_me(is_json):
 @login_required
 def api_profiles_me_bin():
     if(request.headers['Source'] == "zwift-companion"):
-        return do_api_profiles_me(True)
+        return do_api_profiles(current_user.player_id, True)
     else:
-        return do_api_profiles_me(False)
+        return do_api_profiles(current_user.player_id, False)
 
 @app.route('/api/profiles/me/', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me_json():
-    return do_api_profiles_me(True)
+    return do_api_profiles(current_user.player_id, True)
+
+@app.route('/api/profiles/<int:profile_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_json(profile_id):
+    return do_api_profiles(profile_id, True)
 
 @app.route('/api/partners/garmin/auth', methods=['GET'])
 @app.route('/api/partners/trainingpeaks/auth', methods=['GET'])
@@ -1446,13 +1444,33 @@ def api_profiles_id_privacy(player_id):
         fd.write(profile.SerializeToString())
     return '', 200
 
+@app.route('/api/profiles/<int:m_player_id>/followers', methods=['GET']) #?start=0&limit=200&include-follow-requests=false
+@jwt_to_session_cookie
+@login_required
+def api_profiles_followers(m_player_id):
+    rows = db.session.execute(sqlalchemy.text("SELECT player_id,first_name,last_name FROM user"))
+    json_data_list = []
+    for row in rows:
+        player_id = row[0]
+        profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+        profile = profile_pb2.PlayerProfile()
+        profile_file = '%s/profile.bin' % profile_dir
+        with open(profile_file, 'rb') as fd:
+            profile.ParseFromString(fd.read())
+        #all users are following favourites of this user (temp decision for small crouds)
+        json_data_list.append({"id":0,"followerId":player_id,"followeeId":m_player_id,"status":"IS_FOLLOWING","isFolloweeFavoriteOfFollower":True, \
+            "followerProfile":{"id":player_id,"firstName":row[1],"lastName":row[2],"imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id,"imageSrcLarge":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id,"countryCode":profile.country_code}, \
+            "followeeProfile":None})
+    return jsonify(json_data_list)
+
+@app.route('/api/search/profiles/restricted', methods=['POST'])
 @app.route('/api/search/profiles', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def api_search_profiles():
     query = request.json['query']
     rows = db.session.execute(sqlalchemy.text("SELECT player_id,first_name,last_name FROM user WHERE first_name like '%%%s%%' or last_name like '%%%s%%'" % (query, query)))
-    json_data_list = [];
+    json_data_list = []
     for row in rows:
         player_id = row[0]
         profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
@@ -1871,10 +1889,64 @@ def api_profiles_activities_rideon(recieving_player_id):
         discord.send_message(message, sending_player_id)
     return '{}', 200
 
+glb_private_events = {} #todo: move to database
+@app.route('/api/private_event/<int:meetup_id>', methods=['DELETE'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_remove(meetup_id):
+    glb_private_events.pop(meetup_id)
+    return '', 200
+
+@app.route('/api/private_event/<int:meetup_id>', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_edit(meetup_id):
+    str_pe = request.stream.read()
+    print(str_pe)
+    json_pe = json.loads(str_pe)
+    org_json_pe = glb_private_events[meetup_id]
+    for f in ('culling', 'distanceInMeters', 'durationInSeconds', 'eventStart', 'invitedProfileIds', 'laps', 'routeId', 'rubberbanding', 'showResults', 'sport', 'workoutHash'):
+        org_json_pe[f] = json_pe[f]
+    org_json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    return jsonify({"id":meetup_id})
+
+@app.route('/api/private_event', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMeters":13800.0,"durationInSeconds":0,"eventStart":"2022-03-17T16:27:00Z","invitedProfileIds":[4357549,4486967],"laps":0,"routeId":2474227587,"rubberbanding":true,"showResults":false,"sport":"CYCLING","workoutHash":0}
+    str_pe = request.stream.read()
+    #print(str_pe)
+    json_pe = json.loads(str_pe)
+    pe_id = len(glb_private_events) * 10 + 1
+    json_pe['id'] = pe_id
+    json_pe['eventSubgroupId'] = pe_id + 2
+    json_pe['name'] = "Route #%s" % json_pe['routeId'] #todo: more readable
+    json_pe['inviteStatus'] = "ACCEPTED" #todo: real status
+    json_pe['acceptedTotalCount'] = len(json_pe['invitedProfileIds']) #todo: real count
+    json_pe['acceptedFolloweeCount'] = len(json_pe['invitedProfileIds']) #todo: real count
+    json_pe['invitedTotalCount'] = len(json_pe['invitedProfileIds'])
+    partial_profile = get_partial_profile(current_user.player_id)
+    json_pe['organizerProfileId'] = current_user.player_id
+    json_pe['organizerFirstName'] = partial_profile.first_name
+    json_pe['organizerProfileId'] = partial_profile.last_name
+    json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    json_pe['organizerImageUrl'] = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % current_user.player_id
+    #"invitedProfileIds":[id1,id2,...] - todo: send WorldAttribute 'invite'
+    glb_private_events[pe_id] = json_pe
+    return jsonify({"id":pe_id}), 201
+
+@app.route('/api/private_event/feed', methods=['GET', 'POST'])
+#[{"id":2894545,"eventSubgroupId":3459785,"name":"Beach Island Loop","sport":"CYCLING","eventStart":"2022-03-17T16:27:00Z","routeId":2474227587,"durationInSeconds":0,"distanceInMeters":13800.0,"inviteStatus":"ACCEPTED","invitedTotalCount":3,"acceptedTotalCount":1,"acceptedFolloweeCount":0,"organizerImageUrl":"https://static-cdn.zwift.com/prod/profile/b44242c2-2367483","organizerProfileId":4485018,"organizerFirstName":"Youry","organizerLastName":"Pershin","updateDate":"2022-03-16T21:21:41Z","laps":0,"rubberbanding":true}]
+def api_private_event_feed():
+    ret = []
+    for pe in glb_private_events.values():
+        ret.append(pe)
+    print(ret)
+    return jsonify(ret)
 
 @app.route('/api/private_event/entitlement', methods=['GET'])
-def api_empty_obj():
-    return '{}', 200
+def api_private_event_entitlement():
+    return jsonify({"entitled": True})
 
 @app.route('/api/profiles/<int:player_id>/campaigns/otm2020', methods=['GET'])
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
