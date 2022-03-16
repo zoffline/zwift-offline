@@ -920,7 +920,9 @@ def activity_moving_time(activity):
         return 0
 
 def activity_protobuf_to_json(activity):
-    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":"Youry","lastName":"Pershin","imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % activity.player_id,"approvalRequired":None}, \
+    profile = get_partial_profile(activity.player_id)
+    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":profile.first_name,"lastName":profile.last_name, \
+    "imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % activity.player_id,"approvalRequired":None}, \
     "worldId":activity.f3,"name":activity.name,"sport":str_sport(activity.f29),"startDate":activity.start_date, \
     "endDate":activity.end_date,"distanceInMeters":activity.distance, \
     "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"", \
@@ -1140,8 +1142,38 @@ def api_events_search():
         return events.SerializeToString(), 200
 
 @app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
+@app.route('/api/events/signup/<int:event_id>', methods=['DELETE'])
+@jwt_to_session_cookie
+@login_required
 def api_events_subgroups_signup_id(event_id):
-    return '{"signedUp":true}', 200
+    if request.method == 'POST':
+        wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E
+        pe = events_pb2.PlayerJoinedEvent()
+        ret = True
+    else:
+        wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_LEFT_E
+        pe = events_pb2.PlayerLeftEvent()
+        ret = False
+    #empty request.data
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = wa_type
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
+
+    pe.ev_sg_id = event_id
+    pe.player_id = current_user.player_id
+    #optional uint64 pje_f3/ple_f3 = 3;
+    player_update.payload = pe.SerializeToString()
+
+    for recieving_player_id in online.keys():
+        if not recieving_player_id in player_update_queue:
+            player_update_queue[recieving_player_id] = list()
+        player_update_queue[recieving_player_id].append(player_update.SerializeToString())
+
+    return jsonify({"signedUp":ret})
 
 
 @app.route('/api/events/subgroups/register/<int:event_id>', methods=['POST'])
