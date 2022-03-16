@@ -67,12 +67,13 @@ enum NotableMomentTypeZG {
 	NMT_STARTED_MISSION = 16;
 	NMT_HOLIDAY_EVENT_COMPLETE = 21;
 }
-message NotableMoment {
+message NotableMoment { //.2,.3,.4 meanings inside last_activity.bin - not type, priority, incidentTime (i.e. 1595, 8, 9)
 	optional uint64 activity_id = 1;
 	optional NotableMomentTypeZG type = 2;
 	optional uint32 priority = 3;
 	optional uint64 incidentTime = 4;
-	optional string aux1 = 5; // example: {\"achievementId\":35,\"name\":\"PAIRED\",\"description\":\"Paired a phone through Zwift Companion\"}
+	optional string aux1 = 5; // examples: {"achievementId":35,"name":"PAIRED","description":"Paired a phone through Zwift Companion"}
+	                          //           {"segmentName":"Marina Sprint","jerseyHash":"0x997d9df7","durationInMS":30524} (from last_activity.bin)
 	optional string aux2 = 6; // empty string
 	optional string largeImageUrl = 7;
 }

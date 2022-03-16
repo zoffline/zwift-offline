@@ -1,6 +1,18 @@
 syntax = "proto2";
 import "profile.proto"; //enums PlayerType and Sport
 
+message PlayerJoinedEvent {
+	required uint64 ev_sg_id = 1;
+	required uint64 player_id = 2;
+	optional uint64 pje_f3 = 3;
+}
+
+message PlayerLeftEvent { //didn't decompiled yet, just a guess
+	required uint64 ev_sg_id = 1;
+	required uint64 player_id = 2;
+	optional uint64 ple_f3 = 3;
+}
+
 message EventSubgroupProtobuf { //where is fieldLimit, signedUp, signupStatus, registered, registrationStatus, followeeEntrantCount
 //totalEntrantCount, followeeSignedUpCount, totalSignedUpCount, followeeJoinedCount, totalJoinedCount, rulesSet, workoutHash, overrideMapPreferences
 //qualificationRuleIds, accessValidationResult

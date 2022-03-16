@@ -92,12 +92,10 @@ def post_credentials(session, username, password):
         exit(-1)
 
 
-def query_player_profile(session, access_token):
-    # Query Player Profile
-    # GET https://us-or-rly101.zwift.com/api/profiles/<player_id>
+def query(session, access_token, route):
     try:
         response = session.get(
-            url="https://us-or-rly101.zwift.com/api/profiles/me",
+            url="https://us-or-rly101.zwift.com/%s" % route,
             headers={
                 "Accept-Encoding": "gzip, deflate",
                 "Accept": "application/x-protobuf-lite",
@@ -199,9 +197,12 @@ def main(argv):
     session = requests.session()
 
     access_token, refresh_token = login(session, username, password)
-    profile = query_player_profile(session, access_token)
+    profile = query(session, access_token, "api/profiles/me")
     with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
         f.write(profile)
+    achievements = query(session, access_token, "achievement/loadPlayerAchievements")
+    with open('%s/achievements.bin' % SCRIPT_DIR, 'wb') as f:
+        f.write(achievements)
 
     logout(session, refresh_token)
 
