@@ -246,6 +246,7 @@
     },
     {
       "name": "game_1_17_noesis_enabled",
+      "value": true,
       "values": {}
     },
     {
@@ -254,17 +255,18 @@
     },
     {
       "name": "game_1_14_settings_refactor",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
-          },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
+          },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
           },
           "rampUpTime": {
             "numberValue": 10.0
