@@ -602,8 +602,8 @@ def profile(username):
                 try:
                     file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
                     with open(file_path, 'w') as f:
-                        f.write(username + '\n');
-                        f.write(password + '\n');
+                        f.write(username + '\n')
+                        f.write(password + '\n')
                     if credentials_key is not None:
                         with open(file_path, 'rb') as fr:
                             zwift_credentials = fr.read()
