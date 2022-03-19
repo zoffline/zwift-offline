@@ -737,7 +737,7 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'achievements.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
             if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
@@ -1330,16 +1330,6 @@ def do_api_profiles(profile_id, is_json):
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
             if MULTIPLAYER:
-                # For newly added existing profiles, User's player id likely differs from profile's player id.
-                # If there's existing data in db for this profile, update it for the newly assigned player id.
-                # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
-                #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
-                # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
-                if profile.id != profile_id:
-                    db.session.execute(sqlalchemy.text('UPDATE activity SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.execute(sqlalchemy.text('UPDATE goal SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.execute(sqlalchemy.text('UPDATE segment_result SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.commit()
                 profile.id = profile_id
             elif current_user.player_id != profile.id:
                 # Update AnonUser's player_id to match
