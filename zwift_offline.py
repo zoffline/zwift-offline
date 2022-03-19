@@ -695,7 +695,7 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'achievements.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
             if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
