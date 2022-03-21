@@ -597,8 +597,8 @@ def profile(username):
                 try:
                     file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
                     with open(file_path, 'w') as f:
-                        f.write(username + '\n');
-                        f.write(password + '\n');
+                        f.write(username + '\n')
+                        f.write(password + '\n')
                     if credentials_key is not None:
                         with open(file_path, 'rb') as fr:
                             zwift_credentials = fr.read()
@@ -1917,20 +1917,19 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     partial_profile = get_partial_profile(current_user.player_id)
     json_pe['organizerProfileId'] = current_user.player_id
     json_pe['organizerFirstName'] = partial_profile.first_name
-    json_pe['organizerProfileId'] = partial_profile.last_name
+    json_pe['organizerLastName'] = partial_profile.last_name
     json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     json_pe['organizerImageUrl'] = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % current_user.player_id
-    #"invitedProfileIds":[id1,id2,...] - todo: send WorldAttribute 'invite'
+    #"invitedProfileIds":[id1,id2,...] - todo: send WAT_JOIN_E(PlayerJoinedEvent with ev_sg_id) to myself and 'invite' to others
     glb_private_events[pe_id] = json_pe
     return jsonify({"id":pe_id}), 201
 
 @app.route('/api/private_event/feed', methods=['GET', 'POST'])
-#[{"id":2894545,"eventSubgroupId":3459785,"name":"Beach Island Loop","sport":"CYCLING","eventStart":"2022-03-17T16:27:00Z","routeId":2474227587,"durationInSeconds":0,"distanceInMeters":13800.0,"inviteStatus":"ACCEPTED","invitedTotalCount":3,"acceptedTotalCount":1,"acceptedFolloweeCount":0,"organizerImageUrl":"https://static-cdn.zwift.com/prod/profile/b44242c2-2367483","organizerProfileId":4485018,"organizerFirstName":"Youry","organizerLastName":"Pershin","updateDate":"2022-03-16T21:21:41Z","laps":0,"rubberbanding":true}]
 def api_private_event_feed():
     ret = []
     for pe in glb_private_events.values():
         ret.append(pe)
-    print(ret)
+    #print(ret)
     return jsonify(ret)
 
 @app.route('/api/private_event/entitlement', methods=['GET'])
