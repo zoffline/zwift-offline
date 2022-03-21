@@ -43,13 +43,13 @@ message PrivateEventFeedListProto {
 
 message PlayerJoinedEvent {
 	required uint64 ev_sg_id = 1;
-	required uint64 player_id = 2;
+	optional uint64 player_id = 2;
 	optional uint64 pje_f3 = 3;
 }
 
 message PlayerLeftEvent { //didn't decompiled yet, just a guess
 	required uint64 ev_sg_id = 1;
-	required uint64 player_id = 2;
+	optional uint64 player_id = 2;
 	optional uint64 ple_f3 = 3;
 }
 
@@ -185,7 +185,7 @@ message Event { //real name: EventProtobuf; where is shortName, shortDescription
 	optional EventType eventType = 24;
 	optional uint64 e_f25 = 25;
 	optional string e_f26 = 26;
-	optional uint64 e_f27 = 27; //<=4, ENUM?
+	optional uint64 e_f27 = 27; //<=4, ENUM? saw = 2
 	optional bool overrideMapPreferences = 28;
 	optional bool invisibleToNonParticipants = 29;
 	optional EventSeriesProtobuf evSeries = 30;
