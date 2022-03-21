@@ -36,6 +36,19 @@ enum WA_TYPE {
 	WAT_PPI = 116;   //ZNETWORK_INTERNAL_HandlePacePartnerInfo
 }
 
+enum UserBikeAction {
+	UBA_ELBOW = 0;
+	UBA_WAVE = 1;
+	UBA_02 = 2; //BikeEntity::UpdateAnimation
+	UBA_RIDEON = 3;
+	UBA_HAMMER = 4;
+	UBA_NICE = 5;
+	UBA_BRING_IT = 6;
+	UBA_TOAST = 7;
+	UBA_BELL = 8;
+	UBA_HOLIDAY_WAVE = 9; //not sure
+}
+
 message WorldAttribute {
 	optional int64 wa_f1 = 1;          //not r/w by game? 587645624533328784, later 5876456 85771834256
 	optional int64 server_realm = 2;
@@ -51,8 +64,16 @@ message WorldAttribute {
 	optional int64 wa_f12 = 12;        //not r/w by game? Not in package when testing
 	optional int32 wa_f13 = 13;        //not r/w by game? 
 	optional int64 timestamp = 14;     //not written by game? (from server) looks like "The Current Epoch Unix Timestamp" in Microseconds
-	optional int32 wa_f15 = 15;        //not r/w by game? 6, might be course
+	optional int32 wa_f15 = 15;        //6, not r/w by game?
 	optional int64 wa_f16 = 16;        //not r/w by game? stored as bool
+}
+
+message PlayerLeftWorld {
+	required int64 player_id = 1;
+	optional int64 world_time = 2; // not sure
+	optional bool anotherLogin = 3; // user profile logged in twice -> one of them should be logged out
+	optional bool plw_f4 = 4; //true
+	repeated sint64 plw_f5 = 5; // [1056322864]
 }
 
 /*message WorldAttributes {
@@ -117,7 +138,7 @@ message PlayerState {
 	optional Sport sport = 31;
 	optional float ps_f32 = 32;
 	optional uint32 ps_f33 = 33;
-	optional float ps_f34 = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving)
+	optional float dist_lat = 34; //= BikeEntity.field_F00 (=219.56387 and incr if moving: actual distance moved included lateral movement)
 	optional int32 world = 35;
 	optional uint32 ps_f36 = 36; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
 	optional uint32 ps_f37 = 37; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
@@ -195,16 +216,16 @@ message UdpConfigVOD {
 }
 
 message PlayerRouteDistance {
-	optional int32 bikeId = 1; //BikeManager::FindBikeWithNetworkID
-	optional float prd_f2 = 2; //or fixed
+	optional int32 player_id = 1;        //BikeManager::FindBikeWithNetworkID
+	optional float distance_covered = 2; //not sure
 	optional int32 prd_f3 = 3; //-> m_bikeEntity->field_9C8
 }
 
 message EventSubgroupPlacements {
-	optional int32 esp_f1 = 1; //-> m_bikeEntity->field_9C0; UdpStatistics::registerFanViewLatestPlayerStateInfo
+	optional int32 position = 1; //-> m_bikeEntity->field_9C0; UdpStatistics::registerFanViewLatestPlayerStateInfo
 	repeated PlayerRouteDistance player_rd1 = 2;
 	repeated PlayerRouteDistance player_rd2 = 3;
-	repeated PlayerRouteDistance player_rd3 = 4;
+	repeated PlayerRouteDistance eventRiderPosition = 4;
 	repeated PlayerRouteDistance player_rd4 = 5;
 	optional int32 eventTotalRiders = 6;
 	optional int32 bikeNetworkId = 7;
@@ -230,7 +251,7 @@ message ServerToClient {
 	optional int64 stc_f13 = 13;
 	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
-	optional IPProtocol zc_protocol = 16; //TODO: enum; 2: TCP
+	optional IPProtocol zc_protocol = 16;
 	optional int64 stc_f17 = 17; //read in WorldClockService::calculateOneLegLatency
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
