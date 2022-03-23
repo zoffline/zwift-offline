@@ -12,7 +12,7 @@ message InvitedProfileProto {
 }
 
 message EventInviteProto {
-	required InvitedProfileProto profile = 1;
+	optional InvitedProfileProto profile = 1;
 	required uint64 invite_f2 = 2;
 }
 

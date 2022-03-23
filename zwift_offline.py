@@ -45,7 +45,6 @@ import protobuf.activity_pb2 as activity_pb2
 import protobuf.goal_pb2 as goal_pb2
 import protobuf.login_response_pb2 as login_response_pb2
 import protobuf.per_session_info_pb2 as per_session_info_pb2
-import protobuf.periodic_info_pb2 as periodic_info_pb2
 import protobuf.profile_pb2 as profile_pb2
 import protobuf.segment_result_pb2 as segment_result_pb2
 import protobuf.world_pb2 as world_pb2
@@ -635,8 +634,8 @@ def garmin(username):
         try:
             file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.txt')
             with open(file_path, 'w') as f:
-                f.write(username + '\n');
-                f.write(password + '\n');
+                f.write(username + '\n')
+                f.write(password + '\n')
             if credentials_key is not None:
                 with open(file_path, 'rb') as fr:
                     garmin_credentials = fr.read()
@@ -742,7 +741,7 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'achievements.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
             if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
@@ -1148,6 +1147,26 @@ def api_events_search():
     else:
         return events.SerializeToString(), 200
 
+def create_event_wat(event_id, wa_type, pe, dest_ids):
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = wa_type
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
+
+    pe.ev_sg_id = event_id
+    pe.player_id = current_user.player_id
+    #optional uint64 pje_f3/ple_f3 = 3;
+    player_update.payload = pe.SerializeToString()
+    player_update_s = player_update.SerializeToString()
+
+    for recieving_player_id in dest_ids:
+        if not recieving_player_id in player_update_queue:
+            player_update_queue[recieving_player_id] = list()
+        player_update_queue[recieving_player_id].append(player_update_s)
+
 @app.route('/api/events/subgroups/signup/<int:event_id>', methods=['POST'])
 @app.route('/api/events/signup/<int:event_id>', methods=['DELETE'])
 @jwt_to_session_cookie
@@ -1162,26 +1181,8 @@ def api_events_subgroups_signup_id(event_id):
         pe = events_pb2.PlayerLeftEvent()
         ret = False
     #empty request.data
-    player_update = udp_node_msgs_pb2.WorldAttribute()
-    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-    player_update.wa_type = wa_type
-    player_update.world_time_born = world_time()
-    player_update.world_time_expire = world_time() + 60000
-    player_update.wa_f12 = 1
-    player_update.timestamp = int(get_utc_time()*1000000)
-
-    pe.ev_sg_id = event_id
-    pe.player_id = current_user.player_id
-    #optional uint64 pje_f3/ple_f3 = 3;
-    player_update.payload = pe.SerializeToString()
-
-    for recieving_player_id in online.keys():
-        if not recieving_player_id in player_update_queue:
-            player_update_queue[recieving_player_id] = list()
-        player_update_queue[recieving_player_id].append(player_update.SerializeToString())
-
+    create_event_wat(event_id, wa_type, pe, online.keys())
     return jsonify({"signedUp":ret})
-
 
 @app.route('/api/events/subgroups/register/<int:event_id>', methods=['POST'])
 def api_events_subgroups_register_id(event_id):
@@ -1337,16 +1338,6 @@ def do_api_profiles(profile_id, is_json):
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
             if MULTIPLAYER:
-                # For newly added existing profiles, User's player id likely differs from profile's player id.
-                # If there's existing data in db for this profile, update it for the newly assigned player id.
-                # XXX: Users can maliciously abuse this by intentionally uploading a profile with another user's current player id.
-                #      However, without it, anyone "upgrading" to multiplayer mode will lose their existing data.
-                # TODO: need a warning in README that switching to multiplayer mode and back to single player will lose your existing data.
-                if profile.id != profile_id:
-                    db.session.execute(sqlalchemy.text('UPDATE activity SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.execute(sqlalchemy.text('UPDATE goal SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.execute(sqlalchemy.text('UPDATE segment_result SET player_id = %s WHERE player_id = %s' % (profile_id, profile.id)))
-                    db.session.commit()
                 profile.id = profile_id
             elif current_user.player_id != profile.id:
                 # Update AnonUser's player_id to match
@@ -1590,10 +1581,7 @@ def api_profiles_activities(player_id):
         if current_user.player_id != player_id:
             return '', 401
         activity = activity_pb2.Activity()
-        raw_act = request.stream.read()
-        #with open('act-%s.bin' % world_time(), 'wb') as act_file:
-        #    act_file.write(raw_act)
-        activity.ParseFromString(raw_act)
+        activity.ParseFromString(request.stream.read())
         activity.id = get_id('activity')
         insert_protobuf_into_db('activity', activity)
         return '{"id": %ld}' % activity.id, 200
@@ -1843,10 +1831,7 @@ def api_profiles_activities_id(player_id, activity_id):
         return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
-    raw_act = request.stream.read()
-    #with open('act-%s.bin' % world_time(), 'wb') as act_file:
-    #    act_file.write(raw_act)
-    activity.ParseFromString(raw_act)
+    activity.ParseFromString(request.stream.read())
     update_protobuf_in_db('activity', activity, activity_id)
 
     response = '{"id":%s}' % activity_id
@@ -1933,7 +1918,8 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     json_pe = json.loads(str_pe)
     pe_id = len(glb_private_events) * 10 + 1
     json_pe['id'] = pe_id
-    json_pe['eventSubgroupId'] = pe_id + 2
+    ev_sg_id = pe_id + 2
+    json_pe['eventSubgroupId'] = ev_sg_id
     json_pe['name'] = "Route #%s" % json_pe['routeId'] #todo: more readable
     json_pe['inviteStatus'] = "ACCEPTED" #todo: real status
     json_pe['acceptedTotalCount'] = len(json_pe['invitedProfileIds']) #todo: real count
@@ -1941,11 +1927,65 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     json_pe['invitedTotalCount'] = len(json_pe['invitedProfileIds'])
     partial_profile = get_partial_profile(current_user.player_id)
     json_pe['organizerProfileId'] = current_user.player_id
+    json_pe['organizerId'] = current_user.player_id
+    json_pe['startLocation'] = 1 #todo
+    json_pe['allowsLateJoin'] = True #todo
     json_pe['organizerFirstName'] = partial_profile.first_name
     json_pe['organizerLastName'] = partial_profile.last_name
     json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     json_pe['organizerImageUrl'] = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % current_user.player_id
-    #"invitedProfileIds":[id1,id2,...] - todo: send WAT_JOIN_E(PlayerJoinedEvent with ev_sg_id) to myself and 'invite' to others
+    eventInvites = [{"invitedProfile": {
+                "countryCode": partial_profile.country_code,
+                "enrolledZwiftAcademy": False, #todo
+                "firstName": partial_profile.first_name,
+                "id": current_user.player_id,
+                "imageSrc": json_pe['organizerImageUrl'],
+                "lastName": partial_profile.last_name,
+                "male": True, #todo
+                "playerType": "NORMAL", #todo
+                "socialFacts": {
+                    "followerStatusOfLoggedInPlayer": "SELF",#todo
+                    "isFavoriteOfLoggedInPlayer": False #todo
+                }
+            },
+            "status": "ACCEPTED"}]
+    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), [current_user.player_id])
+
+    pe = events_pb2.EventInviteProto()
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_INV_W
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
+
+    pe.invite_f2 = 1
+    player_update.payload = pe.SerializeToString()
+    player_update_s = player_update.SerializeToString()
+
+    for peer_id in json_pe['invitedProfileIds']:
+        if not peer_id in player_update_queue:
+            player_update_queue[peer_id] = list()
+        player_update_queue[peer_id].append(player_update_s)
+        p_partial_profile = get_partial_profile(peer_id)
+        eventInvites.append({"invitedProfile": {
+                "countryCode": p_partial_profile.country_code,
+                "enrolledZwiftAcademy": False, #todo
+                "firstName": p_partial_profile.first_name,
+                "id": peer_id,
+                "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % peer_id,
+                "lastName": p_partial_profile.last_name,
+                "male": True, #todo
+                "playerType": "NORMAL", #todo
+                "socialFacts": {
+                    "followerStatusOfLoggedInPlayer": "IS_FOLLOWING", #todo
+                    "isFavoriteOfLoggedInPlayer": True #todo
+                }
+            },
+            "status": "PENDING"}) #todo
+    json_pe['eventInvites'] = eventInvites
+
     glb_private_events[pe_id] = json_pe
     return jsonify({"id":pe_id}), 201
 
@@ -1955,6 +1995,12 @@ def api_private_event_feed():
     for pe in glb_private_events.values():
         ret.append(pe)
     #print(ret)
+    return jsonify(ret)
+
+@app.route('/api/private_event/<int:event_id>', methods=['GET'])
+def api_private_event_id(event_id):
+    ret = glb_private_events[event_id]
+    print(ret)
     return jsonify(ret)
 
 @app.route('/api/private_event/entitlement', methods=['GET'])
@@ -2471,23 +2517,6 @@ def relay_worlds_attributes():
         chat_message.ParseFromString(player_update.payload)
         discord.send_message(chat_message.message, chat_message.player_id)
     return '', 201
-
-
-#@app.route('/relay/periodic-info', methods=['GET']) #did not found in decompiled app
-#def relay_periodic_info():
-#    infos = periodic_info_pb2.PeriodicInfos()
-#    info = infos.infos.add()
-#    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-#        info.game_server_ip = "127.0.0.1"
-#    else:
-#        info.game_server_ip = server_ip
-#    info.f2 = 3022
-#    info.f3 = 10
-#    info.f4 = 60
-#    info.f5 = 30
-#    info.f6 = 3
-#    return infos.SerializeToString(), 200
-
 
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
     where_stmt = ("WHERE segment_id = '%s'" % segment_id)
