@@ -16,6 +16,7 @@ import re
 import smtplib, ssl
 import requests
 import json
+import subprocess
 from copy import copy
 from functools import wraps
 from io import BytesIO
@@ -689,7 +690,7 @@ def send_restarting_message():
             send_message_to_all_online(message)
             discord.send_message(message)
             time.sleep(6)
-            os.kill(os.getpid(), signal.SIGINT)
+            os.system("sudo systemctl restart zoffline.service")
 
 
 @app.route("/restart")
@@ -703,6 +704,8 @@ def restart_server():
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
         discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        p = subprocess.Popen(["git", "pull"], cwd="/home/ubuntu/zwift-offline")
+        p.wait()
     return redirect('/user/%s/' % current_user.username)
 
 
@@ -1006,10 +1009,7 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(get_utc_time())
     udp_node = response.info.nodes.nodes.add()
-    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-        udp_node.ip = "127.0.0.1"
-    else:
-        udp_node.ip = server_ip  # TCP telemetry server
+    udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     return response.SerializeToString(), 200
 
@@ -2191,10 +2191,7 @@ def api_profiles_goals_id(player_id, goal_id):
 def api_tcp_config():
     infos = per_session_info_pb2.TcpConfig()
     info = infos.nodes.add()
-    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-        info.ip = "127.0.0.1"
-    else:
-        info.ip = server_ip
+    info.ip = server_ip
     info.port = 3023
     return infos.SerializeToString(), 200
 
@@ -2908,7 +2905,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
     logger.info("Server is running.")
-    server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
+    server = WSGIServer(('0.0.0.0', 4443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
     server.serve_forever()
 
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host='0.0.0.0') # debug=True, use_reload=False)

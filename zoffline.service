@@ -1,0 +1,11 @@
+[Unit]
+Description=zoffline service
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 /home/ubuntu/zwift-offline/standalone.py
+
+[Install]
+WantedBy=multi-user.target
