@@ -1294,6 +1294,8 @@ def api_profiles_activities_id(player_id, activity_id):
     if current_user.player_id != player_id:
         return '', 401
     if request.method == 'DELETE':
+        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
+        db.session.commit()
         return 'true', 200
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
