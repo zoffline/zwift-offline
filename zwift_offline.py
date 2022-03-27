@@ -16,7 +16,7 @@ import re
 import smtplib, ssl
 import requests
 import json
-from copy import copy
+from copy import copy, deepcopy
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
@@ -1888,12 +1888,16 @@ def api_profiles_activities_rideon(recieving_player_id):
 glb_notifications = {} #player_id -> dictionary, todo: move to database
 glb_cur_notif_id = 1
 def create_zca_notification(player_id, private_event, organizer):
+    global glb_cur_notif_id
     if not player_id in glb_notifications.keys():
         glb_notifications[player_id] = {}
     d = glb_notifications[player_id]
-    argString0 = json.dumps({"eventId":private_event['id'],"eventStartDate":datetime.datetime.strptime(private_event['eventStart'], '%Y-%m-%dT%H:%M:%S'),"otherInviteeCount":len(private_event['invitedProfileIds'])})
+    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
+    argString0 = json.dumps({"eventId":private_event['id'],"eventStartDate": \
+        int((datetime.datetime.strptime(private_event['eventStart'], '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp()), \
+        "otherInviteeCount":len(private_event['invitedProfileIds'])})
     n = { "activity": None, "argLong0": 0, "argLong1": 0, "argString0": argString0,
-        "createdOn": private_event['updateDate'],
+        "createdOn": str_timestamp(unix_time_millis(datetime.datetime.now())),
         "fromProfile": {
             "firstName": organizer["firstName"],
             "id": organizer["id"],
@@ -1921,6 +1925,7 @@ def api_notifications():
     if current_user.player_id in glb_notifications.keys():
         for n in glb_notifications[current_user.player_id].values():
             ret_notifications.append(n)
+    #print (ret_notifications)
     return jsonify(ret_notifications)
 
 @app.route('/api/notifications/<int:notif_id>', methods=['PUT'])
@@ -1930,7 +1935,7 @@ def api_notifications_put(notif_id):
     n = glb_notifications[current_user.player_id][notif_id]
     n["read"] = request.json['read']
     n["readDate"] = request.json['readDate']
-    n["lastModified"] = request.json['lastModified']
+    n["lastModified"] = n["readDate"]
     return '', 204
 
 glb_private_events = {} #todo: move to database
@@ -1970,7 +1975,7 @@ def api_private_event_reject(meetup_id): #todo: check if world attribute sent
 @login_required
 def api_private_event_edit(meetup_id):
     str_pe = request.stream.read()
-    print(str_pe)
+    #print(str_pe)
     json_pe = json.loads(str_pe)
     org_json_pe = glb_private_events[meetup_id]
     for f in ('culling', 'distanceInMeters', 'durationInSeconds', 'eventStart', 'invitedProfileIds', 'laps', 'routeId', 'rubberbanding', 'showResults', 'sport', 'workoutHash'):
@@ -1988,6 +1993,7 @@ def api_private_event_edit(meetup_id):
 @jwt_to_session_cookie
 @login_required
 def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMeters":13800.0,"durationInSeconds":0,"eventStart":"2022-03-17T16:27:00Z","invitedProfileIds":[4357549,4486967],"laps":0,"routeId":2474227587,"rubberbanding":true,"showResults":false,"sport":"CYCLING","workoutHash":0}
+    global glb_cur_pe_id
     str_pe = request.stream.read()
     #print(str_pe)
     json_pe = json.loads(str_pe)
@@ -2018,13 +2024,9 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
                 "lastName": partial_profile.last_name,
                 "male": True, #todo
                 "playerType": "NORMAL", #todo
-                "socialFacts": {
-                    "followerStatusOfLoggedInPlayer": "SELF",#todo
-                    "isFavoriteOfLoggedInPlayer": False #todo
-                }
             },
             "status": "ACCEPTED"}]
-    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), [current_user.player_id])
+    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
 
     pe = events_pb2.EventInviteProto()
     player_update = udp_node_msgs_pb2.WorldAttribute()
@@ -2062,20 +2064,17 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     return jsonify({"id":pe_id}), 201
 
 def clone_and_append_social(player_id, private_event):
-    ret = private_event.deepcopy()
+    ret = deepcopy(private_event)
     status = 'PENDING'
-    for i in private_event['eventInvites']:
-        if i['invitedProfile']['id'] == player_id:
+    for i in ret['eventInvites']:
+        p = i['invitedProfile']
+        #todo: strict social
+        if p['id'] == player_id:
+            p['socialFacts'] = {"followerStatusOfLoggedInPlayer":"SELF","isFavoriteOfLoggedInPlayer":False}
             status = i['status']
-            break
+        else:
+            p['socialFacts'] = {"followerStatusOfLoggedInPlayer":"IS_FOLLOWING","isFavoriteOfLoggedInPlayer":True}
     ret['inviteStatus'] = status
-    #todo: strict social
-    if player_id == private_event['organizerProfileId']:
-        ret['socialFacts'] = { "followerStatusOfLoggedInPlayer": "SELF", \
-                               "isFavoriteOfLoggedInPlayer": False }
-    else:
-        ret['socialFacts'] = { "followerStatusOfLoggedInPlayer": "IS_FOLLOWING", \
-                               "isFavoriteOfLoggedInPlayer": True }
     return ret
 
 @app.route('/api/private_event/feed', methods=['GET', 'POST'])
@@ -2497,7 +2496,7 @@ def transformPrivateEvents(player_id, max_count, status):
             for i in e['eventInvites']:
                 if i['invitedProfile']['id'] == player_id:
                     if i['status'] == status:
-                        e_clone = e.deepcopy()
+                        e_clone = deepcopy(e)
                         e_clone['inviteStatus'] = status
                         ret.append(e_clone)
                         if len(ret) >= max_count:
@@ -2902,7 +2901,10 @@ def auth_realms_zwift_protocol_openid_connect_token():
             return jsonify(fake_jwt_with_session_cookie(session_cookie)), 200
         elif "refresh_token" in request.form:
             token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
-            return jsonify(fake_jwt_with_session_cookie(token['session_cookie']))
+            if 'session_cookie' in token:
+                return jsonify(fake_jwt_with_session_cookie(token['session_cookie']))
+            else:
+                return '', 401
         else:  # android login
             current_user.enable_ghosts = user.enable_ghosts
             ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
