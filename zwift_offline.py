@@ -909,7 +909,6 @@ def api_eventfeed():
     return jsonify({"data":json_data,"cursor":None})
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
-@app.route('/api/notifications', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
@@ -1889,13 +1888,85 @@ def api_profiles_activities_rideon(recieving_player_id):
         discord.send_message(message, sending_player_id)
     return '{}', 200
 
+glb_notifications = {} #player_id -> dictionary, todo: move to database
+glb_cur_notif_id = 1
+def create_zca_notification(player_id, private_event, organizer):
+    if not player_id in glb_notifications.keys():
+        glb_notifications[player_id] = {}
+    d = glb_notifications[player_id]
+    argString0 = json.dumps({"eventId":private_event['id'],"eventStartDate":datetime.datetime.strptime(private_event['eventStart'], '%Y-%m-%dT%H:%M:%S'),"otherInviteeCount":len(private_event['invitedProfileIds'])})
+    n = { "activity": None, "argLong0": 0, "argLong1": 0, "argString0": argString0,
+        "createdOn": private_event['updateDate'],
+        "fromProfile": {
+            "firstName": organizer["firstName"],
+            "id": organizer["id"],
+            "imageSrc": organizer["imageSrc"],
+            "imageSrcLarge": organizer["imageSrc"],
+            "lastName": organizer["lastName"],
+            "publicId": "283b140f-91d2-4882-bd8e-e4194ddf7128", #todo, hope not used
+            "socialFacts": {
+                "favoriteOfLoggedInPlayer": True, #todo
+                "followeeStatusOfLoggedInPlayer": "IS_FOLLOWING", #todo
+                "followerStatusOfLoggedInPlayer": "IS_FOLLOWING" #todo
+            }
+        },
+        "id": glb_cur_notif_id, "lastModified": None, "read": False, "readDate": None,
+        "type": "PRIVATE_EVENT_INVITE" 
+    }
+    d[glb_cur_notif_id] = n
+    glb_cur_notif_id += 1
+
+@app.route('/api/notifications', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_notifications():
+    ret_notifications = []
+    if current_user.player_id in glb_notifications.keys():
+        for n in glb_notifications[current_user.player_id].values():
+            ret_notifications.append(n)
+    return jsonify(ret_notifications)
+
+@app.route('/api/notifications/<int:notif_id>', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_notifications_put(notif_id):
+    n = glb_notifications[current_user.player_id][notif_id]
+    n["read"] = request.json['read']
+    n["readDate"] = request.json['readDate']
+    n["lastModified"] = request.json['lastModified']
+    return '', 204
+
 glb_private_events = {} #todo: move to database
+glb_cur_pe_id = 1
 @app.route('/api/private_event/<int:meetup_id>', methods=['DELETE'])
 @jwt_to_session_cookie
 @login_required
 def api_private_event_remove(meetup_id):
     glb_private_events.pop(meetup_id)
+    for d in glb_notifications.values():
+        if meetup_id in d.keys():
+            d.pop(meetup_id)
     return '', 200
+
+def edit_private_event(player_id, meetup_id, decision):
+    if meetup_id in glb_private_events.keys():
+        e = glb_private_events[meetup_id]
+        for i in e['eventInvites']:
+            if i['invitedProfile']['id'] == player_id:
+                i['status'] = decision
+    return '', 204
+
+@app.route('/api/private_event/<int:meetup_id>/accept', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_accept(meetup_id): #todo: check if world attribute sent
+    return edit_private_event(current_user.player_id, meetup_id, 'ACCEPTED')
+
+@app.route('/api/private_event/<int:meetup_id>/reject', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_reject(meetup_id): #todo: check if world attribute sent
+    return edit_private_event(current_user.player_id, meetup_id, 'REJECTED')
 
 @app.route('/api/private_event/<int:meetup_id>', methods=['PUT'])
 @jwt_to_session_cookie
@@ -1908,6 +1979,12 @@ def api_private_event_edit(meetup_id):
     for f in ('culling', 'distanceInMeters', 'durationInSeconds', 'eventStart', 'invitedProfileIds', 'laps', 'routeId', 'rubberbanding', 'showResults', 'sport', 'workoutHash'):
         org_json_pe[f] = json_pe[f]
     org_json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    for d in glb_notifications.values():
+        if meetup_id in d.keys():
+            n = d[meetup_id]
+            n['read'] = False
+            n['readDate'] = None
+            n['lastModified'] = org_json_pe['updateDate']
     return jsonify({"id":meetup_id})
 
 @app.route('/api/private_event', methods=['POST'])
@@ -1917,11 +1994,11 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     str_pe = request.stream.read()
     #print(str_pe)
     json_pe = json.loads(str_pe)
-    pe_id = len(glb_private_events) * 10 + 1
+    pe_id = glb_cur_pe_id * 10 + 1
+    glb_cur_pe_id += 1
     json_pe['id'] = pe_id
     json_pe['eventSubgroupId'] = pe_id + 2
     json_pe['name'] = "Route #%s" % json_pe['routeId'] #todo: more readable
-    json_pe['inviteStatus'] = "ACCEPTED" #todo: real status
     json_pe['acceptedTotalCount'] = len(json_pe['invitedProfileIds']) #todo: real count
     json_pe['acceptedFolloweeCount'] = len(json_pe['invitedProfileIds']) #todo: real count
     json_pe['invitedTotalCount'] = len(json_pe['invitedProfileIds'])
@@ -1931,15 +2008,90 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     json_pe['organizerLastName'] = partial_profile.last_name
     json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     json_pe['organizerImageUrl'] = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % current_user.player_id
-    #"invitedProfileIds":[id1,id2,...] - todo: send WAT_JOIN_E(PlayerJoinedEvent with ev_sg_id) to myself and 'invite' to others
+    eventInvites = [{"invitedProfile": {
+                "countryCode": partial_profile.country_code,
+                "enrolledZwiftAcademy": False, #todo
+                "firstName": partial_profile.first_name,
+                "id": current_user.player_id,
+                "imageSrc": json_pe['organizerImageUrl'],
+                "lastName": partial_profile.last_name,
+                "male": True, #todo
+                "playerType": "NORMAL", #todo
+                "socialFacts": {
+                    "followerStatusOfLoggedInPlayer": "SELF",#todo
+                    "isFavoriteOfLoggedInPlayer": False #todo
+                }
+            },
+            "status": "ACCEPTED"}]
+    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), [current_user.player_id])
+
+    pe = events_pb2.EventInviteProto()
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_INV_W
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = world_time() + 60000
+    player_update.wa_f12 = 1
+    player_update.timestamp = int(get_utc_time()*1000000)
+
+    pe.invite_f2 = 1
+    player_update.payload = pe.SerializeToString()
+    player_update_s = player_update.SerializeToString()
+
+    for peer_id in json_pe['invitedProfileIds']:
+        create_zca_notification(peer_id, json_pe, eventInvites[0]["invitedProfile"])
+        if not peer_id in player_update_queue:
+            player_update_queue[peer_id] = list()
+        player_update_queue[peer_id].append(player_update_s)
+        p_partial_profile = get_partial_profile(peer_id)
+        eventInvites.append({"invitedProfile": {
+                "countryCode": p_partial_profile.country_code,
+                "enrolledZwiftAcademy": False, #todo
+                "firstName": p_partial_profile.first_name,
+                "id": peer_id,
+                "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % peer_id,
+                "lastName": p_partial_profile.last_name,
+                "male": True, #todo
+                "playerType": "NORMAL", #todo
+            },
+            "status": "PENDING"})
+    json_pe['eventInvites'] = eventInvites
+
     glb_private_events[pe_id] = json_pe
     return jsonify({"id":pe_id}), 201
 
+def clone_and_append_social(player_id, private_event):
+    ret = private_event.deepcopy()
+    status = 'PENDING'
+    for i in private_event['eventInvites']:
+        if i['invitedProfile']['id'] == player_id:
+            status = i['status']
+            break
+    ret['inviteStatus'] = status
+    #todo: strict social
+    if player_id == private_event['organizerProfileId']:
+        ret['socialFacts'] = { "followerStatusOfLoggedInPlayer": "SELF", \
+                               "isFavoriteOfLoggedInPlayer": False }
+    else:
+        ret['socialFacts'] = { "followerStatusOfLoggedInPlayer": "IS_FOLLOWING", \
+                               "isFavoriteOfLoggedInPlayer": True }
+    return ret
+
 @app.route('/api/private_event/feed', methods=['GET', 'POST'])
+@jwt_to_session_cookie
+@login_required
 def api_private_event_feed():
     ret = []
     for pe in glb_private_events.values():
-        ret.append(pe)
+        ret.append(clone_and_append_social(current_user.player_id, pe))
+    #print(ret)
+    return jsonify(ret)
+
+@app.route('/api/private_event/<int:event_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_id(event_id):
+    ret = clone_and_append_social(current_user.player_id, glb_private_events[event_id])
     #print(ret)
     return jsonify(ret)
 
@@ -2323,8 +2475,21 @@ def convert_events_to_json(events):
         json_events.append(json_event)
     return json_events
 
+def transformPrivateEvents(player_id, max_count, status):
+    ret = []
+    if max_count > 0:
+        for e in glb_private_events.values():
+            for i in e['eventInvites']:
+                if i['invitedProfile']['id'] == player_id:
+                    if i['status'] == status:
+                        e_clone = e.deepcopy()
+                        e_clone['inviteStatus'] = status
+                        ret.append(e_clone)
+                        if len(ret) >= max_count:
+                            return ret
+    return ret
 
-#todo: followingCount=3&pendingEventInviteCount=50&acceptedEventInviteCount=3&playerTotal=true&playerSport=all&eventSport=CYCLING&fetchCampaign=true
+#todo: followingCount=3&playerSport=all&eventSport=CYCLING&fetchCampaign=true
 @app.route('/relay/worlds/<int:server_realm>/aggregate/mobile', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
@@ -2337,8 +2502,12 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     eventCount = int(request.args.get('eventCount'))
     events = get_events(eventCount, 'CYCLING') #runners, sorry!
     json_events = convert_events_to_json(events)
-    return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":[],"acceptedPrivateEventFeed":[],"hasFolloweesToRideOn":False, \
-    "worldName":"MAKURIISLANDS","playerCount":0,"followingPlayerCount":0,"followingPlayers":[]})
+    pendingEventInviteCount = int(request.args.get('pendingEventInviteCount'))
+    ppeFeed = transformPrivateEvents(current_user.player_id, pendingEventInviteCount, 'PENDING')
+    acceptedEventInviteCount = int(request.args.get('acceptedEventInviteCount'))
+    apeFeed = transformPrivateEvents(current_user.player_id, acceptedEventInviteCount, 'ACCEPTED')
+    return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":ppeFeed,"acceptedPrivateEventFeed":apeFeed,"hasFolloweesToRideOn":False, \
+    "worldName":"MAKURIISLANDS","playerCount": len(online),"followingPlayerCount":0,"followingPlayers":[]})
 
 @app.route('/relay/worlds/<int:server_realm>', methods=['GET'])
 @app.route('/relay/worlds/<int:server_realm>/', methods=['GET'])
