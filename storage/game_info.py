@@ -1,6 +1,7 @@
 import json
 import urllib.request
 import os.path
+import sys
 
 def downloadImage(url):
     filepath = url.replace('https://cdn.zwift.com', '../cdn')
@@ -14,7 +15,7 @@ def downloadImage(url):
         #print('Skipped: %s' % filepath)
     return
 
-with open('../game_info.txt', encoding='utf-8-sig') as f:
+with open(os.path.join(sys.path[0], '../game_info.txt'), encoding='utf-8-sig') as f:
     data = json.load(f)
 
 print(data['gameInfoHash'])

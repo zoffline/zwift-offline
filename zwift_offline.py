@@ -28,17 +28,15 @@ from flask import Flask, request, jsonify, redirect, render_template, url_for, f
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
-from google.protobuf.json_format import MessageToJson
-from google.protobuf.json_format import MessageToDict
+from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
 from google.protobuf import text_format
-from google.protobuf.json_format import Parse
 from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-sys.path.insert(1, 'protobuf') # otherwise import in .proto does not work
+sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
 import protobuf.activity_pb2 as activity_pb2

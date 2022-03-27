@@ -114,13 +114,13 @@ def sync(user, password):
     access_token, refresh_token = login(session, user, password)
 
     events = get_gameinfo(session, access_token).decode('utf-8')
-    with open('../game_info.txt', 'wb') as f:
+    with open(os.path.join(sys.path[0], '../game_info.txt'), 'wb') as f:
         f.write(events.encode('utf-8-sig'))
 
     logout(session, refresh_token)
 
 def main(argv):
-    with open('event_creds.json', 'r') as f:
+    with open(os.path.join(sys.path[0], 'event_creds.json'), 'r') as f:
         sync_creds = json.load(f)
         for sync_cred in sync_creds:
             sync(sync_cred['user'], sync_cred['password'])
