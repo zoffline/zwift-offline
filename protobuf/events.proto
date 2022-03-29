@@ -2,39 +2,44 @@ syntax = "proto2";
 import "profile.proto"; //enums PlayerType and Sport
 
 message InvitedProfileProto {
-	required uint64 ipp_f1 = 1;
-	optional string ipp_f2 = 2;
-	optional string ipp_f3 = 3;
-	optional string ipp_f4 = 4;
-	optional bool ipp_f5 = 5;
-	optional bool ipp_f6 = 6;
+	required uint64 player_id = 1;
+	optional string firstName = 2;
+	optional string lastName = 3;
+	optional string imageSrc = 4;
+	optional bool enrolledZwiftAcademy = 5;
+	optional bool male = 6;
 	optional PlayerType player_type = 7;
 }
 
+enum EventInviteStatus {
+	PENDING = 0;
+	ACCEPTED = 1;
+	REJECTED = 2;
+}
 message EventInviteProto {
 	optional InvitedProfileProto profile = 1;
-	required uint64 invite_f2 = 2;
+	required EventInviteStatus status = 2;
 }
 
 message PrivateEventFeedProto {
-	required uint64 pef_f1 = 1; //read in PrivateEventsManagerV2::RegisterPrivateEvent
+	required uint64 event_id = 1; //read in PrivateEventsManagerV2::RegisterPrivateEvent
 	optional Sport sport = 2;
 	optional uint64 eventSubgroupStart = 3; //IsPrivateEventExpired: return ZNETWORK_GetNetworkSyncedTimeGMT() > a1->m_eventSubgroupStart / 1000uLL + 1800
 	optional uint64 route_id = 4;
-	optional uint32 pef_f5 = 5;
-	optional float pef_f6 = 6;
-	optional uint64 pef_f7 = 7; //stored as int32
-	optional uint32 pef_f8 = 8;
-	optional uint32 pef_f9 = 9;
-	optional uint32 pef_f10 = 10;
-	optional string pef_f11 = 11;
-	optional uint64 pef_f12 = 12;
-	optional string pef_f13 = 13;
-	optional string pef_f14 = 14;
-	optional uint64 pef_f15 = 15;
+	optional uint32 durationInSeconds = 5;
+	optional float distanceInMeters = 6;
+	optional uint64 answeredCount = 7; //stored as int32
+	optional uint32 invitedTotalCount = 8;
+	optional uint32 acceptedFolloweeCount = 9;
+	optional uint32 acceptedTotalCount = 10;
+	optional string organizerImageUrl = 11;
+	optional uint64 organizerProfileId = 12;
+	optional string organizerFirstName = 13;
+	optional string organizerLastName = 14;
+	optional uint64 updateDate = 15;
 	optional uint64 subgroupId = 16;
-	optional uint32 pef_f17 = 17;
-	optional bool pef_f18 = 18;
+	optional uint32 laps = 17;
+	optional bool rubberbanding = 18; //keep together "rulesId": "1024" 
 }
 
 message PrivateEventFeedListProto {
@@ -42,13 +47,13 @@ message PrivateEventFeedListProto {
 }
 
 message PlayerJoinedEvent {
-	required uint64 ev_sg_id = 1;
+	required uint64 rel_id = 1; //subgroup id
 	optional uint64 player_id = 2;
 	optional uint64 pje_f3 = 3;
 }
 
-message PlayerLeftEvent { //didn't decompiled yet, just a guess
-	required uint64 ev_sg_id = 1;
+message PlayerLeftEvent {
+	required uint64 rel_id = 1; //event id
 	optional uint64 player_id = 2;
 	optional uint64 ple_f3 = 3;
 }
@@ -204,4 +209,21 @@ message Event { //real name: EventProtobuf; where is shortName, shortDescription
 
 message Events { //real name: EventsProtobuf
 	repeated Event events = 1;
+}
+
+message PrivateEventProto {
+	required uint64 id = 1;
+	optional Sport sport = 2;
+	optional uint64 eventStart = 3;
+	optional uint64 routeId = 4;
+	optional uint64 startLocation = 5;
+	optional uint32 durationInSeconds = 6;
+	optional float distanceInMeters = 7;
+	optional string description = 8;
+	optional uint64 workoutHash = 9; //or laps
+	optional uint64 organizerId = 10;
+	repeated EventInviteProto eventInvites = 11;
+	optional bool showResults = 12;
+	optional uint32 laps = 13; //or workoutHash
+	optional bool rubberbanding = 14;
 }

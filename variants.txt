@@ -251,6 +251,7 @@
     },
     {
       "name": "game_1_20_home_screen",
+      "value": true,
       "values": {}
     },
     {
