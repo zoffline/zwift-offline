@@ -567,6 +567,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if state.roadTime:
             if not player_id in online.keys() and time.time() > start_time + 30:
                 discord.send_message('%s riders online' % (len(online) + 1))
+            if player_id in online.keys():
+                if online[player_id].worldTime > state.worldTime:
+                    return #udp is unordered -> drop old state
             online[player_id] = state
 
         #Add handling of ghosts for player if it's missing
@@ -685,6 +688,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
+                        latency = message.world_time - recv.world_time
+                        if latency >= 0:
+                            message.cts_latency = latency
                         #print('dt: %s' % (message.world_time - state.worldTime))
                         socket.sendto(message.SerializeToString(), client_address)
                         dumpUdpProtobuf(message, "TX")
@@ -692,26 +698,30 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         del message.states[:]
                     s = message.states.add()
                     s.CopyFrom(player)
+                    #s.worldTime = zwift_offline.world_time() #test
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
+        latency = message.world_time - recv.world_time
+        if latency >= 0:
+            message.cts_latency = latency
         #print('dt: %s' % (message.world_time - state.worldTime))
         socket.sendto(message.SerializeToString(), client_address)
         dumpUdpProtobuf(message, "TX")
-
         #Send new state immediately to all nearby players
-        for p_id in online.keys():
-            player = online[p_id]
-            if player.id != player_id and zwift_offline.is_nearby(state, player) and is_udp_addr_known(p_id) and is_state_new_for(state, p_id): #always new if ordered
-                peer_address = get_udp_addr(p_id)
-                message = get_empty_message(player.id)
-                message.num_msgs = 1
-                message.world_time = zwift_offline.world_time() #state.worldTime?
-                #print('dt: %s' % (message.world_time - state.worldTime))
-                s = message.states.add()
-                s.CopyFrom(state)
-                socket.sendto(message.SerializeToString(), peer_address)
-                dumpUdpProtobuf(message, "TX+")
+        #for p_id in online.keys():
+        #    player = online[p_id]
+        #    if player.id != player_id and zwift_offline.is_nearby(state, player) and is_udp_addr_known(p_id) and is_state_new_for(state, p_id): #always new if ordered
+        #        peer_address = get_udp_addr(p_id)
+        #        message = get_empty_message(player.id)
+        #        message.num_msgs = 1
+        #        message.world_time = zwift_offline.world_time() #state.worldTime?
+        #        #print('dt: %s' % (message.world_time - state.worldTime))
+        #        s = message.states.add()
+        #        s.CopyFrom(state)
+        #        s.worldTime = zwift_offline.world_time() #test
+        #        socket.sendto(message.SerializeToString(), peer_address)
+        #        dumpUdpProtobuf(message, "TX+")
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)

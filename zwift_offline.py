@@ -843,6 +843,7 @@ def delete(filename):
 @app.route("/logout/<username>")
 @login_required
 def logout(username):
+    session.clear()
     logout_user()
     flash("Successfully logged out.")
     return redirect(url_for('login'))
@@ -3005,6 +3006,7 @@ def auth_realms_zwift_protocol_openid_connect_token():
 @app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_logout():
     # This is called on ZCA logout, we don't want the game client to logout (anyway jwt.decode would fail)
+    session.clear()
     return '', 204
 
 @app.route("/start-zwift" , methods=['POST'])

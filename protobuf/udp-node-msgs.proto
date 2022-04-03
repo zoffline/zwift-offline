@@ -241,7 +241,7 @@ message ServerToClient {
 	optional int64 player_id = 2;
 	optional int64 world_time = 3;
 	optional int32 seqno = 4;
-	optional int32 stc_f5 = 5; //read in WorldClockService::calculateOneLegLatency
+	optional int32 stc_f5 = 5; //low-priority world time sync algo (not investigated yet, maybe deprecated) in WorldClockService::calculateOneLegLatency
 	// 6,7: absent
 	repeated PlayerState states = 8;
 	repeated WorldAttribute updates = 9;
@@ -252,7 +252,7 @@ message ServerToClient {
 	optional int32 zwifters = 14;
 	optional int32 zc_local_port = 15;
 	optional IPProtocol zc_protocol = 16;
-	optional int64 stc_f17 = 17; //read in WorldClockService::calculateOneLegLatency
+	optional int64 cts_latency = 17; //high-priority world time sync algo in WorldClockService::calculateOneLegLatency
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
 	optional bool hasSimultLogin = 20; //UdpClient::disconnectionRequested due to simultaneous login (1); OR simultaneous login ceased (0)
