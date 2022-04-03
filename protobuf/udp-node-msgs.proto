@@ -54,6 +54,7 @@ message ServerToClient {
 	repeated PlayerState states = 8;
 	repeated PlayerUpdate updates = 9;
 	optional int64 f11 = 11;
+	optional int64 latency = 17;
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
 }

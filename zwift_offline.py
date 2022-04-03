@@ -771,6 +771,7 @@ def delete(filename):
 @app.route("/logout/<username>")
 @login_required
 def logout(username):
+    session.clear()
     logout_user()
     flash("Successfully logged out.")
     return redirect(url_for('login'))
