@@ -277,7 +277,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
-        dumpTcpProtobuf(hello, "RX")
+        #dumpTcpProtobuf(hello, "RX")
         # send packet containing UDP server (127.0.0.1)
         # (very little investigation done into this packet while creating
         #  protobuf structures hence the excessive "details" usage)
@@ -319,7 +319,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         # Send size of payload as 2 bytes
         self.request.sendall(struct.pack('!h', len(payload)))
         self.request.sendall(payload)
-        dumpTcpProtobuf(msg, "TX")
+        #dumpTcpProtobuf(msg, "TX")
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
@@ -349,7 +349,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(zc_params_payload)))
                     self.request.sendall(zc_params_payload)
                     #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
-                    dumpTcpProtobuf(zc_params, "TX")
+                    #dumpTcpProtobuf(zc_params, "TX")
                     zwift_offline.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()
@@ -369,7 +369,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message_payload = message.SerializeToString()
                             self.request.sendall(struct.pack('!h', len(message_payload)))
                             self.request.sendall(message_payload)
-                            dumpTcpProtobuf(message, "TX")
+                            #dumpTcpProtobuf(message, "TX")
 
                             message = udp_node_msgs_pb2.ServerToClient()
                             message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -386,7 +386,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     message_payload = message.SerializeToString()
                     self.request.sendall(struct.pack('!h', len(message_payload)))
                     self.request.sendall(message_payload)
-                    dumpTcpProtobuf(message, "TX")
+                    #dumpTcpProtobuf(message, "TX")
                 elif last_alive_check < t - 25:
                     last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(payload)))
@@ -548,7 +548,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             except Exception as exc:
                 print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
-        dumpUdpProtobuf(recv, "RX")
+        #dumpUdpProtobuf(recv, "RX")
 
         client_address = self.client_address
         player_id = recv.player_id
@@ -693,7 +693,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                             message.cts_latency = latency
                         #print('dt: %s' % (message.world_time - state.worldTime))
                         socket.sendto(message.SerializeToString(), client_address)
-                        dumpUdpProtobuf(message, "TX")
+                        #dumpUdpProtobuf(message, "TX")
                         message.msgnum += 1
                         del message.states[:]
                     s = message.states.add()
@@ -707,7 +707,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.cts_latency = latency
         #print('dt: %s' % (message.world_time - state.worldTime))
         socket.sendto(message.SerializeToString(), client_address)
-        dumpUdpProtobuf(message, "TX")
+        #dumpUdpProtobuf(message, "TX")
         #Send new state immediately to all nearby players
         #for p_id in online.keys():
         #    player = online[p_id]
@@ -721,7 +721,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         #        s.CopyFrom(state)
         #        s.worldTime = zwift_offline.world_time() #test
         #        socket.sendto(message.SerializeToString(), peer_address)
-        #        dumpUdpProtobuf(message, "TX+")
+        #        #dumpUdpProtobuf(message, "TX+")
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)

@@ -1090,7 +1090,8 @@ def get_events(limit, sport):
         event.course_id = item[2]
         event.sport = sport
         event.lateJoinInMinutes = 30
-        event.eventStart = int(get_time()) * 1000 + const_delay_ms
+        eventStart = int(get_time()) * 1000 + const_delay_ms
+        event.eventStart = eventStart
         event.visible = True
         event.overrideMapPreferences = False
         event.invisibleToNonParticipants = False
@@ -1109,16 +1110,16 @@ def get_events(limit, sport):
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            event_cat.registrationStart = event.eventStart - 30000
-            event_cat.registrationStartWT = world_time()
-            event_cat.registrationEnd = event.eventStart
+            #need good value#event_cat.registrationStart = eventStart - 30000
+            #need good value#event_cat.registrationStartWT = world_time()
+            event_cat.registrationEnd = eventStart
             event_cat.registrationEndWT = world_time() + const_delay_ms
-            event_cat.lineUpStart = event.eventStart - 15000
-            event_cat.lineUpStartWT = world_time() + const_delay_ms - 15000
-            event_cat.lineUpEnd = event.eventStart
-            event_cat.lineUpEndWT = world_time() + const_delay_ms
-            event_cat.eventSubgroupStart = event.eventStart
-            event_cat.eventSubgroupStartWT = world_time() + const_delay_ms
+            #need good value#event_cat.lineUpStart = eventStart - 15000
+            #need good value#event_cat.lineUpStartWT = world_time() + const_delay_ms - 15000
+            #need good value#event_cat.lineUpEnd = eventStart
+            #need good value#event_cat.lineUpEndWT = world_time() + const_delay_ms
+            #need good value#event_cat.eventSubgroupStart = eventStart
+            #need good value#event_cat.eventSubgroupStartWT = world_time() + const_delay_ms
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
             event_cat.label = cat
@@ -1133,7 +1134,6 @@ def get_events(limit, sport):
             #event_cat.rules_id = 8; // 320 and others
             event_cat.distanceInMeters = 0
             event_cat.laps = 0
-            event_cat.startLocation = 0 # 13, tag488 [>=6 -> 'bad start location'] valid values: 1..5 (0->1)
             event_cat.durationInSeconds = 0
             #event_cat.jerseyHash = 36; // 493134166, tag672
             #event_cat.tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
@@ -2265,15 +2265,24 @@ def sport_from_str(str_sport):
     return 1 #running
 
 def str_timestamp(ts):
-    sec = int(ts/1000)
-    ms = ts % 1000
-    return datetime.datetime.utcfromtimestamp(sec).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
+    if ts == None:
+        return None
+    else:
+        sec = int(ts/1000)
+        ms = ts % 1000
+        return datetime.datetime.utcfromtimestamp(sec).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
+
+def str_timestamp_json(ts):
+    if ts == 0:
+        return None
+    else:
+        return str_timestamp(ts)
 
 def goalProtobufToJson(goal):
     return {"id":goal.id,"profileId":goal.player_id,"sport":str_sport(goal.f3),"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
 "targetDistanceInMeters":goal.target_distance,"targetDurationInMinutes":goal.target_duration,"actualDistanceInMeters":goal.actual_distance,
-"actualDurationInMinutes":goal.actual_duration,"createdOn":str_timestamp(goal.created_on),
-"periodEndDate":str_timestamp(goal.period_end_date),"status":int(goal.f13),"timezone":""}
+"actualDurationInMinutes":goal.actual_duration,"createdOn":str_timestamp_json(goal.created_on),
+"periodEndDate":str_timestamp_json(goal.period_end_date),"status":int(goal.f13),"timezone":""}
 
 def goalJsonToProtobuf(json_goal):
     goal = goal_pb2.Goal()
@@ -2441,7 +2450,7 @@ def relay_worlds_generic(server_realm=None):
             try:
                 player_update = udp_node_msgs_pb2.WorldAttribute()
                 player_update.ParseFromString(request.data)
-                dumpProtobuf("rwg.txt", "RX", player_update)
+                #dumpProtobuf("rwg.txt", "RX", player_update)
                 #chat_message.ParseFromString(request.data[6:])
                 #serializedMessage = chat_message.SerializeToString()
             except Exception as exc:
@@ -2551,15 +2560,15 @@ def convert_event_to_json(event):
 "subgroupLabel":event_cat.name[-1],"rulesId":event_cat.rules_id,"mapId":event_cat.course_id,"routeId":event_cat.route_id,"routeUrl":event_cat.routeUrl, \
 "jerseyHash":event_cat.jerseyHash,"bikeHash":event_cat.bikeHash,"startLocation":event_cat.startLocation,"invitedLeaders":iterableToJson(event_cat.invitedLeaders), \
 "invitedSweepers":iterableToJson(event_cat.invitedSweepers),"paceType":event_cat.paceType,"fromPaceValue":event_cat.fromPaceValue,"toPaceValue":event_cat.toPaceValue, \
-"fieldLimit":None,"registrationStart":str_timestamp(event_cat.registrationStart),"registrationEnd":str_timestamp(event_cat.registrationEnd),"lineUpStart":str_timestamp(event_cat.lineUpStart), \
-"lineUpEnd":str_timestamp(event_cat.lineUpEnd),"eventSubgroupStart":str_timestamp(event_cat.eventSubgroupStart),"durationInSeconds":event_cat.durationInSeconds,"laps":event_cat.laps, \
+"fieldLimit":None,"registrationStart":str_timestamp_json(event_cat.registrationStart),"registrationEnd":str_timestamp_json(event_cat.registrationEnd),"lineUpStart":str_timestamp_json(event_cat.lineUpStart), \
+"lineUpEnd":str_timestamp_json(event_cat.lineUpEnd),"eventSubgroupStart":str_timestamp_json(event_cat.eventSubgroupStart),"durationInSeconds":event_cat.durationInSeconds,"laps":event_cat.laps, \
 "distanceInMeters":event_cat.distanceInMeters,"signedUp":False,"signupStatus":1,"registered":False,"registrationStatus":1,"followeeEntrantCount":0, \
 "totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0,"auxiliaryUrl":"", \
 "rulesSet":["ALLOWS_LATE_JOIN"],"workoutHash":None,"customUrl":event_cat.customUrl,"overrideMapPreferences":False, \
 "tags":[""],"lateJoinInMinutes":event_cat.lateJoinInMinutes,"timeTrialOptions":None,"qualificationRuleIds":None,"accessValidationResult":None})
     return {"id":event.id,"worldId":event.server_realm,"name":event.name,"description":event.description,"shortName":None,"mapId":event.course_id, \
 "shortDescription":None,"imageUrl":event.imageUrl,"routeId":event.route_id,"rulesId":event.rules_id,"rulesSet":["ALLOWS_LATE_JOIN"], \
-"routeUrl":None,"jerseyHash":event.jerseyHash,"bikeHash":None,"visible":event.visible,"overrideMapPreferences":event.overrideMapPreferences,"eventStart":str_timestamp(event.eventStart), "tags":[""], \
+"routeUrl":None,"jerseyHash":event.jerseyHash,"bikeHash":None,"visible":event.visible,"overrideMapPreferences":event.overrideMapPreferences,"eventStart":str_timestamp_json(event.eventStart), "tags":[""], \
 "durationInSeconds":event.durationInSeconds,"distanceInMeters":event.distanceInMeters,"laps":event.laps,"privateEvent":False,"invisibleToNonParticipants":event.invisibleToNonParticipants, \
 "followeeEntrantCount":0,"totalEntrantCount":0,"followeeSignedUpCount":0,"totalSignedUpCount":0,"followeeJoinedCount":0,"totalJoinedCount":0, \
 "eventSeries":None,"auxiliaryUrl":"","imageS3Name":None,"imageS3Bucket":None,"sport":str_sport(event.sport),"cullingType":"CULLING_EVERYBODY", \
@@ -2671,7 +2680,7 @@ def relay_worlds_attributes():
     player_update = udp_node_msgs_pb2.WorldAttribute()
     try:
         player_update.ParseFromString(request.data)
-        dumpProtobuf("rwa.txt", "RX", player_update)
+        #dumpProtobuf("rwa.txt", "RX", player_update)
     except Exception as exc:
         logger.warn('player_update_parse: %s' % repr(exc))
         return '', 422
