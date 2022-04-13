@@ -229,7 +229,8 @@ courses_lookup = {
     12: 'Crit City',  # event specific
     13: 'Makuri Islands',
     14: 'France',
-    15: 'Paris'
+    15: 'Paris',
+    16: 'Gravel Mountain'  # event specific
 }
 
 
