@@ -1068,8 +1068,10 @@ def api_per_session_info():
 
 def get_events(limit, sport):
     events_list = [('Bologna TT', 2843604888, 10),
-                   ('Crit City CW', 947394567, 12),
-                   ('Crit City CCW', 2875658892, 12),
+                   ('Crit City', 947394567, 12),
+                   ('Crit City Reverse', 2875658892, 12),
+                   ('Gravel Mountain', 3687150686, 16),
+                   ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
                    ('Watopia Waistband', 1064303857, 6)]
     event_id = 1000
