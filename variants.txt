@@ -1,21 +1,6 @@
 {
   "variants": [
     {
-      "name": "return_to_home",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_12_nhd_v1",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_12_1_retire_client_chat_culling",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_14_draftlock_fix",
       "values": {}
     },
@@ -79,11 +64,6 @@
       "values": {}
     },
     {
-      "name": "game_1_19_gender_dob_change",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_18_0_osx_monterey_bluetooth_uart_fix",
       "value": true,
       "values": {
@@ -109,17 +89,6 @@
       }
     },
     {
-      "name": "game_1_19_segment_results_sub_active",
-      "value": true,
-      "values": {
-        "fields": {
-          "game_1_19_segment_results_sub_active": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_20_hw_experiment_1",
       "value": true,
       "values": {}
@@ -135,7 +104,7 @@
       "values": {}
     },
     {
-      "name": "game_1_20_apple_novus_ble_refactor",
+      "name": "game_1_24_apple_novus_ble_refactor",
       "values": {}
     },
     {
@@ -174,12 +143,8 @@
       "values": {}
     },
     {
-      "name": "game_1_21_default_activity_name_change",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_21_android_novus_ble_refactor",
+      "value": true,
       "values": {}
     },
     {
@@ -214,7 +179,7 @@
       "values": {}
     },
     {
-      "name": "game_1_22_wahoo_direct_connect_trainer",
+      "name": "game_1_23_3_wahoo_direct_connect_trainer",
       "values": {}
     },
     {
@@ -223,10 +188,26 @@
     },
     {
       "name": "game_1_23_universal_start_line_for_time_based_event",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_23_ble_cycling_speed_pairing_fix",
+      "values": {}
+    },
+    {
+      "name": "game_1_25_0_gmplay_2246_cull_inaudible_entity_audio",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_24_display_workout_of_the_week_card",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_24_display_recommended_workout_cards",
+      "value": true,
       "values": {}
     },
     {
@@ -245,15 +226,16 @@
     },
     {
       "name": "game_1_17_noesis_enabled",
-      "values": {}
-    },
-    {
-      "name": "game_1_20_home_screen",
       "value": true,
       "values": {}
     },
     {
+      "name": "game_1_20_home_screen",
+      "values": {}
+    },
+    {
       "name": "game_1_14_settings_refactor",
+      "value": true,
       "values": {}
     },
     {

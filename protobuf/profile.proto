@@ -28,12 +28,6 @@ enum PowerType {
 	PT_VIRTUAL = 0;
 	PT_METER = 1;
 }
-message AchievementEntry {
-	required int32 id = 1;
-}
-message Achievements {
-	repeated AchievementEntry achievements = 1;
-}
 
 message PlayerProfile {
 	optional int64 id = 1;
@@ -325,4 +319,12 @@ message Attribute {
 	optional int64 number_value = 2;
 	optional float float_value = 3;
 	optional string string_value = 5;
+}
+
+message AchievementEntry {
+	required int32 id = 1;
+}
+
+message Achievements {
+	repeated AchievementEntry achievements = 1;
 }

@@ -527,6 +527,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if state.roadTime:
             if not player_id in online.keys() and time.time() > start_time + 30:
                 discord.send_message('%s riders online' % (len(online) + 1))
+            if player_id in online.keys():
+                if online[player_id].worldTime > state.worldTime:
+                    return #udp is unordered -> drop old state
             online[player_id] = state
 
         #Add handling of ghosts for player if it's missing
@@ -645,6 +648,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
+                        latency = message.world_time - recv.world_time
+                        if latency >= 0:
+                            message.cts_latency = latency
                         socket.sendto(message.SerializeToString(), client_address)
                         message.msgnum += 1
                         del message.states[:]
@@ -653,6 +659,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
+        latency = message.world_time - recv.world_time
+        if latency >= 0:
+            message.cts_latency = latency
         socket.sendto(message.SerializeToString(), client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
