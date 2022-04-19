@@ -180,6 +180,7 @@
     },
     {
       "name": "game_1_23_3_wahoo_direct_connect_trainer",
+      "value": true,
       "values": {}
     },
     {
@@ -242,9 +243,6 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
-          },
           "minERGModeDisableTime": {
             "numberValue": 5.0
           },
@@ -253,6 +251,9 @@
           },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
+          },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
           }
         }
       }
