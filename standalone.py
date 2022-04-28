@@ -639,9 +639,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
-        latency = message.world_time - recv.world_time
-        if latency >= 0:
-            message.latency = latency
+        message.latency = message.world_time - recv.world_time
         socket.sendto(message.SerializeToString(), client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
