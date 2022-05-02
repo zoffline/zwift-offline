@@ -628,9 +628,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
-                        latency = message.world_time - recv.world_time
-                        if latency >= 0:
-                            message.latency = latency
+                        message.latency = message.world_time - recv.world_time
                         socket.sendto(message.SerializeToString(), client_address)
                         message.msgnum += 1
                         del message.states[:]
