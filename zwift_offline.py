@@ -871,7 +871,7 @@ def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
         online.pop(player_id)
-        discord.send_message('%s riders online' % len(online))
+        discord.change_presence(len(online))
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 

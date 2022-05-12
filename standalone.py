@@ -52,6 +52,8 @@ else:
     class DummyDiscord():
         def send_message(self, msg, sender_id=None):
             pass
+        def change_presence(self, n):
+            pass
     discord = DummyDiscord()
 
 MAP_OVERRIDE = deque(maxlen=16)
@@ -505,11 +507,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Update player online state
         if state.roadTime:
-            if not player_id in online.keys() and time.time() > start_time + 30:
-                discord.send_message('%s riders online' % (len(online) + 1))
             if player_id in online.keys():
                 if online[player_id].worldTime > state.worldTime:
                     return #udp is unordered -> drop old state
+            elif time.time() > start_time + 10:
+                discord.change_presence(len(online) + 1)
             online[player_id] = state
 
         #Add handling of ghosts for player if it's missing
