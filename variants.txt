@@ -116,10 +116,6 @@
       "values": {}
     },
     {
-      "name": "game_1_20_steering_mode_cleanup",
-      "values": {}
-    },
-    {
       "name": "game_1_21_add_device_jet_black_swb",
       "values": {}
     },
@@ -159,6 +155,7 @@
     },
     {
       "name": "game_1_21_ble_dll_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -212,6 +209,40 @@
       "values": {}
     },
     {
+      "name": "game_1_25_pack_steering_collision_reduction",
+      "values": {
+        "fields": {
+          "game_1_25_pack_steering_collision_reduction": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_25_wdc_error_dialogs",
+      "values": {}
+    },
+    {
+      "name": "game_1_25_extended_pedal_asssit",
+      "values": {
+        "fields": {
+          "initialDropInTime": {
+            "numberValue": 10000.0
+          },
+          "extendedDropInTime": {
+            "numberValue": 60000.0
+          },
+          "initialDropInFrames": {
+            "numberValue": 1000.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_25_flat_grade_while_in_ui",
+      "values": {}
+    },
+    {
       "name": "log_ble_packets",
       "values": {}
     },
@@ -224,6 +255,16 @@
       "name": "game_1_21_perf_analytics",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_25_watchdog_timer",
+      "values": {
+        "fields": {
+          "timeoutInterval": {
+            "numberValue": 30.0
+          }
+        }
+      }
     },
     {
       "name": "game_1_17_noesis_enabled",
@@ -243,8 +284,8 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
           },
           "rampUpTime": {
             "numberValue": 10.0
@@ -252,8 +293,8 @@
           "workoutAutoPauseTime": {
             "numberValue": 3.0
           },
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
           }
         }
       }

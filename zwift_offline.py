@@ -1037,6 +1037,7 @@ def api_profiles_me():
 
 
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
+@app.route('/api/profiles/<int:player_id>/in-game-fields', methods=['PUT'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_id(player_id):
