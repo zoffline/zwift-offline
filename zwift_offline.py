@@ -1820,7 +1820,20 @@ def api_segment_results():
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
 def live_segment_results_service_leaders():
-    return '', 200
+    results = segment_result_pb2.SegmentResults()
+    results.world_id = 0
+    results.segment_id = 0
+    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+        JOIN (SELECT s.player_id, MIN(Cast(s.elapsed_ms AS INTEGER)) AS min_time
+            FROM segment_result s WHERE world_time > '%s' GROUP BY s.player_id) s2 ON s2.player_id = s1.player_id
+            AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+        GROUP BY s1.player_id, s1.elapsed_ms
+        ORDER BY CAST(s1.elapsed_ms AS INTEGER)
+        LIMIT 1000""" % (world_time()-(60*60*1000))))
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+    return results.SerializeToString(), 200
 
 
 @app.route('/relay/worlds/<int:world_id>/leave', methods=['POST'])
