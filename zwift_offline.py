@@ -898,12 +898,14 @@ def api_per_session_info():
 
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
-    events_list = [('Bologna TT', 2843604888),
+    events_list = [('Alpe Du Zwift Downhill', 1480439148),
+                   ('Bologna TT', 2843604888),
                    ('Crit City', 947394567),
                    ('Crit City Reverse', 2875658892),
                    ('Gravel Mountain', 3687150686),
                    ('Gravel Mountain Reverse', 2956533021),
                    ('Neokyo Crit', 1127056801),
+                   ('Ventop Downhill', 2891361683),
                    ('Watopia Waistband', 1064303857)]
     event_id = 1000
     events = events_pb2.Events()
