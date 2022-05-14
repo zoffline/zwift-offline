@@ -53,6 +53,8 @@ else:
     class DummyDiscord():
         def send_message(self, msg, sender_id=None):
             pass
+        def change_presence(self, n):
+            pass
     discord = DummyDiscord()
 
 MAP_OVERRIDE = deque(maxlen=16)
@@ -72,7 +74,7 @@ global_news = {} #player id to dictionary of peer_player_id->worldTime
 start_time = time.time()
 
 def road_id(state):
-    return (state.f20 & 0xff00) >> 8
+    return (state.aux3 & 0xff00) >> 8
 
 def is_forward(state):
     return (state.f19 & 4) != 0
@@ -506,32 +508,10 @@ def is_state_new_for(peer_player_state, player_id):
         global_news[player_id] = {}
     for_news = global_news[player_id]
     if peer_player_state.id in for_news.keys():
-        sent_peer_world_time = for_news[peer_player_state.id]
-        if sent_peer_world_time == peer_player_state.worldTime:
-            #print("is_state_new_for guard")
+        if for_news[peer_player_state.id] == peer_player_state.worldTime:
             return False #already sent
-        if sent_peer_world_time > peer_player_state.worldTime:
-            print("is_state_new_for: out of order")
-            return False #filter out
-        #if peer_player_state.worldTime - sent_peer_world_time < 500:
-        #    print("is_state_new_for: less than 500")
-        #    return False #filter out
     for_news[peer_player_state.id] = peer_player_state.worldTime
     return True
-
-global_udp_addresses = {} # player_id to address
-def is_udp_addr_known(p_id):
-    return p_id in global_udp_addresses.keys()
-
-def get_udp_addr(p_id):
-    return global_udp_addresses[p_id]
-
-def set_udp_address(p_id, addr):
-    #if not is_udp_addr_known(p_id):
-    #    print("set_udp_address(%s): new %s" % (p_id, addr))
-    #elif global_udp_addresses[p_id] != addr:
-    #    print("set_udp_address(%s): changed to %s" % (p_id, addr))
-    global_udp_addresses[p_id] = addr
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -553,7 +533,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
         client_address = self.client_address
         player_id = recv.player_id
         state = recv.state
-        set_udp_address(player_id, client_address)
 
         #Add last updates for player if missing
         if not player_id in last_pp_updates.keys():
@@ -565,11 +544,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         #Update player online state
         if state.roadTime:
-            if not player_id in online.keys() and time.time() > start_time + 30:
-                discord.send_message('%s riders online' % (len(online) + 1))
             if player_id in online.keys():
                 if online[player_id].worldTime > state.worldTime:
                     return #udp is unordered -> drop old state
+            elif time.time() > start_time + 10:
+                discord.change_presence(len(online) + 1)
             online[player_id] = state
 
         #Add handling of ghosts for player if it's missing
@@ -688,9 +667,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if player != None:
                     if len(message.states) > 9:
                         message.world_time = zwift_offline.world_time()
-                        latency = message.world_time - recv.world_time
-                        if latency >= 0:
-                            message.cts_latency = latency
+                        message.cts_latency = message.world_time - recv.world_time
                         #print('dt: %s' % (message.world_time - state.worldTime))
                         socket.sendto(message.SerializeToString(), client_address)
                         #dumpUdpProtobuf(message, "TX")
@@ -702,9 +679,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         else:
             message.num_msgs = 1
         message.world_time = zwift_offline.world_time()
-        latency = message.world_time - recv.world_time
-        if latency >= 0:
-            message.cts_latency = latency
+        message.cts_latency = message.world_time - recv.world_time
         #print('dt: %s' % (message.world_time - state.worldTime))
         socket.sendto(message.SerializeToString(), client_address)
         #dumpUdpProtobuf(message, "TX")

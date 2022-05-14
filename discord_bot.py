@@ -83,3 +83,10 @@ class DiscordThread(threading.Thread):
         data["content"] = message
         data["username"] = sender
         requests.post(self.webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})
+
+    def change_presence(self, n):
+        if n > 0:
+            activity = discord.Game(name=f"{n} rider{'s'[:n>1]} online")
+        else:
+            activity = None
+        asyncio.run(self.discord_bot.change_presence(activity=activity))

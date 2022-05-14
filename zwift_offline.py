@@ -249,7 +249,8 @@ courses_lookup = {
     12: 'Crit City',  # event specific
     13: 'Makuri Islands',
     14: 'France',
-    15: 'Paris'
+    15: 'Paris',
+    16: 'Gravel Mountain'  # event specific
 }
 
 
@@ -1043,7 +1044,7 @@ def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
         online.pop(player_id)
-        discord.send_message('%s riders online' % len(online))
+        discord.change_presence(len(online))
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
@@ -1067,12 +1068,14 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit, sport):
-    events_list = [('Bologna TT', 2843604888, 10),
+    events_list = [('Alpe Du Zwift Downhill', 1480439148, 6),
+                   ('Bologna TT', 2843604888, 10),
                    ('Crit City', 947394567, 12),
                    ('Crit City Reverse', 2875658892, 12),
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
+                   ('Ventop Downhill', 2891361683, 14),
                    ('Watopia Waistband', 1064303857, 6)]
     event_id = 1000
     cnt = 0
@@ -1554,6 +1557,7 @@ def api_profiles_me_id(player_id):
     return api_profiles_me_json()
 
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
+@app.route('/api/profiles/<int:player_id>/in-game-fields', methods=['PUT'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_id(player_id):
@@ -1855,6 +1859,8 @@ def api_profiles_activities_id(player_id, activity_id):
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
+        return response, 200
+    if activity.distance < 300:
         return response, 200
     player_id = current_user.player_id
     if current_user.enable_ghosts:
@@ -2724,6 +2730,7 @@ def relay_worlds_attributes():
         discord.send_message(chat_message.message, chat_message.player_id)
     return '', 201
 
+
 def add_segment_results(segment_id, player_id, only_best, from_date, to_date, results):
     where_stmt = ("WHERE segment_id = '%s'" % segment_id)
     rows = None
@@ -2754,6 +2761,8 @@ def handle_segment_results(request):
             return '', 400
         result = segment_result_pb2.SegmentResult()
         result.ParseFromString(request.stream.read())
+        if result.segment_id == 1:
+            return '', 400
         result.id = get_id('segment_result')
         result.world_time = world_time()
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -2805,7 +2814,20 @@ def api_segment_results():
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
 def live_segment_results_service_leaders():
-    return '', 200
+    results = segment_result_pb2.SegmentResults()
+    results.server_realm = 0
+    results.segment_id = 0
+    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+        JOIN (SELECT s.player_id, s.segment_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+            FROM segment_result s WHERE world_time > '%s' GROUP BY s.player_id, s.segment_id) s2
+            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+        GROUP BY s1.player_id, s1.elapsed_ms
+        ORDER BY CAST(s1.segment_id AS INTEGER), CAST(s1.elapsed_ms AS INTEGER)
+        LIMIT 1000""" % (world_time()-(60*60*1000))))
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+    return results.SerializeToString(), 200
 
 
 @app.route('/relay/worlds/<int:server_realm>/leave', methods=['POST'])

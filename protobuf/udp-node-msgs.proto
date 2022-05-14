@@ -96,7 +96,19 @@ message Player {
 	optional PlayerProfile player_profile = 1;
 	optional PlayerState player_state = 2;
 }*/
-
+enum POWERUP_TYPE {
+	LIGHTNESS      = 0;
+	DRAFTBOOST     = 1;
+	BONUS_XP_LIGHT = 2;
+	BONUS_XP       = 3;
+	UNDRAFTABLE    = 4;
+	AERO           = 5;
+	NINJA          = 6;
+	STEAMROLLER    = 7;
+	ANVIL          = 8;
+	POWERUP_CNT    = 9;
+	POWERUP_NONE   = 15;
+}
 message PlayerState {
 	optional int64 id = 1;
 	optional int64 worldTime = 2; // milliseconds
@@ -107,7 +119,7 @@ message PlayerState {
 	optional uint32 ps_f7 = 7;
 	optional int32 roadPosition = 8;
 	optional int32 cadenceUHz = 9; // =(cad / 60) * 1000000
-	optional int32 ps_f10 = 10; // BikeEntity.field_B58; 0
+	optional int32 ps_f10 = 10; // BikeEntity.field_B58; 0 - ETA related (something around speed)
 	optional int32 heartrate = 11;
 	optional int32 power = 12;
 	optional int64 heading = 13;
@@ -124,8 +136,11 @@ message PlayerState {
 	//byte[2]: fallback course/getMapRevisionId
 	//byte[3]: realRideons (not counted yet in BikeEntity::m_rideons) @ BikeEntity::UpdateRideOns, see also BikeEntity::Update
 	optional uint32 f19 = 19;
-	optional uint32 f20 = 20; //road_id: (f20 & 0xff00) >> 8 (=16777231 -> road_id = 0)
-	optional uint32 progress = 21; // WorkoutMode = progress & 0xF
+	//ZNETWORK_SerializeAux3: low 4 bits=POWERUP_TYPE; next 4 bits: BikeEntity.field_2B14+1; next 8 bits: road_id
+	// BikeEntity.field_2b16: true-> |= 0x2000000, false-> |= 0x1000000 (bits 24-25)
+	// bit 28: EbikeBoost::GetActiveBoostOption
+	optional uint32 aux3 = 20;
+	optional uint32 progress = 21; // WorkoutMode = progress & 0xF, up to 7 including (workoutPhaseType+1 or 0)
 	optional int64 customizationId = 22;
 	optional bool justWatching = 23;
 	optional int32 calories = 24;
@@ -188,8 +203,8 @@ message RelayAddress {
 	optional int32 lb_course = 2; // load balancing cluster: course id
 	optional string ip = 3;
 	optional int32 port = 4;
-	optional float ra_f5 = 5; //or fixed
-	optional float ra_f6 = 6; //or fixed
+	optional float ra_f5 = 5; //used when appropriate server selection occurs (RelayAddressService::getAddress)
+	optional float ra_f6 = 6; //used when appropriate server selection occurs (RelayAddressService::getAddress)
 }
 
 message UdpConfig {
@@ -203,7 +218,7 @@ message RelayAddressesVOD {
 	optional int32 lb_realm = 1;  // load balancing cluster: server realm or 0 (generic)
 	optional int32 lb_course = 2; // load balancing cluster: course id
 	repeated RelayAddress relay_addresses = 3;
-	optional bool rav_f4 = 4;
+	optional bool rav_f4 = 4; //server selection method: true->higher (ra_f5, ra_f6), false->nearest (ra_f5, ra_f6)
 }
 
 message UdpConfigVOD {
@@ -211,30 +226,35 @@ message UdpConfigVOD {
 	optional int32 port = 2;
 	optional int64 ucv_f3 = 3;
 	optional int64 ucv_f4 = 4;
-	optional float ucv_f5 = 5; //or fixed
-	optional float ucv_f6 = 6; //or fixed
+	optional float ucv_f5 = 5;
+	optional float ucv_f6 = 6;
 }
 
 message PlayerRouteDistance {
 	optional int32 player_id = 1;        //BikeManager::FindBikeWithNetworkID
 	optional float distance_covered = 2; //not sure
-	optional int32 prd_f3 = 3; //-> m_bikeEntity->field_9C8
+	optional int32 millisec_to_leader = 3; // ZNETWORK_INTERNAL_ProcessPlayerPackets
 }
 
 message EventSubgroupPlacements {
-	optional int32 position = 1; //-> m_bikeEntity->field_9C0; UdpStatistics::registerFanViewLatestPlayerStateInfo
+	optional int32 position = 1; //UdpStatistics::registerFanViewLatestPlayerStateInfo
 	repeated PlayerRouteDistance player_rd1 = 2;
 	repeated PlayerRouteDistance player_rd2 = 3;
 	repeated PlayerRouteDistance eventRiderPosition = 4;
 	repeated PlayerRouteDistance player_rd4 = 5;
 	optional int32 eventTotalRiders = 6;
 	optional int32 bikeNetworkId = 7;
-	optional int32 esp_f8 = 8; //-> BikeWithNetworkID->field_9C8
+	optional int32 millisec_to_leader = 8; //ZNETWORK_INTERNAL_ProcessPlayerPackets
 	optional float esp_f9 = 9; //or fixed
 }
 enum IPProtocol {
 	UDP = 1;
 	TCP = 2;
+}
+enum ExpungeReason {
+	NOT_EXPUNGED = 0;
+	WORLD_FULL = 1;
+	ROADS_CLOSED = 2;
 }
 message ServerToClient {
 	optional int64 server_realm = 1;
@@ -261,7 +281,7 @@ message ServerToClient {
 	optional EventSubgroupPlacements ev_subgroup_ps = 23; //tag442
 	optional UdpConfig udp_config = 24; //tag450
 	optional UdpConfigVOD udp_config_vod_1 = 25; //tag458
-	optional int32 stc_f26 = 26; //tag464 UdpClient::receivedExpungeReason
+	optional ExpungeReason expungeReason = 26; //tag464 UdpClient::receivedExpungeReason
 	optional UdpConfigVOD udp_config_vod_2 = 27; //tag474
 	repeated PlayerState player_states = 28; //tag482
 	optional TcpConfig tcp_config = 29; //tag490
@@ -278,9 +298,9 @@ message Ghosts { //not from the Zwift game, zoffline-specific!
 }
 
 message RideOn {
-    required int64 player_id = 1;
-    required int64 to_player_id = 2;
-    required string firstName = 3;
-    required string lastName = 4;
-    required int32 countryCode = 5;
+	required int64 player_id = 1;
+	required int64 to_player_id = 2;
+	required string firstName = 3;
+	required string lastName = 4;
+	required int32 countryCode = 5;
 }

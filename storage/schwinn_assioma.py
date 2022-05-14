@@ -55,17 +55,34 @@ def assioma_callback(sender, data):
     curr = current_milli_time()
     if (len(data) != 9) or (data[0] != 0x23): #b'#\x00\x00\x00dN\x00W\x98'
         return
-    cb |= 2
+    cb |= 1
     if cb == 3:
-        print(f"A.{sender}: {data}")
         with open(f'assioma_{start}.bin', "ab") as f:
             f.write(data)
         last_assioma_power = data[2]+256*data[3]
+        print(f"A: {last_assioma_power}")
         with open(f'assioma_{start}.csv', "a") as f:
             #          time,        dev_time,             crank,                power,                balance
             #f.write(f"{curr-start},{data[7]+256*data[8]},{data[5]+256*data[6]},{data[2]+256*data[3]},{data[4]}\n")
             #          time,        power
             f.write(f"{curr-start},{last_assioma_power}\n")
+
+def schwinn_my_callback(sender, data):
+    global cb, start, last_assioma_power
+    curr = current_milli_time()
+    #if (len(data) != 9) or (data[0] != 0x23): #b'E\x02E\x00\x1f\x00\x02'
+    #    return
+    cb |= 2
+    if cb == 3:
+        with open(f'schwinn_my{start}.bin', "ab") as f:
+            f.write(data)
+        my_power = data[4]+256*data[5]
+        print(f"M: {my_power}")
+        with open(f'schwinn_my{start}.csv', "a") as f:
+            #          time,        dev_time,             crank,                power,                balance
+            #f.write(f"{curr-start},{data[7]+256*data[8]},{data[5]+256*data[6]},{data[2]+256*data[3]},{data[4]}\n")
+            #          time,        power
+            f.write(f"{curr-start},{my_power},{last_assioma_power}\n")
 
 async def connect_to_device(address):
     print(f"Starting {address['name']}...")
@@ -73,7 +90,7 @@ async def connect_to_device(address):
         print(f"{address['name']} connected: {client.is_connected}")
         try:
             await client.start_notify(address['char'], address['callback'])
-            await asyncio.sleep(60.0 * 10)
+            await asyncio.sleep(60.0 * 25)
             await client.stop_notify(address['char'])
         except Exception as e:
             print(e)        
@@ -88,7 +105,8 @@ if __name__ == "__main__":
         main(
             [
                 {"name": "Assioma", "address": "E7:01:AD:C7:2A:B7", "char": "00002a63-0000-1000-8000-00805F9B34FB", "callback": assioma_callback },
-                {"name": "Schwinn", "address": "84:71:27:27:4A:44", "char": "5c7d82a0-9803-11e3-8a6c-0002a5d5c51b", "callback": schwinn_callback },
+                #{"name": "Schwinn", "address": "84:71:27:27:4A:44", "char": "5c7d82a0-9803-11e3-8a6c-0002a5d5c51b", "callback": schwinn_callback },
+                {"name": "SchwinnMy", "address": "30:AE:A4:8B:97:8A", "char": "00002ad2-0000-1000-8000-00805F9B34FB", "callback": schwinn_my_callback },
             ]
         )
     )
