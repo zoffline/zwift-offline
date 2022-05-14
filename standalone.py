@@ -271,6 +271,9 @@ def dumpTcpProtobuf(msg, dr):
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
+        if (len(self.data) > 3) and (self.data[3] != 0):
+            print("TCPHandler hello(0) expected, got %s" % self.data[3])
+            return
         #print("TCPHandler hello: %s" % self.data.hex())
         hello = udp_node_msgs_pb2.ClientToServer()
         try:
@@ -332,7 +335,34 @@ class TCPHandler(socketserver.BaseRequestHandler):
         payload = msg.SerializeToString()
 
         last_alive_check = int(zwift_offline.get_utc_time())
+        self.request.settimeout(0) #make recv non-blocking
         while True:
+            self.data = b''
+            try:
+                self.data = self.request.recv(1024)
+                if (len(self.data) > 3) and (self.data[3] == 1):
+                    subscr = udp_node_msgs_pb2.ClientToServer()
+                    try:
+                        subscr.ParseFromString(self.data[4:-4])
+                    except Exception as exc:
+                        print('TCPHandler ParseFromString exception: %s' % repr(exc))
+                    msg1 = udp_node_msgs_pb2.ServerToClient()
+                    msg1.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+                    msg1.player_id = subscr.player_id
+                    msg1.world_time = zwift_offline.world_time()
+                    if subscr.subsSegments:
+                        msg1.ackSubsSegm.extend(subscr.subsSegments)
+                    elif subscr.unsSegments:
+                        msg1.ackSubsSegm.extend(subscr.unsSegments)
+                    payload1 = msg1.SerializeToString()
+                    self.request.sendall(struct.pack('!h', len(payload1)))
+                    self.request.sendall(payload1)
+                    print('TCPHandler subscr: %s' % msg1.ackSubsSegm)
+                else:
+                    print('TCPHandler recv: %s while [un]subscr expected' % self.data.hex())
+            except Exception as exc:
+                #print('TCPHandler ParseFromString exception: %s' % repr(exc)) #10035 is ok here
+                pass
             #Check every 5 seconds for new updates
             tcpthreadevent.wait(timeout=5)
             try:
