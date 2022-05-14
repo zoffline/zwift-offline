@@ -1312,6 +1312,8 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
+    if activity.distance < 300:
+        return response, 200
     player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
@@ -1771,6 +1773,8 @@ def handle_segment_results(request):
             return '', 400
         result = segment_result_pb2.SegmentResult()
         result.ParseFromString(request.stream.read())
+        if result.segment_id == 1:
+            return '', 400
         result.id = get_id('segment_result')
         result.world_time = world_time()
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
