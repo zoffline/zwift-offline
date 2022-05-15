@@ -1063,15 +1063,23 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit, sport):
-    events_list = [('Alpe Du Zwift Downhill', 1480439148, 6),
+    events_list = [('2022 Bambino Fondo', 3368626651, 6),
+                   ('2022 Medio Fondo', 2900074211, 6),
+                   ('2022 Gran Fondo', 1327147942, 6),
+                   ('Alpe du Zwift Downhill', 1480439148, 6),
                    ('Bologna TT', 2843604888, 10),
                    ('Crit City', 947394567, 12),
                    ('Crit City Reverse', 2875658892, 12),
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
+                   ('The Magnificent 8', 2207442179, 6),
                    ('Ventop Downhill', 2891361683, 14),
-                   ('Watopia Waistband', 1064303857, 6)]
+                   ('Watopia\'s Waistband', 1064303857, 6),
+                   ('WBR Climbing Series', 2218409282, 6),
+                   ('Zwift Bambino Fondo', 3621162212, 6),
+                   ('Zwift Medio Fondo', 3748780161, 6),
+                   ('Zwift Gran Fondo', 242381847, 6)]
     event_id = 1000
     cnt = 0
     events = events_pb2.Events()
