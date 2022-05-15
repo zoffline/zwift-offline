@@ -1,0 +1,191 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>Header for C(++)</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>Header for C(++)</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Contents of file wcxhead.h */</div>
+<div class="p3">/* It contains definitions of error codes, flags and callbacks */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Error codes returned to calling application */</div>
+<div class="p3">#define E_END_ARCHIVE&nbsp;&nbsp;&nbsp;&nbsp; 10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* No more files in archive */</div>
+<div class="p3">#define E_NO_MEMORY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Not enough memory */</div>
+<div class="p3">#define E_BAD_DATA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* CRC error in the data of the currently unpacked file */</div>
+<div class="p3">#define E_BAD_ARCHIVE&nbsp;&nbsp;&nbsp;&nbsp; 13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* The archive as a whole is bad, e.g. damaged headers */</div>
+<div class="p3">#define E_UNKNOWN_FORMAT&nbsp; 14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Archive format unknown */</div>
+<div class="p3">#define E_EOPEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Cannot open existing file */</div>
+<div class="p3">#define E_ECREATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Cannot create file */</div>
+<div class="p3">#define E_ECLOSE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Error closing file */</div>
+<div class="p3">#define E_EREAD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 18&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Error reading from file */</div>
+<div class="p3">#define E_EWRITE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Error writing to file */</div>
+<div class="p3">#define E_SMALL_BUF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Buffer too small */</div>
+<div class="p3">#define E_EABORTED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 21&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Function aborted by user */</div>
+<div class="p3">#define E_NO_FILES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 22&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* No files found */</div>
+<div class="p3">#define E_TOO_MANY_FILES&nbsp; 23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Too many files to pack */</div>
+<div class="p3">#define E_NOT_SUPPORTED&nbsp;&nbsp; 24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Function not supported */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* flags for unpacking */</div>
+<div class="p3">#define PK_OM_LIST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0</div>
+<div class="p3">#define PK_OM_EXTRACT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* flags for ProcessFile */</div>
+<div class="p3">#define PK_SKIP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Skip this file */</div>
+<div class="p3">#define PK_TEST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Test file integrity */</div>
+<div class="p3">#define PK_EXTRACT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Extract to disk */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Flags passed through ChangeVolProc */</div>
+<div class="p3">#define PK_VOL_ASK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Ask user for location of next volume */</div>
+<div class="p3">#define PK_VOL_NOTIFY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Notify app that next volume will be unpacked */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Flags for packing */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* For PackFiles */</div>
+<div class="p3">#define PK_PACK_MOVE_FILES&nbsp; 1&nbsp;&nbsp;&nbsp; /* Delete original after packing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_PACK_SAVE_PATHS&nbsp; 2&nbsp;&nbsp;&nbsp; /* Save path names of files&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_PACK_ENCRYPT&nbsp;&nbsp;&nbsp;&nbsp; 4&nbsp;&nbsp;&nbsp; /* Ask user for password, then encrypt&nbsp; */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Returned by GetPackCaps */</div>
+<div class="p3">#define PK_CAPS_NEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp; /* Can create new archives&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_MODIFY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp; /* Can modify exisiting archives&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_MULTIPLE&nbsp;&nbsp;&nbsp; 4&nbsp;&nbsp;&nbsp; /* Archive can contain multiple files&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_DELETE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8&nbsp;&nbsp;&nbsp; /* Can delete files&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_OPTIONS&nbsp;&nbsp;&nbsp; 16&nbsp;&nbsp;&nbsp; /* Has options dialog&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_MEMPACK&nbsp;&nbsp;&nbsp; 32&nbsp;&nbsp;&nbsp; /* Supports packing in memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_BY_CONTENT 64&nbsp;&nbsp;&nbsp; /* Detect archive type by content&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_SEARCHTEXT 128&nbsp;&nbsp; /* Allow searching for text in archives */</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* created with this plugin}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define PK_CAPS_HIDE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 256&nbsp;&nbsp; /* Show as normal files (hide packer&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* icon), open with Ctrl+PgDn, not Enter*/</div>
+<div class="p3">#define PK_CAPS_ENCRYPT&nbsp;&nbsp;&nbsp; 512&nbsp;&nbsp; /* Plugin supports PK_PACK_ENCRYPT option*/</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">#define BACKGROUND_UNPACK&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp; /* Which operations are thread-safe?&nbsp;&nbsp;&nbsp; */</div>
+<div class="p3">#define BACKGROUND_PACK&nbsp;&nbsp;&nbsp;&nbsp; 2</div>
+<div class="p3">#define BACKGROUND_MEMPACK&nbsp; 4</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Flags for packing in memory */</div>
+<div class="p3">#define MEM_OPTIONS_WANTHEADERS 1&nbsp; /* Return archive headers with packed data */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Errors returned by PackToMem */</div>
+<div class="p3">#define MEMPACK_OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp; /* Function call finished OK, but there is more data */</div>
+<div class="p3">#define MEMPACK_DONE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp; /* Function call finished OK, there is no more data&nbsp; */</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">#define PK_CRYPT_SAVE_PASSWORD 1</div>
+<div class="p3">#define PK_CRYPT_LOAD_PASSWORD 2</div>
+<div class="p3">#define PK_CRYPT_LOAD_PASSWORD_NO_UI 3 // Load password only if master password has already been entered!</div>
+<div class="p3">#define PK_CRYPT_COPY_PASSWORD 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Copy encrypted password to new archive name</div>
+<div class="p3">#define PK_CRYPT_MOVE_PASSWORD 5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Move password when renaming an archive</div>
+<div class="p3">#define PK_CRYPT_DELETE_PASSWORD 6&nbsp;&nbsp;&nbsp;&nbsp; // Delete password</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">#define PK_CRYPTOPT_MASTERPASS_SET 1&nbsp;&nbsp; // The user already has a master password defined</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char ArcName[260];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char FileName[260];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Flags;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int PackSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int HostOS;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileCRC;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileTime;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpVer;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Method;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileAttr;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp; } tHeaderData;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char ArcName[1024];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char FileName[1024];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Flags;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int PackSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int PackSizeHigh;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int UnpSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int UnpSizeHigh;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int HostOS;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileCRC;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileTime;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpVer;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Method;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileAttr;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char Reserved[1024];</div>
+<div class="p3">&nbsp; } tHeaderDataEx;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; WCHAR ArcName[1024];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; WCHAR FileName[1024];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Flags;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int PackSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int PackSizeHigh;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int UnpSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; unsigned int UnpSizeHigh;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int HostOS;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileCRC;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileTime;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpVer;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Method;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileAttr;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char Reserved[1024];</div>
+<div class="p3">&nbsp; } tHeaderDataExW;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* ArcName;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenMode;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenResult;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp; } tOpenArchiveData;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; WCHAR* ArcName;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenMode;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenResult;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; WCHAR* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp; } tOpenArchiveDataW;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p2"><span class="s5">  </span>int size;</div>
+<div class="p2"><span class="s5">  </span>DWORD PluginInterfaceVersionLow;</div>
+<div class="p2"><span class="s5">  </span>DWORD PluginInterfaceVersionHi;</div>
+<div class="p2"><span class="s5">  </span>char DefaultIniName[MAX_PATH];</div>
+<div class="p3">} PackDefaultParamStruct;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">/* Definition of callback functions called by the DLL</div>
+<div class="p3">Ask to swap disk for multi-volume archive */</div>
+<div class="p3">typedef int (__stdcall *tChangeVolProc)(char *ArcName,int Mode);</div>
+<div class="p3">typedef int (__stdcall *tChangeVolProcW)(WCHAR *ArcName,int Mode);</div>
+<div class="p3">/* Notify that data is processed - used for progress dialog */</div>
+<div class="p3">typedef int (__stdcall *tProcessDataProc)(char *FileName,int Size);</div>
+<div class="p3">typedef int (__stdcall *tProcessDataProcW)(WCHAR *FileName,int Size);</div>
+<div class="p3">typedef int (__stdcall *tPkCryptProc)(int CryptoNr,int Mode,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char* ArchiveName,char* Password,int maxlen);</div>
+<div class="p3">typedef int (__stdcall *tPkCryptProcW)(int CryptoNr,int Mode,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WCHAR* ArchiveName,WCHAR* Password,int maxlen);</div>
+<div class="p7">&nbsp;</div>
+<div class="p2">
+</div>
+</BODY></HTML>

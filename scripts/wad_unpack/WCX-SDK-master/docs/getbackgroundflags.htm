@@ -1,0 +1,38 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>GetBackgroundFlags</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>GetBackgroundFlags</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">GetBackgroundFlags is called to determine whether a plugin supports background packing or unpacking.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall GetBackgroundFlags(void);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">GetBackgroundFlags should return one of the following values:</div>
+<div class="p3">&nbsp;</div>
+<div class="p5"><span class="s2"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p5"><span class="s2">BACKGROUND_UNPACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>Calls to OpenArchive, ReadHeader(Ex), ProcessFile and CloseArchive are thread-safe (unpack in background)</div>
+<div class="p5"><span class="s2">BACKGROUND_PACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2  </span>Calls to PackFiles are thread-safe (pack in background)</div>
+<div class="p5"><span class="s2">BACKGROUND_MEMPACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4  </span>Calls to StartMemPack, PackToMem and DoneMemPack are thread-safe</div>
+<div class="p2"><B>Notes</B></div>
+<div class="p2">To make your packer plugin thread-safe, you should remove any global variables which aren't the same for all pack or unpack operations. For example, the path to the ini file name can remain global, but something like the compression ratio, or file handles need to be stored separately.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Packing:</B> The PackFiles function is just a single call, so you can store all variables on the stack (local variables of that function).</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Unpacking:</B> You can allocate a struct containing all the variables you need across function calls, like the compression method and ratio, and state variables, and return a pointer to this struct as a result to OpenArchive. This pointer will then passed to all other functions like ReadHeader as parameter hArcData.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Pack in memory:</B> You can do the same in StartMemPack as described under Unpacking.
+
+</div>
+</BODY></HTML>

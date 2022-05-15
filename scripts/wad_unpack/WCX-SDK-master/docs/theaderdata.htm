@@ -1,0 +1,59 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>tHeaderData</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>tHeaderData</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">tHeaderData is a structure used in <A HREF="readheader.htm">ReaderHeader</A>.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char ArcName[260];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char FileName[260];</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Flags;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int PackSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int HostOS;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileCRC;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileTime;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int UnpVer;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int Method;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int FileAttr;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp; } tHeaderData;</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><I>ArcName, FileName, PackSize, UnpSize</I> contain the name of the archive, the name of the file within the archive, size of the file when packed, and the size of the file when extracted, respectively.</div>
+<div class="p2"><I>HostOS</I> is there for compatibility with unrar.dll only, and should be set to zero.</div>
+<div class="p2"><I>FileCRC</I> is the 32-bit CRC (cyclic redundancy check) checksum of the file. If not available, set to zero.</div>
+<div class="p2">The <I>Cmt*</I> values can be used to transfer file comment information. They are currently not used in Total Commander, so they may be set to zero.</div>
+<div class="p2"><I>FileAttr</I> can be set to any combination of the following values:</div>
+<div class="p2"><span class="s17"><B>Value  </span>Description</B></div>
+<div class="p2"><span class="s17">0x1  </span>Read-only file</div>
+<div class="p2"><span class="s17">0x2  </span>Hidden file</div>
+<div class="p2"><span class="s17">0x4  </span>System file</div>
+<div class="p2"><span class="s17">0x8  </span>Volume ID file</div>
+<div class="p2"><span class="s17">0x10  </span>Directory</div>
+<div class="p2"><span class="s17">0x20  </span>Archive file</div>
+<div class="p2"><span class="s17">0x3F  </span>Any file</div>
+<div class="p2"><I>FileTime</I> contains the date and the time of the file's last update. Use the following algorithm to set the value:</div>
+<div class="p20">FileTime = (year - 1980) &lt;&lt; 25 | month &lt;&lt; 21 | day &lt;&lt; 16 | hour &lt;&lt; 11 | minute &lt;&lt; 5 | second/2;</div>
+<div class="p2">Make sure that:</div>
+<div class="p2"><I>year</I> is in the four digit format between 1980 and 2100</div>
+<div class="p2"><I>month</I> is a number between 1 and 12</div>
+<div class="p2"><I>hour</I> is in the 24 hour format</div>
+<div class="p2">
+</div>
+</BODY></HTML>

@@ -1,0 +1,49 @@
+body { background-color: window; color: windowtext}
+a:link { color:#008000;text-decoration:none;}
+a:visited { color:#800000;text-decoration:none;}
+a:active { color:#008000;text-decoration:underline;}
+a:hover { color:#008000;text-decoration:underline;}
+div { font-family:Arial,sans-serif; }
+.s1 { margin-left:0pt;text-indent:0pt;width: 193pt;font-family:Courier New; }
+.s2 { margin-left:0pt;text-indent:0pt;width: 189pt;font-family:Courier New; }
+.s3 { width: 195pt;font-family:Courier New; }
+.s4 { margin-left:0pt;text-indent:0pt;width: 195pt;font-family:Courier New; }
+.s5 { width: 72pt;font-family:Courier New; }
+.s6 { font-family:Courier New; }
+.s7 { margin-left:0pt;text-indent:0pt;width: 130pt; }
+.s8 { margin-left:0pt;text-indent:0pt;width: 213pt;font-family:Courier New; }
+.s9 { margin-left:0pt;text-indent:0pt;width: 113pt; }
+.s10 { margin-left:0pt;text-indent:0pt;width: 11pt; }
+.s11 { margin-left:0pt;text-indent:0pt;width: 113pt;font-family:Courier New; }
+.s12 { margin-left:0pt;text-indent:0pt;width: 839017pt;font-family:Courier New; }
+.s13 { text-indent:0pt;width: -838768pt }
+.s14 { margin-left:0pt;text-indent:0pt;width: 207pt;font-family:Courier New; }
+.s15 { margin-left:0pt;text-indent:0pt;width: 11pt;font-size:small; }
+.s16 { margin-left:0pt;text-indent:0pt;width: 190pt;font-family:Courier New; }
+.s17 { width: 117pt; }
+.s18 { margin-left:0pt;text-indent:0pt;width: 156pt;font-family:Courier New; }
+.s19 { margin-left:0pt;text-indent:0pt;width: 141pt; }
+.s20 { width: 72pt; }
+.p1 { margin-top:0;margin-bottom:0;color:#0000FF;font-size:small; }
+.p2 { margin-top:0;margin-bottom:0; }
+.p3 { margin-top:0;margin-bottom:0;font-family:Courier New; }
+.p4 { margin-top:0;margin-bottom:0;text-indent:-192pt;margin-left:192pt; }
+.p5 { margin-top:0;margin-bottom:0;text-indent:-189pt;margin-left:189pt; }
+.p6 { margin-top:0;margin-bottom:0;text-indent:-195pt;margin-left:195pt; }
+.p7 { margin-top:0;margin-bottom:0;font-size:small; }
+.p8 { margin-top:0;margin-bottom:0;font-family:020b0604020202020204; }
+.p9 { margin-top:0;margin-bottom:0;text-indent:-130pt;margin-left:130pt; }
+.p10 { margin-top:0;margin-bottom:0;margin-left:28pt; }
+.p11 { margin-top:0;margin-bottom:0;text-indent:-213pt;margin-left:213pt; }
+.p12 { margin-top:0;margin-bottom:0;text-indent:-113pt;margin-left:113pt; }
+.p13 { margin-top:0;margin-bottom:0;text-indent:-11pt;margin-left:11pt; }
+.p14 { margin-top:0;margin-bottom:0;text-indent:-113pt;margin-left:113pt;font-family:Courier New; }
+.p15 { margin-top:0;margin-bottom:0;text-indent:-249pt;margin-left:249pt; }
+.p16 { margin-top:0;margin-bottom:0;text-indent:-207pt;margin-left:207pt; }
+.p17 { margin-top:0;margin-bottom:0;color:#0000FF;font-size:medium; }
+.p18 { margin-top:0;margin-bottom:0;margin-left:11pt;font-size:small; }
+.p19 { margin-top:0;margin-bottom:0;text-indent:-190pt;margin-left:190pt; }
+.p20 { margin-top:0;margin-bottom:0;text-indent:-72pt;margin-left:72pt; }
+.p21 { margin-top:0;margin-bottom:0;text-indent:-156pt;margin-left:156pt; }
+.p22 { margin-top:0;margin-bottom:0;text-indent:-141pt;margin-left:141pt; }
+.p23 { margin-top:0;margin-bottom:0;text-indent:-11pt;margin-left:11pt;font-size:small; }

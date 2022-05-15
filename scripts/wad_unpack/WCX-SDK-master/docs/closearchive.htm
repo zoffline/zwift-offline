@@ -1,0 +1,26 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>CloseArchive</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>CloseArchive</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">CloseArchive should perform all necessary operations when an archive is about to be closed.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall CloseArchive (HANDLE hArcData);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">CloseArchive should return zero on success, or one of the <A HREF="error_codes.htm">error values</A> otherwise. It should free all the resources associated with the open archive.</div>
+<div class="p2">The parameter <I>hArcData</I> refers to the value returned by a programmer within a previous call to <A HREF="openarchive.htm">OpenArchive</A>.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

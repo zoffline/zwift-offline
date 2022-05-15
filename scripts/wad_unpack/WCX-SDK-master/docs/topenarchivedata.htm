@@ -1,0 +1,44 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>tOpenArchiveData</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>tOpenArchiveData</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">tOpenArchiveData is used in <A HREF="openarchive.htm">OpenArchive</A>.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* ArcName;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenMode;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int OpenResult;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char* CmtBuf;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtBufSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtSize;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int CmtState;</div>
+<div class="p3">&nbsp; } tOpenArchiveData;</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><I>ArcName</I> contains the name of the archive to open.</div>
+<div class="p2"><I>OpenMode</I> is set to one of the following values:</div>
+<div class="p21"><span class="s18"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p21"><span class="s18">PK_OM_LIST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0  </span>Open file for reading of file names only</div>
+<div class="p21"><span class="s18">PK_OM_EXTRACT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>Open file for processing (extract or test)</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><I>OpenResult</I> used to return one of the <A HREF="error_codes.htm">error values</A> if an error occurs.</div>
+<div class="p2">The <I>Cmt*</I> variables are for the file comment. They are currently not used by Total Commander, so may be set to NULL.</div>
+<div class="p2"><B>Notes:</B></div>
+<div class="p2">If the file is opened with OpenMode==PK_OM_LIST, <A HREF="processfile.htm">ProcessFile</A> will never be called by Total Commander.</div>
+<div class="p2">The <A HREF="unicode_support.htm">Unicode</A> version of this function uses WCHAR* instead of char* for the text fields.</div>
+<div class="p7">&nbsp;</div>
+<div class="p2">
+</div>
+</BODY></HTML>

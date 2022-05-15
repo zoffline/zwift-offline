@@ -1,0 +1,38 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>PackDefaultParamStruct</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>PackDefaultParamStruct</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackDefaultParamStruct is passed to <A HREF="packsetdefaultparams.htm">PackSetDefaultParams</A> to inform the plugin about the current plugin interface version and ini file location.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Declaration:</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef struct {</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; int size;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; DWORD PluginInterfaceVersionLow;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; DWORD PluginInterfaceVersionHi;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; char DefaultIniName[MAX_PATH];</div>
+<div class="p3">} PackDefaultParamStruct;</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description of struct members:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p9"><span class="s7">size  </span>The size of the structure, in bytes. Later revisions of the plugin interface may add more structure members, and will adjust this size field accordingly.</div>
+<div class="p9">&nbsp;</div>
+<div class="p9"><span class="s7">PluginInterfaceVersionLow  </span>Low value of plugin interface version. This is the value after the comma, multiplied by 100! Example. For plugin interface version 2.1, the low DWORD is 10 and the high DWORD is 2.</div>
+<div class="p9">&nbsp;</div>
+<div class="p9"><span class="s7">PluginInterfaceVersionHi  </span>High value of plugin interface version.</div>
+<div class="p9">&nbsp;</div>
+<div class="p9"><span class="s7">DefaultIniName  </span>Suggested location+name of the ini file where the plugin could store its data. This is a fully qualified path+file name, and will be in the same directory as the wincmd.ini. It's recommended to store the plugin data in this file or at least in this directory, because the plugin directory or the Windows directory may not be writable!
+
+</div>
+</BODY></HTML>

@@ -1,0 +1,35 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>PackSetDefaultParams</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>PackSetDefaultParams</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackSetDefaultParams is called immediately after loading the DLL, before any other function. This function is new in version 2.1. It requires Total Commander &gt;=5.51, but is ignored by older versions.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Declaration:</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p3">void __stdcall PackSetDefaultParams(PackDefaultParamStruct* dps);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description of parameters:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p12"><span class="s9">dps  </span>This structure of type <A HREF="packdefaultparamstruct.htm">PackDefaultParamStruct</A> currently contains the version number of the plugin interface, and the suggested location for the settings file (ini file). It is recommended to store any plugin-specific information either directly in that file, or in that directory under a different name. Make sure to use a unique header when storing data in this file, because it is shared by other file system plugins! If your plugin needs more than 1kbyte of data, you should use your own ini file because ini files are limited to 64k.</div>
+<div class="p12">&nbsp;</div>
+<div class="p12"><B>Return value:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">The function has no return value:</div>
+<div class="p12">&nbsp;</div>
+<div class="p2"><B>Important note:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">This function is only called in Total Commander 5.51 and later. The plugin version will be &gt;= 2.1.
+
+</div>
+</BODY></HTML>

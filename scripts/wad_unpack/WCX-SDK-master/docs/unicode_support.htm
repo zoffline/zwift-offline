@@ -1,0 +1,58 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>Unicode Support</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>Unicode Support</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">With Total Commander 7.5 (packer plugin interface 2.20), Unicode support has been added to all plugin types. In principle, you need to implement the same functions as for ANSI, with two differences: The function name is changed from FunctionName to FunctionNameW, and Ansi strings are changed to wide char names.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Total Commander will call the Unicode functions on all NT-based systems (Windows NT, 2000, XP) if they are present. If not, or on Windows 9x/ME, Total Commander will call the Ansi functions.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The following functions of the packer plugin interface support Unicode:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><A HREF="openarchive.htm">OpenArchive</A>W</div>
+<div class="p2"><A HREF="readheaderex.htm">ReadHeaderEx</A>W</div>
+<div class="p2"><A HREF="processfile.htm">ProcessFile</A>W</div>
+<div class="p2"><A HREF="setchangevolproc.htm">SetChangeVolProc</A>W</div>
+<div class="p2"><A HREF="setprocessdataproc.htm">SetProcessDataProc</A>W</div>
+<div class="p2"><A HREF="packfiles.htm">PackFiles</A>W</div>
+<div class="p2"><A HREF="deletefiles.htm">DeleteFiles</A>W</div>
+<div class="p2"><A HREF="startmempack.htm">StartMemPack</A>W</div>
+<div class="p2"><A HREF="canyouhandlethisfile.htm">CanYouHandleThisFile</A>W</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The following functions do not exist in a Unicode form and must be implemented as Ansi:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ReadHeader - use ReadHeaderEx</div>
+<div class="p2">CloseArchive</div>
+<div class="p2">GetPackerCaps</div>
+<div class="p2">ConfigurePacker</div>
+<div class="p2">PackToMem</div>
+<div class="p2">DoneMemPack</div>
+<div class="p2">PackSetDefaultParams</div>
+<div class="p2">ReadHeaderEx</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>What's the easiest way to support Unicode in an existing plugin?</B></div>
+<div class="p2"><B>1. </B>Get my sample plugin fsplugin (file system plugins section) even if you write a different type of plugin!</div>
+<div class="p2"><B>2. </B>Add the files cunicode.h and cunicode.cpp to your project. They contain various functions to make Unicode support easier.</div>
+<div class="p2"><B>3. </B>Convert your existing functions to Unicode and rename them to FunctionNameW. For all file functions like CreateFile, do not call their Unicode counterpart CreateFileW directly. Instead, call the functions from cunicode.cpp like CreateFileT. These functions automatically call the right Unicode or Ansi function, and even support file name lengths &gt;259 characters!</div>
+<div class="p2"><B>4. </B>For each converted function like FunctionNameW, recreate a function FunctionName which you call this way:</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">int __stdcall FunctionName(char* SomeString1,char* SomeString2)</div>
+<div class="p2">{</div>
+<div class="p2"><span class="s20">  </span>WCHAR SomeString1W[wdirtypemax],SomeString2W[wdirtypemax];</div>
+<div class="p2"><span class="s20">  </span>return FunctionNameW(awfilenamecopy(SomeString1W,SomeString1),awfilenamecopy(SomeString2W,SomeString2));</div>
+<div class="p2">}</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">The Macro awfilenamecopy will convert the Ansi string SomeString1 to Unicode and store it inSomeString1W. This variable must not be a pointer, because awfilenamecopy uses "countof" to get the target length.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

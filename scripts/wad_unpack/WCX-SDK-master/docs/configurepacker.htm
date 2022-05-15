@@ -1,0 +1,28 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>ConfigurePacker</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>ConfigurePacker</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ConfigurePacker gets called when the user clicks the Configure button from within "Pack files..." dialog box in Totalcmd.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">void __stdcall ConfigurePacker (HWND Parent, HINSTANCE DllInstance);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Usually, you provide a user with a dialog box specifying a method and/or its parameters that should be applied in the packing process. Or, you just want to display a message box about what your plugin is, just like Christian Ghisler's DiskDir does.</div>
+<div class="p2">In order to help you with a feedback, you can use a window handle of Totalcmd process, <I>Parent</I>. That is, you make your dialog box a child of <I>Parent</I>.</div>
+<div class="p2">When creating a window, you may also need handle of the DLL (your DLL) that creates your dialog box, <I>DllInstance</I>.</div>
+<div class="p2">You may decide not to implement this function. Then, make sure you omit PK_CAPS_OPTIONS from return values of <A HREF="getpackercaps.htm">GetPackerCaps</A>.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

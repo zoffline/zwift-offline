@@ -1,0 +1,54 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>tPkCryptProc</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>PkCryptProc</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PkCryptProc is a callback function, which the plugin can call to store passwords in the secure password store, read them back, or copy them to a new connection.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Declaration:</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall PkCryptProc(int CryptoNumber, int mode, char* ArchiveName, char* Password, int maxlen);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description of parameters:</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p12"><span class="s11">CryptoNumber  </span>Here the plugin needs to pass the crypto number received through the <A HREF="pksetcryptcallback.htm">PkSetCryptCallback</A> function.</div>
+<div class="p14">&nbsp;</div>
+<div class="p12"><span class="s11">mode  </span>The mode of operation:</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_SAVE_PASSWORD: Save password to password store</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_LOAD_PASSWORD: Load password from password store</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_LOAD_PASSWORD_NO_UI: Load password only if master password has already been entered</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_COPY_PASSWORD: Copy password to new connection. Here the second string parameter "Password" is not a password, but the name of the target archive name</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_MOVE_PASSWORD: As above, but delete the source password</div>
+<div class="p12"><span class="s9">  </span>PK_CRYPT_DELETE_PASSWORD: Delete the password of the given archive name</div>
+<div class="p14">&nbsp;</div>
+<div class="p12"><span class="s11">ArchiveName  </span>Name of the archive for this operation. The plugin can give any name here which can be stored in Windows ini files. The plugin should encode names which cannot be stored in ini files, or give a reference code or so instead of the file name.</div>
+<div class="p14">&nbsp;</div>
+<div class="p12"><span class="s11">Password  </span>Operation-specific, usually the password to be stored/retrieved, or the target name when copying/moving a connection</div>
+<div class="p14">&nbsp;</div>
+<div class="p12"><span class="s11">maxlen  </span>Maximum length, in characters, the password buffer can store when calling one of the load functions</div>
+<div class="p12">&nbsp;</div>
+<div class="p12"><B>Return value:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Total Commander returns one of these values:</div>
+<div class="p22"><span class="s19">FS_FILE_OK  </span>Success</div>
+<div class="p22"><span class="s19">E_ECREATE  </span>Encrypt/Decrypt failed</div>
+<div class="p22"><span class="s19">E_EWRITE  </span>Could not write password to password store</div>
+<div class="p22"><span class="s19">E_EREAD  </span>Password not found in password store</div>
+<div class="p22"><span class="s19">E_NO_FILES  </span>No master password entered yet</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Note:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">When showing the details of an existing archive, you should call PK_CRYPT_LOAD_PASSWORD_NO_UI first. In case of error E_NO_FILES, show a button "Edit password". Only call PK_CRYPT_LOAD_PASSWORD when the user clicks that button, or tries to decrypt the archive. This way the user doesn't have to enter the master password if he just wanted to make some other changes to the archive settings.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

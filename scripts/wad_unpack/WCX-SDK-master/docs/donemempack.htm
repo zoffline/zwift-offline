@@ -1,0 +1,31 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>DoneMemPack</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>DoneMemPack</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">DoneMemPack ends packing into memory. This function is used together with <A HREF="startmempack.htm">StartMemPack</A> and <A HREF="packtomem.htm">PackToMem</A>.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall DoneMemPack (int hMemPack);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description of fields:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><I>Return value:</I> DoneMemPack should return zero if successful, or one of the error codes otherwise.</div>
+<div class="p2"><I>hMemPack</I> is the handle returned by StartMemPack.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"> It may be called in two different cases:</div>
+<div class="p2">1. The packing functions have completed successfully, or</div>
+<div class="p2">2. The user has aborted the packing operation.</div>
+<div class="p2">The plugin should free all data allocated when packing.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

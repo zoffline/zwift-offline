@@ -1,0 +1,212 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>Header file for Delphi</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>Header file for Delphi</B></div>
+<div class="p3">&nbsp;</div>
+<div class="p3">{ Contents of file wcxhead.pas }</div>
+<div class="p3">{ It contains definitions of error codes, flags and callbacks }</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">unit wcxhead;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">interface</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">const&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Error codes returned to calling application}</div>
+<div class="p3">&nbsp; E_END_ARCHIVE=&nbsp;&nbsp;&nbsp;&nbsp; 10;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {No more files in archive}</div>
+<div class="p3">&nbsp; E_NO_MEMORY=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 11;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Not enough memory}</div>
+<div class="p3">&nbsp; E_BAD_DATA=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {CRC error in the data of the currently unpacked file}</div>
+<div class="p3">&nbsp; E_BAD_ARCHIVE=&nbsp;&nbsp;&nbsp;&nbsp; 13;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {The archive as a whole is bad, e.g. damaged headers}</div>
+<div class="p3">&nbsp; E_UNKNOWN_FORMAT=&nbsp; 14;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Archive format unknown}</div>
+<div class="p3">&nbsp; E_EOPEN=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Cannot open existing file}</div>
+<div class="p3">&nbsp; E_ECREATE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Cannot create file}</div>
+<div class="p3">&nbsp; E_ECLOSE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 17;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Error closing file}</div>
+<div class="p3">&nbsp; E_EREAD=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 18;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Error reading from file}</div>
+<div class="p3">&nbsp; E_EWRITE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 19;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Error writing to file}</div>
+<div class="p3">&nbsp; E_SMALL_BUF=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Buffer too small}</div>
+<div class="p3">&nbsp; E_EABORTED=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 21;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Function aborted by user}</div>
+<div class="p3">&nbsp; E_NO_FILES=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 22;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {No files found}</div>
+<div class="p3">&nbsp; E_TOO_MANY_FILES=&nbsp; 23;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Too many files to pack}</div>
+<div class="p3">&nbsp; E_NOT_SUPPORTED=&nbsp;&nbsp; 24;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {Function not supported}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Unpacking flags}</div>
+<div class="p3">&nbsp; PK_OM_LIST=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0;</div>
+<div class="p3">&nbsp; PK_OM_EXTRACT=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Flags for ProcessFile}</div>
+<div class="p3">&nbsp; PK_SKIP=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0;&nbsp;&nbsp;&nbsp;&nbsp; {Skip file (no unpacking)}</div>
+<div class="p3">&nbsp; PK_TEST=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1;&nbsp;&nbsp;&nbsp;&nbsp; {Test file integrity}</div>
+<div class="p3">&nbsp; PK_EXTRACT=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2;&nbsp;&nbsp;&nbsp;&nbsp; {Extract file to disk}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Flags passed through ChangeVolProc}</div>
+<div class="p3">&nbsp; PK_VOL_ASK=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0;&nbsp;&nbsp;&nbsp;&nbsp; {Ask user for location of next volume}</div>
+<div class="p3">&nbsp; PK_VOL_NOTIFY=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1;&nbsp;&nbsp;&nbsp;&nbsp; {Notify app that next volume will be unpacked}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Packing flags}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {For PackFiles}</div>
+<div class="p3">&nbsp; PK_PACK_MOVE_FILES=&nbsp;&nbsp; 1;&nbsp;&nbsp;&nbsp; {Delete original after packing}</div>
+<div class="p3">&nbsp; PK_PACK_SAVE_PATHS=&nbsp;&nbsp; 2;&nbsp;&nbsp;&nbsp; {Save path names of files}</div>
+<div class="p3">&nbsp; PK_PACK_ENCRYPT=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4;&nbsp;&nbsp;&nbsp; {Ask user for password, then encrypt}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Returned by GetPackCaps}</div>
+<div class="p3">&nbsp; PK_CAPS_NEW=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1;&nbsp;&nbsp;&nbsp; {Can create new archives}</div>
+<div class="p3">&nbsp; PK_CAPS_MODIFY=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2;&nbsp;&nbsp;&nbsp; {Can modify exisiting archives}</div>
+<div class="p3">&nbsp; PK_CAPS_MULTIPLE=&nbsp;&nbsp;&nbsp;&nbsp; 4;&nbsp;&nbsp;&nbsp; {Archive can contain multiple files}</div>
+<div class="p3">&nbsp; PK_CAPS_DELETE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8;&nbsp;&nbsp;&nbsp; {Can delete files}</div>
+<div class="p3">&nbsp; PK_CAPS_OPTIONS=&nbsp;&nbsp;&nbsp;&nbsp; 16;&nbsp;&nbsp;&nbsp; {Supports the options dialogbox}</div>
+<div class="p3">&nbsp; PK_CAPS_MEMPACK=&nbsp;&nbsp;&nbsp;&nbsp; 32;&nbsp;&nbsp;&nbsp; {Supports packing in memory}</div>
+<div class="p3">&nbsp; PK_CAPS_BY_CONTENT=&nbsp; 64;&nbsp;&nbsp;&nbsp; {Detect archive type by content}</div>
+<div class="p3">&nbsp; PK_CAPS_SEARCHTEXT= 128;&nbsp;&nbsp;&nbsp; {Allow searching for text in archives</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { created with this plugin}</div>
+<div class="p3">&nbsp; PK_CAPS_HIDE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 256;&nbsp;&nbsp;&nbsp; { Show as normal files (hide packer icon) }</div>
+<div class="p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { open with Ctrl+PgDn, not Enter }</div>
+<div class="p3">&nbsp; PK_CAPS_ENCRYPT=&nbsp;&nbsp;&nbsp; 512;&nbsp;&nbsp;&nbsp; { Plugin supports PK_PACK_ENCRYPT option }</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; BACKGROUND_UNPACK=1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Which operations are thread-safe? }</div>
+<div class="p3">&nbsp; BACKGROUND_PACK=2;</div>
+<div class="p3">&nbsp; BACKGROUND_MEMPACK=4;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { For tar.pluginext in background }</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Flags for packing in memory}</div>
+<div class="p3">&nbsp; MEM_OPTIONS_WANTHEADERS=1;&nbsp; {Return archive headers with packed data}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Errors returned by PackToMem}</div>
+<div class="p3">&nbsp; MEMPACK_OK=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0;&nbsp;&nbsp;&nbsp; {Function call finished OK, but there is more data}</div>
+<div class="p3">&nbsp; MEMPACK_DONE=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1;&nbsp;&nbsp;&nbsp; {Function call finished OK, there is no more data}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; {Flags for PkCryptProc callback}</div>
+<div class="p3">&nbsp; PK_CRYPT_SAVE_PASSWORD=1;</div>
+<div class="p3">&nbsp; PK_CRYPT_LOAD_PASSWORD=2;</div>
+<div class="p3">&nbsp; PK_CRYPT_LOAD_PASSWORD_NO_UI=3;&nbsp;&nbsp; { Load password only if master password has already been entered!}</div>
+<div class="p3">&nbsp; PK_CRYPT_COPY_PASSWORD=4;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Copy encrypted password to new archive name}</div>
+<div class="p3">&nbsp; PK_CRYPT_MOVE_PASSWORD=5;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move password when renaming an archive}</div>
+<div class="p3">&nbsp; PK_CRYPT_DELETE_PASSWORD=6;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Delete password}</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">#define PK_CRYPTOPT_MASTERPASS_SET 1&nbsp;&nbsp; // The user already has a master password defined</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">type</div>
+<div class="p3">&nbsp; {Definition of callback functions called by the DLL}</div>
+<div class="p3">&nbsp; {Ask to swap disk for multi-volume archive}</div>
+<div class="p3">&nbsp; PChangeVolProc=^TChangeVolProc;</div>
+<div class="p3">&nbsp; TChangeVolProc=function(ArcName:pchar;Mode:longint):longint; stdcall;</div>
+<div class="p3">&nbsp; PChangeVolProcW=^TChangeVolProcW;</div>
+<div class="p3">&nbsp; TChangeVolProcW=function(ArcName:pwidechar;Mode:longint):longint; stdcall;</div>
+<div class="p3">&nbsp; {Notify that data is processed - used for progress dialog}</div>
+<div class="p3">&nbsp; PProcessDataProc=^TProcessDataProc;</div>
+<div class="p3">&nbsp; TProcessDataProc=function(FileName:pchar;Size:longint):longint; stdcall;</div>
+<div class="p3">&nbsp; PProcessDataProcW=^TProcessDataProcW;</div>
+<div class="p3">&nbsp; TProcessDataProcW=function(FileName:pwidechar;Size:longint):longint; stdcall;</div>
+<div class="p3">&nbsp; PPkPluginCryptProc=^TPkPluginCryptProc;</div>
+<div class="p3">&nbsp; TPkPluginCryptProc=function(CryptoNr:integer;mode:integer;ArchiveName,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Password:pchar;maxlen:integer):integer; stdcall;</div>
+<div class="p3">&nbsp; PPkPluginCryptProcW=^TPkPluginCryptProcW;</div>
+<div class="p3">&nbsp; TPkPluginCryptProcW=function(CryptoNr:integer;mode:integer;ArchiveName,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Password:pwidechar;maxlen:integer):integer; stdcall;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">type</div>
+<div class="p3">&nbsp; THeaderData=packed record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; ArcName:array [0..259] of char;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileName:array [0..259] of char;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Flags,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PackSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; HostOS,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileCRC,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileTime,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpVer,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Method,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileAttr:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBuf:pchar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBufSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtState:longint;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; THeaderDataEx=packed record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; ArcName:array [0..1023] of char;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileName:array [0..1023] of char;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Flags:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PackSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PackSizeHigh,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpSizeHigh:DWORD;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; HostOS,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileCRC,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileTime,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpVer,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Method,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileAttr:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBuf:pchar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBufSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtState:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Reserved:array[0..1023] of char;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; THeaderDataExW=packed record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; ArcName:array [0..1023] of widechar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileName:array [0..1023] of widechar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Flags:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PackSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PackSizeHigh,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpSizeHigh:DWORD;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; HostOS,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileCRC,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileTime,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; UnpVer,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Method,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; FileAttr:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBuf:pchar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBufSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtState:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; Reserved:array[0..1023] of char;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; tOpenArchiveData=packed record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; ArcName:pchar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; OpenMode,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; OpenResult:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBuf:pchar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBufSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtState:longint;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; tOpenArchiveDataW=packed record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; ArcName:pwidechar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; OpenMode,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; OpenResult:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBuf:pwidechar;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtBufSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtSize,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; CmtState:longint;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">&nbsp; tPackDefaultParamStruct=record</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; size,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PluginInterfaceVersionLow,</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; PluginInterfaceVersionHi:longint;</div>
+<div class="p3">&nbsp;&nbsp;&nbsp; DefaultIniName:array[0..259] of char;</div>
+<div class="p3">&nbsp; end;</div>
+<div class="p3">&nbsp; pPackDefaultParamStruct=^tPackDefaultParamStruct;</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">implementation</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">end.</div>
+<div class="p7">&nbsp;</div>
+<div class="p2">
+</div>
+</BODY></HTML>

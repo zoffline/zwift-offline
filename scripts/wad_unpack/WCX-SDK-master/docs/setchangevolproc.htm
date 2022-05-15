@@ -1,0 +1,25 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>SetChangeVolProc</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>SetChangeVolProc</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">This function allows you to notify user about changing a volume when packing files.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">void __stdcall SetChangeVolProc (HANDLE hArcData, <A HREF="tchangevolproc.htm">tChangeVolProc</A><span class="s6"> pChangeVolProc1);</span></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><I>pChangeVolProc1</I> contains a pointer to a function that you may want to call when notifying user to change volume (e.g. insterting another diskette). You need to store the value at some place if you want to use it; you can use <I>hArcData</I> that you have returned by <A HREF="openarchive.htm">OpenArchive</A> to identify that place.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

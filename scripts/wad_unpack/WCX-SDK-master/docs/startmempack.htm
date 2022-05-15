@@ -1,0 +1,30 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>StartMemPack</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>StartMemPack</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">StartMemPack starts packing into memory. This function is only needed if you want to create archives in combination with TAR, e.g. TAR.BZ2. It allows Totalcmd to create a TAR.Plugin file in a single step.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall StartMemPack (int Options, char *FileName);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">StartMemPack should return a user-defined handle (e.g. pointer to a structure) on success, zero otherwise.</div>
+<div class="p2"><I>FileName</I> refers to the name of the file being packed - some packers store the name in the local header.</div>
+<div class="p2"><I>Options</I> can contain a combination of the following values:</div>
+<div class="p16"><span class="s14"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p16"><span class="s14">MEM_OPTIONS_WANTHEADERS&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>The output stream should include the complete headers (beginning+end)</div>
+<div class="p7">&nbsp;</div>
+<div class="p2">
+</div>
+</BODY></HTML>

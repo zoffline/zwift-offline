@@ -1,0 +1,42 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>PackToMem</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>PackToMem</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackToMem packs the next chunk of data passed to it and/or returns the compressed data to the calling program. It is implemented together with <A HREF="startmempack.htm">StartMemPack</A> and DoneMemPack</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall PackToMem (int hMemPack, char* BufIn, int InLen, int* Taken, char* BufOut, int OutLen, int* Written, int SeekBy);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description of the fields</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackToMem should return MEMPACK_OK (=0) on success, MEMPACK_DONE (=1) when done, or one of the <A HREF="error_codes.htm">error values</A> otherwise.</div>
+<div class="p2"><I>hMemPack</I> is the handle returned by StartMemPack()</div>
+<div class="p2"><I>BufIn</I> is a pointer to the data which needs to be packed</div>
+<div class="p2"><I>InLen</I> contains the number of bytes pointed to by BufIn</div>
+<div class="p2"><I>Taken</I> has to receive the number of bytes taken from the buffer. If not the whole buffer is taken, the calling program will pass the remaining bytes to the plugin in a later call.</div>
+<div class="p2"><I>BufOut</I> is a pointer to a buffer which can receive packed data</div>
+<div class="p2"><I>OutLen</I> contains the size of the buffer pointed to by BufOut</div>
+<div class="p2"><I>Written</I> has to receive the number of bytes placed in the buffer pointed to by BufOut</div>
+<div class="p2"><I>SeekBy</I> may be set to the offset from the current output posisition by which the file pointer has to be moved BEFORE accepting the data in BufOut. This allows the plugin to modify a file header also AFTER packing, e.g. to write a CRC to the header.</div>
+<div class="p2"><B>Description of the function</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackToMem is the most complex function of the packer plugin. It is called by Total Commander in a loop as long as there is data to be packed, and as there is data to retrieve. The plugin should do the following:</div>
+<div class="p13"><span class="s10">1.  </span>As long as there is data sent through BufIn, take it and add it to your internal buffers (if there is enough space).</div>
+<div class="p13"><span class="s10">2.  </span>As soon as there is enough data in the internal input buffers, start packing to the output buffers.</div>
+<div class="p13"><span class="s10">3.  </span>As soon as there is enough data in the internal output buffers, start sending data to BufOut.</div>
+<div class="p13"><span class="s10">4.  </span>When InLen is 0, there is no more data to be compressed, so finish sending data to BufOut until no more data is in the output buffer.</div>
+<div class="p13"><span class="s10">5.  </span>When there is no more data available, return 1.</div>
+<div class="p13"><span class="s10">5.  </span>There is no obligation to take any data through BufIn or send any through BufOut. Total Commander will call this function until it either returns 1, or an error.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

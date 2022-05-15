@@ -1,0 +1,36 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>PackFiles</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>PackFiles</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackFiles specifies what should happen when a user creates, or adds files to the archive.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall PackFiles (char *PackedFile, char *SubPath, char *SrcPath, char *AddList, int Flags);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">PackFiles should return zero on success, or one of the <A HREF="error_codes.htm">error codes</A> otherwise.</div>
+<div class="p2"><I>PackedFile</I> refers to the archive that is to be created or modified. The string contains the full path.</div>
+<div class="p2"><I>SubPath</I> is either NULL, when the files should be packed with the paths given with the file names, or not NULL when they should be placed below the given subdirectory within the archive. Example:</div>
+<div class="p10"><I>SubPath</I>="subdirectory"</div>
+<div class="p10">Name in AddList="subdir2\filename.ext"</div>
+<div class="p10">-&gt; File should be packed as "subdirectory\subdir2\filename.ext"</div>
+<div class="p2"><I>SrcPath</I> contains path to the files in <I>AddList</I>. <I>SrcPath</I> and <I>AddList</I> together specify files that are to be packed into <I>PackedFile</I>. Each string in <I>AddList</I> is zero-delimited (ends in zero), and the <I>AddList</I> string ends with an extra zero byte, i.e. there are two zero bytes at the end of<I> AddList</I>.</div>
+<div class="p2"><I>Flags</I> can contain a combination of the following values reflecting the user choice from within Totalcmd:</div>
+<div class="p11"><span class="s8"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p11"><span class="s8">PK_PACK_MOVE_FILES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>Delete original after packing</div>
+<div class="p11"><span class="s8">PK_PACK_SAVE_PATHS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2  </span>Save path names of files</div>
+<div class="p11"><span class="s8">PK_PACK_ENCRYPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4  </span>Ask user for password, then encrypt file with that password</div>
+<div class="p2">
+</div>
+</BODY></HTML>

@@ -1,0 +1,26 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>CanYouHandleThisFile</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>CanYouHandleThisFile</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">CanYouHandleThisFile allows the plugin to handle files with different extensions than the one defined in Total Commander. It is called when the plugin defines PK_CAPS_BY_CONTENT, and the user tries to open an archive with Ctrl+PageDown.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">BOOL __stdcall CanYouHandleThisFile (char *FileName);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">CanYouHandleThisFile should return true (nonzero) if the plugin recognizes the file as an archive which it can handle. The detection must be by contents, NOT by extension. If this function is not implemented, Totalcmd assumes that only files with a given extension can be handled by the plugin.</div>
+<div class="p2"><I>Filename</I> contains the fully qualified name (path+name) of the file to be checked.
+
+</div>
+</BODY></HTML>

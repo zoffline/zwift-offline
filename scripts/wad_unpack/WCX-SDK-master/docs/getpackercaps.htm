@@ -1,0 +1,40 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>GetPackerCaps</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>GetPackerCaps</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">GetPackerCaps tells Totalcmd what features your packer plugin supports.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall GetPackerCaps();</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Implement GetPackerCaps to return a combination of the following values:</div>
+<div class="p2"><span class="s3"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p6"><span class="s4">PK_CAPS_NEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>Can create new archives</div>
+<div class="p6"><span class="s4">PK_CAPS_MODIFY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2  </span>Can modify existing archives</div>
+<div class="p6"><span class="s4">PK_CAPS_MULTIPLE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4  </span>Archive can contain multiple files</div>
+<div class="p6"><span class="s4">PK_CAPS_DELETE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8  </span>Can delete files</div>
+<div class="p6"><span class="s4">PK_CAPS_OPTIONS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16  </span>Has options dialog</div>
+<div class="p6"><span class="s4">PK_CAPS_MEMPACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 32  </span>Supports packing in memory</div>
+<div class="p6"><span class="s4">PK_CAPS_BY_CONTENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 64  </span>Detect archive type by content</div>
+<div class="p6"><span class="s4">PK_CAPS_SEARCHTEXT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 128  </span>Allow searching for text in archives created with this plugin</div>
+<div class="p6"><span class="s4">PK_CAPS_HIDE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 256  </span>Don't show packer icon, don't open with Enter but with Ctrl+PgDn</div>
+<div class="p6"><span class="s4">PK_CAPS_ENCRYPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 512  </span>Plugin supports encryption.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Omitting PK_CAPS_NEW and PK_CAPS_MODIFY means <A HREF="packfiles.htm">PackFiles</A> will never be called and so you don't have to implement <A HREF="packfiles.htm">PackFiles</A>. Omitting PK_CAPS_MULTIPLE means <A HREF="packfiles.htm">PackFiles</A> will be supplied with just one file. Leaving out PK_CAPS_DELETE means <A HREF="deletefiles.htm">DeleteFiles</A> will never be called; leaving out PK_CAPS_OPTIONS means <A HREF="configurepacker.htm">ConfigurePacker</A> will not be called. PK_CAPS_MEMPACK enables the functions <A HREF="startmempack.htm">StartMemPack</A>, <A HREF="packtomem.htm">PackToMem</A> and <A HREF="donemempack.htm">DoneMemPack</A>. If PK_CAPS_BY_CONTENT is returned, Totalcmd calls the function <A HREF="canyouhandlethisfile.htm">CanYouHandleThisFile</A> when the user presses Ctrl+PageDown on an unknown archive type. Finally, if PK_CAPS_SEARCHTEXT is returned, Total Commander will search for text inside files packed with this plugin. This may not be a good idea for certain plugins like the diskdir plugin, where file contents may not be available. If PK_CAPS_HIDE is set, the plugin will not show the file type as a packer. This is useful for plugins which are mainly used for creating files, e.g. to create batch files, avi files etc. The file needs to be opened with Ctrl+PgDn in this case, because Enter will launch the associated application.</div>
+<div class="p2"><B>Important note:</B></div>
+<div class="p2">If you change the return values of this function, e.g. add packing support, you need to reinstall the packer plugin in Total Commander, otherwise it will not detect the new capabilities.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

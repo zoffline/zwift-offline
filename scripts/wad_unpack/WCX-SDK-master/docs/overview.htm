@@ -1,0 +1,88 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>Overview</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>Writing WCX packer plugins - Overview</B></div>
+<div class="p8">&nbsp;</div>
+<div class="p8">This help file is about writing packer plugins for the file manager Total Commander, available on <A TARGET="_blank" HREF="http://www.ghisler.com">www.ghisler.com</A>. It describes the functions you need to implement to add a specific packer to Total Commander. You should also look at the available sample packers (with source), which give you some insight on plugin programming. There are samples for Microsoft Visual C++ and Delphi.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">A WCX is nothing more than a 32-bit Windows DLL renamed to *.WCX, which supports a list of specific functions. Total Commander loads this library dynamically at runtime with LoadLibrary(), and loads all available functions with GetProcAddress(). This means that not all functions described here must be implemented (see below). All functions use the STDCALL calling convention with no C++ name mangling (see below), exactly like in most standard system libraries in Windows.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The minimum functions needed for a read-only plugin are:</B></div>
+<div class="p2"><A HREF="openarchive.htm">OpenArchive</A> - tells the plugin which archive it should open for listing or reading.</div>
+<div class="p2"><A HREF="readheader.htm">ReadHeader</A> - this function is called as long as the plugin returns no error - the plugin must return one filename inside the archive per call.</div>
+<div class="p2"><A HREF="processfile.htm">ProcessFile</A> - called immediately after ReadHeader. Tells the plugin to extract, test, or skip this file.</div>
+<div class="p2"><A HREF="closearchive.htm">CloseArchive</A> - called after ReadHeader returns an error.</div>
+<div class="p2"><A HREF="setchangevolproc.htm">SetChangeVolProc</A> - Set a callback function to request a disk change from the user.</div>
+<div class="p2"><A HREF="setprocessdataproc.htm">SetProcessDataProc</A> - Set a callback function to give feedback and allow aborting of the pack or unpack operation.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>All the following functions are optional.</B> If you want to support them, you need to implement <A HREF="getpackercaps.htm">GetPackerCaps</A> too, to tell Total Commander which functions are supported. If <A HREF="getpackercaps.htm">GetPackerCaps</A> isn't available, Total Commander assumes that the plugin only supports unpacking. Even with a read-only plugin, you may want to implement GetPackerCaps and return PK_CAPS_SEARCHTEXT to allow Total Commander to search for text in archives of this type.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The first group allows to create or modify existing archives:</B></div>
+<div class="p2"><A HREF="packfiles.htm">PackFiles</A> - tells the plugin to pack a list of files into a given archive. If the archive exists, the plugin should add the files to that archive. Total Commander will ask the user for overwrite confirmation, so files which already exist in the archive should be overwritten.</div>
+<div class="p2"><A HREF="deletefiles.htm">DeleteFiles</A> - tells the plugin to remove files from the given archive.</div>
+<div class="p2"><A HREF="configurepacker.htm">ConfigurePacker</A> - lets the plugin open a configuration dialog for packing (not unpacking!). It is called when the 'configure' button is pressed in Total Commander's <I>Files - Pack</I> dialog.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The following optional functions are for packing in memory:</B></div>
+<div class="p2">This is used by Total Commander to create TAR.Plugin files in one step. For example, the .BZ2 plugin supports these functions. Most plugins can pack multiple files into one archive, and therefore will not need to implement these functions.</div>
+<div class="p2"><A HREF="startmempack.htm">StartMemPack</A> tells the plugin to prepare internal structures for packing into memory.</div>
+<div class="p2"><A HREF="packtomem.htm">PackToMem</A> sends new data (to be packed) to the plugin, and receives packed data from it.</div>
+<div class="p2"><A HREF="donemempack.htm">DoneMemPack</A> terminates the packing to memory, either after a successful PackToMem loop, or when the user aborts packing.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>The following function tells the plugin to check whether it can handle the specified unknown file or not:</B></div>
+<div class="p2"><A HREF="canyouhandlethisfile.htm">CanYouHandleThisFile</A> allows the plugin to support files which may have a different extension, e.g. self-extracting archives.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>How Total Commander calls the extraction functions:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Here is a simple pseudocode declaration how Total Commander calls the extraction functions:</div>
+<div class="p2"><B>1. Loop to scan for files in the archive:</B></div>
+<div class="p2">OpenArchive()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; with OpenMode==PK_OM_LIST</div>
+<div class="p2">repeat</div>
+<div class="p2">&nbsp;&nbsp; ReadHeader()</div>
+<div class="p2">&nbsp;&nbsp; ProcessFile(...,PK_SKIP,...)</div>
+<div class="p2">until error returned</div>
+<div class="p2">CloseArchive()</div>
+<div class="p2"><B>2. Loop to extract files from the archive:</B></div>
+<div class="p2">OpenArchive()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; with OpenMode==PK_OM_EXTRACT</div>
+<div class="p2">repeat</div>
+<div class="p2">&nbsp;&nbsp; ReadHeader()</div>
+<div class="p2">&nbsp;&nbsp; if WantToExtractThisFile()</div>
+<div class="p2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ProcessFile(...,PK_EXTRACT,...)</div>
+<div class="p2">&nbsp;&nbsp; else</div>
+<div class="p2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ProcessFile(...,PK_SKIP,...)</div>
+<div class="p2">until error returned</div>
+<div class="p2">CloseArchive()</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Important note for C and C++ Programmers with Visual C++:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">If using __stdcall the linker produces file names like "_ReadHeader@8"</div>
+<div class="p2">To get a compatible plugin a "Def" file e.g. wcx.def has to be added to your project.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">--Begin of wxc.def file to change export names for linker</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">EXPORTS</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">CloseArchive=_CloseArchive@4</div>
+<div class="p2">DeleteFiles=_DeleteFiles@8</div>
+<div class="p2">GetPackerCaps=_GetPackerCaps@0</div>
+<div class="p2">OpenArchive=_OpenArchive@4</div>
+<div class="p2">PackFiles=_PackFiles@20</div>
+<div class="p2">ProcessFile=_ProcessFile@16</div>
+<div class="p2">ReadHeader=_ReadHeader@8</div>
+<div class="p2">SetChangeVolProc=_SetChangeVolProc@8</div>
+<div class="p2">SetProcessDataProc=_SetProcessDataProc@8</div>
+<div class="p2">ConfigurePacker=_ConfigurePacker@8</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">--End of wcx.def file</div>
+<div class="p2">
+</div>
+</BODY></HTML>

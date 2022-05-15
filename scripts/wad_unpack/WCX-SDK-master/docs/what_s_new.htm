@@ -1,0 +1,41 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>What's new</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>What's new</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p13">The following function has been added to plugin version 2.21 second edition (all functions are otherwise unchanged):</div>
+<div class="p13">- <A HREF="64_bit_support.htm">64-bit support</A></div>
+<div class="p13">&nbsp;</div>
+<div class="p13">The following function has been added to plugin version 2.21. It's optional:</div>
+<div class="p13">- <A HREF="getbackgroundflags.htm">GetBackgroundFlags</A> for packing and unpacking in the background</div>
+<div class="p13">&nbsp;</div>
+<div class="p13">The following function has been added to plugin version 2.20. It's optional:</div>
+<div class="p13"><span class="s10">-  </span><A HREF="unicode_support.htm">Unicode</A> support</div>
+<div class="p13"><span class="s10">-  </span>Store passwords in a safe way via <A HREF="tpkcryptproc.htm">tPkCryptProc</A> callback</div>
+<div class="p2">&nbsp;</div>
+<div class="p13">The following function has been added to plugin version 2.12. It's optional:</div>
+<div class="p13"><span class="s10">-  </span>A new flag PK_CAPS_ENCRYPT can be returned by <A HREF="getpackercaps.htm">GetPackerCaps</A> to allow packing with password. PK_PACK_ENCRYPT will then passed to the plugin in <A HREF="packfiles.htm">PackFiles</A>.</div>
+<div class="p13"><span class="s10">-&nbsp;  </span><A HREF="readheaderex.htm">ReadHeaderEx</A> now supports files in archives &gt; 2GB.&nbsp; The fields PackSize, PackSizeHigh, UnpSize and UnpSizeHigh have been changed to "unsigned int".</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">The following function has been added to plugin version 2.1. It's optional:</div>
+<div class="p13"><span class="s10">-  </span>The new function PackSetDefaultParams informs the plugin about the plugin version number and suggested ini location.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">The following functions have been added in packer plugin version 2.0. All of them are optional. Plugins written with the first specification will continue to work without changes.</div>
+<div class="p2">&nbsp;</div>
+<div class="p13"><span class="s10">-  </span>A new flag PK_CAPS_SEARCHTEXT can be returned by <A HREF="getpackercaps.htm">GetPackerCaps</A> to allow searching for text with this plugin. Nothing else needs to be changed to support text searches.</div>
+<div class="p13"><span class="s10">-  </span>The new function <A HREF="canyouhandlethisfile.htm">CanYouHandleThisFile</A> can be implemented to support archives with different extensions than the default extension, e.g. self-extracting archives. Total Commander calls this function when PK_CAPS_BY_CONTENT is returned by <A HREF="getpackercaps.htm">GetPackerCaps</A>. Use this option with care with large plugins! If it isn't specified, your plugin will only be loaded for that specific file type, otherwise for all file types.</div>
+<div class="p13"><span class="s10">-  </span>Functions to pack in memory. These are used to create TAR.Plugin archives in one operation, e.g. tar.bz2. Most plugins will not need to support them.</div>
+<div class="p23">&nbsp;</div>
+<div class="p13">
+</div>
+</BODY></HTML>

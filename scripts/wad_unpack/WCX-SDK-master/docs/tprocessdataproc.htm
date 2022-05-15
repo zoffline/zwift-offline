@@ -1,0 +1,29 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>tProcessDataProc</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>tProcessDataProc</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">tProcessDataProc is a typedef of the function that notifies the user about the progress when un/packing files.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef int (__stdcall *tProcessDataProc)(char *FileName, int Size);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><A HREF="setprocessdataproc.htm">SetProcessDataProc</A> has provided you with a pointer to a function with this declaration. When you want to notify the user about the progress when un/packing files, call this function with appropriate parameters. The function itself is part of Totalcmd - you only specify what Totalcmd should display. In addition, Totalcmd displays the Cancel button that allows the user to abort the un/packing process. If the user has clicked on Cancel, the function returns zero.</div>
+<div class="p2"><I>FileName</I> can be used to pass a pointer to the currently processed filename (0 terminated string), or NULL if it is not available.</div>
+<div class="p2">Set <I>Size</I> to the number of bytes processed since the previous call to the function. For plugins which unpack in CloseArchive: Set size to negative percent value (-1..-100) to directly set first percent bar, -1000..-1100 for second percent bar (-1000=0%).</div>
+<div class="p2"><B>Note</B></div>
+<div class="p2">The keyword or constant __stdcall must be set according to the compiler that you will use to make the library. For example, this is STDCALL for cygwin and __stdcall for MSC.
+
+</div>
+</BODY></HTML>

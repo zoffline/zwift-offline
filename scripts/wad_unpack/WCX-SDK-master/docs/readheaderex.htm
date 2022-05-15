@@ -1,0 +1,27 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>ReadHeaderEx</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>ReadHeaderEx</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Totalcmd calls ReadHeaderEx to find out what files are in the archive. This function is always called instead of <A HREF="readheader.htm">ReadHeader</A> if it is present. It only needs to be implemented if the supported archive type may contain files &gt;2 GB. You should implement both ReadHeader and ReadHeaderEx in this case, for compatibility with older versions of Total Commander.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall ReadHeaderEx (HANDLE hArcData, <A HREF="theaderdataex.htm">tHeaderDataEx</A><span class="s6"> *HeaderDataEx);</span></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ReadHeaderEx is called as long as it returns zero (as long as the previous call to this function returned zero). Each time it is called, <I>HeaderDataEx</I> is supposed to provide Totalcmd with information about the next file contained in the archive. When all files in the archive have been returned, ReadHeaderEx should return E_END_ARCHIVE which will prevent ReaderHeaderEx from being called again. If an error occurs, ReadHeaderEx should return one of the <A HREF="error_codes.htm">error values</A> or 0 for no error.</div>
+<div class="p2"><I>hArcData</I> contains the handle returned by <A HREF="openarchive.htm">OpenArchive</A>. The programmer is encouraged to store other information in the location that can be accessed via this handle. For example, you may want to store the position in the archive when returning files information in ReadHeaderEx.</div>
+<div class="p2">In short, you are supposed to set at least PackSize, PackSizeHigh, UnpSize, UnpSizeHigh, FileTime, and FileName members of tHeaderDataEx. Totalcmd will use this information to display content of the archive when the archive is viewed as a directory.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

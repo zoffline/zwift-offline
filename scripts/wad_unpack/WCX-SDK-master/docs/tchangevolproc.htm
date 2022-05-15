@@ -1,0 +1,32 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>tChangeVolProc</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>tChangeVolProc</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">tChangeVolProc is a typedef of the function that asks the user to change volume.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">typedef int (__stdcall *tChangeVolProc)(char *ArcName, int Mode);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><A HREF="setchangevolproc.htm">SetChangeVolProc</A> has provided you with a pointer to a function with this declaration. When you want the user to be asked about changing volume, call this function with appropriate parameters. The function itself is part of Totalcmd - you only specify the question. Totalcmd then asks the user, and you get the answer as the result of the call to this function. If the user has aborted the operation, the function returns zero.</div>
+<div class="p2"><I>ArcName</I> specifies the filename of the archive that you are processing, and will receive the name of the next volume.</div>
+<div class="p2">Set <I>Mode</I> to one of the following values, according to what you want Totalcmd to ask the user:</div>
+<div class="p19"><span class="s16"><B>Constant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value  </span>Description</B></div>
+<div class="p19"><span class="s16">PK_VOL_ASK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0  </span>Ask user for location of next volume</div>
+<div class="p19"><span class="s16">PK_VOL_NOTIFY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1  </span>Notify app that next volume will be unpacked</div>
+<div class="p2"><B>Note:</B></div>
+<div class="p2">The keyword or constant __stdcall must be set according to the compiler that you will use to make the library. For example, this is STDCALL for cygwin and __stdcall for MSC.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

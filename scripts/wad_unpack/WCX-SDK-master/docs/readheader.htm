@@ -1,0 +1,27 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>ReadHeader</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>ReadHeader</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Totalcmd calls ReadHeader to find out what files are in the archive.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall ReadHeader (HANDLE hArcData, <A HREF="theaderdata.htm">tHeaderData</A><span class="s6"> *HeaderData);</span></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ReadHeader is called as long as it returns zero (as long as the previous call to this function returned zero). Each time it is called, <I>HeaderData</I> is supposed to provide Totalcmd with information about the next file contained in the archive. When all files in the archive have been returned, ReadHeader should return E_END_ARCHIVE which will prevent ReaderHeader from being called again. If an error occurs, ReadHeader should return one of the <A HREF="error_codes.htm">error values</A> or 0 for no error.</div>
+<div class="p2"><I>hArcData</I> contains the handle returned by <A HREF="openarchive.htm">OpenArchive</A>. The programmer is encouraged to store other information in the location that can be accessed via this handle. For example, you may want to store the position in the archive when returning files information in ReadHeader.</div>
+<div class="p2">In short, you are supposed to set at least PackSize, UnpSize, FileTime, and FileName members of tHeaderData. Totalcmd will use this information to display content of the archive when the archive is viewed as a directory.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

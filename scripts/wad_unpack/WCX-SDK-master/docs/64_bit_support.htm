@@ -1,0 +1,70 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>64-bit Support</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>64-bit support</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">With Total Commander 8, Total Commander is now also available in 64-bit. Since plugins are simple dlls, and 64-bit programs can only load 64-bit dlls, a plugin needs to be re-compiled with a 64-bit compiler to work with 64-bit Total Commander.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>IMPORTANT:</B> A 64-bit plugin must have the same name as the 32-bit plugin and be in the same directory, but '64' must be appended to the extension. Example: filesystem.wcx -&gt; filesystem.wcx64. 64-bit-only plugins must also end with '64'.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Since all 64-bit Windows versions support Unicode, it's sufficient to write a 64-bit Unicode-only plugin. However, if your existing 32-bit plugin only supports ANSI functions, you can port it without modifications to 64 bit. Total Commander 64-bit also supports the ANSI functions if it cannot find the Unicode functions. 64-bit Unicode plugins do not have an extension starting with 'u', they have the normal 'wcx64' extension.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Some porting notes:</B></div>
+<div class="p2">All integer parameters in plugin functions remain 32-bit (e.g. in C: int, long, DWORD; Delphi: integer, dword), only pointers and handles are 64-bit wide now. Recompiling a program or dll with a 64-bit compiler usually takes care of this automatically without needing many changes. Problems can arise when converting pointers to integer or vice versa. Make sure to use 64-bit integer variables (e.g. size_t in C, ptrint or ptruint in Lazarus) for such operations.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>What's the easiest way to convert an existing plugin to 64-bit?</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>1. If the plugin was written in C or C++:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">If you have Visual Studio Professional 2005 or later, a 64-bit compiler is already included. If you use the free Express version or Visual Studio 2003, <B>you need to install the Windows Software Development Kit (SDK) </B>in addition to Visual Studio Express.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Here is how to add 64-bit support to an existing plugin:</div>
+<div class="p2">1. Check the toolbars in Visual Studio: There are comboboxes for the compile type (Debug or Release), and one which shows "Win32".</div>
+<div class="p2">2. Open the one showing "Win32", and click on the "Configuration manager".</div>
+<div class="p2">3. Click on "New" in the Active Solution Platform list (right side). A new dialog box "New Solution Platform" will be shown.</div>
+<div class="p2">4. In the upper field, choose "x64"</div>
+<div class="p2">5. In the lower field, "copy from", choose "Win32"</div>
+<div class="p2">6. Make sure the checkbox "Create new project platform" is on</div>
+<div class="p2">7. Click OK</div>
+<div class="p2">See also: http://msdn.microsoft.com/en-us/library/9yb4317s.aspx</div>
+<div class="p2">8. Now you can switch in the same project between Win32 and x64. Switch to x64.</div>
+<div class="p2">9. Open the settings of your project.</div>
+<div class="p2">10. You should set the following options:</div>
+<div class="p2">&nbsp;&nbsp;&nbsp;&nbsp; C++ - Code generation - runtime library: Multi-threaded-Debug (/Mtd) &lt;- not multithreaded debug dll !</div>
+<div class="p2">&nbsp;&nbsp;&nbsp;&nbsp; Linker - General - output file: wcx/pluginname.wcx64</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Download links:</B></div>
+<div class="p2">1. Visual Studio Express C++ edition:</div>
+<div class="p2">http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express</div>
+<div class="p2">2. Windows Software Development Kit (SDK):</div>
+<div class="p2">http://msdn.microsoft.com/en-us/windows/bb980924.aspx</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>2. If the plugin was written in Delphi or Free Pascal:</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">There is a 64-bit Lazarus/Free Pascal available, which can be used to create 64-bit dlls. Total Commander itself was compiled with Lazarus as a 64-bit application. There are menu items in the "Tools" menu to convert Delphi projects and forms to Lazarus.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2">Lazarus/Free Pascal works a bit differently from Delphi, so some functions may need to be changed. Here are the problems encountered when porting Total Commander:</div>
+<div class="p2">1. Free pascal is different -&gt; Use {$MODE Delphi} in all *.pas files to handle functions the Delphi way</div>
+<div class="p2">2. strnew creates a NIL pointer when the passed pchar is 0 bytes long. -&gt; Use your own strnew function.</div>
+<div class="p2">3. Windows messages below WM_USER are not passed to the windows procedure. -&gt; Use SetWindowLongPtr to subclass the window</div>
+<div class="p2">4. The calculation&nbsp; p-buffer&nbsp; is not working when p is a pwidechar, buffer an array of widechar -&gt; use p-pwidechar(@bufffer)</div>
+<div class="p2">5. INVALID_HANDLE_VALUE is incorrectly set to 0 instead of -1 in lcltype.pp! -&gt; Put "windows" at end of "uses" command.</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Download links:</B></div>
+<div class="p2">You should download and install the 64-bit daily snapshot from</div>
+<div class="p2">http://www.lazarus.freepascal.org/</div>
+<div class="p2">Click on "Daily snapshots", then on e.g. Lazarus + fpc 2.4.4&nbsp;&nbsp;&nbsp;&nbsp; <B>win64</B></div>
+<div class="p2">The final releases are very outdated, so the snapshots usually work much better.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

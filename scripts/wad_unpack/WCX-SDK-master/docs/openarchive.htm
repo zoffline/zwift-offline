@@ -1,0 +1,26 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>OpenArchive</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>OpenArchive</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">OpenArchive should perform all necessary operations when an archive is to be opened.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">HANDLE __stdcall OpenArchive (<A HREF="topenarchivedata.htm">tOpenArchiveData</A><span class="s6"> *ArchiveData);</span></div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">OpenArchive should return a unique handle representing the archive. The handle should remain valid until <A HREF="closearchive.htm">CloseArchive</A> is called. If an <A HREF="error_codes.htm">error</A> occurs, you should return zero, and specify the <A HREF="error_codes.htm">error</A> by setting OpenResult member of ArchiveData.</div>
+<div class="p2">You can use the ArchiveData to query information about the archive being open, and store the information in ArchiveData to some location that can be accessed via the handle.</div>
+<div class="p2">
+</div>
+</BODY></HTML>

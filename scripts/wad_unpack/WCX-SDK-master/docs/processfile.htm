@@ -1,0 +1,33 @@
+<HTML><HEAD>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	
+	<TITLE>ProcessFile</TITLE>
+	
+	<META NAME="AUTHOR" CONTENT="Copyright ©2000-2019 by Christian Ghisler">
+	<META NAME="GENERATOR" CONTENT="HelpScribble 7.8.0">
+<link href="ie.css" type="text/css" rel="stylesheet">
+<!--[if gte IE 5]>
+<style type="text/css">@import url(ie5+.css);</style>
+<![endif]-->
+</HEAD>
+<BODY>
+<div class="p1"><B>ProcessFile</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ProcessFile should unpack the specified file or test the integrity of the archive.</div>
+<div class="p3">&nbsp;</div>
+<div class="p3">int __stdcall ProcessFile (HANDLE hArcData, int Operation, char *DestPath, char *DestName);</div>
+<div class="p2">&nbsp;</div>
+<div class="p2"><B>Description</B></div>
+<div class="p2">&nbsp;</div>
+<div class="p2">ProcessFile should return zero on success, or one of the <A HREF="error_codes.htm">error values</A> otherwise.</div>
+<div class="p2"><I>hArcData</I> contains the handle previously returned by you in <A HREF="openarchive.htm">OpenArchive</A>. Using this, you should be able to find out information (such as the archive filename) that you need for extracting files from the archive.</div>
+<div class="p2">Unlike <A HREF="packfiles.htm">PackFiles</A>, ProcessFile is passed only one filename. Either <I>DestName</I> contains the full path and file name and <I>DestPath</I> is NULL, or <I>DestName</I> contains only the file name and <I>DestPath</I> the file path. This is done for compatibility with unrar.dll.</div>
+<div class="p2">When Total Commander first opens an archive, it scans all file names with OpenMode==PK_OM_LIST, so ReadHeader() is called in a loop with calling ProcessFile(...,PK_SKIP,...). When the user has selected some files and started to decompress them, Total Commander again calls ReadHeader() in a loop. For each file which is to be extracted, Total Commander calls ProcessFile() with Operation==PK_EXTRACT immediately after the ReadHeader() call for this file. If the file needs to be skipped, it calls it with Operation==PK_SKIP.</div>
+<div class="p2">Each time <I>DestName</I> is set to contain the filename to be extracted, tested, or skipped. To find out what operation out of these last three you should apply to the current file within the archive, <I>Operation</I> is set to one of the following:</div>
+<div class="p15"><span class="s12"><B>Constant  </span><span class="s13">Value  </span>Description</B></div>
+<div class="p15"><span class="s12">PK_SKIP  </span><span class="s13">0  </span>Skip this file</div>
+<div class="p15"><span class="s12">PK_TEST  </span><span class="s13">1  </span>Test file integrity</div>
+<div class="p15"><span class="s12">PK_EXTRACT  </span><span class="s13">2  </span>Extract to disk</div>
+<div class="p2">
+</div>
+</BODY></HTML>
