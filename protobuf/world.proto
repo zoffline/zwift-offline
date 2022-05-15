@@ -1,43 +1,43 @@
 syntax = "proto2";
-message World {
-	required uint32 id = 1;
-	required string name = 2;
-	required uint32 f3 = 3;
-	/* missing 4 */
-	required uint64 f5 = 5;
-	required uint64 world_time = 6;
-	required uint64 real_time = 7;
-	repeated Player player_states = 8;
-	repeated Player pace_partner_states = 12;
+import "profile.proto"; //enums PlayerType and Sport
+
+message DropInWorld {
+	required uint64 id = 1;
+	optional string name = 2;
+	optional uint64 course_id = 3;
+	optional bool f4 = 4;
+	optional uint64 zwifters = 5;
+	optional uint64 world_time = 6;
+	optional uint64 real_time = 7;
+	repeated DropInPlayer pro_players = 8;
+	repeated DropInPlayer followees = 9;
+	repeated DropInPlayer others = 10;
+	optional uint64 max_zwifters = 11; //stored as int32
+	repeated DropInPlayer pacer_bots = 12;
 }
 
-message Worlds {
-	repeated World worlds = 1;
+message DropInWorldList {
+	repeated DropInWorld worlds = 1;
 }
 
-message WorldAttributes {
-	/* repeated RiderAttributes riders = 1; */
-	required int64 world_time = 2;
-}
-
-message Player {
-	required uint32 id = 1;
+message DropInPlayer {
+	required uint64 id = 1;
 	required string firstName = 2;
 	required string lastName = 3;
-	optional uint32 distance = 4;
-	optional uint32 time = 5;
-	optional uint32 f6 = 6;
-	optional uint32 f7 = 7;
-	optional uint32 f8 = 8;
-	optional uint32 f9 = 9;
-	optional uint32 f10 = 10;
-	optional uint32 f11 = 11;
-	optional uint32 power = 12;
-	optional uint32 f13 = 13;
+	optional uint64 distance = 4;
+	optional uint64 time = 5;
+	optional uint64 country_code = 6;
+	optional PlayerType player_type = 7;
+	optional Sport sport = 8;
+	optional bool f9 = 9; 
+	optional bool f10 = 10;
+	optional uint64 f11 = 11;
+	optional uint64 power = 12;
+	optional uint64 f13 = 13;
 	optional float x = 14;
-	optional float altitude = 15;
-	optional float y = 16;
-	optional uint64 route = 17;
-	optional uint32 f18 = 18;
-	optional uint32 f19 = 19;
+	optional float y_altitude = 15;
+	optional float z = 16;
+	optional int32 route = 17;
+	optional uint32 ride_power = 18;
+	optional uint32 speed = 19;
 }

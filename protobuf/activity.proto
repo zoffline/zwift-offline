@@ -1,34 +1,200 @@
 syntax = "proto2";
-message Activity {
+import "profile.proto"; //enum ActivityPrivacyType, Sport
+//All decompiled. TODO: uncomment all new fields and use in algo
+enum NotableMomentTypeZCA {
+	NMTC_ACHIEVEMENT_UNLOCKED = 1;
+	NMTC_UNLOCKED_ITEM = 2;
+	NMTC_MISSION_COMPLETED = 3;
+	NMTC_FINISHED_CHALLENGE = 4;
+	NMTC_TOOK_ARCH_JERSEY = 5;
+	NMTC_NEW_PR = 6;
+	NMTC_MET_DAILY_TARGET = 7;
+	NMTC_GAINED_LEVEL = 8;
+	NMTC_COMPLETED_GOAL = 9;
+	NMTC_FINISHED_EVENT = 10;
+	NMTC_FINISHED_WORKOUT = 11;
+	NMTC_RIDE_ON = 12;
+	NMTC_TRAINING_PLAN_COMPLETED = 13;
+}
+enum NotableMomentTypeZG_idx {
+	NMTI_UNKNOWN = 0;
+	NMTI_NEW_PR = 1;
+	NMTI_GAINED_LEVEL = 2;
+	NMTI_TRAINING_PLAN_COMPLETE = 3;
+	NMTI_UNLOCKED_ITEM = 4;
+	NMTI_ACHIEVEMENT_UNLOCKED = 5;
+	NMTI_MISSION_COMPLETED = 6;
+	NMTI_COMPLETED_GOAL = 7;
+	NMTI_MET_DAILY_TARGET = 8;
+	NMTI_TOOK_ARCH_JERSEY = 9;
+	NMTI_FINISHED_CHALLENGE = 10;
+	NMTI_FINISHED_EVENT = 11;
+	NMTI_FINISHED_WORKOUT = 12;
+	NMTI_ACTIVITY_BESTS = 13;
+	NMTI_RIDEON = 14;
+	NMTI_RIDEON_INT = 15; //international
+	NMTI_QUIT_EVENT = 16;
+	NMTI_USED_POWERUP = 17;
+	NMTI_PASSED_TIMING_ARCH = 18;
+	NMTI_CREATED_GOAL = 19;
+	NMTI_JOINED_EVENT = 20;
+	NMTI_STARTED_WORKOUT = 21;
+	NMTI_STARTED_MISSION = 22;
+	NMTI_HOLIDAY_EVENT_COMPLETE = 23;
+}
+enum NotableMomentTypeZG {
+	NMT_NEW_PR = 0;
+	NMT_GAINED_LEVEL = 5;
+	NMT_TRAINING_PLAN_COMPLETE = 19;
+	NMT_UNLOCKED_ITEM = 4;
+	NMT_ACHIEVEMENT_UNLOCKED = 2;
+	NMT_MISSION_COMPLETED = 3;
+	NMT_COMPLETED_GOAL = 10;
+	NMT_MET_DAILY_TARGET = 1;
+	NMT_TOOK_ARCH_JERSEY = 8;
+	NMT_FINISHED_CHALLENGE = 17;
+	NMT_FINISHED_EVENT = 13;
+	NMT_FINISHED_WORKOUT = 15;
+	NMT_ACTIVITY_BESTS = 20;
+	NMT_RIDEON = 18;
+	NMT_RIDEON_INT = 22; //international
+	NMT_QUIT_EVENT = 12;
+	NMT_USED_POWERUP = 6;
+	NMT_PASSED_TIMING_ARCH = 7;
+	NMT_CREATED_GOAL = 9;
+	NMT_JOINED_EVENT = 11;
+	NMT_STARTED_WORKOUT = 14;
+	NMT_STARTED_MISSION = 16;
+	NMT_HOLIDAY_EVENT_COMPLETE = 21;
+}
+message NotableMoment { //.2,.3,.4 meanings inside last_activity.bin - not type, priority, incidentTime (i.e. 1595, 8, 9)
+	optional uint64 activity_id = 1;
+	optional NotableMomentTypeZG type = 2;
+	optional uint32 priority = 3;
+	optional uint64 incidentTime = 4;
+	optional string aux1 = 5; // examples: {"achievementId":35,"name":"PAIRED","description":"Paired a phone through Zwift Companion"}
+	                          //           {"segmentName":"Marina Sprint","jerseyHash":"0x997d9df7","durationInMS":30524} (from last_activity.bin)
+	optional string aux2 = 6; // empty string
+	optional string largeImageUrl = 7;
+}
+
+message SocialInteraction {
+	optional uint64 player_id = 1;
+	optional uint32 timeDuration = 2;
+	optional float proximityTimeScore = 3;
+	optional string si_f4 = 4;
+}
+
+message ClubAttribution {
+	optional string name = 1;
+	optional float value = 2;
+}
+
+enum ProfileFollowStatus {
+	PFS_UNKNOWN = 1;
+	PFS_REQUESTS_TO_FOLLOW = 2;
+	PFS_IS_FOLLOWING = 3;
+	PFS_IS_BLOCKED = 4;
+	PFS_NO_RELATIONSHIP = 5;
+	PFS_SELF = 6;
+	PFS_HAS_BEEN_DECLINED = 7;
+}
+enum FitnessPrivacy {
+	UNSET = 0;
+	HIDE_SENSITIVE_DATA = 1;
+	SAME_AS_ACTIVITY = 2;
+}
+
+message ActivityFull {  //where is primaryImageUrl, feedImageThumbnailUrl, activityRideOnCount, activityCommentCount, eventId, rideOnGiven
 	optional uint64 id = 1;
 	required uint64 player_id = 2;
-	required uint32 f3 = 3; /* world_id or player_type_id */
+	required uint64 course_id = 3;
 	required string name = 4;
-	optional uint32 f5 = 5;
-
-	optional uint32 f6 = 6;
+	optional string f5 = 5;
+	optional bool privateActivity = 6;
 	required string start_date = 7;
 	optional string end_date = 8;
-	optional float distance = 9; /* in meters */
+	optional float distanceInMeters = 9;
 	optional float avg_heart_rate = 10;
 	optional float max_heart_rate = 11;
 	optional float avg_watts = 12;
 	optional float max_watts = 13;
 	optional float avg_cadence = 14;
 	optional float max_cadence = 15;
-	optional float avg_speed = 16; /* in m/s */
-	optional float max_speed = 17; /* in m/s */
+	optional float avg_speed = 16; // in m/s
+	optional float max_speed = 17; // in m/s
 	optional float calories = 18;
 	optional float total_elevation = 19;
-	optional uint64 strava_upload_id = 20;
-	optional uint64 strava_activity_id = 21;
-	optional uint32 f23 = 23;
+	optional uint32 strava_upload_id = 20; //uint64 stored as int32
+	optional uint32 strava_activity_id = 21; //uint64 stored as int32
+	optional string f22 = 22;
+	optional uint32 f23 = 23; //empty; stored as int32; enum up to 5 - ProfileFollowStatus?
 	optional bytes fit = 24;
 	optional string fit_filename = 25;
-	optional uint32 f29 = 29;
+	optional uint64 subgroupId = 26;
+	optional uint64 workoutHash = 27;
+	optional float progressPercentage = 28;
+	optional Sport sport = 29;
+	repeated string act_f30 = 30;
 	optional string date = 31;
+	optional float act_f32 = 32;
+	optional string act_f33 = 33;
+	optional string act_f34 = 34;
+	repeated NotableMoment notables = 35;
+	repeated SocialInteraction socials = 36;
+	optional ActivityPrivacyType privacy = 37;
+	optional FitnessPrivacy fitness_privacy = 38;
+	optional string club_name = 39;
+	optional int64 movingTimeInMs = 40;
+	repeated ClubAttribution cas = 41;
+}
+message Activity { //field names pinned to db 
+	optional uint64 id = 1;
+	required uint64 player_id = 2;
+	required uint64 f3 = 3; //-> rename to course_id
+	required string name = 4;
+	optional string f5 = 5;
+	optional bool f6 = 6;
+	required string start_date = 7;
+	optional string end_date = 8;
+	optional float distance = 9; // in meters
+	optional float avg_heart_rate = 10;
+	optional float max_heart_rate = 11;
+	optional float avg_watts = 12;
+	optional float max_watts = 13;
+	optional float avg_cadence = 14;
+	optional float max_cadence = 15;
+	optional float avg_speed = 16; // in m/s
+	optional float max_speed = 17; // in m/s
+	optional float calories = 18;
+	optional float total_elevation = 19;
+	optional uint32 strava_upload_id = 20; //uint64 stored as int32
+	optional uint32 strava_activity_id = 21; //uint64 stored as int32
+	//optional string f22 = 22;
+	optional uint32 f23 = 23; //empty; stored as int32; enum up to 5 - ProfileFollowStatus?
+	optional bytes fit = 24;
+	optional string fit_filename = 25;
+	//optional uint64 subgroupId = 26;
+	//optional uint64 workoutHash = 27;
+	//optional float progressPercentage = 28;
+	optional int64 f29 = 29; //-> Sport sport
+	//repeated string act_f30 = 30;
+	optional string date = 31;
+	/*optional float act_f32 = 32;
+	optional string act_f33 = 33;
+	optional string act_f34 = 34;
+	repeated NotableMoment notables = 35;
+	repeated SocialInteraction socials = 36;
+	optional ActivityPrivacyType privacy = 37;
+	optional FitnessPrivacy fitness_privacy = 38;
+	optional string club_name = 39;
+	optional int64 moving_time_ms = 40;
+	repeated ClubAttribution cas = 41;*/
 }
 
-message Activities {
+message ActivityList {
 	repeated Activity activities = 1;
+}
+message ActivityListFull {
+	repeated ActivityFull activities = 1;
 }
