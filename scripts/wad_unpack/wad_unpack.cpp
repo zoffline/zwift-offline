@@ -107,7 +107,7 @@ struct WadUnpacker {
                                 return;
                             }
                             if (g_compr_bytes_remain) {
-                                bytesToRead = (g_compr_bytes_remain >> 19) ? 0x80000 : ((g_compr_bytes_remain + 7) & 0xFFFFFFF8);
+                                bytesToRead = (g_compr_bytes_remain >> 19) ? 0x80000 : g_compr_bytes_remain;
                                 g_compr_bytes_remain = (g_compr_bytes_remain >> 19) ? (g_compr_bytes_remain - 0x80000) : 0;
                                 if (bytesToRead != fread_s(pDecompressPtr + 0x80000, bytesToRead, 1, bytesToRead, g_fwad)) {
                                     g_ret = -11;
@@ -638,17 +638,18 @@ extern "C" {
         auto ret = new WadUnpacker(ArchiveData->ArcName, false);
         if (ret->g_ret != 0) {
             delete ret;
+            ArchiveData->OpenResult = E_BAD_ARCHIVE;
             return 0;
         }
         return ret;
     }
     __declspec(dllexport) int __stdcall ReadHeader(HANDLE hArcData, tHeaderData* HeaderData) {
         auto obj = (WadUnpacker*)hArcData;
-        return obj->ReadHeader(HeaderData) ? 0 : E_END_ARCHIVE;
+        return (obj && obj->ReadHeader(HeaderData)) ? 0 : E_END_ARCHIVE;
     }
     __declspec(dllexport) int __stdcall ProcessFile(HANDLE hArcData, int Operation, char* DestPath, char* DestName) {
         auto obj = (WadUnpacker*)hArcData;
-        if (obj->m_curPosition == obj->m_list.cend()) return E_NO_FILES;
+        if (obj == nullptr || obj->m_curPosition == obj->m_list.cend()) return E_NO_FILES;
         if (Operation == PK_EXTRACT) {
             char fullPath[260] = {};
             if (DestPath)
@@ -666,6 +667,7 @@ extern "C" {
                 return E_ECREATE;
             }
             auto pf = obj->m_curPosition->second;
+            //TODO: support slow media and write by chunks with m_wcxProcess call
             if (pf->m_fileLength != fwrite(&pf->m_firstChar, 1, pf->m_fileLength, f)) {
                 fclose(f);
                 obj->m_curPosition++;
@@ -684,8 +686,9 @@ extern "C" {
     __declspec(dllexport) void __stdcall SetChangeVolProc(HANDLE hArcData, tChangeVolProc pChangeVolProc1) {}
     __declspec(dllexport) void __stdcall SetProcessDataProc(HANDLE hArcData, tProcessDataProc pProcessDataProc) {
         auto obj = (WadUnpacker*)hArcData;
-        obj->m_wcxProcess = pProcessDataProc;
+        if (obj) obj->m_wcxProcess = pProcessDataProc;
     }
+    __declspec(dllexport) int __stdcall GetBackgroundFlags() { return BACKGROUND_UNPACK; }
     __declspec(dllexport) int __stdcall GetPackerCaps() { return PK_CAPS_BY_CONTENT | PK_CAPS_SEARCHTEXT; }
     __declspec(dllexport) BOOL __stdcall CanYouHandleThisFile(char* FileName) {
         FILE* f = nullptr;

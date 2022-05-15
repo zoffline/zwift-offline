@@ -3,13 +3,23 @@
   <PropertyGroup>
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WcxDebug|x64'">
     <LocalDebuggerCommandArguments>z:\Zwift\noesis.wad</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>c:\Users\build\Downloads\tmp\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ConsoleDebug|x64'">
+    <LocalDebuggerCommandArguments>c:\Users\build\source\repos\wad_unpack\x64\ConsoleRelease\noesis.wad</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>c:\Users\build\Downloads\tmp\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WcxRelease|x64'">
     <LocalDebuggerCommandArguments>z:\Zwift\noesis.wad</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>c:\Users\build\Downloads\tmp\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ConsoleRelease|x64'">
+    <LocalDebuggerCommandArguments>c:\Users\build\source\repos\wad_unpack\x64\ConsoleRelease\noesis.wad</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>c:\Users\build\Downloads\tmp\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
