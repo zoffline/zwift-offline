@@ -43,6 +43,8 @@ message ClientToServer {
 	required int64 last_update = 10;
 	required int64 f11 = 11;
 	required int64 last_player_update = 12;
+	repeated int64 subsSegments = 15;
+	repeated int64 unsSegments = 16;
 }
 
 message ServerToClient {
@@ -57,6 +59,7 @@ message ServerToClient {
 	optional int64 latency = 17;
 	optional int32 num_msgs = 18;
 	optional int32 msgnum = 19;
+	repeated int64 ackSubsSegm = 30;
 }
 
 message Ghost {

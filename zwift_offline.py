@@ -1771,8 +1771,9 @@ def handle_segment_results(request):
     if request.method == 'POST':
         if not request.stream:
             return '', 400
+        data = request.stream.read()
         result = segment_result_pb2.SegmentResult()
-        result.ParseFromString(request.stream.read())
+        result.ParseFromString(data)
         if result.segment_id == 1:
             return '', 400
         result.id = get_id('segment_result')
@@ -1780,6 +1781,26 @@ def handle_segment_results(request):
         result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
         result.f20 = 0
         insert_protobuf_into_db('segment_result', result)
+
+        # Previously done in /relay/worlds/attributes
+        player_update = udp_node_msgs_pb2.PlayerUpdate()
+        player_update.f2 = 1
+        player_update.type = 105
+        player_update.payload = data
+        player_update.world_time1 = world_time()
+        player_update.world_time2 = world_time() + 60000
+        player_update.f14 = int(get_utc_time() * 1000000)
+        sending_player_id = result.player_id
+        if sending_player_id in online:
+            sending_player = online[sending_player_id]
+            for receiving_player_id in online.keys():
+                if receiving_player_id != sending_player_id:
+                    receiving_player = online[receiving_player_id]
+                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
+                        if not receiving_player_id in player_update_queue:
+                            player_update_queue[receiving_player_id] = list()
+                        player_update_queue[receiving_player_id].append(player_update.SerializeToString())
+
         return '{"id": %ld}' % result.id, 200
 
     # request.method == GET
@@ -1836,6 +1857,25 @@ def live_segment_results_service_leaders():
         GROUP BY s1.player_id, s1.elapsed_ms
         ORDER BY CAST(s1.segment_id AS INTEGER), CAST(s1.elapsed_ms AS INTEGER)
         LIMIT 1000""" % (world_time()-(60*60*1000))))
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+    return results.SerializeToString(), 200
+
+
+@app.route('/live-segment-results-service/leaderboard/<segment_id>', methods=['GET'])
+def live_segment_results_service_leaderboard_segment_id(segment_id):
+    id = int(segment_id) & 0xffffffffffffffff
+    results = segment_result_pb2.SegmentResults()
+    results.world_id = 0
+    results.segment_id = id
+    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+        JOIN (SELECT s.player_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+            FROM segment_result s WHERE segment_id = '%s' AND world_time > '%s' GROUP BY s.player_id) s2
+            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
+        GROUP BY s1.player_id, s1.elapsed_ms
+        ORDER BY CAST(s1.elapsed_ms AS INTEGER)
+        LIMIT 1000""" % (id, (world_time()-(60*60*1000)))))
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'f17', 'f18'])

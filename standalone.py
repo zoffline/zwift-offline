@@ -259,6 +259,8 @@ class CDNHandler(SimpleHTTPRequestHandler):
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
+        if len(self.data) > 3 and self.data[3] != 0:
+            return
         hello = tcp_node_msgs_pb2.TCPHello()
         try:
             hello.ParseFromString(self.data[4:-4])
@@ -316,9 +318,36 @@ class TCPHandler(socketserver.BaseRequestHandler):
         payload = msg.SerializeToString()
 
         last_alive_check = int(zwift_offline.get_utc_time())
+        self.request.settimeout(1) #make recv non-blocking
         while True:
+            self.data = b''
+            try:
+                self.data = self.request.recv(1024)
+                i = 0
+                while i < len(self.data):
+                    size = int.from_bytes(self.data[i:i+2], "big")
+                    packet = self.data[i:i+size+2]
+                    if len(packet) == size + 2 and packet[3] == 1:
+                        subscr = udp_node_msgs_pb2.ClientToServer()
+                        try:
+                            subscr.ParseFromString(packet[4:-4])
+                        except:
+                            pass
+                        if subscr.subsSegments:
+                            msg1 = udp_node_msgs_pb2.ServerToClient()
+                            msg1.f1 = 1
+                            msg1.player_id = subscr.player_id
+                            msg1.world_time = zwift_offline.world_time()
+                            msg1.ackSubsSegm.extend(subscr.subsSegments)
+                            payload1 = msg1.SerializeToString()
+                            self.request.sendall(struct.pack('!h', len(payload1)))
+                            self.request.sendall(payload1)
+                    i += size + 2
+            except:
+                pass #timeout is ok here
+
             #Check every 5 seconds for new updates
-            tcpthreadevent.wait(timeout=5)
+            #tcpthreadevent.wait(timeout=5) # no more, we will use the request timeout now
             try:
                 message = udp_node_msgs_pb2.ServerToClient()
                 message.f1 = 1
