@@ -73,7 +73,7 @@ global_news = {} #player id to dictionary of peer_player_id->worldTime
 start_time = time.time()
 
 def road_id(state):
-    return (state.f20 & 0xff00) >> 8
+    return (state.aux3 & 0xff00) >> 8
 
 def is_forward(state):
     return (state.f19 & 4) != 0

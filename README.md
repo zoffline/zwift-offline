@@ -304,8 +304,7 @@ To enable support for multiple users perform the steps below. zoffline's previou
 
 ### Step 7 [OPTIONAL]: Install Zwift Companion App
 
-* If running from source, download or checkout the [ZCA](https://github.com/zoffline/zwift-offline/tree/zca) branch.
-* Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 <details><summary>Android (non-rooted device)</summary>
 
