@@ -94,10 +94,10 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 <details><summary>Windows Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.100757, you're all set.
+  * If your Zwift version is 1.0.100966, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.100757 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-  * If your Zwift version is newer than 1.0.100757 and zoffline is not running from source: wait for zoffline to be updated.
+  * If your Zwift version is newer than 1.0.100966 and zoffline is running from source: copy ``C:\Program Files (x86)\Zwift\Zwift_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.100966 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
@@ -123,9 +123,9 @@ to generate your own certificates and do the same.
 <details><summary>Mac OS X Instructions</summary>
 
 * Install Zwift
-  * If your Zwift version is 1.0.100757, you're all set.
+  * If your Zwift version is 1.0.100966, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
-  * If your Zwift version is newer than 1.0.100757: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
+  * If your Zwift version is newer than 1.0.100966: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
   * ``ssl/cert-zwift-com.p12``
   * ``ssl/cert-zwift-com.pem``
@@ -178,7 +178,7 @@ to generate your own certificates and do the same.
   * Run `Host Changer`, select created `hosts.txt` file and press the button
   * Optionally, instead of using the "Host Changer" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
     * If running from source, install the required module with ``pip3 install dnspython``
-  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app.
+  * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
 * Patch after every installation or update:
   * Install/update Zwift from Google play, but do not start it yet.
     * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
@@ -215,7 +215,7 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
     * ``adb push hosts /etc/hosts``
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of modifying your ``hosts`` file.
 * Start Zwift and sign in using any email/password
-  * If multiplayer is enabled, access https://secure.zwift.com/signup/ to sign up and import your files.
+  * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files.
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
@@ -276,14 +276,15 @@ To obtain your current profile:
   * e.g., on Linux/Mac: ``pip3 install garmin-uploader cryptography``
   * e.g., on Windows in command prompt: ``pip install garmin-uploader cryptography``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
-  * You may need to use the cloudscraper branch if upload fails: ``pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
+  * You may need to use the cloudscraper branch if upload fails: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
+  * If cloudscraper doesn't work you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
 * Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
-  * If multiplayer is enabled, use the profile button in the launcher window to encrypt the credentials file.
+  * If multiplayer is enabled, use the Garmin button in the launcher window to encrypt the credentials file.
 
 </details>
 
@@ -296,14 +297,15 @@ To enable support for multiple users perform the steps below. zoffline's previou
 * Create a ``multiplayer.txt`` file in the ``storage`` directory.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
   * TCP ports 80, 443, 3023 and UDP port 3022 will need to be open on the PC running zoffline if its running remotely.
-* Start Zwift and create an account in the new Zwift launcher and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
+* Start Zwift and create an account in the new Zwift launcher (desktop solution only, for Android go to `https://<zoffline ip>/signup/`, in-app registration does not work yet) and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
 </details>
 
 ### Step 7 [OPTIONAL]: Install Zwift Companion App
 
-Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
+* If running from source, download or checkout the [ZCA](https://github.com/zoffline/zwift-offline/tree/zca) branch.
+* Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 
 <details><summary>Android (non-rooted device)</summary>
 
