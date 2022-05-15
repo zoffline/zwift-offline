@@ -2772,10 +2772,11 @@ def handle_segment_results(request):
 
         # Previously done in /relay/worlds/attributes
         player_update = udp_node_msgs_pb2.WorldAttribute()
+        player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SR
         player_update.payload = data
+        player_update.world_time_born = world_time()
         player_update.world_time_expire = world_time() + 60000
-        player_update.wa_f12 = 1
         player_update.timestamp = int(get_utc_time() * 1000000)
         sending_player_id = result.player_id
         if sending_player_id in online:
