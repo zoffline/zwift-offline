@@ -352,6 +352,12 @@ def get_partial_profile(player_id):
 def get_course(state):
     return (state.f19 & 0xff0000) >> 16
 
+def road_id(state):
+    return (state.aux3 & 0xff00) >> 8
+
+def is_forward(state):
+    return (state.f19 & 4) != 0
+
 
 def is_nearby(player_state1, player_state2, range = 100000):
     if player_state1 is None or player_state2 is None:
@@ -2189,6 +2195,27 @@ def api_private_event_id(event_id):
 @app.route('/api/private_event/entitlement', methods=['GET'])
 def api_private_event_entitlement():
     return jsonify({"entitled": True})
+
+@app.route('/relay/events/subgroups/<int:meetup_id>/late-join', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def relay_events_subgroups_id_late_join(meetup_id):
+    id = meetup_id - 2
+    if id in glb_private_events.keys():
+        event = jsonPrivateEventToProtobuf(glb_private_events[id])
+        leader = event.organizerId
+        if leader in online.keys():
+            state = online[leader]
+            lj = events_pb2.LateJoinInformation()
+            lj.road_id = road_id(state)
+            lj.road_time = state.roadTime / 1005000
+            lj.is_forward = is_forward(state)
+            lj.player_id = leader
+            lj.lj_f5 = 0
+            lj.lj_f6 = 0
+            lj.lj_f7 = 0
+            return lj.SerializeToString(), 200
+    return '', 200
 
 @app.route('/api/profiles/<int:player_id>/campaigns/otm2020', methods=['GET'])
 @app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
