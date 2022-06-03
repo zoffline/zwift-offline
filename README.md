@@ -29,7 +29,6 @@ To install zoffline on Linux, Windows, or Mac OS X:
 
 * Install Python 3 (https://www.python.org/downloads/) if not already installed
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
-  * Python 2 remains supported for now, but it is not recommended.
 * Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, protobuf3_to_dict, stravalib (optional)
   * e.g., on Linux/Mac: ``pip3 install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
   * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib``
@@ -361,7 +360,6 @@ Docker
 
 * Python 3 (https://www.python.org/downloads/)
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
-  * Python 2 remains supported for now, but it is not recommended.
 * Flask (http://flask.pocoo.org/)
   * ``pip3 install flask``
 * python-protobuf (https://pypi.org/project/protobuf/)
