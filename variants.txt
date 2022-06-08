@@ -1,35 +1,16 @@
 {
   "variants": [
     {
+      "name": "game_1_26_ninety_day_prs",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_14_draftlock_fix",
       "values": {}
     },
     {
       "name": "xplatform_partner_connection_vitality",
-      "values": {}
-    },
-    {
-      "name": "pack_dynamics_30_global",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "pack_dynamics_30_makuri",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "pack_dynamics_30_london",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "pack_dynamics_30_watopia",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "pack_dynamics_30_exclude_events",
       "values": {}
     },
     {
@@ -194,11 +175,6 @@
       "values": {}
     },
     {
-      "name": "game_1_25_0_gmplay_2246_cull_inaudible_entity_audio",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_24_display_workout_of_the_week_card",
       "value": true,
       "values": {}
@@ -210,6 +186,7 @@
     },
     {
       "name": "game_1_25_pack_steering_collision_reduction",
+      "value": true,
       "values": {
         "fields": {
           "game_1_25_pack_steering_collision_reduction": {
@@ -219,27 +196,51 @@
       }
     },
     {
+      "name": "game_training_partners",
+      "values": {}
+    },
+    {
+      "name": "game_1_26_sq_null_pointer_guards",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_26_increase_workout_line_spacing_scale",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_upload_route_results",
+      "values": {}
+    },
+    {
       "name": "game_1_25_wdc_error_dialogs",
       "values": {}
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
+      "value": true,
       "values": {
         "fields": {
           "initialDropInTime": {
             "numberValue": 10000.0
           },
-          "extendedDropInTime": {
-            "numberValue": 60000.0
-          },
           "initialDropInFrames": {
             "numberValue": 1000.0
+          },
+          "extendedDropInTime": {
+            "numberValue": 60000.0
           }
         }
       }
     },
     {
       "name": "game_1_25_flat_grade_while_in_ui",
+      "values": {}
+    },
+    {
+      "name": "game_1_26_club_attribution",
+      "value": true,
       "values": {}
     },
     {
@@ -257,11 +258,14 @@
       "values": {}
     },
     {
-      "name": "game_1_25_watchdog_timer",
+      "name": "game_1_26_watchdog_timer",
       "values": {
         "fields": {
           "timeoutInterval": {
             "numberValue": 30.0
+          },
+          "abortEnabled": {
+            "boolValue": false
           }
         }
       }
@@ -284,17 +288,17 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
           },
           "rampUpTime": {
             "numberValue": 10.0
           },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
+          },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
-          },
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
           }
         }
       }
