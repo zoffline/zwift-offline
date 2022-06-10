@@ -1,11 +1,6 @@
 # Script to manipulate zoffline bot files
-# The folder must be a number between 3000000 and 4000000
-# Suggested folder name: 3<course><class><bot>
-# e.g.: 3060301
-#       3 = mandatory
-#        06 = Watopia (from bot_start_lines.csv)
-#          03 = class C (01 = A, 02 = B, ...)
-#            01 = first bot
+#
+# Route ID can be found in Zwift\assets\Worlds\worldX\data_1.wad\Worlds\worldX\routes\routesX.xml (nameHash)
 #
 # To find new start line values, uncomment this line (the values will be printed when you are stopped)
 # https://github.com/zoffline/zwift-offline/blob/d84e82c72086a8994b8b43042b76f70dc1f1e059/standalone.py#L509
@@ -13,7 +8,7 @@
 import os
 import sys
 import csv
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import protobuf.profile_pb2 as profile_pb2
 import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
 
@@ -51,8 +46,14 @@ if file_exists(PROFILE_FILE):
     p = profile_pb2.PlayerProfile()
     with open(PROFILE_FILE, 'rb') as f:
         p.ParseFromString(f.read())
+    p.id = int(input("Player ID: "))
     p.first_name = input("First name: ")
     p.last_name = input("Last name: ")
+    for a in p.public_attributes:
+        #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
+        #TODO: -1021012238: figure out
+        if a.id == 1766985504 or a.id == -1021012238:  #-1021012238 == 3273955058
+            a.number_value = int(input("Route ID: "))
     with open(PROFILE_FILE, 'wb') as f:
         f.write(p.SerializeToString())
 
