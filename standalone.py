@@ -28,18 +28,21 @@ import protobuf.profile_pb2 as profile_pb2
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
-    STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
+    EXE_DIR = os.path.dirname(sys.executable)
+    STORAGE_DIR = "%s/storage" % EXE_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % EXE_DIR
+    BOTS_DIR = '%s/bots' % EXE_DIR
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % SCRIPT_DIR, START_LINES_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
+    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
+    BOTS_DIR = '%s/bots' % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
-PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-BOTS_DIR = '%s/bots' % SCRIPT_DIR
 
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -422,23 +425,24 @@ class GhostsVariables:
     last_package_time = 0
 
 class PacePartnerVariables:
-    route = None
-    position = 0
-
-class BotVariables:
+    profile = None
     route = None
     position = 0
 
 def load_pace_partners():
     if not os.path.isdir(PACE_PARTNERS_DIR): return
     for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
-        for pp_id in dirs:
-            p_id = int(pp_id)
-            route = '%s/%s/route.bin' % (PACE_PARTNERS_DIR, pp_id)
-            if os.path.isfile(route):
+        for d in dirs:
+            profile = os.path.join(PACE_PARTNERS_DIR, d, 'profile.bin')
+            route = os.path.join(PACE_PARTNERS_DIR, d, 'route.bin')
+            if os.path.isfile(profile) and os.path.isfile(route):
+                with open(profile, 'rb') as fd:
+                    p = profile_pb2.PlayerProfile()
+                    p.ParseFromString(fd.read())
+                    global_pace_partners[p.id] = PacePartnerVariables()
+                    pp = global_pace_partners[p.id]
+                    pp.profile = p
                 with open(route, 'rb') as fd:
-                    global_pace_partners[p_id] = PacePartnerVariables()
-                    pp = global_pace_partners[p_id]
                     pp.route = udp_node_msgs_pb2.Ghost()
                     pp.route.ParseFromString(fd.read())
                     pp.position = 0
@@ -458,13 +462,17 @@ def play_pace_partners():
 def load_bots():
     if not os.path.isdir(BOTS_DIR): return
     for (root, dirs, files) in os.walk(BOTS_DIR):
-        for bot_id in dirs:
-            p_id = int(bot_id)
-            route = '%s/%s/route.bin' % (BOTS_DIR, bot_id)
-            if os.path.isfile(route):
+        for d in dirs:
+            profile = os.path.join(BOTS_DIR, d, 'profile.bin')
+            route = os.path.join(BOTS_DIR, d, 'route.bin')
+            if os.path.isfile(profile) and os.path.isfile(route):
+                with open(profile, 'rb') as fd:
+                    p = profile_pb2.PlayerProfile()
+                    p.ParseFromString(fd.read())
+                    global_bots[p.id] = PacePartnerVariables()
+                    bot = global_bots[p.id]
+                    bot.profile = p
                 with open(route, 'rb') as fd:
-                    global_bots[p_id] = BotVariables()
-                    bot = global_bots[p_id]
                     bot.route = udp_node_msgs_pb2.Ghost()
                     bot.route.ParseFromString(fd.read())
                     bot.position = 0

@@ -313,39 +313,39 @@ def toSigned(n, byte_count):
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
         #Read from disk
-        if player_id > 2000000 and player_id < 3000000:
-            profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, player_id)
-        elif player_id > 3000000  and player_id < 4000000:
-            profile_file = '%s/%s/profile.bin' % (BOTS_DIR, player_id)
+        if player_id in global_pace_partners.keys():
+            profile = global_pace_partners[player_id].profile
+        elif player_id in global_bots.keys():
+            profile = global_bots[player_id].profile
         else:
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
-        if os.path.isfile(profile_file):
-            try:
-                with open(profile_file, 'rb') as fd:
-                    profile = profile_pb2.PlayerProfile()
-                    profile.ParseFromString(fd.read())
-                    partial_profile = PartialProfile()
-                    partial_profile.player_id = player_id
-                    partial_profile.imageSrc = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
-                    partial_profile.first_name = profile.first_name
-                    partial_profile.last_name = profile.last_name
-                    partial_profile.country_code = profile.country_code
-                    partial_profile.player_type = profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1))
-                    partial_profile.male = profile.is_male
-                    for f in profile.public_attributes:
-                        #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
-                        #TODO: -1021012238: figure out
-                        if f.id == 1766985504 or f.id == -1021012238:  #-1021012238 == 3273955058
-                            if f.number_value >= 0:
-                                partial_profile.route = toSigned(f.number_value, 4)
-                            else:
-                                partial_profile.route = -toSigned(-f.number_value, 4)
-                            break
-                    player_partial_profiles[player_id] = partial_profile
-            except Exception as exc:
-                logger.warn('get_partial_profile: %s' % repr(exc))
-                return None
-        else: return None
+            if os.path.isfile(profile_file):
+                try:
+                    with open(profile_file, 'rb') as fd:
+                        profile = profile_pb2.PlayerProfile()
+                        profile.ParseFromString(fd.read())
+                except Exception as exc:
+                    logger.warn('get_partial_profile: %s' % repr(exc))
+                    return None
+            else: return None
+        partial_profile = PartialProfile()
+        partial_profile.player_id = player_id
+        partial_profile.imageSrc = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
+        partial_profile.first_name = profile.first_name
+        partial_profile.last_name = profile.last_name
+        partial_profile.country_code = profile.country_code
+        partial_profile.player_type = profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1))
+        partial_profile.male = profile.is_male
+        for f in profile.public_attributes:
+            #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
+            #TODO: -1021012238: figure out
+            if f.id == 1766985504 or f.id == -1021012238:  #-1021012238 == 3273955058
+                if f.number_value >= 0:
+                    partial_profile.route = toSigned(f.number_value, 4)
+                else:
+                    partial_profile.route = -toSigned(-f.number_value, 4)
+                break
+        player_partial_profiles[player_id] = partial_profile
     return player_partial_profiles[player_id]
 
 
@@ -1675,18 +1675,20 @@ def api_profiles():
                         p.run_shirt_type = 3344420794 # shirt 10
                         p.run_shorts_type = 4269451728 # shorts 10
         else:
-            if p_id > 2000000 and p_id < 3000000:
-                profile_file = '%s/%s/profile.bin' % (PACE_PARTNERS_DIR, i)
-            elif p_id > 3000000 and p_id < 4000000:
-                profile_file = '%s/%s/profile.bin' % (BOTS_DIR, i)
+            if p_id in global_pace_partners.keys():
+                profile = global_pace_partners[p_id].profile
+            elif p_id in global_bots.keys():
+                profile = global_bots[p_id].profile
             else:
-                profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, i)
-            if os.path.isfile(profile_file):
-                with open(profile_file, 'rb') as fd:
-                    profile.ParseFromString(fd.read())
-                    profile.id = p_id
-                    p = profiles.profiles.add()
-                    p.CopyFrom(profile)
+                profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, p_id)
+                if os.path.isfile(profile_file):
+                    try:
+                        with open(profile_file, 'rb') as fd:
+                            profile.ParseFromString(fd.read())
+                    except Exception as exc:
+                        logger.warn('api_profiles: %s' % repr(exc))
+            p = profiles.profiles.add()
+            p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
 
