@@ -18,8 +18,6 @@ a = Analysis(['standalone.py'],
              cipher=block_cipher,
              noarchive=False)
 a.datas += Tree('cdn', prefix='cdn')
-a.datas += Tree('pace_partners', prefix='pace_partners')
-a.datas += Tree('bots', prefix='bots')
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
