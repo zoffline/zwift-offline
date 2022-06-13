@@ -259,10 +259,11 @@
     },
     {
       "name": "game_1_26_watchdog_timer",
+      "value": true,
       "values": {
         "fields": {
           "timeoutInterval": {
-            "numberValue": 30.0
+            "numberValue": 60.0
           },
           "abortEnabled": {
             "boolValue": false
