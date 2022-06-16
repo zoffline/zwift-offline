@@ -21,7 +21,7 @@ from functools import wraps
 from io import BytesIO
 from shutil import copyfile
 from logging.handlers import RotatingFileHandler
-from urllib.parse import unquote
+from urllib.parse import unquote, quote
 
 import jwt
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
@@ -1804,7 +1804,6 @@ def runalyze_upload(player_id, activity):
 
 def zwift_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
     zwift_credentials = '%s/zwift_credentials.txt' % profile_dir
     if not os.path.exists(zwift_credentials):
         logger.info("zwift_credentials.txt missing, skip Zwift activity update")
@@ -1832,7 +1831,6 @@ def zwift_upload(player_id, activity):
     try:
         session = requests.session()
         try:
-            activity = activity_pb2.Activity()
             access_token, refresh_token = online_sync.login(session, username, password)
             activity.player_id = online_sync.get_player_id(session, access_token)
             res = online_sync.upload_activity(session, access_token, activity)
@@ -1874,7 +1872,7 @@ def api_profiles_activities_id(player_id, activity_id):
     player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
-            save_ghost(activity.name, player_id)
+            save_ghost(quote(activity.name, safe=' '), player_id)
         except Exception as exc:
             logger.warn('save_ghost: %s' % repr(exc))
             pass
