@@ -21,9 +21,9 @@ else:
     from Cookie import SimpleCookie
 
 import zwift_offline as zo
-import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
-import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
-import protobuf.profile_pb2 as profile_pb2
+import udp_node_msgs_pb2
+import tcp_node_msgs_pb2
+import profile_pb2
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle

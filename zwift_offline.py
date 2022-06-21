@@ -36,19 +36,19 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
-import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
-import protobuf.tcp_node_msgs_pb2 as tcp_node_msgs_pb2
-import protobuf.activity_pb2 as activity_pb2
-import protobuf.goal_pb2 as goal_pb2
-import protobuf.login_response_pb2 as login_response_pb2
-import protobuf.per_session_info_pb2 as per_session_info_pb2
-import protobuf.profile_pb2 as profile_pb2
-import protobuf.segment_result_pb2 as segment_result_pb2
-import protobuf.world_pb2 as world_pb2
-import protobuf.zfiles_pb2 as zfiles_pb2
-import protobuf.hash_seeds_pb2 as hash_seeds_pb2
-import protobuf.events_pb2 as events_pb2
-import protobuf.variants_pb2 as variants_pb2
+import udp_node_msgs_pb2
+import tcp_node_msgs_pb2
+import activity_pb2
+import goal_pb2
+import login_response_pb2
+import per_session_info_pb2
+import profile_pb2
+import segment_result_pb2
+import world_pb2
+import zfiles_pb2
+import hash_seeds_pb2
+import events_pb2
+import variants_pb2
 import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))

@@ -9,8 +9,8 @@ import os
 import sys
 import csv
 sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
-import protobuf.profile_pb2 as profile_pb2
-import protobuf.udp_node_msgs_pb2 as udp_node_msgs_pb2
+import profile_pb2
+import udp_node_msgs_pb2
 
 try:
     input = raw_input

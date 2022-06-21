@@ -27,8 +27,8 @@
 
 import json
 import requests
-import protobuf.activity_pb2 as activity_pb2
-import protobuf.profile_pb2 as profile_pb2
+import activity_pb2
+import profile_pb2
 
 
 def post_credentials(session, username, password):
