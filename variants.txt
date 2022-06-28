@@ -277,10 +277,6 @@
       "values": {}
     },
     {
-      "name": "game_1_20_home_screen",
-      "values": {}
-    },
-    {
       "name": "game_1_14_settings_refactor",
       "value": true,
       "values": {}
