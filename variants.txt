@@ -94,6 +94,7 @@
     },
     {
       "name": "game_1_20_disable_high_volume_send_mixpanel",
+      "value": true,
       "values": {}
     },
     {
@@ -219,7 +220,6 @@
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
-      "value": true,
       "values": {
         "fields": {
           "initialDropInTime": {
