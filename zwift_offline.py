@@ -3138,11 +3138,12 @@ def auth_realms_zwift_tokens_access_codes():
 @login_required
 def experimentation_v1_variant():
     variants = variants_pb2.FeatureResponse()
-    with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
-        Parse(f.read(), variants)
-    v = variants.variants.add()
-    v.name = "game_1_20_home_screen"
-    v.value = current_user.new_home
+    if not b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
+        with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
+            Parse(f.read(), variants)
+        v = variants.variants.add()
+        v.name = "game_1_20_home_screen"
+        v.value = current_user.new_home
     return variants.SerializeToString(), 200
 
 def get_profile_saved_game_achiev2_40_bytes():

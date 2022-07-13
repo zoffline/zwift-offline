@@ -155,6 +155,7 @@
     },
     {
       "name": "game_1_22_ble_device_name_hash_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -198,7 +199,16 @@
     },
     {
       "name": "game_training_partners",
-      "values": {}
+      "values": {
+        "fields": {
+          "recording_enabled": {
+            "boolValue": false
+          },
+          "spawn_enabled": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_1_26_sq_null_pointer_guards",
@@ -211,7 +221,16 @@
       "values": {}
     },
     {
-      "name": "game_upload_route_results",
+      "name": "game_1_27_enable_dynamic_workout_trigger_events",
+      "values": {}
+    },
+    {
+      "name": "game_1_27_add_lineup_to_leave_current_event",
+      "values": {}
+    },
+    {
+      "name": "game_upload_route_results_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -220,6 +239,7 @@
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
+      "value": true,
       "values": {
         "fields": {
           "initialDropInTime": {
@@ -241,6 +261,50 @@
     {
       "name": "game_1_26_club_attribution",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_27_fix_training_plan_summary_no_stats",
+      "values": {}
+    },
+    {
+      "name": "game_1_26_ble_middleware",
+      "values": {}
+    },
+    {
+      "name": "game_1_26_memorable_screenshots",
+      "values": {}
+    },
+    {
+      "name": "game_1_27_atv_remote_gestures",
+      "values": {
+        "fields": {
+          "ATVMoveSensitivity": {},
+          "ATVFriction": {
+            "numberValue": 0.9
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_27_hardware_restriction",
+      "values": {}
+    },
+    {
+      "name": "game_1_27_goal_notable_moment",
+      "values": {}
+    },
+    {
+      "name": "game_1_28_hub_firmware_update",
+      "values": {}
+    },
+    {
+      "name": "game_ftms_spindown_fix",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_27_dynamic_campaigns_filter",
       "values": {}
     },
     {
