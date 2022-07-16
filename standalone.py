@@ -8,9 +8,11 @@ import threading
 import time
 import csv
 import math
+import socket
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
+from Crypto.Cipher import AES
 if sys.version_info[0] > 2:
     import socketserver
     from http.server import SimpleHTTPRequestHandler
@@ -73,6 +75,7 @@ player_update_queue = {}
 global_pace_partners = {}
 global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
+global_relay = {}
 start_time = time.time()
 
 def boolean(s):
@@ -251,23 +254,78 @@ class CDNHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Length', len(resp.content))
         self.end_headers()
 
+class Packet:
+    flags = 0
+    ri = 0
+    ci = 0
+    sn = 0
+    payload = b''
+
+def init_vector(dt, ct, ci, sn):
+    return struct.pack('!h', 0) + struct.pack('!h', dt) + struct.pack('!h', ct) + struct.pack('!h', ci) + struct.pack('!i', sn)
+
+def decode_packet(data, relay):
+    if int.from_bytes(data[0:2], "big") > len(data) - 2:
+        return None
+    p = Packet()
+    s = 3
+    p.flags = data[2]
+    if p.flags & 4:
+        p.ri = int.from_bytes(data[s:s+4], "big")
+        s += 4
+    if p.flags & 2:
+        p.ci = int.from_bytes(data[s:s+2], "big")
+        relay.ci = p.ci
+        s += 2
+    if p.flags & 1:
+        p.sn = int.from_bytes(data[s:s+4], "big")
+        relay.sn = p.sn
+        s += 4
+    iv = init_vector(1, 3, relay.ci, relay.sn)
+    aesgcm = AES.new(relay.key, AES.MODE_GCM, iv)
+    p.payload = aesgcm.decrypt(data[s:])
+    return p
+
+def encode_packet(ri, ci, sn, payload, key, iv):
+    flags = 0
+    header = b''
+    if ri is not None:
+        flags = flags | 4
+        header += struct.pack('!i', ri)
+    if ci is not None:
+        flags = flags | 2
+        header += struct.pack('!h', ci)
+    if sn is not None:
+        flags = flags | 1
+        header += struct.pack('!i', sn)
+    aesgcm = AES.new(key, AES.MODE_GCM, iv)
+    header = struct.pack('b', flags) + header
+    aesgcm.update(header)
+    ep = aesgcm.encrypt(payload)
+    data = header + ep
+    return struct.pack('!h', len(data)) + data
+
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        self.data = self.request.recv(1024)
-        if len(self.data) > 3 and self.data[3] != 0:
-            print("TCPHandler hello(0) expected, got %s" % self.data[3])
+        ip = struct.unpack("!I", socket.inet_aton(self.client_address[0]))[0]
+        if not ip in global_relay.keys():
+            print('No key found')
             return
-        #print("TCPHandler hello: %s" % self.data.hex())
+        self.data = self.request.recv(1024)
+        relay = global_relay[ip]
+        p = decode_packet(self.data, relay)
+        print("TCPHandler hello: %s" % p.payload.hex())
+        if len(p.payload) > 1 and p.payload[1] != 0:
+            print("TCPHandler hello(0) expected, got %s" % p.payload[1])
+            return
         hello = udp_node_msgs_pb2.ClientToServer()
         try:
-            hello.ParseFromString(self.data[4:-4]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
+            hello.ParseFromString(p.payload[2:-8]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
             #type: TcpClient::sayHello(=0x0), TcpClient::sendSubscribeToSegment(=0x1), TcpClient::processSegmentUnsubscription(=0x1)
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
         # send packet containing UDP server (127.0.0.1)
-        # (very little investigation done into this packet while creating
-        #  protobuf structures hence the excessive "details" usage)
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
@@ -303,9 +361,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
         details4.CopyFrom(details2)
         msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
-        # Send size of payload as 2 bytes
-        self.request.sendall(struct.pack('!h', len(payload)))
-        self.request.sendall(payload)
+
+        iv = init_vector(1, 4, relay.ci, relay.sn)
+        r = encode_packet(None, None, None, payload, relay.key, iv)
+        print(relay.key)
+        print(r.hex())
+        self.request.sendall(r)
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
@@ -703,13 +764,13 @@ zoffline_thread.daemon = True
 zoffline_thread.start()
 
 tcpthreadevent = threading.Event()
-tcpserver = socketserver.ThreadingTCPServer(('', 3023), TCPHandler)
+tcpserver = socketserver.ThreadingTCPServer(('', 3025), TCPHandler)
 tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
 tcpserver_thread.start()
 
 socketserver.ThreadingUDPServer.allow_reuse_address = True
-udpserver = socketserver.ThreadingUDPServer(('', 3022), UDPHandler)
+udpserver = socketserver.ThreadingUDPServer(('', 3024), UDPHandler)
 udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
 udpserver_thread.start()
@@ -735,4 +796,4 @@ if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
         dns = threading.Thread(target=fake_dns, args=(server_ip,))
         dns.start()
 
-zo.run_standalone(online, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, player_update_queue, discord)

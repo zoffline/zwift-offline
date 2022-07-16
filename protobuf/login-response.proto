@@ -1,8 +1,0 @@
-syntax = "proto2";
-/* XXX: This is a first approximation of login response. Not looked into or verified. */
-import "per-session-info.proto";
-
-message LoginResponse {
-	required string session_state = 1;
-	required PerSessionInfo info = 2;
-}

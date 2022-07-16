@@ -16,6 +16,8 @@ import re
 import smtplib, ssl
 import requests
 import json
+import socket
+import struct
 from copy import copy, deepcopy
 from functools import wraps
 from io import BytesIO
@@ -40,7 +42,7 @@ import udp_node_msgs_pb2
 import tcp_node_msgs_pb2
 import activity_pb2
 import goal_pb2
-import login_response_pb2
+import login_pb2
 import per_session_info_pb2
 import profile_pb2
 import segment_result_pb2
@@ -207,6 +209,12 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
 
     def is_authenticated(self):
         return True
+
+class Relay:
+    ri = 0
+    ci = 0
+    sn = 0
+    key = b''
 
 class PartialProfile:
     player_id = 0
@@ -1028,8 +1036,13 @@ def api_gameinfo():
 
 @app.route('/api/users/login', methods=['POST'])
 def api_users_login():
-    # Should just return a binary blob rather than build a "proper" response...
-    response = login_response_pb2.LoginResponse()
+    req = login_pb2.LoginRequest()
+    req.ParseFromString(request.stream.read())
+    ip = struct.unpack("!I", socket.inet_aton(request.remote_addr))[0]
+    global_relay[ip] = Relay()
+    global_relay[ip].key = req.key
+
+    response = login_pb2.LoginResponse()
     response.session_state = 'abc'
     response.info.relay_url = "https://us-or-rly101.zwift.com/relay"
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
@@ -1041,7 +1054,18 @@ def api_users_login():
     else:
         udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
+    response.relay_session_id = ip
     return response.SerializeToString(), 200
+
+
+#@app.route('/relay/session/refresh', methods=['POST'])
+#def relay_session_refresh():
+#    print(request.stream.read().hex())
+#    seed = hash_seeds_pb2.HashSeed()
+#    seed.seed1 = 1000
+#    seed.seed2 = 1000
+#    seed.expiryDate = 1000
+#    return seed.SerializeToString(), 200
 
 
 def logout_player(player_id):
@@ -3138,7 +3162,14 @@ def auth_realms_zwift_tokens_access_codes():
 @login_required
 def experimentation_v1_variant():
     variants = variants_pb2.FeatureResponse()
-    if not b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
+    if b'game_1_26_2_data_encryption' in request.stream.read():
+        v1 = variants.variants.add()
+        v1.name = "game_1_26_2_data_encryption"
+        v1.value = True
+        v2 = variants.variants.add()
+        v2.name = "game_1_27_0_disable_encryption_bypass"
+        v2.value = True
+    else:
         with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
             Parse(f.read(), variants)
         v = variants.variants.add()
@@ -3186,8 +3217,9 @@ def achievement_unlock():
     return '', 202
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
+    global global_relay
     global global_pace_partners
     global global_bots
     global global_ghosts
@@ -3197,6 +3229,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     global discord
     global login_manager
     online = passed_online
+    global_relay = passed_global_relay
     global_pace_partners = passed_global_pace_partners
     global_bots = passed_global_bots
     global_ghosts = passed_global_ghosts
