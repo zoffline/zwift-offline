@@ -264,7 +264,7 @@ class Packet:
 def init_vector(dt, ct, ci, sn):
     return struct.pack('!h', 0) + struct.pack('!h', dt) + struct.pack('!h', ct) + struct.pack('!h', ci) + struct.pack('!i', sn)
 
-def decode_packet(data, relay, dt, ct):
+def decode_packet(data, key, iv):
     p = Packet()
     s = 1
     p.flags = data[0]
@@ -273,18 +273,15 @@ def decode_packet(data, relay, dt, ct):
         s += 4
     if p.flags & 2:
         p.ci = int.from_bytes(data[s:s+2], "big")
-        relay.ci = p.ci
         s += 2
     if p.flags & 1:
         p.sn = int.from_bytes(data[s:s+4], "big")
-        relay.sn = p.sn
         s += 4
-    iv = init_vector(dt, ct, relay.ci, relay.sn)
-    aesgcm = AES.new(relay.key, AES.MODE_GCM, iv)
+    aesgcm = AES.new(key, AES.MODE_GCM, iv)
     p.payload = aesgcm.decrypt(data[s:])
     return p
 
-def encode_packet(ri, ci, sn, payload, key, iv):
+def encode_packet(payload, key, iv, ri, ci, sn):
     flags = 0
     header = b''
     if ri is not None:
@@ -309,12 +306,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
             print('No key found')
             return
         self.data = self.request.recv(1024)
+        print("TCPHandler hello: %s" % self.data.hex())
         if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
             print("Wrong packet size")
             return
         relay = global_relay[ip]
-        p = decode_packet(self.data[2:], relay, 1, 3)
-        #print("TCPHandler hello: %s" % p.payload.hex())
+        iv = init_vector(1, 3, relay.tcp_ci, relay.tcp_sn)
+        p = decode_packet(self.data[2:], relay.key, iv)
+        if p.ci is not None:
+            relay.tcp_ci = p.ci
+        if p.sn is not None:
+            relay.tcp_sn = p.sn
+        else:
+            relay.tcp_sn += 1
         if len(p.payload) > 1 and p.payload[1] != 0:
             print("TCPHandler hello(0) expected, got %s" % p.payload[1])
             return
@@ -362,8 +366,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
 
-        iv = init_vector(1, 4, relay.ci, relay.sn)
-        r = encode_packet(None, None, None, payload, relay.key, iv)
+        iv = init_vector(1, 4, relay.tcp_ci, relay.tcp_sn)
+        r = encode_packet(payload, relay.key, iv, None, None, None)
+        relay.tcp_sn += 1
         #print(relay.key)
         #print(r.hex())
         self.request.sendall(struct.pack('!h', len(r)) + r)
@@ -387,11 +392,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 while i < len(self.data):
                     size = int.from_bytes(self.data[i:i+2], "big")
                     packet = self.data[i:i+size+2]
-                    #print(packet.hex())
-                    if len(packet) == size + 2 and packet[3] == 1:
+                    #print("TCPHandler: %s" % packet.hex())
+                    iv = init_vector(1, 3, relay.tcp_ci, relay.tcp_sn)
+                    p = decode_packet(packet[2:], relay.key, iv)
+                    if p.ci is not None:
+                        relay.tcp_ci = p.ci
+                    if p.sn is not None:
+                        relay.tcp_sn = p.sn
+                    else:
+                        relay.tcp_sn += 1
+                    #print("TCPHandler: %s" % p.hex())
+                    if len(p.payload) > 1 and p.payload[1] == 1:
                         subscr = udp_node_msgs_pb2.ClientToServer()
                         try:
-                            subscr.ParseFromString(packet[4:-4])
+                            subscr.ParseFromString(p.payload[2:-8])
                             #print(subscr)
                         except Exception as exc:
                             print('TCPHandler ParseFromString exception: %s' % repr(exc))
@@ -402,8 +416,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             msg1.world_time = zo.world_time()
                             msg1.ackSubsSegm.extend(subscr.subsSegments)
                             payload1 = msg1.SerializeToString()
-                            self.request.sendall(struct.pack('!h', len(payload1)))
-                            self.request.sendall(payload1)
+
+                            iv = init_vector(1, 4, relay.tcp_ci, relay.tcp_sn)
+                            r = encode_packet(payload1, relay.key, iv, None, None, None)
+                            relay.tcp_sn += 1
+                            self.request.sendall(struct.pack('!h', len(r)) + r)
                             #print('TCPHandler subscr: %s' % msg1.ackSubsSegm)
                     i += size + 2
             except Exception as exc:
@@ -461,12 +478,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 if len(message.updates) > 0:
                     last_alive_check = t
                     message_payload = message.SerializeToString()
-                    self.request.sendall(struct.pack('!h', len(message_payload)))
-                    self.request.sendall(message_payload)
+
+                    iv = init_vector(1, 4, relay.tcp_ci, relay.tcp_sn)
+                    r = encode_packet(message_payload, relay.key, iv, None, None, None)
+                    relay.tcp_sn += 1
+                    self.request.sendall(struct.pack('!h', len(r)) + r)
                 elif last_alive_check < t - 25:
                     last_alive_check = t
-                    self.request.sendall(struct.pack('!h', len(payload)))
-                    self.request.sendall(payload)
+
+                    iv = init_vector(1, 4, relay.tcp_ci, relay.tcp_sn)
+                    r = encode_packet(payload, relay.key, iv, None, None, None)
+                    relay.tcp_sn += 1
+                    #print(r.hex())
+                    self.request.sendall(struct.pack('!h', len(r)) + r)
             except Exception as exc:
                 print('TCPHandler loop exception: %s' % repr(exc))
                 break
@@ -601,9 +625,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
         data = self.request[0]
         sock = self.request[1]
         relay = global_relay[ip]
-        print(data.hex())
-        p = decode_packet(data, relay, 1, 1)
-        print(p.payload.hex())
+        #print("UDPHandler: %s" % data.hex())
+        iv = init_vector(1, 1, relay.udp_ci, relay.udp_sn)
+        p = decode_packet(data, relay.key, iv)
+        if p.ci is not None:
+            relay.udp_ci = p.ci
+        if p.sn is not None:
+            relay.udp_sn = p.sn
+        #print("UDPHandler: %s" % p.payload.hex())
 
         recv = udp_node_msgs_pb2.ClientToServer()
 
@@ -755,9 +784,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) > 9:
                         message.world_time = zo.world_time()
                         message.cts_latency = message.world_time - recv.world_time
-                        iv = init_vector(1, 2, relay.ci, relay.sn)
-                        relay.sn += 1
-                        r = encode_packet(None, None, relay.sn, message.SerializeToString(), relay.key, iv)
+                        iv = init_vector(1, 2, relay.udp_ci, relay.udp_sn)
+                        r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_sn)
+                        relay.udp_sn += 1
                         sock.sendto(r, client_address)
                         message.msgnum += 1
                         del message.states[:]
@@ -767,8 +796,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.num_msgs = 1
         message.world_time = zo.world_time()
         message.cts_latency = message.world_time - recv.world_time
-        iv = init_vector(1, 2, relay.ci, relay.sn)
-        r = encode_packet(None, None, relay.sn, message.SerializeToString(), relay.key, iv)
+        iv = init_vector(1, 2, relay.udp_ci, relay.udp_sn)
+        r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_sn)
+        relay.udp_sn += 1
         #print(r.hex())
         sock.sendto(r, client_address)
 
