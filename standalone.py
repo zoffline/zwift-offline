@@ -8,7 +8,6 @@ import threading
 import time
 import csv
 import math
-import socket
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
@@ -76,6 +75,7 @@ global_pace_partners = {}
 global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
+global_clients = {}
 start_time = time.time()
 
 def boolean(s):
@@ -334,16 +334,20 @@ def encode_packet(payload, key, iv, ri, ci, sn):
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        ip = struct.unpack("!I", socket.inet_aton(self.client_address[0]))[0]
-        if not ip in global_relay.keys():
-            print('No key found')
-            return
         self.data = self.request.recv(1024)
+        ip = self.client_address[0] + str(self.client_address[1])
+        if not ip in global_clients.keys():
+            relay_id = int.from_bytes(self.data[3:7], "big")
+            if relay_id in global_relay.keys():
+                global_clients[ip] = global_relay[relay_id]
+            else:
+                print('No key found')
+                return
         print("TCPHandler hello: %s" % self.data.hex())
         if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
             print("Wrong packet size")
             return
-        relay = global_relay[ip]
+        relay = global_clients[ip]
         iv = InitializationVector(1, 3, relay.tcp_ci, 0)
         p = decode_packet(self.data[2:], relay.key, iv)
         if p.ci is not None:
@@ -649,13 +653,17 @@ def is_state_new_for(peer_player_state, player_id):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        ip = struct.unpack("!I", socket.inet_aton(self.client_address[0]))[0]
-        if not ip in global_relay.keys():
-            print('No key found')
-            return
         data = self.request[0]
-        sock = self.request[1]
-        relay = global_relay[ip]
+        socket = self.request[1]
+        ip = self.client_address[0] + str(self.client_address[1])
+        if not ip in global_clients.keys():
+            relay_id = int.from_bytes(data[1:5], "big")
+            if relay_id in global_relay.keys():
+                global_clients[ip] = global_relay[relay_id]
+            else:
+                print('No key found')
+                return
+        relay = global_clients[ip]
         iv = InitializationVector(1, 1, relay.udp_ci, relay.udp_sn)
         p = decode_packet(data, relay.key, iv)
         if p.ci is not None:
@@ -817,7 +825,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         iv.sn = relay.udp_sn
                         r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_sn)
                         relay.udp_sn += 1
-                        sock.sendto(r, client_address)
+                        socket.sendto(r, client_address)
                         message.msgnum += 1
                         del message.states[:]
                     s = message.states.add()
@@ -830,7 +838,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         iv.sn = relay.udp_sn
         r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_sn)
         relay.udp_sn += 1
-        sock.sendto(r, client_address)
+        socket.sendto(r, client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)

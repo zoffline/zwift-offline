@@ -16,7 +16,6 @@ import re
 import smtplib, ssl
 import requests
 import json
-import socket
 import struct
 from copy import copy, deepcopy
 from functools import wraps
@@ -1037,12 +1036,14 @@ def api_gameinfo():
         return r
 
 @app.route('/api/users/login', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
 def api_users_login():
     req = login_pb2.LoginRequest()
     req.ParseFromString(request.stream.read())
-    ip = struct.unpack("!I", socket.inet_aton(request.remote_addr))[0]
-    global_relay[ip] = Relay()
-    global_relay[ip].key = req.key
+    player_id = current_user.player_id
+    global_relay[player_id] = Relay()
+    global_relay[player_id].key = req.key
 
     response = login_pb2.LoginResponse()
     response.session_state = 'abc'
@@ -1056,7 +1057,7 @@ def api_users_login():
     else:
         udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
-    response.relay_session_id = ip
+    response.relay_session_id = player_id
     return response.SerializeToString(), 200
 
 
