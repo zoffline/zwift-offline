@@ -301,8 +301,8 @@ def encode_packet(ri, ci, sn, payload, key, iv):
     aesgcm = AES.new(key, AES.MODE_GCM, iv)
     header = struct.pack('b', flags) + header
     aesgcm.update(header)
-    ep = aesgcm.encrypt(payload)
-    data = header + ep
+    ep, tag = aesgcm.encrypt_and_digest(payload)
+    data = header + ep + tag[:4]
     return struct.pack('!h', len(data)) + data
 
 class TCPHandler(socketserver.BaseRequestHandler):

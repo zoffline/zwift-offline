@@ -5,8 +5,8 @@ import "per-session-info.proto";
 message LoginResponse {
 	required string session_state = 1;
 	required PerSessionInfo info = 2;
-	optional int32 relay_session_id = 3;
-	optional int32 f4 = 4;
+	optional uint32 relay_session_id = 3;
+	optional uint32 f4 = 4;
 }
 
 message LoginRequest {
