@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 import per_session_info_pb2 as per__session__info__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogin.proto\x1a\x16per-session-info.proto\"k\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x1d\n\x04info\x18\x02 \x02(\x0b\x32\x0f.PerSessionInfo\x12\x18\n\x10relay_session_id\x18\x03 \x01(\x05\x12\n\n\x02\x66\x34\x18\x04 \x01(\x05\"J\n\x0cLoginRequest\x12-\n\nproperties\x18\x01 \x02(\x0b\x32\x19.AnalyticsEventProperties\x12\x0b\n\x03key\x18\x02 \x02(\t\"0\n\x16\x41nalyticsEventProperty\x12\n\n\x02\x66\x31\x18\x01 \x02(\t\x12\n\n\x02\x66\x32\x18\x02 \x02(\t\"E\n\x18\x41nalyticsEventProperties\x12)\n\x08property\x18\x02 \x03(\x0b\x32\x17.AnalyticsEventProperty')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogin.proto\x1a\x16per-session-info.proto\"k\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x1d\n\x04info\x18\x02 \x02(\x0b\x32\x0f.PerSessionInfo\x12\x18\n\x10relay_session_id\x18\x03 \x01(\r\x12\n\n\x02\x66\x34\x18\x04 \x01(\r\"J\n\x0cLoginRequest\x12-\n\nproperties\x18\x01 \x02(\x0b\x32\x19.AnalyticsEventProperties\x12\x0b\n\x03key\x18\x02 \x02(\t\"0\n\x16\x41nalyticsEventProperty\x12\n\n\x02\x66\x31\x18\x01 \x02(\t\x12\n\n\x02\x66\x32\x18\x02 \x02(\t\"E\n\x18\x41nalyticsEventProperties\x12)\n\x08property\x18\x02 \x03(\x0b\x32\x17.AnalyticsEventProperty')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'login_pb2', globals())

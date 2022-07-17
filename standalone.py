@@ -264,12 +264,10 @@ class Packet:
 def init_vector(dt, ct, ci, sn):
     return struct.pack('!h', 0) + struct.pack('!h', dt) + struct.pack('!h', ct) + struct.pack('!h', ci) + struct.pack('!i', sn)
 
-def decode_packet(data, relay):
-    if int.from_bytes(data[0:2], "big") > len(data) - 2:
-        return None
+def decode_packet(data, relay, dt, ct):
     p = Packet()
-    s = 3
-    p.flags = data[2]
+    s = 1
+    p.flags = data[0]
     if p.flags & 4:
         p.ri = int.from_bytes(data[s:s+4], "big")
         s += 4
@@ -281,7 +279,7 @@ def decode_packet(data, relay):
         p.sn = int.from_bytes(data[s:s+4], "big")
         relay.sn = p.sn
         s += 4
-    iv = init_vector(1, 3, relay.ci, relay.sn)
+    iv = init_vector(dt, ct, relay.ci, relay.sn)
     aesgcm = AES.new(relay.key, AES.MODE_GCM, iv)
     p.payload = aesgcm.decrypt(data[s:])
     return p
@@ -302,8 +300,7 @@ def encode_packet(ri, ci, sn, payload, key, iv):
     header = struct.pack('b', flags) + header
     aesgcm.update(header)
     ep, tag = aesgcm.encrypt_and_digest(payload)
-    data = header + ep + tag[:4]
-    return struct.pack('!h', len(data)) + data
+    return header + ep + tag[:4]
 
 class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -312,9 +309,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
             print('No key found')
             return
         self.data = self.request.recv(1024)
+        if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
+            print("Wrong packet size")
+            return
         relay = global_relay[ip]
-        p = decode_packet(self.data, relay)
-        print("TCPHandler hello: %s" % p.payload.hex())
+        p = decode_packet(self.data[2:], relay, 1, 3)
+        #print("TCPHandler hello: %s" % p.payload.hex())
         if len(p.payload) > 1 and p.payload[1] != 0:
             print("TCPHandler hello(0) expected, got %s" % p.payload[1])
             return
@@ -364,9 +364,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
         iv = init_vector(1, 4, relay.ci, relay.sn)
         r = encode_packet(None, None, None, payload, relay.key, iv)
-        print(relay.key)
-        print(r.hex())
-        self.request.sendall(r)
+        #print(relay.key)
+        #print(r.hex())
+        self.request.sendall(struct.pack('!h', len(r)) + r)
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
@@ -594,16 +594,25 @@ def is_state_new_for(peer_player_state, player_id):
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        ip = struct.unpack("!I", socket.inet_aton(self.client_address[0]))[0]
+        if not ip in global_relay.keys():
+            print('No key found')
+            return
         data = self.request[0]
-        socket = self.request[1]
+        sock = self.request[1]
+        relay = global_relay[ip]
+        print(data.hex())
+        p = decode_packet(data, relay, 1, 1)
+        print(p.payload.hex())
+
         recv = udp_node_msgs_pb2.ClientToServer()
 
         try:
-            recv.ParseFromString(data[:-4])
+            recv.ParseFromString(p.payload[:-8])
         except:
             try:
                 #If no sensors connected, first byte must be skipped
-                recv.ParseFromString(data[1:-4])
+                recv.ParseFromString(p.payload[1:-8])
             except Exception as exc:
                 print('UDPHandler ParseFromString exception: %s' % repr(exc))
                 return
@@ -746,7 +755,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) > 9:
                         message.world_time = zo.world_time()
                         message.cts_latency = message.world_time - recv.world_time
-                        socket.sendto(message.SerializeToString(), client_address)
+                        iv = init_vector(1, 2, relay.ci, relay.sn)
+                        relay.sn += 1
+                        r = encode_packet(None, None, relay.sn, message.SerializeToString(), relay.key, iv)
+                        sock.sendto(r, client_address)
                         message.msgnum += 1
                         del message.states[:]
                     s = message.states.add()
@@ -755,7 +767,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.num_msgs = 1
         message.world_time = zo.world_time()
         message.cts_latency = message.world_time - recv.world_time
-        socket.sendto(message.SerializeToString(), client_address)
+        iv = init_vector(1, 2, relay.ci, relay.sn)
+        r = encode_packet(None, None, relay.sn, message.SerializeToString(), relay.key, iv)
+        #print(r.hex())
+        sock.sendto(r, client_address)
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
