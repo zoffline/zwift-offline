@@ -35,6 +35,8 @@ from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 
 sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import udp_node_msgs_pb2
@@ -113,22 +115,12 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
-    try:
-        from cryptography.fernet import Fernet
-        encrypt = True
-    except ImportError:
-        logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
-        encrypt = False
-    if encrypt:
-        OLD_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
-        CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
-        if os.path.exists(OLD_KEY_FILE):  # check if we need to migrate from the old filename to new
-            os.rename(OLD_KEY_FILE, CREDENTIALS_KEY_FILE)
-        if not os.path.exists(CREDENTIALS_KEY_FILE):
-            with open(CREDENTIALS_KEY_FILE, 'wb') as f:
-                f.write(Fernet.generate_key())
-        with open(CREDENTIALS_KEY_FILE, 'rb') as f:
-            credentials_key = f.read()
+    CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
+    if not os.path.exists(CREDENTIALS_KEY_FILE):
+        with open(CREDENTIALS_KEY_FILE, 'wb') as f:
+            f.write(get_random_bytes(32))
+    with open(CREDENTIALS_KEY_FILE, 'rb') as f:
+        credentials_key = f.read()
 
 try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
@@ -637,9 +629,10 @@ def profile(username):
                     if credentials_key is not None:
                         with open(file_path, 'rb') as fr:
                             zwift_credentials = fr.read()
-                            cipher_suite = Fernet(credentials_key)
+                            cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
                             ciphered_text = cipher_suite.encrypt(zwift_credentials)
                             with open(file_path, 'wb') as fw:
+                                fw.write(cipher_suite.iv)
                                 fw.write(ciphered_text)
                     flash("Zwift credentials saved.")
                 except Exception as exc:
@@ -670,9 +663,10 @@ def garmin(username):
             if credentials_key is not None:
                 with open(file_path, 'rb') as fr:
                     garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
+                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
                     ciphered_text = cipher_suite.encrypt(garmin_credentials)
                     with open(file_path, 'wb') as fw:
+                        fw.write(cipher_suite.iv)
                         fw.write(ciphered_text)
             flash("Garmin credentials saved.")
         except Exception as exc:
@@ -781,16 +775,18 @@ def upload(username):
             if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
                 with open(file_path, 'rb') as fr:
                     garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
+                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
                     ciphered_text = cipher_suite.encrypt(garmin_credentials)
                     with open(file_path, 'wb') as fw:
+                        fw.write(cipher_suite.iv)
                         fw.write(ciphered_text)
             if uploaded_file.filename == 'zwift_credentials.txt' and credentials_key is not None:
                 with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
+                    zwift_credentials = fr.read()
+                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
+                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
                     with open(file_path, 'wb') as fw:
+                        fw.write(cipher_suite.iv)
                         fw.write(ciphered_text)   
             flash("File %s uploaded." % uploaded_file.filename)
         else:
@@ -1783,12 +1779,12 @@ def garmin_upload(player_id, activity):
         logger.info("garmin_credentials.txt missing, skip Garmin activity update")
         return
     try:
-        with open(garmin_credentials, 'r') as f:
+        with open(garmin_credentials, 'rb') as f:
             if credentials_key is not None:
-                cipher_suite = Fernet(credentials_key)
+                iv = f.read(16)
                 ciphered_text = f.read()
-                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
-                unciphered_text = unciphered_text.decode(encoding='UTF-8')
+                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
                 split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
@@ -1847,12 +1843,12 @@ def zwift_upload(player_id, activity):
         logger.info("server_ip.txt missing, skip Zwift activity update")
         return
     try:
-        with open(zwift_credentials, 'r') as f:
+        with open(zwift_credentials, 'rb') as f:
             if credentials_key is not None:
-                cipher_suite = Fernet(credentials_key)
+                iv = f.read(16)
                 ciphered_text = f.read()
-                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
-                unciphered_text = unciphered_text.decode(encoding='UTF-8')
+                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
                 split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
