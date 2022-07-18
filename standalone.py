@@ -464,7 +464,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     zc_params.player_id = player_id
                     zc_params.world_time = 0
                     zc_params.zc_local_ip = zo.zc_connect_queue[player_id][0]
-                    zc_params.zc_local_port = zo.zc_connect_queue[player_id][1] #21587
+                    zc_params.zc_local_port = zo.zc_connect_queue[player_id][1] #simple:21587, secure:21588
+                    if zo.zc_connect_queue[player_id][2] != "None":
+                        zc_params.zc_key = zo.zc_connect_queue[player_id][2]
                     zc_params.zc_protocol = udp_node_msgs_pb2.IPProtocol.TCP #=2
                     zc_params_payload = zc_params.SerializeToString()
 

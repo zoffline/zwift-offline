@@ -1554,10 +1554,15 @@ def api_profiles_me_phone():
     if not request.stream:
         return '', 400
     phoneAddress = request.json['phoneAddress']
-    phonePort = int(request.json['port'])
-    zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort)
+    if 'port' in request.json:
+        phonePort = int(request.json['port'])
+        phoneSecretKey = 'None'
+    if 'securePort' in request.json:
+        phonePort = int(request.json['securePort'])
+        phoneSecretKey = request.json['secret']
+    zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort, phoneSecretKey)
     #todo UDP scenario
-    logger.info("ZCompanion %d reg: %s:%d" % (current_user.player_id, phoneAddress, phonePort))
+    logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey))
     return '', 204
 
 @app.route('/api/profiles/me/<int:player_id>', methods=['PUT'])
