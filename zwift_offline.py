@@ -1056,18 +1056,18 @@ def api_users_login():
         udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     response.relay_session_id = player_id
-    response.f4 = 70
+    response.expiration = 70
     return response.SerializeToString(), 200
 
 
-#@app.route('/relay/session/refresh', methods=['POST'])
-#def relay_session_refresh():
-#    print(request.stream.read().hex())
-#    seed = hash_seeds_pb2.HashSeed()
-#    seed.seed1 = 1000
-#    seed.seed2 = 1000
-#    seed.expiryDate = 1000
-#    return seed.SerializeToString(), 200
+@app.route('/relay/session/refresh', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def relay_session_refresh():
+    refresh = login_pb2.RelaySessionRefreshResponse()
+    refresh.relay_session_id = current_user.player_id
+    refresh.expiration = 70
+    return refresh.SerializeToString(), 200
 
 
 def logout_player(player_id):

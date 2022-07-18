@@ -654,6 +654,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         relay = global_clients[ip]
         iv = InitializationVector(1, 1, relay.udp_ci, relay.udp_r_sn)
         p = decode_packet(data, relay.key, iv)
+        relay.udp_r_sn += 1
         if p.ci is not None:
             relay.udp_ci = p.ci
             relay.udp_t_sn = 0

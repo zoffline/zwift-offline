@@ -6,7 +6,7 @@ message LoginResponse {
 	required string session_state = 1;
 	required PerSessionInfo info = 2;
 	optional uint32 relay_session_id = 3;
-	optional uint32 f4 = 4;
+	optional uint32 expiration = 4; // minutes
 }
 
 message LoginRequest {
@@ -21,4 +21,9 @@ message AnalyticsEventProperty {
 
 message AnalyticsEventProperties {
 	repeated AnalyticsEventProperty property = 2;
+}
+
+message RelaySessionRefreshResponse {
+	required uint32 relay_session_id = 1;
+	required uint32 expiration = 2; // minutes
 }
