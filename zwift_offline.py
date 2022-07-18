@@ -205,8 +205,10 @@ class Relay:
     ri = 0
     tcp_ci = 0
     udp_ci = 0
-    tcp_sn = 0
-    udp_sn = 0
+    tcp_r_sn = 0
+    tcp_t_sn = 0
+    udp_r_sn = 0
+    udp_t_sn = 0
     key = b''
 
 class PartialProfile:
