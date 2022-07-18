@@ -271,9 +271,9 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* Install dependencies: garmin-uploader, cryptography (optional)
-  * e.g., on Linux/Mac: ``pip3 install garmin-uploader cryptography``
-  * e.g., on Windows in command prompt: ``pip install garmin-uploader cryptography``
+* Install dependencies: garmin-uploader
+  * e.g., on Linux/Mac: ``pip3 install garmin-uploader``
+  * e.g., on Windows in command prompt: ``pip install garmin-uploader``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
   * You may need to use the cloudscraper branch if upload fails: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
   * If cloudscraper doesn't work you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
@@ -374,12 +374,12 @@ Docker
   * ``pip3 install flask_sqlalchemy``
 * gevent (http://www.gevent.org/)
   * ``pip3 install gevent``
+* pycryptodome (https://pypi.org/project/pycryptodome/)
+  * ``pip3 install pycryptodome``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
   * ``pip3 install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
   * ``pip3 install garmin-uploader``
-* OPTIONAL: cryptography (https://cryptography.io/en/latest/)
-  * ``pip3 install cryptography``
 
 
 ## Note

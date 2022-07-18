@@ -3,7 +3,7 @@ FROM python:3-alpine as builder
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache git gcc g++ musl-dev libffi-dev openssl-dev file make
-RUN pip install --user flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib garmin-uploader requests dnspython
+RUN pip install --user flask flask_sqlalchemy flask-login pyjwt gevent protobuf protobuf3_to_dict stravalib garmin-uploader requests dnspython pycryptodome
 
 RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
 
