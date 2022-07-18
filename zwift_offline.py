@@ -1056,6 +1056,7 @@ def api_users_login():
         udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     response.relay_session_id = player_id
+    response.f4 = 70
     return response.SerializeToString(), 200
 
 

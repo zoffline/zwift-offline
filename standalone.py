@@ -401,7 +401,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
         details4.CopyFrom(details2)
         msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
-
         iv.ct = 4
         r = encode_packet(payload, relay.key, iv, None, None, None)
         relay.tcp_t_sn += 1
@@ -409,13 +408,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
         player_id = hello.player_id
         #print("TCPHandler for %d" % player_id)
-        msg = udp_node_msgs_pb2.ServerToClient()
-        msg.player_id = player_id
-        msg.world_time = 0
-        msg.stc_f11 = True
-        payload = msg.SerializeToString()
 
-        last_alive_check = int(zo.get_utc_time())
         self.request.settimeout(1) #make recv non-blocking
         while True:
             self.data = b''
@@ -446,12 +439,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             msg1.world_time = zo.world_time()
                             msg1.ackSubsSegm.extend(subscr.subsSegments)
                             payload1 = msg1.SerializeToString()
-
                             iv.ct = 4
                             iv.sn = relay.tcp_t_sn
                             r = encode_packet(payload1, relay.key, iv, None, None, None)
                             relay.tcp_t_sn += 1
-                            last_alive_check = t
                             self.request.sendall(struct.pack('!h', len(r)) + r)
                             #print('TCPHandler subscr: %s' % msg1.ackSubsSegm)
                     i += size + 2
@@ -459,8 +450,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 #print('TCPHandler exception: %s' % repr(exc)) #timeout is ok here
                 pass
 
-            #Check every 5 seconds for new updates
-            #tcpthreadevent.wait(timeout=5) # no more, we will use the request timeout now
             try:
                 #if ZC need to be registered
                 if player_id in zo.zc_connect_queue: # and player_id in online:
@@ -473,12 +462,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         zc_params.zc_key = zo.zc_connect_queue[player_id][2]
                     zc_params.zc_protocol = udp_node_msgs_pb2.IPProtocol.TCP #=2
                     zc_params_payload = zc_params.SerializeToString()
-
                     iv.ct = 4
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(zc_params_payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
-                    last_alive_check = t
                     self.request.sendall(struct.pack('!h', len(r)) + r)
                     #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
                     zo.zc_connect_queue.pop(player_id)
@@ -498,7 +485,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         #Send if 10 updates has already been added and start a new message
                         if len(message.updates) > 9:
                             message_payload = message.SerializeToString()
-
                             iv.ct = 4
                             iv.sn = relay.tcp_t_sn
                             r = encode_packet(message_payload, relay.key, iv, None, None, None)
@@ -514,24 +500,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for player_update_proto in added_player_updates:
                         player_update_queue[player_id].remove(player_update_proto)
 
-                #Check if any updates are added and should be sent to client, otherwise just keep alive every 25 seconds
+                #Check if any updates are added and should be sent to client, otherwise just keep alive
                 if len(message.updates) > 0:
-                    last_alive_check = t
                     message_payload = message.SerializeToString()
-
                     iv.ct = 4
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(message_payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
                     self.request.sendall(struct.pack('!h', len(r)) + r)
-                #elif last_alive_check < t - 25:
-                #    last_alive_check = t
-
-                #    iv.ct = 4
-                #    iv.sn = relay.tcp_t_sn
-                #    r = encode_packet(payload, relay.key, iv, None, None, None)
-                #    relay.tcp_t_sn += 1
-                #    self.request.sendall(struct.pack('!h', len(r)) + r)
+                else:
+                    iv.ct = 4
+                    iv.sn = relay.tcp_t_sn
+                    r = encode_packet(payload, relay.key, iv, None, None, None)
+                    relay.tcp_t_sn += 1
+                    self.request.sendall(struct.pack('!h', len(r)) + r)
             except Exception as exc:
                 print('TCPHandler loop exception: %s' % repr(exc))
                 break
