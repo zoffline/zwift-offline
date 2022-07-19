@@ -279,7 +279,7 @@
       "name": "game_1_27_atv_remote_gestures",
       "values": {
         "fields": {
-          "ATVMoveSensitivity": {},
+          "ATVMoveSensitivity": { "varintValue": 5 },
           "ATVFriction": {
             "numberValue": 0.9
           }
