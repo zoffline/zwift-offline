@@ -255,11 +255,11 @@ class CDNHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
 class Packet:
-    flags = 0
-    ri = 0
-    ci = 0
-    sn = 0
-    payload = b''
+    flags = None
+    ri = None
+    ci = None
+    sn = None
+    payload = None
 
 class InitializationVector:
     def __init__(self, dt = 0, ct = 0, ci = 0, sn = 0):
@@ -343,7 +343,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             else:
                 print('No key found')
                 return
-        print("TCPHandler hello: %s" % self.data.hex())
+        #print("TCPHandler hello: %s" % self.data.hex())
         if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
             print("Wrong packet size")
             return
@@ -415,7 +415,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
             t = int(zo.get_utc_time())
             try:
                 self.data = self.request.recv(1024)
-                #print(self.data.hex())
                 i = 0
                 while i < len(self.data):
                     size = int.from_bytes(self.data[i:i+2], "big")
@@ -424,12 +423,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     iv.sn = relay.tcp_r_sn
                     p = decode_packet(packet[2:], relay.key, iv)
                     relay.tcp_r_sn += 1
-                    print("TCPHandler: %s" % p.payload.hex())
+                    #print("TCPHandler: %s" % p.payload.hex())
                     if len(p.payload) > 1 and p.payload[1] == 1:
                         subscr = udp_node_msgs_pb2.ClientToServer()
                         try:
                             subscr.ParseFromString(p.payload[2:-8])
-                            #print(subscr)
                         except Exception as exc:
                             print('TCPHandler ParseFromString exception: %s' % repr(exc))
                         if subscr.subsSegments:
@@ -658,6 +656,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if p.ci is not None:
             relay.udp_ci = p.ci
             relay.udp_t_sn = 0
+            iv.ci = p.ci
         if p.sn is not None:
             relay.udp_r_sn = p.sn
 
