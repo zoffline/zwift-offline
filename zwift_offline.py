@@ -17,6 +17,7 @@ import smtplib, ssl
 import requests
 import json
 import struct
+import base64
 from copy import copy, deepcopy
 from functools import wraps
 from io import BytesIO
@@ -1558,10 +1559,10 @@ def api_profiles_me_phone():
         phoneSecretKey = 'None'
     if 'securePort' in request.json:
         phonePort = int(request.json['securePort'])
-        phoneSecretKey = request.json['secret']
+        phoneSecretKey = base64.b64decode(request.json['secret'])
     zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort, phoneSecretKey)
     #todo UDP scenario
-    logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey))
+    logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey.hex()))
     return '', 204
 
 @app.route('/api/profiles/me/<int:player_id>', methods=['PUT'])

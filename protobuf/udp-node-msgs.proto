@@ -287,7 +287,7 @@ message ServerToClient {
 	optional TcpConfig tcp_config = 29; //tag490
 	repeated int64 ackSubsSegm = 30; //tag496 TcpClient::processSubscribedSegment
 	optional uint32 stc_f31 = 31; //tag508
-	optional string zc_key = 32; //tag642
+	optional bytes zc_key = 32; //tag642
 }
 
 message Ghost { //not from the Zwift game, zoffline-specific!
