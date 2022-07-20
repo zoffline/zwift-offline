@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0evariants.proto\"d\n\x06Struct\x12#\n\x06\x66ields\x18\x01 \x03(\x0b\x32\x13.Struct.FieldsEntry\x1a\x35\n\x0b\x46ieldsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x15\n\x05value\x18\x02 \x01(\x0b\x32\x06.Value:\x02\x38\x01\"\xba\x01\n\x05Value\x12 \n\nnull_value\x18\x01 \x01(\x0e\x32\n.NullValueH\x00\x12\x16\n\x0cnumber_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x04 \x01(\x08H\x00\x12\x1f\n\x0cstruct_value\x18\x05 \x01(\x0b\x32\x07.StructH\x00\x12 \n\nlist_value\x18\x06 \x01(\x0b\x32\n.ListValueH\x00\x42\x06\n\x04kind\"#\n\tListValue\x12\x16\n\x06values\x18\x01 \x03(\x0b\x32\x06.Value\"N\n\x16\x46\x65\x61tureResponse_Params\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05value\x18\x02 \x01(\x08\x12\x17\n\x06values\x18\x03 \x01(\x0b\x32\x07.Struct\"<\n\x0f\x46\x65\x61tureResponse\x12)\n\x08variants\x18\x01 \x03(\x0b\x32\x17.FeatureResponse_Params*\x1b\n\tNullValue\x12\x0e\n\nNULL_VALUE\x10\x00')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0evariants.proto\"d\n\x06Struct\x12#\n\x06\x66ields\x18\x01 \x03(\x0b\x32\x13.Struct.FieldsEntry\x1a\x35\n\x0b\x46ieldsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x15\n\x05value\x18\x02 \x01(\x0b\x32\x06.Value:\x02\x38\x01\"\xb1\x01\n\x05Value\x12 \n\nnull_value\x18\x01 \x01(\x0e\x32\n.NullValueH\x00\x12\x16\n\x0cnumber_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x04 \x01(\x08H\x00\x12\x16\n\x0cvarint_value\x18\x05 \x01(\x04H\x00\x12 \n\nlist_value\x18\x06 \x01(\x0b\x32\n.ListValueH\x00\x42\x06\n\x04kind\"#\n\tListValue\x12\x16\n\x06values\x18\x01 \x03(\x0b\x32\x06.Value\"N\n\x16\x46\x65\x61tureResponse_Params\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05value\x18\x02 \x01(\x08\x12\x17\n\x06values\x18\x03 \x01(\x0b\x32\x07.Struct\"<\n\x0f\x46\x65\x61tureResponse\x12)\n\x08variants\x18\x01 \x03(\x0b\x32\x17.FeatureResponse_Params*\x1b\n\tNullValue\x12\x0e\n\nNULL_VALUE\x10\x00')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'variants_pb2', globals())
@@ -22,18 +22,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _STRUCT_FIELDSENTRY._options = None
   _STRUCT_FIELDSENTRY._serialized_options = b'8\001'
-  _NULLVALUE._serialized_start=488
-  _NULLVALUE._serialized_end=515
+  _NULLVALUE._serialized_start=479
+  _NULLVALUE._serialized_end=506
   _STRUCT._serialized_start=18
   _STRUCT._serialized_end=118
   _STRUCT_FIELDSENTRY._serialized_start=65
   _STRUCT_FIELDSENTRY._serialized_end=118
   _VALUE._serialized_start=121
-  _VALUE._serialized_end=307
-  _LISTVALUE._serialized_start=309
-  _LISTVALUE._serialized_end=344
-  _FEATURERESPONSE_PARAMS._serialized_start=346
-  _FEATURERESPONSE_PARAMS._serialized_end=424
-  _FEATURERESPONSE._serialized_start=426
-  _FEATURERESPONSE._serialized_end=486
+  _VALUE._serialized_end=298
+  _LISTVALUE._serialized_start=300
+  _LISTVALUE._serialized_end=335
+  _FEATURERESPONSE_PARAMS._serialized_start=337
+  _FEATURERESPONSE_PARAMS._serialized_end=415
+  _FEATURERESPONSE._serialized_start=417
+  _FEATURERESPONSE._serialized_end=477
 # @@protoc_insertion_point(module_scope)
