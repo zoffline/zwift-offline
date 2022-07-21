@@ -254,6 +254,16 @@ class CDNHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Length', len(resp.content))
         self.end_headers()
 
+class DeviceType:
+    Relay = 1
+    Zc = 2
+
+class ChannelType:
+    UdpClient = 1
+    UdpServer = 2
+    TcpClient = 3
+    TcpServer = 4
+
 class Packet:
     flags = None
     ri = None
@@ -348,7 +358,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             print("Wrong packet size")
             return
         relay = global_clients[ip]
-        iv = InitializationVector(1, 3, relay.tcp_ci, 0)
+        iv = InitializationVector(DeviceType.Relay, ChannelType.TcpClient, relay.tcp_ci, 0)
         p = decode_packet(self.data[2:], relay.key, iv)
         if p.ci is not None:
             relay.tcp_ci = p.ci
@@ -401,7 +411,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         details4.CopyFrom(details2)
         msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
-        iv.ct = 4
+        iv.ct = ChannelType.TcpServer
         r = encode_packet(payload, relay.key, iv, None, None, None)
         relay.tcp_t_sn += 1
         self.request.sendall(struct.pack('!h', len(r)) + r)
@@ -419,7 +429,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 while i < len(self.data):
                     size = int.from_bytes(self.data[i:i+2], "big")
                     packet = self.data[i:i+size+2]
-                    iv.ct = 3
+                    iv.ct = ChannelType.TcpClient
                     iv.sn = relay.tcp_r_sn
                     p = decode_packet(packet[2:], relay.key, iv)
                     relay.tcp_r_sn += 1
@@ -437,7 +447,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             msg1.world_time = zo.world_time()
                             msg1.ackSubsSegm.extend(subscr.subsSegments)
                             payload1 = msg1.SerializeToString()
-                            iv.ct = 4
+                            iv.ct = ChannelType.TcpServer
                             iv.sn = relay.tcp_t_sn
                             r = encode_packet(payload1, relay.key, iv, None, None, None)
                             relay.tcp_t_sn += 1
@@ -460,7 +470,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         zc_params.zc_key = zo.zc_connect_queue[player_id][2]
                     zc_params.zc_protocol = udp_node_msgs_pb2.IPProtocol.TCP #=2
                     zc_params_payload = zc_params.SerializeToString()
-                    iv.ct = 4
+                    iv.ct = ChannelType.TcpServer
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(zc_params_payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
@@ -483,7 +493,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         #Send if 10 updates has already been added and start a new message
                         if len(message.updates) > 9:
                             message_payload = message.SerializeToString()
-                            iv.ct = 4
+                            iv.ct = ChannelType.TcpServer
                             iv.sn = relay.tcp_t_sn
                             r = encode_packet(message_payload, relay.key, iv, None, None, None)
                             relay.tcp_t_sn += 1
@@ -501,13 +511,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 #Check if any updates are added and should be sent to client, otherwise just keep alive
                 if len(message.updates) > 0:
                     message_payload = message.SerializeToString()
-                    iv.ct = 4
+                    iv.ct = ChannelType.TcpServer
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(message_payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
                     self.request.sendall(struct.pack('!h', len(r)) + r)
                 else:
-                    iv.ct = 4
+                    iv.ct = ChannelType.TcpServer
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
@@ -650,7 +660,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 print('No key found')
                 return
         relay = global_clients[ip]
-        iv = InitializationVector(1, 1, relay.udp_ci, relay.udp_r_sn)
+        iv = InitializationVector(DeviceType.Relay, ChannelType.UdpClient, relay.udp_ci, relay.udp_r_sn)
         p = decode_packet(data, relay.key, iv)
         relay.udp_r_sn += 1
         if p.ci is not None:
@@ -810,7 +820,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     if len(message.states) > 9:
                         message.world_time = zo.world_time()
                         message.cts_latency = message.world_time - recv.world_time
-                        iv.ct = 2
+                        iv.ct = ChannelType.UdpServer
                         iv.sn = relay.udp_t_sn
                         r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_t_sn)
                         relay.udp_t_sn += 1
@@ -823,7 +833,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             message.num_msgs = 1
         message.world_time = zo.world_time()
         message.cts_latency = message.world_time - recv.world_time
-        iv.ct = 2
+        iv.ct = ChannelType.UdpServer
         iv.sn = relay.udp_t_sn
         r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_t_sn)
         relay.udp_t_sn += 1
