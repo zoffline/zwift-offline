@@ -116,7 +116,7 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
-    CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
+    CREDENTIALS_KEY_FILE = "%s/credentials-key.bin" % STORAGE_DIR
     if not os.path.exists(CREDENTIALS_KEY_FILE):
         with open(CREDENTIALS_KEY_FILE, 'wb') as f:
             f.write(get_random_bytes(32))
