@@ -203,14 +203,15 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
         return True
 
 class Relay:
-    ri = 0
-    tcp_ci = 0
-    udp_ci = 0
-    tcp_r_sn = 0
-    tcp_t_sn = 0
-    udp_r_sn = 0
-    udp_t_sn = 0
-    key = b''
+    def __init__(self, key = b''):
+        self.ri = 0
+        self.tcp_ci = 0
+        self.udp_ci = 0
+        self.tcp_r_sn = 0
+        self.tcp_t_sn = 0
+        self.udp_r_sn = 0
+        self.udp_t_sn = 0
+        self.key = key
 
 class PartialProfile:
     player_id = 0
@@ -1041,8 +1042,7 @@ def api_users_login():
     req = login_pb2.LoginRequest()
     req.ParseFromString(request.stream.read())
     player_id = current_user.player_id
-    global_relay[player_id] = Relay()
-    global_relay[player_id].key = req.key
+    global_relay[player_id] = Relay(req.key)
 
     response = login_pb2.LoginResponse()
     response.session_state = 'abc'
