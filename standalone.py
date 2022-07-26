@@ -50,6 +50,7 @@ CDN_DIR = "%s/cdn" % SCRIPT_DIR
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
+ENCRYPTION_KEYS_FILE = "%s/encryption_keys.json" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
@@ -79,9 +80,6 @@ global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
 start_time = time.time()
-
-ENCRYPTION_KEYS_FILE = "%s/encryption_keys.json" % STORAGE_DIR
-encryption_keys = {}
 
 def boolean(s):
     if s.lower() in ['true', 'yes', '1']: return True
@@ -352,21 +350,21 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024)
         ip = self.client_address[0] + str(self.client_address[1])
         if not ip in global_clients.keys():
+            encryption_keys = {}
             if os.path.isfile(ENCRYPTION_KEYS_FILE):
                 with open(ENCRYPTION_KEYS_FILE) as f:
                    encryption_keys = json.load(f, object_pairs_hook=lambda d: {int(k): v for k, v in d})
             relay_id = int.from_bytes(self.data[3:7], "big")
             if relay_id in global_relay.keys():
-                global_clients[ip] = global_relay[relay_id]
                 encryption_keys[relay_id] = base64.b64encode(global_relay[relay_id].key).decode('ascii')
                 with open(ENCRYPTION_KEYS_FILE, 'w') as f:
                     json.dump(encryption_keys, f)
             elif relay_id in encryption_keys.keys():
                 global_relay[relay_id] = zo.Relay(base64.b64decode(encryption_keys[relay_id]))
-                global_clients[ip] = global_relay[relay_id]
             else:
-                print('No key found')
+                print('No encryption key for relay ID %s' % relay_id)
                 return
+            global_clients[ip] = global_relay[relay_id]
         #print("TCPHandler hello: %s" % self.data.hex())
         if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
             print("Wrong packet size")
@@ -671,7 +669,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
             if relay_id in global_relay.keys():
                 global_clients[ip] = global_relay[relay_id]
             else:
-                #print('No key found')
                 return
         relay = global_clients[ip]
         iv = InitializationVector(DeviceType.Relay, ChannelType.UdpClient, relay.udp_ci, relay.udp_r_sn)
