@@ -8,8 +8,6 @@ import threading
 import time
 import csv
 import math
-import json
-import base64
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
@@ -50,7 +48,6 @@ CDN_DIR = "%s/cdn" % SCRIPT_DIR
 PROXYPASS_FILE = "%s/cdn-proxy.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
-ENCRYPTION_KEYS_FILE = "%s/encryption_keys.json" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
@@ -350,17 +347,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024)
         ip = self.client_address[0] + str(self.client_address[1])
         if not ip in global_clients.keys():
-            encryption_keys = {}
-            if os.path.isfile(ENCRYPTION_KEYS_FILE):
-                with open(ENCRYPTION_KEYS_FILE) as f:
-                   encryption_keys = json.load(f, object_pairs_hook=lambda d: {int(k): v for k, v in d})
             relay_id = int.from_bytes(self.data[3:7], "big")
+            ENCRYPTION_KEY_FILE = "%s/%s/encryption_key.bin" % (STORAGE_DIR, relay_id)
             if relay_id in global_relay.keys():
-                encryption_keys[relay_id] = base64.b64encode(global_relay[relay_id].key).decode('ascii')
-                with open(ENCRYPTION_KEYS_FILE, 'w') as f:
-                    json.dump(encryption_keys, f)
-            elif relay_id in encryption_keys.keys():
-                global_relay[relay_id] = zo.Relay(base64.b64decode(encryption_keys[relay_id]))
+                with open(ENCRYPTION_KEY_FILE, 'wb') as f:
+                    f.write(global_relay[relay_id].key)
+            elif os.path.isfile(ENCRYPTION_KEY_FILE):
+                with open(ENCRYPTION_KEY_FILE, 'rb') as f:
+                    global_relay[relay_id] = zo.Relay(f.read())
             else:
                 print('No encryption key for relay ID %s' % relay_id)
                 return
