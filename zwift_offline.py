@@ -591,7 +591,7 @@ def authorization():
             f.write(token_response['access_token'] + '\n');
             f.write(token_response['refresh_token'] + '\n');
             f.write(str(token_response['expires_at']) + '\n');
-        flash("Strava authorized. Go to \"Upload\" to remove authorization.")
+        flash("Strava authorized. Go to \"Profile\" to remove authorization.")
     except Exception as exc:
         logger.warn('Strava: %s' % repr(exc))
         flash("Strava canceled.")
@@ -624,24 +624,19 @@ def profile(username):
             except Exception as exc:
                 logger.warn('Zwift profile: %s' % repr(exc))
                 flash("Error downloading profile.")
-            if request.form.get("safe_zwift", None) != None:
+            if request.form.get("save_zwift", None) != None:
                 try:
-                    file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
-                    with open(file_path, 'w') as f:
-                        f.write(username + '\n')
-                        f.write(password + '\n')
-                    if credentials_key is not None:
-                        with open(file_path, 'rb') as fr:
-                            zwift_credentials = fr.read()
-                            cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-                            ciphered_text = cipher_suite.encrypt(zwift_credentials)
-                            with open(file_path, 'wb') as fw:
-                                fw.write(cipher_suite.iv)
-                                fw.write(ciphered_text)
-                    flash("Zwift credentials saved.")
+                    zwift_credentials = (username + '\n' + password).encode('UTF-8')
+                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
+                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
+                    file_path = os.path.join(profile_dir, 'zwift_credentials.bin')
+                    with open(file_path, 'wb') as fw:
+                        fw.write(cipher_suite.iv)
+                        fw.write(ciphered_text)
+                    flash("Zwift credentials saved. Go to \"Profile\" to remove credentials.")
                 except Exception as exc:
                     logger.warn('zwift_credentials: %s' % repr(exc))
-                    flash("Error saving 'zwift_credentials.txt' file.")
+                    flash("Error saving 'zwift_credentials.bin' file.")
         except Exception as exc:
             logger.warn('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
@@ -660,22 +655,17 @@ def garmin(username):
         password = request.form['password']
 
         try:
-            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.txt')
-            with open(file_path, 'w') as f:
-                f.write(username + '\n')
-                f.write(password + '\n')
-            if credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(cipher_suite.iv)
-                        fw.write(ciphered_text)
-            flash("Garmin credentials saved.")
+            garmin_credentials = (username + '\n' + password).encode('UTF-8')
+            cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
+            ciphered_text = cipher_suite.encrypt(garmin_credentials)
+            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.bin')
+            with open(file_path, 'wb') as fw:
+                fw.write(cipher_suite.iv)
+                fw.write(ciphered_text)
+            flash("Garmin credentials saved. Go to \"Profile\" to remove credentials.")
         except Exception as exc:
             logger.warn('garmin_credentials: %s' % repr(exc))
-            flash("Error saving 'garmin_credentials.txt' file.")
+            flash("Error saving 'garmin_credentials.bin' file.")
     return render_template("garmin.html", username=current_user.username)
 
 
@@ -773,25 +763,9 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'achievements.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'achievements.bin']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
-            if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(cipher_suite.iv)
-                        fw.write(ciphered_text)
-            if uploaded_file.filename == 'zwift_credentials.txt' and credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    zwift_credentials = fr.read()
-                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(cipher_suite.iv)
-                        fw.write(ciphered_text)   
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
@@ -812,12 +786,12 @@ def upload(username):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
     garmin = None
-    garmin_file = os.path.join(profile_dir, 'garmin_credentials.txt')
+    garmin_file = os.path.join(profile_dir, 'garmin_credentials.bin')
     if os.path.isfile(garmin_file):
         stat = os.stat(garmin_file)
         garmin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
     zwift = None
-    zwift_file = os.path.join(profile_dir, 'zwift_credentials.txt')
+    zwift_file = os.path.join(profile_dir, 'zwift_credentials.bin')
     if os.path.isfile(zwift_file):
         stat = os.stat(zwift_file)
         zwift = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
@@ -847,7 +821,7 @@ def download_avatarLarge(player_id):
 @login_required
 def delete(filename):
     player_id = current_user.player_id
-    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.bin', 'zwift_credentials.bin']:
         return '', 403
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     delete_file = os.path.join(profile_dir, filename)
@@ -1778,23 +1752,19 @@ def garmin_upload(player_id, activity):
         logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    garmin_credentials = '%s/garmin_credentials.txt' % profile_dir
+    garmin_credentials = '%s/garmin_credentials.bin' % profile_dir
     if not os.path.exists(garmin_credentials):
-        logger.info("garmin_credentials.txt missing, skip Garmin activity update")
+        logger.info("garmin_credentials.bin missing, skip Garmin activity update")
         return
     try:
         with open(garmin_credentials, 'rb') as f:
-            if credentials_key is not None:
-                iv = f.read(16)
-                ciphered_text = f.read()
-                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
-                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
-                split_credentials = unciphered_text.splitlines()
-                username = split_credentials[0]
-                password = split_credentials[1]
-            else:
-                username = f.readline().rstrip('\r\n')
-                password = f.readline().rstrip('\r\n')
+            iv = f.read(16)
+            ciphered_text = f.read()
+            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
+            split_credentials = unciphered_text.splitlines()
+            username = split_credentials[0]
+            password = split_credentials[1]
     except Exception as exc:
         logger.warn("Failed to read %s. Skipping Garmin upload attempt. %s" % (garmin_credentials, repr(exc)))
         return
@@ -1839,26 +1809,22 @@ def runalyze_upload(player_id, activity):
 
 def zwift_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    zwift_credentials = '%s/zwift_credentials.txt' % profile_dir
+    zwift_credentials = '%s/zwift_credentials.bin' % profile_dir
     if not os.path.exists(zwift_credentials):
-        logger.info("zwift_credentials.txt missing, skip Zwift activity update")
+        logger.info("zwift_credentials.bin missing, skip Zwift activity update")
         return
     if not os.path.exists(SERVER_IP_FILE):
         logger.info("server_ip.txt missing, skip Zwift activity update")
         return
     try:
         with open(zwift_credentials, 'rb') as f:
-            if credentials_key is not None:
-                iv = f.read(16)
-                ciphered_text = f.read()
-                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
-                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
-                split_credentials = unciphered_text.splitlines()
-                username = split_credentials[0]
-                password = split_credentials[1]
-            else:
-                username = f.readline().rstrip('\r\n')
-                password = f.readline().rstrip('\r\n')
+            iv = f.read(16)
+            ciphered_text = f.read()
+            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
+            split_credentials = unciphered_text.splitlines()
+            username = split_credentials[0]
+            password = split_credentials[1]
     except Exception as exc:
         logger.warn("Failed to read %s. Skipping Zwift upload attempt. %s" % (zwift_credentials, repr(exc)))
         return

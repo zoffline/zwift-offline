@@ -263,7 +263,7 @@ To obtain your current profile:
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
-  * If multiplayer is enabled, use the profile button in the launcher window to import your file.
+  * If multiplayer is enabled, use the Strava button in the launcher window to authorize.
 
 </details>
 
@@ -277,13 +277,7 @@ To obtain your current profile:
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
   * You may need to use the cloudscraper branch if upload fails: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
   * If cloudscraper doesn't work you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
-* Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
-  ```
-  <username>
-  <password>
-  ```
-  * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
-  * If multiplayer is enabled, use the Garmin button in the launcher window to encrypt the credentials file.
+* Enable multiplayer (step 6) and use the Garmin button in the launcher window to enter your credentials.
 
 </details>
 
