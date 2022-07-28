@@ -103,10 +103,8 @@ else:
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 NEWHOME_FILE = "%s/new_home.txt" % STORAGE_DIR
-MULTIPLAYER = False
-credentials_key = None
-if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
-    MULTIPLAYER = True
+MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
+if MULTIPLAYER:
     try:
         if not os.path.isdir(LOGS_DIR):
             os.makedirs(LOGS_DIR)
@@ -1752,19 +1750,28 @@ def garmin_upload(player_id, activity):
         logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    garmin_credentials = '%s/garmin_credentials.bin' % profile_dir
-    if not os.path.exists(garmin_credentials):
-        logger.info("garmin_credentials.bin missing, skip Garmin activity update")
+    garmin_credentials = '%s/garmin_credentials' % profile_dir
+    if os.path.exists(garmin_credentials + '.bin'):
+        garmin_credentials += '.bin'
+    elif os.path.exists(garmin_credentials + '.txt'):
+        garmin_credentials += '.txt'
+    else:
+        logger.info("garmin_credentials missing, skip Garmin activity update")
         return
     try:
-        with open(garmin_credentials, 'rb') as f:
-            iv = f.read(16)
-            ciphered_text = f.read()
-            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
-            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
-            split_credentials = unciphered_text.splitlines()
-            username = split_credentials[0]
-            password = split_credentials[1]
+        if garmin_credentials.endswith('.bin'):
+            with open(garmin_credentials, 'rb') as f:
+                iv = f.read(16)
+                ciphered_text = f.read()
+                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
+                split_credentials = unciphered_text.splitlines()
+                username = split_credentials[0]
+                password = split_credentials[1]
+        else:
+            with open(garmin_credentials) as f:
+                username = f.readline().rstrip('\r\n')
+                password = f.readline().rstrip('\r\n')
     except Exception as exc:
         logger.warn("Failed to read %s. Skipping Garmin upload attempt. %s" % (garmin_credentials, repr(exc)))
         return
