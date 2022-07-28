@@ -16,7 +16,6 @@ import re
 import smtplib, ssl
 import requests
 import json
-import struct
 import base64
 from copy import copy, deepcopy
 from functools import wraps
