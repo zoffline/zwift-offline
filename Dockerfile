@@ -18,7 +18,7 @@ ENV PATH=/root/.local/bin:$PATH
 COPY --from=builder /usr/src/app/zwift-offline/ zwift-offline/
 RUN chmod 777 zwift-offline/storage
 
-EXPOSE 443 80 3022/udp 3023 53/udp
+EXPOSE 443 80 3024/udp 3025 53/udp
 
 VOLUME /usr/src/app/zwift-offline/storage
 
