@@ -3143,8 +3143,12 @@ def auth_realms_zwift_tokens_access_codes():
 def experimentation_v1_variant():
     variants = variants_pb2.FeatureResponse()
     if b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
-        with open(os.path.join(SCRIPT_DIR, "variants_encryption.txt")) as f:
-            Parse(f.read(), variants)
+        v1 = variants.variants.add()
+        v1.name = "game_1_26_2_data_encryption"
+        v1.value = True
+        v2 = variants.variants.add()
+        v2.name = "game_1_27_0_disable_encryption_bypass"
+        v2.value = True
     else:
         with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
             Parse(f.read(), variants)
