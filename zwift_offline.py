@@ -1607,7 +1607,7 @@ def api_profiles_id_photo_post(player_id):
         f.write(stream)
     return '', 200
 
-@app.route('/api/profiles/<int:player_id>/activities/', methods=['GET', 'POST'], strict_slashes=False)
+@app.route('/api/profiles/<int:player_id>/activities', methods=['GET', 'POST'], strict_slashes=False)
 @jwt_to_session_cookie
 @login_required
 def api_profiles_activities(player_id):
