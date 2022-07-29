@@ -1,0 +1,29 @@
+syntax = "proto2";
+/* XXX: This is a first approximation of login response. Not looked into or verified. */
+import "per-session-info.proto";
+
+message LoginResponse {
+	required string session_state = 1;
+	required PerSessionInfo info = 2;
+	optional uint32 relay_session_id = 3;
+	optional uint32 expiration = 4; // minutes
+}
+
+message LoginRequest {
+	required AnalyticsEventProperties properties = 1;
+	required string key = 2;
+}
+
+message AnalyticsEventProperty {
+	required string f1 = 1;
+	required string f2 = 2;
+}
+
+message AnalyticsEventProperties {
+	repeated AnalyticsEventProperty property = 2;
+}
+
+message RelaySessionRefreshResponse {
+	required uint32 relay_session_id = 1;
+	required uint32 expiration = 2; // minutes
+}

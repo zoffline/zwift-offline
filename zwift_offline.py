@@ -16,6 +16,7 @@ import re
 import smtplib, ssl
 import requests
 import json
+import base64
 from copy import copy, deepcopy
 from functools import wraps
 from io import BytesIO
@@ -34,13 +35,15 @@ from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 
 sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import udp_node_msgs_pb2
 import tcp_node_msgs_pb2
 import activity_pb2
 import goal_pb2
-import login_response_pb2
+import login_pb2
 import per_session_info_pb2
 import profile_pb2
 import segment_result_pb2
@@ -99,10 +102,8 @@ else:
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 NEWHOME_FILE = "%s/new_home.txt" % STORAGE_DIR
-MULTIPLAYER = False
-credentials_key = None
-if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
-    MULTIPLAYER = True
+MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
+if MULTIPLAYER:
     try:
         if not os.path.isdir(LOGS_DIR):
             os.makedirs(LOGS_DIR)
@@ -112,22 +113,12 @@ if os.path.exists("%s/multiplayer.txt" % STORAGE_DIR):
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
-    try:
-        from cryptography.fernet import Fernet
-        encrypt = True
-    except ImportError:
-        logger.warn("cryptography is not installed. Uploaded garmin_credentials.txt will not be encrypted.")
-        encrypt = False
-    if encrypt:
-        OLD_KEY_FILE = "%s/garmin-key.txt" % STORAGE_DIR
-        CREDENTIALS_KEY_FILE = "%s/credentials-key.txt" % STORAGE_DIR
-        if os.path.exists(OLD_KEY_FILE):  # check if we need to migrate from the old filename to new
-            os.rename(OLD_KEY_FILE, CREDENTIALS_KEY_FILE)
-        if not os.path.exists(CREDENTIALS_KEY_FILE):
-            with open(CREDENTIALS_KEY_FILE, 'wb') as f:
-                f.write(Fernet.generate_key())
-        with open(CREDENTIALS_KEY_FILE, 'rb') as f:
-            credentials_key = f.read()
+    CREDENTIALS_KEY_FILE = "%s/credentials-key.bin" % STORAGE_DIR
+    if not os.path.exists(CREDENTIALS_KEY_FILE):
+        with open(CREDENTIALS_KEY_FILE, 'wb') as f:
+            f.write(get_random_bytes(32))
+    with open(CREDENTIALS_KEY_FILE, 'rb') as f:
+        credentials_key = f.read()
 
 try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
@@ -207,6 +198,17 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
 
     def is_authenticated(self):
         return True
+
+class Relay:
+    def __init__(self, key = b''):
+        self.ri = 0
+        self.tcp_ci = 0
+        self.udp_ci = 0
+        self.tcp_r_sn = 0
+        self.tcp_t_sn = 0
+        self.udp_r_sn = 0
+        self.udp_t_sn = 0
+        self.key = key
 
 class PartialProfile:
     player_id = 0
@@ -586,7 +588,7 @@ def authorization():
             f.write(token_response['access_token'] + '\n');
             f.write(token_response['refresh_token'] + '\n');
             f.write(str(token_response['expires_at']) + '\n');
-        flash("Strava authorized. Go to \"Upload\" to remove authorization.")
+        flash("Strava authorized. Go to \"Profile\" to remove authorization.")
     except Exception as exc:
         logger.warn('Strava: %s' % repr(exc))
         flash("Strava canceled.")
@@ -619,23 +621,19 @@ def profile(username):
             except Exception as exc:
                 logger.warn('Zwift profile: %s' % repr(exc))
                 flash("Error downloading profile.")
-            if request.form.get("safe_zwift", None) != None:
+            if request.form.get("save_zwift", None) != None:
                 try:
-                    file_path = os.path.join(profile_dir, 'zwift_credentials.txt')
-                    with open(file_path, 'w') as f:
-                        f.write(username + '\n')
-                        f.write(password + '\n')
-                    if credentials_key is not None:
-                        with open(file_path, 'rb') as fr:
-                            zwift_credentials = fr.read()
-                            cipher_suite = Fernet(credentials_key)
-                            ciphered_text = cipher_suite.encrypt(zwift_credentials)
-                            with open(file_path, 'wb') as fw:
-                                fw.write(ciphered_text)
-                    flash("Zwift credentials saved.")
+                    zwift_credentials = (username + '\n' + password).encode('UTF-8')
+                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
+                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
+                    file_path = os.path.join(profile_dir, 'zwift_credentials.bin')
+                    with open(file_path, 'wb') as fw:
+                        fw.write(cipher_suite.iv)
+                        fw.write(ciphered_text)
+                    flash("Zwift credentials saved. Go to \"Profile\" to remove credentials.")
                 except Exception as exc:
                     logger.warn('zwift_credentials: %s' % repr(exc))
-                    flash("Error saving 'zwift_credentials.txt' file.")
+                    flash("Error saving 'zwift_credentials.bin' file.")
         except Exception as exc:
             logger.warn('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
@@ -654,21 +652,17 @@ def garmin(username):
         password = request.form['password']
 
         try:
-            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.txt')
-            with open(file_path, 'w') as f:
-                f.write(username + '\n')
-                f.write(password + '\n')
-            if credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(ciphered_text)
-            flash("Garmin credentials saved.")
+            garmin_credentials = (username + '\n' + password).encode('UTF-8')
+            cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
+            ciphered_text = cipher_suite.encrypt(garmin_credentials)
+            file_path = os.path.join(STORAGE_DIR, str(current_user.player_id), 'garmin_credentials.bin')
+            with open(file_path, 'wb') as fw:
+                fw.write(cipher_suite.iv)
+                fw.write(ciphered_text)
+            flash("Garmin credentials saved. Go to \"Profile\" to remove credentials.")
         except Exception as exc:
             logger.warn('garmin_credentials: %s' % repr(exc))
-            flash("Error saving 'garmin_credentials.txt' file.")
+            flash("Error saving 'garmin_credentials.bin' file.")
     return render_template("garmin.html", username=current_user.username)
 
 
@@ -766,23 +760,9 @@ def upload(username):
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'achievements.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+        if uploaded_file.filename in ['profile.bin', 'achievements.bin']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
-            if uploaded_file.filename == 'garmin_credentials.txt' and credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(ciphered_text)
-            if uploaded_file.filename == 'zwift_credentials.txt' and credentials_key is not None:
-                with open(file_path, 'rb') as fr:
-                    garmin_credentials = fr.read()
-                    cipher_suite = Fernet(credentials_key)
-                    ciphered_text = cipher_suite.encrypt(garmin_credentials)
-                    with open(file_path, 'wb') as fw:
-                        fw.write(ciphered_text)   
             flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
@@ -803,12 +783,12 @@ def upload(username):
         stat = os.stat(token_file)
         token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
     garmin = None
-    garmin_file = os.path.join(profile_dir, 'garmin_credentials.txt')
+    garmin_file = os.path.join(profile_dir, 'garmin_credentials.bin')
     if os.path.isfile(garmin_file):
         stat = os.stat(garmin_file)
         garmin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
     zwift = None
-    zwift_file = os.path.join(profile_dir, 'zwift_credentials.txt')
+    zwift_file = os.path.join(profile_dir, 'zwift_credentials.bin')
     if os.path.isfile(zwift_file):
         stat = os.stat(zwift_file)
         zwift = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
@@ -838,7 +818,7 @@ def download_avatarLarge(player_id):
 @login_required
 def delete(filename):
     player_id = current_user.player_id
-    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.txt', 'zwift_credentials.txt']:
+    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.bin', 'zwift_credentials.bin']:
         return '', 403
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     delete_file = os.path.join(profile_dir, filename)
@@ -1027,9 +1007,15 @@ def api_gameinfo():
         return r
 
 @app.route('/api/users/login', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
 def api_users_login():
-    # Should just return a binary blob rather than build a "proper" response...
-    response = login_response_pb2.LoginResponse()
+    req = login_pb2.LoginRequest()
+    req.ParseFromString(request.stream.read())
+    player_id = current_user.player_id
+    global_relay[player_id] = Relay(req.key)
+
+    response = login_pb2.LoginResponse()
     response.session_state = 'abc'
     response.info.relay_url = "https://us-or-rly101.zwift.com/relay"
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
@@ -1041,7 +1027,19 @@ def api_users_login():
     else:
         udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
+    response.relay_session_id = player_id
+    response.expiration = 70
     return response.SerializeToString(), 200
+
+
+@app.route('/relay/session/refresh', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def relay_session_refresh():
+    refresh = login_pb2.RelaySessionRefreshResponse()
+    refresh.relay_session_id = current_user.player_id
+    refresh.expiration = 70
+    return refresh.SerializeToString(), 200
 
 
 def logout_player(player_id):
@@ -1527,10 +1525,15 @@ def api_profiles_me_phone():
     if not request.stream:
         return '', 400
     phoneAddress = request.json['phoneAddress']
-    phonePort = int(request.json['port'])
-    zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort)
+    if 'port' in request.json:
+        phonePort = int(request.json['port'])
+        phoneSecretKey = 'None'
+    if 'securePort' in request.json:
+        phonePort = int(request.json['securePort'])
+        phoneSecretKey = base64.b64decode(request.json['secret'])
+    zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort, phoneSecretKey)
     #todo UDP scenario
-    logger.info("ZCompanion %d reg: %s:%d" % (current_user.player_id, phoneAddress, phonePort))
+    logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey.hex()))
     return '', 204
 
 @app.route('/api/profiles/me/<int:player_id>', methods=['PUT'])
@@ -1746,21 +1749,26 @@ def garmin_upload(player_id, activity):
         logger.warn("garmin_uploader is not installed. Skipping Garmin upload attempt. %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    garmin_credentials = '%s/garmin_credentials.txt' % profile_dir
-    if not os.path.exists(garmin_credentials):
-        logger.info("garmin_credentials.txt missing, skip Garmin activity update")
+    garmin_credentials = '%s/garmin_credentials' % profile_dir
+    if os.path.exists(garmin_credentials + '.bin'):
+        garmin_credentials += '.bin'
+    elif os.path.exists(garmin_credentials + '.txt'):
+        garmin_credentials += '.txt'
+    else:
+        logger.info("garmin_credentials missing, skip Garmin activity update")
         return
     try:
-        with open(garmin_credentials, 'r') as f:
-            if credentials_key is not None:
-                cipher_suite = Fernet(credentials_key)
+        if garmin_credentials.endswith('.bin'):
+            with open(garmin_credentials, 'rb') as f:
+                iv = f.read(16)
                 ciphered_text = f.read()
-                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
-                unciphered_text = unciphered_text.decode(encoding='UTF-8')
+                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+                unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
                 split_credentials = unciphered_text.splitlines()
                 username = split_credentials[0]
                 password = split_credentials[1]
-            else:
+        else:
+            with open(garmin_credentials) as f:
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
     except Exception as exc:
@@ -1807,26 +1815,22 @@ def runalyze_upload(player_id, activity):
 
 def zwift_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    zwift_credentials = '%s/zwift_credentials.txt' % profile_dir
+    zwift_credentials = '%s/zwift_credentials.bin' % profile_dir
     if not os.path.exists(zwift_credentials):
-        logger.info("zwift_credentials.txt missing, skip Zwift activity update")
+        logger.info("zwift_credentials.bin missing, skip Zwift activity update")
         return
     if not os.path.exists(SERVER_IP_FILE):
         logger.info("server_ip.txt missing, skip Zwift activity update")
         return
     try:
-        with open(zwift_credentials, 'r') as f:
-            if credentials_key is not None:
-                cipher_suite = Fernet(credentials_key)
-                ciphered_text = f.read()
-                unciphered_text = (cipher_suite.decrypt(ciphered_text.encode(encoding='UTF-8')))
-                unciphered_text = unciphered_text.decode(encoding='UTF-8')
-                split_credentials = unciphered_text.splitlines()
-                username = split_credentials[0]
-                password = split_credentials[1]
-            else:
-                username = f.readline().rstrip('\r\n')
-                password = f.readline().rstrip('\r\n')
+        with open(zwift_credentials, 'rb') as f:
+            iv = f.read(16)
+            ciphered_text = f.read()
+            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
+            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
+            split_credentials = unciphered_text.splitlines()
+            username = split_credentials[0]
+            password = split_credentials[1]
     except Exception as exc:
         logger.warn("Failed to read %s. Skipping Zwift upload attempt. %s" % (zwift_credentials, repr(exc)))
         return
@@ -3138,7 +3142,14 @@ def auth_realms_zwift_tokens_access_codes():
 @login_required
 def experimentation_v1_variant():
     variants = variants_pb2.FeatureResponse()
-    if not b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
+    if b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
+        v1 = variants.variants.add()
+        v1.name = "game_1_26_2_data_encryption"
+        v1.value = True
+        v2 = variants.variants.add()
+        v2.name = "game_1_27_0_disable_encryption_bypass"
+        v2.value = True
+    else:
         with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
             Parse(f.read(), variants)
         v = variants.variants.add()
@@ -3186,8 +3197,9 @@ def achievement_unlock():
     return '', 202
 
 
-def run_standalone(passed_online, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
     global online
+    global global_relay
     global global_pace_partners
     global global_bots
     global global_ghosts
@@ -3197,6 +3209,7 @@ def run_standalone(passed_online, passed_global_pace_partners, passed_global_bot
     global discord
     global login_manager
     online = passed_online
+    global_relay = passed_global_relay
     global_pace_partners = passed_global_pace_partners
     global_bots = passed_global_bots
     global_ghosts = passed_global_ghosts
