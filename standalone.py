@@ -360,7 +360,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 return
             global_clients[ip] = global_relay[relay_id]
         #print("TCPHandler hello: %s" % self.data.hex())
-        if int.from_bytes(self.data[0:2], "big") > len(self.data) - 2:
+        if int.from_bytes(self.data[0:2], "big") != len(self.data) - 2:
             print("Wrong packet size")
             return
         relay = global_clients[ip]
