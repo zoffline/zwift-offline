@@ -1337,22 +1337,7 @@ def bikeFrameToStr(val):
     return "---"
 
 def do_api_profiles(profile_id, is_json):
-    if MULTIPLAYER:
-        profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
-    else:
-        # Find first profile.bin if one exists and use it. Multi-profile
-        # support is deprecated and now unsupported for non-multiplayer mode.
-        profile_dir = None
-        for name in os.listdir(STORAGE_DIR):
-            path = "%s/%s" % (STORAGE_DIR, name)
-            if os.path.isdir(path) and os.path.exists("%s/profile.bin" % path):
-                profile_dir = path
-                break
-        if not profile_dir:  # no existing profile
-            profile_dir = "%s/1" % STORAGE_DIR
-            profile_id = 1
-            AnonUser.player_id = profile_id
-
+    profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
     try:
         if not os.path.isdir(profile_dir):
             os.makedirs(profile_dir)
@@ -1369,12 +1354,7 @@ def do_api_profiles(profile_id, is_json):
     else: 
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
-            if MULTIPLAYER:
-                profile.id = profile_id
-            elif current_user.player_id != profile.id:
-                # Update AnonUser's player_id to match
-                AnonUser.player_id = profile.id
-                ghosts_enabled[profile.id] = AnonUser.enable_ghosts
+            profile.id = profile_id
             if not profile.email:
                 profile.email = 'user@email.com'
             if profile.entitlements:
@@ -3100,15 +3080,12 @@ def save_option(option, file):
 @app.route("/start-zwift" , methods=['POST'])
 @login_required
 def start_zwift():
-    if MULTIPLAYER:
-        current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-        ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
-        current_user.new_home = 'newhome' in request.form.keys()
-    else:
-        AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
-        save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
-        AnonUser.new_home = 'newhome' in request.form.keys()
-        save_option(AnonUser.new_home, NEWHOME_FILE)
+    current_user.enable_ghosts = 'enableghosts' in request.form.keys()
+    ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
+    current_user.new_home = 'newhome' in request.form.keys()
+    if not MULTIPLAYER:
+        save_option(current_user.enable_ghosts, ENABLEGHOSTS_FILE)
+        save_option(current_user.new_home, NEWHOME_FILE)
     db.session.commit()
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
@@ -3221,6 +3198,17 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     login_manager.login_view = 'login'
     login_manager.session_protection = None
     if not MULTIPLAYER:
+        # Find first profile.bin if one exists and use it. Multi-profile
+        # support is deprecated and now unsupported for non-multiplayer mode.
+        player_id = None
+        for name in os.listdir(STORAGE_DIR):
+            path = "%s/%s" % (STORAGE_DIR, name)
+            if os.path.isdir(path) and os.path.exists("%s/profile.bin" % path):
+                player_id = int(name)
+                break
+        if not player_id:
+            player_id = 1
+        AnonUser.player_id = player_id
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)
 
