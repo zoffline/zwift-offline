@@ -89,7 +89,6 @@ DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 2
 
 PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
-BOTS_DIR = "%s/bots" % SCRIPT_DIR
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
@@ -256,6 +255,15 @@ courses_lookup = {
     15: 'Paris',
     16: 'Gravel Mountain'  # event specific
 }
+
+bike_frames = {}
+jerseys = []
+with open(os.path.join(SCRIPT_DIR, "game_info.txt"), encoding="utf-8-sig") as f:
+    data = json.load(f)
+    for frame in data['bikeFrames']:
+        bike_frames[int(frame['id'])] = frame['name']
+    for jersey in data['jerseys']:
+        jerseys.append(int(jersey['id']))
 
 
 def jwt_encode(payload, key, **kwargs):
@@ -1329,11 +1337,8 @@ def privacy(profile):
 "suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
 
 def bikeFrameToStr(val):
-    if (val == 0x7d8c357d):
-        return "Zwift Carbon"
-    else:
-        if (val == -722210337):
-            return "Zwift TT"
+    if val in bike_frames.keys():
+        return bike_frames[val]
     return "---"
 
 def do_api_profiles(profile_id, is_json):
@@ -1620,6 +1625,14 @@ def api_profiles_activities(player_id):
         activities.activities.remove(a)
     return activities.SerializeToString(), 200
 
+def span(state):
+    seconds = (world_time() - state.worldTime) // 1000
+    if seconds < 7200: return '%s minutes' % (seconds // 60)
+    elif seconds < 172800: return '%s hours' % (seconds // 3600)
+    elif seconds < 1209600: return '%s days' % (seconds // 86400)
+    elif seconds < 5259492: return '%s weeks' % (seconds // 604800)
+    elif seconds < 63113904: return '%s months' % (seconds // 2629746)
+    else: return '%s years' % (seconds // 31556952)
 
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
@@ -1639,13 +1652,7 @@ def api_profiles():
                     p.CopyFrom(profile)
                     p.id = p_id
                     p.first_name = ''
-                    seconds = (world_time() - global_ghosts[player_id].play.ghosts[ghostId - 1].states[0].worldTime) // 1000
-                    if seconds < 7200: span = '%s minutes' % (seconds // 60)
-                    elif seconds < 172800: span = '%s hours' % (seconds // 3600)
-                    elif seconds < 1209600: span = '%s days' % (seconds // 86400)
-                    elif seconds < 5259492: span = '%s weeks' % (seconds // 604800)
-                    else: span = '%s months' % (seconds // 2629746)
-                    p.last_name = span + ' ago [ghost]'
+                    p.last_name = span(global_ghosts[player_id].play.ghosts[ghostId-1].states[0]) + ' ago [ghost]'
                     p.bike_frame = 1456463855 # tron bike
                     p.country_code = 0
                     if p.ride_jersey == 3761002195:

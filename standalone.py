@@ -8,6 +8,7 @@ import threading
 import time
 import csv
 import math
+import random
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
@@ -32,7 +33,6 @@ if getattr(sys, 'frozen', False):
     EXE_DIR = os.path.dirname(sys.executable)
     STORAGE_DIR = "%s/storage" % EXE_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % EXE_DIR
-    BOTS_DIR = '%s/bots' % EXE_DIR
     START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
     if not os.path.isfile(START_LINES_FILE):
         copyfile('%s/start_lines.csv' % SCRIPT_DIR, START_LINES_FILE)
@@ -40,7 +40,6 @@ else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-    BOTS_DIR = '%s/bots' % SCRIPT_DIR
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
@@ -64,7 +63,6 @@ MAP_OVERRIDE = deque(maxlen=16)
 
 ghost_update_freq = 3
 pacer_update_freq = 1
-bot_update_freq = 3
 last_pp_updates = {}
 last_bot_updates = {}
 global_ghosts = {}
@@ -582,22 +580,30 @@ def play_pace_partners():
         ppthreadevent.wait(timeout=pacer_update_freq)
 
 def load_bots():
-    if not os.path.isdir(BOTS_DIR): return
-    for (root, dirs, files) in os.walk(BOTS_DIR):
-        for d in dirs:
-            profile = os.path.join(BOTS_DIR, d, 'profile.bin')
-            route = os.path.join(BOTS_DIR, d, 'route.bin')
-            if os.path.isfile(profile) and os.path.isfile(route):
-                with open(profile, 'rb') as fd:
-                    p = profile_pb2.PlayerProfile()
-                    p.ParseFromString(fd.read())
-                    global_bots[p.id] = PacePartnerVariables()
-                    bot = global_bots[p.id]
-                    bot.profile = p
-                with open(route, 'rb') as fd:
-                    bot.route = udp_node_msgs_pb2.Ghost()
-                    bot.route.ParseFromString(fd.read())
-                    bot.position = 0
+    if not os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR): return
+    i = 1
+    for name in os.listdir(STORAGE_DIR):
+        path = '%s/%s/ghosts' % (STORAGE_DIR, name)
+        if os.path.isdir(path):
+            for (root, dirs, files) in os.walk(path):
+                for f in files:
+                    if f.endswith('.bin'):
+                        p = profile_pb2.PlayerProfile()
+                        p.id = i + 1000000
+                        global_bots[p.id] = PacePartnerVariables()
+                        bot = global_bots[p.id]
+                        bot.route = udp_node_msgs_pb2.Ghost()
+                        bot.position = 0
+                        with open(os.path.join(root, f), 'rb') as fd:
+                            bot.route.ParseFromString(fd.read())
+                        p.first_name = ''
+                        p.last_name = zo.span(bot.route.states[0]) + ' ago [bot]'
+                        p.is_male = bool(random.getrandbits(1))
+                        p.ride_jersey = random.choice(zo.jerseys)
+                        p.bike_frame = random.choice(list(zo.bike_frames.keys()))
+                        p.country_code = 0
+                        bot.profile = p
+                        i += 1
 
 def play_bots():
     global global_bots
@@ -614,7 +620,7 @@ def play_bots():
             state.id = bot_id
             state.watchingRiderId = bot_id
             state.worldTime = zo.world_time()
-        botthreadevent.wait(timeout=bot_update_freq)
+        botthreadevent.wait(timeout=ghost_update_freq)
 
 def remove_inactive():
     while True:
@@ -786,7 +792,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
                 if zo.is_nearby(watching_state, pace_partner):
                     nearby.append(p_id)
-        if t >= last_bot_updates[player_id] + bot_update_freq:
+        if t >= last_bot_updates[player_id] + ghost_update_freq:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
                 bot_variables = global_bots[p_id]
