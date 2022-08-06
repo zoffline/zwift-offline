@@ -1653,14 +1653,9 @@ def api_profiles():
                     p.id = p_id
                     p.first_name = ''
                     p.last_name = span(global_ghosts[player_id].play.ghosts[ghostId-1].states[0]) + ' ago [ghost]'
-                    p.bike_frame = 1456463855 # tron bike
+                    p.ride_jersey = random.choice(jerseys)
+                    p.bike_frame = random.choice(list(bike_frames.keys()))
                     p.country_code = 0
-                    if p.ride_jersey == 3761002195:
-                        p.ride_jersey = 1869390707 # basic 2 jersey
-                        p.bike_frame_colour = 80 # green bike
-                    else:
-                        p.ride_jersey = 3761002195 # basic 4 jersey
-                        p.bike_frame_colour = 125 # blue bike
                     if p.run_shirt_type == 3344420794:
                         p.run_shirt_type = 4197967370 # shirt 11
                         p.run_shorts_type = 3273293920 # shorts 11
