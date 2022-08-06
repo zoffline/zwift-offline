@@ -591,9 +591,9 @@ def load_bots():
                         global_bots[p.id] = PacePartnerVariables()
                         bot = global_bots[p.id]
                         bot.route = udp_node_msgs_pb2.Ghost()
-                        bot.position = 0
                         with open(os.path.join(root, f), 'rb') as fd:
                             bot.route.ParseFromString(fd.read())
+                        bot.position = random.randrange(len(bot.route.states))
                         p.first_name = ''
                         p.last_name = zo.span(bot.route.states[0]) + ' ago [bot]'
                         p.is_male = bool(random.getrandbits(1))
