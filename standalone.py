@@ -550,7 +550,6 @@ class PacePartnerVariables:
     position = 0
 
 def load_pace_partners():
-    if not os.path.isdir(PACE_PARTNERS_DIR): return
     for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
         for d in dirs:
             profile = os.path.join(PACE_PARTNERS_DIR, d, 'profile.bin')
@@ -580,7 +579,6 @@ def play_pace_partners():
         ppthreadevent.wait(timeout=pacer_update_freq)
 
 def load_bots():
-    if not os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR): return
     i = 1
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
@@ -872,15 +870,17 @@ rithreadevent = threading.Event()
 ri = threading.Thread(target=remove_inactive)
 ri.start()
 
-load_pace_partners()
-ppthreadevent = threading.Event()
-pp = threading.Thread(target=play_pace_partners)
-pp.start()
+if os.path.isdir(PACE_PARTNERS_DIR):
+    load_pace_partners()
+    ppthreadevent = threading.Event()
+    pp = threading.Thread(target=play_pace_partners)
+    pp.start()
 
-load_bots()
-botthreadevent = threading.Event()
-bot = threading.Thread(target=play_bots)
-bot.start()
+if os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR):
+    load_bots()
+    botthreadevent = threading.Event()
+    bot = threading.Thread(target=play_bots)
+    bot.start()
 
 if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
     from fake_dns import fake_dns
