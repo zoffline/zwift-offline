@@ -794,9 +794,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
         nearby = {}
         for p_id in online.keys():
             player = online[p_id]
-            is_nearby, distance = nearby_distance(watching_state, player)
-            if player.id != player_id and is_nearby and is_state_new_for(player, player_id):
-                nearby[p_id] = distance
+            if player.id != player_id:
+                is_nearby, distance = nearby_distance(watching_state, player)
+                if is_nearby and is_state_new_for(player, player_id):
+                    nearby[p_id] = distance
         if t >= last_pp_updates[player_id] + pacer_update_freq:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
