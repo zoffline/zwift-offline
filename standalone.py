@@ -817,9 +817,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
             ghosts.last_play = t
             ghost_id = 1
             for g in ghosts.play.ghosts:
-                is_nearby, distance = nearby_distance(watching_state, g.states[ghosts.play_count])
-                if len(g.states) > ghosts.play_count and is_nearby:
-                    nearby[player_id + ghost_id * 10000000] = distance
+                if len(g.states) > ghosts.play_count:
+                    is_nearby, distance = nearby_distance(watching_state, g.states[ghosts.play_count])
+                    if is_nearby:
+                        nearby[player_id + ghost_id * 10000000] = distance
                 ghost_id += 1
             ghosts.play_count += 1
 
