@@ -9,6 +9,7 @@ import time
 import csv
 import math
 import random
+import itertools
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
@@ -657,6 +658,18 @@ def is_state_new_for(peer_player_state, player_id):
     for_news[peer_player_state.id] = peer_player_state.worldTime
     return True
 
+def nearby_distance(state1, state2):
+    if state1 is None or state2 is None:
+        return False, None
+    try:
+        if zo.get_course(state1) == zo.get_course(state2):
+            dist = math.hypot(state2.x - state1.x, state2.z - state1.z)
+            if dist < 100000:
+                return True, dist
+    except Exception as exc:
+        print('nearby_distance: %s' % repr(exc))
+    return False, None
+
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
@@ -778,37 +791,44 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 watching_state = ghost.states[ghosts.play_count]
 
         #Check if online players, pace partners, bots and ghosts are nearby
-        nearby = list()
+        nearby = {}
         for p_id in online.keys():
             player = online[p_id]
-            if player.id != player_id and zo.is_nearby(watching_state, player) and is_state_new_for(player, player_id):
-                nearby.append(p_id)
+            is_nearby, distance = nearby_distance(watching_state, player)
+            if player.id != player_id and is_nearby and is_state_new_for(player, player_id):
+                nearby[p_id] = distance
         if t >= last_pp_updates[player_id] + pacer_update_freq:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
                 pace_partner_variables = global_pace_partners[p_id]
                 pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
-                if zo.is_nearby(watching_state, pace_partner):
-                    nearby.append(p_id)
+                is_nearby, distance = nearby_distance(watching_state, pace_partner)
+                if is_nearby:
+                    nearby[p_id] = distance
         if t >= last_bot_updates[player_id] + ghost_update_freq:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
                 bot_variables = global_bots[p_id]
                 bot = bot_variables.route.states[bot_variables.position]
-                if zo.is_nearby(watching_state, bot):
-                    nearby.append(p_id)
+                is_nearby, distance = nearby_distance(watching_state, bot)
+                if is_nearby:
+                    nearby[p_id] = distance
         elif ghosts.started and t >= ghosts.last_play + ghost_update_freq:
             ghosts.last_play = t
             ghost_id = 1
             for g in ghosts.play.ghosts:
-                if len(g.states) > ghosts.play_count and zo.is_nearby(watching_state, g.states[ghosts.play_count]):
-                    nearby.append(player_id + ghost_id * 10000000)
+                is_nearby, distance = nearby_distance(watching_state, g.states[ghosts.play_count])
+                if len(g.states) > ghosts.play_count and is_nearby:
+                    nearby[player_id + ghost_id * 10000000] = distance
                 ghost_id += 1
             ghosts.play_count += 1
 
         #Send nearby riders states or empty message
         message = get_empty_message(player_id)
         if nearby:
+            if len(nearby) > 100:
+                nearby = dict(sorted(nearby.items(), key=lambda item: item[1]))
+                nearby = dict(itertools.islice(nearby.items(), 100))
             message.num_msgs = math.ceil(len(nearby) / 10)
             for p_id in nearby:
                 player = None

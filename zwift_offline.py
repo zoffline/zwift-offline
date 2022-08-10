@@ -372,28 +372,17 @@ def is_forward(state):
     return (state.f19 & 4) != 0
 
 
-def is_nearby(player_state1, player_state2, range = 100000):
-    if player_state1 is None or player_state2 is None:
+def is_nearby(state1, state2, range = 100000):
+    if state1 is None or state2 is None:
         return False
     try:
-        if player_state1.watchingRiderId == player_state2.id or player_state2.watchingRiderId == player_state1.id:
+        if state1.watchingRiderId == state2.id or state2.watchingRiderId == state1.id:
             return True
-        course1 = get_course(player_state1)
-        course2 = get_course(player_state2)
-        if course1 == course2:
-            x1 = int(player_state1.x)
-            x2 = int(player_state2.x)
-            if x1 - range <= x2 and x1 + range >= x2:
-                z1 = int(player_state1.z)
-                z2 = int(player_state2.z)
-                if z1 - range <= z2 and z1 + range >= z2:
-                    a1 = int(player_state1.y_altitude)
-                    a2 = int(player_state2.y_altitude)
-                    if a1 - range <= a2 and a1 + range >= a2:
-                        return True
+        if get_course(state1) == get_course(state2):
+            if math.hypot(state2.x - state1.x, state2.z - state1.z) < range:
+                return True
     except Exception as exc:
         logger.warn('is_nearby: %s' % repr(exc))
-        pass
     return False
 
 
@@ -1864,7 +1853,6 @@ def api_profiles_activities_id(player_id, activity_id):
             save_ghost(quote(activity.name, safe=' '), player_id)
         except Exception as exc:
             logger.warn('save_ghost: %s' % repr(exc))
-            pass
     # For using with upload_activity
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(activity.SerializeToString())
