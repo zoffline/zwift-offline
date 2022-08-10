@@ -3137,6 +3137,7 @@ def get_profile_saved_game_achiev2_40_bytes():
             return b''
 
 @app.route('/achievement/loadPlayerAchievements', methods=['GET'])
+@app.route('/api/achievement/loadPlayerAchievements', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def achievement_loadPlayerAchievements():
@@ -3154,6 +3155,7 @@ def achievement_loadPlayerAchievements():
 
 
 @app.route('/achievement/unlock', methods=['POST'])
+@app.route('/api/achievement/unlock', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def achievement_unlock():

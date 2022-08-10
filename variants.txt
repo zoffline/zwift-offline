@@ -85,10 +85,6 @@
       "values": {}
     },
     {
-      "name": "game_1_24_apple_novus_ble_refactor",
-      "values": {}
-    },
-    {
       "name": "game_1_21_ble_data_guard_v2",
       "values": {}
     },
@@ -136,7 +132,7 @@
       "values": {}
     },
     {
-      "name": "game_1_21_ble_dll_v2",
+      "name": "game_1_27_ble_dll_v2",
       "value": true,
       "values": {}
     },
@@ -201,6 +197,9 @@
       "name": "game_training_partners",
       "values": {
         "fields": {
+          "screenshots_enabled": {
+            "boolValue": false
+          },
           "recording_enabled": {
             "boolValue": false
           },
@@ -222,10 +221,32 @@
     },
     {
       "name": "game_1_27_enable_dynamic_workout_trigger_events",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_enable_workout_hud_hiding",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_display_pr_hud_in_dynamic_workouts",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_fix_leaderboard_hud_starting_display_road_time",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_render_profile_screen_drop_down_box_title_text",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_27_add_lineup_to_leave_current_event",
+      "value": true,
       "values": {}
     },
     {
@@ -239,7 +260,6 @@
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
-      "value": true,
       "values": {
         "fields": {
           "initialDropInTime": {
@@ -268,7 +288,7 @@
       "values": {}
     },
     {
-      "name": "game_1_26_ble_middleware",
+      "name": "game_1_28_ble_middleware",
       "values": {}
     },
     {
@@ -279,17 +299,30 @@
       "name": "game_1_27_atv_remote_gestures",
       "values": {
         "fields": {
+          "ATVPopInitDist": {
+            "numberValue": 180.0
+          },
+          "ATVPopInitDelay": {
+            "numberValue": 0.1
+          },
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
+          "ATVPopDist": {
+            "numberValue": 120.0
+          },
           "ATVFriction": {
             "numberValue": 0.9
+          },
+          "ATVPopDelay": {
+            "numberValue": 0.15
           }
         }
       }
     },
     {
       "name": "game_1_27_hardware_restriction",
+      "value": true,
       "values": {}
     },
     {
@@ -307,6 +340,20 @@
     },
     {
       "name": "game_1_27_dynamic_campaigns_filter",
+      "values": {}
+    },
+    {
+      "name": "bike_override_using_triggers",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "kit_override_using_triggers",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_event_core_feed_service",
       "values": {}
     },
     {
@@ -340,7 +387,13 @@
     {
       "name": "game_1_17_noesis_enabled",
       "value": true,
-      "values": {}
+      "values": {
+        "fields": {
+          "RenderDevice": {
+            "varintValue": "0"
+          }
+        }
+      }
     },
     {
       "name": "game_1_14_settings_refactor",
