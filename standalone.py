@@ -870,6 +870,18 @@ class UDPHandler(socketserver.BaseRequestHandler):
         relay.udp_t_sn += 1
         socket.sendto(r, client_address)
 
+if os.path.isdir(PACE_PARTNERS_DIR):
+    load_pace_partners()
+    ppthreadevent = threading.Event()
+    pp = threading.Thread(target=play_pace_partners)
+    pp.start()
+
+if os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR):
+    load_bots()
+    botthreadevent = threading.Event()
+    bot = threading.Thread(target=play_bots)
+    bot.start()
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.ThreadingTCPServer(('', 80), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
@@ -891,18 +903,6 @@ udpserver_thread.start()
 rithreadevent = threading.Event()
 ri = threading.Thread(target=remove_inactive)
 ri.start()
-
-if os.path.isdir(PACE_PARTNERS_DIR):
-    load_pace_partners()
-    ppthreadevent = threading.Event()
-    pp = threading.Thread(target=play_pace_partners)
-    pp.start()
-
-if os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR):
-    load_bots()
-    botthreadevent = threading.Event()
-    bot = threading.Thread(target=play_bots)
-    bot.start()
 
 if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
     from fake_dns import fake_dns
