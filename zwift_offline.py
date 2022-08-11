@@ -3196,7 +3196,10 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
         for name in os.listdir(STORAGE_DIR):
             path = "%s/%s" % (STORAGE_DIR, name)
             if os.path.isdir(path) and os.path.exists("%s/profile.bin" % path):
-                player_id = int(name)
+                try:
+                    player_id = int(name)
+                except ValueError:
+                    continue
                 break
         if not player_id:
             player_id = 1
