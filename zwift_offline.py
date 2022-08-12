@@ -372,14 +372,15 @@ def is_forward(state):
     return (state.f19 & 4) != 0
 
 
-def is_nearby(state1, state2, range = 100000):
-    if state1 is None or state2 is None:
+def is_nearby(s1, s2):
+    if s1 is None or s2 is None:
         return False
     try:
-        if state1.watchingRiderId == state2.id or state2.watchingRiderId == state1.id:
+        if s1.watchingRiderId == s2.id or s2.watchingRiderId == s1.id:
             return True
-        if get_course(state1) == get_course(state2):
-            if math.hypot(state2.x - state1.x, state2.z - state1.z) < range:
+        if get_course(s1) == get_course(s2):
+            dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
+            if dist <= 100000 or road_id(s1) == road_id(s2):
                 return True
     except Exception as exc:
         logger.warn('is_nearby: %s' % repr(exc))

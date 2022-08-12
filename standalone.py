@@ -658,13 +658,13 @@ def is_state_new_for(peer_player_state, player_id):
     for_news[peer_player_state.id] = peer_player_state.worldTime
     return True
 
-def nearby_distance(state1, state2):
-    if state1 is None or state2 is None:
+def nearby_distance(s1, s2):
+    if s1 is None or s2 is None:
         return False, None
     try:
-        if zo.get_course(state1) == zo.get_course(state2):
-            dist = math.hypot(state2.x - state1.x, state2.z - state1.z)
-            if dist < 100000:
+        if zo.get_course(s1) == zo.get_course(s2):
+            dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
+            if dist <= 100000 or zo.road_id(s1) == zo.road_id(s2):
                 return True, dist
     except Exception as exc:
         print('nearby_distance: %s' % repr(exc))
