@@ -17,6 +17,7 @@ import smtplib, ssl
 import requests
 import json
 import base64
+import xml.etree.ElementTree as ET
 from copy import copy, deepcopy
 from functools import wraps
 from io import BytesIO
@@ -256,14 +257,8 @@ courses_lookup = {
     16: 'Gravel Mountain'  # event specific
 }
 
-bike_frames = {}
-jerseys = []
-with open(os.path.join(SCRIPT_DIR, "game_info.txt"), encoding="utf-8-sig") as f:
-    data = json.load(f)
-    for frame in data['bikeFrames']:
-        bike_frames[int(frame['id'])] = frame['name']
-    for jersey in data['jerseys']:
-        jerseys.append(int(jersey['id']))
+tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
+GD = tree.getroot()
 
 
 def jwt_encode(payload, key, **kwargs):
@@ -1327,8 +1322,9 @@ def privacy(profile):
 "suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
 
 def bikeFrameToStr(val):
-    if val in bike_frames.keys():
-        return bike_frames[val]
+    item = GD.find("./BIKEFRAMES/BIKEFRAME[@signature='%s']" % val)
+    if item is not None:
+        return item.get('name')
     return "---"
 
 def do_api_profiles(profile_id, is_json):
@@ -1643,15 +1639,18 @@ def api_profiles():
                     p.id = p_id
                     p.first_name = ''
                     p.last_name = span(global_ghosts[player_id].play.ghosts[ghostId-1].states[0]) + ' ago [ghost]'
-                    p.ride_jersey = random.choice(jerseys)
-                    p.bike_frame = random.choice(list(bike_frames.keys()))
+                    p.ride_helmet_type = int(random.choice(GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
+                    p.glasses_type = int(random.choice(GD.findall("./GLASSES/GLASS")).get('signature'))
+                    p.ride_shoes_type = int(random.choice(GD.findall("./BIKESHOES/BIKESHOE")).get('signature'))
+                    p.ride_socks_type = int(random.choice(GD.findall("./SOCKS/SOCK")).get('signature'))
+                    p.ride_jersey = int(random.choice(GD.findall("./JERSEYS/JERSEY")).get('signature'))
+                    p.bike_wheel_front = int(random.choice(GD.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")).get('signature'))
+                    p.bike_wheel_rear = int(random.choice(GD.findall("./BIKEREARWHEELS/BIKEREARWHEEL")).get('signature'))
+                    p.bike_frame = int(random.choice(GD.findall("./BIKEFRAMES/BIKEFRAME")).get('signature'))
                     p.country_code = 0
-                    if p.run_shirt_type == 3344420794:
-                        p.run_shirt_type = 4197967370 # shirt 11
-                        p.run_shorts_type = 3273293920 # shorts 11
-                    else:
-                        p.run_shirt_type = 3344420794 # shirt 10
-                        p.run_shorts_type = 4269451728 # shorts 10
+                    p.run_shirt_type = int(random.choice(GD.findall("./RUNSHIRTS/RUNSHIRT")).get('signature'))
+                    p.run_shorts_type = int(random.choice(GD.findall("./RUNSHORTS/RUNSHORT")).get('signature'))
+                    p.run_shoes_type = int(random.choice(GD.findall("./RUNSHOES/RUNSHOE")).get('signature'))
         else:
             if p_id in global_pace_partners.keys():
                 profile = global_pace_partners[p_id].profile

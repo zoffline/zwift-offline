@@ -598,9 +598,18 @@ def load_bots():
                         p.first_name = ''
                         p.last_name = zo.span(bot.route.states[0]) + ' ago [bot]'
                         p.is_male = bool(random.getrandbits(1))
-                        p.ride_jersey = random.choice(zo.jerseys)
-                        p.bike_frame = random.choice(list(zo.bike_frames.keys()))
+                        p.ride_helmet_type = int(random.choice(zo.GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
+                        p.glasses_type = int(random.choice(zo.GD.findall("./GLASSES/GLASS")).get('signature'))
+                        p.ride_shoes_type = int(random.choice(zo.GD.findall("./BIKESHOES/BIKESHOE")).get('signature'))
+                        p.ride_socks_type = int(random.choice(zo.GD.findall("./SOCKS/SOCK")).get('signature'))
+                        p.ride_jersey = int(random.choice(zo.GD.findall("./JERSEYS/JERSEY")).get('signature'))
+                        p.bike_wheel_front = int(random.choice(zo.GD.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")).get('signature'))
+                        p.bike_wheel_rear = int(random.choice(zo.GD.findall("./BIKEREARWHEELS/BIKEREARWHEEL")).get('signature'))
+                        p.bike_frame = int(random.choice(zo.GD.findall("./BIKEFRAMES/BIKEFRAME")).get('signature'))
                         p.country_code = 0
+                        p.run_shirt_type = int(random.choice(zo.GD.findall("./RUNSHIRTS/RUNSHIRT")).get('signature'))
+                        p.run_shorts_type = int(random.choice(zo.GD.findall("./RUNSHORTS/RUNSHORT")).get('signature'))
+                        p.run_shoes_type = int(random.choice(zo.GD.findall("./RUNSHOES/RUNSHOE")).get('signature'))
                         bot.profile = p
                         i += 1
 
