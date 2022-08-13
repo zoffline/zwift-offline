@@ -1620,6 +1620,20 @@ def span(state):
     elif seconds < 63113904: return '%s months' % (seconds // 2629746)
     else: return '%s years' % (seconds // 31556952)
 
+def random_profile(p):
+    p.ride_helmet_type = int(random.choice(GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
+    p.glasses_type = int(random.choice(GD.findall("./GLASSES/GLASS")).get('signature'))
+    p.ride_shoes_type = int(random.choice(GD.findall("./BIKESHOES/BIKESHOE")).get('signature'))
+    p.ride_socks_type = int(random.choice(GD.findall("./SOCKS/SOCK")).get('signature'))
+    p.ride_jersey = int(random.choice(GD.findall("./JERSEYS/JERSEY")).get('signature'))
+    p.bike_wheel_front = int(random.choice(GD.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")).get('signature'))
+    p.bike_wheel_rear = int(random.choice(GD.findall("./BIKEREARWHEELS/BIKEREARWHEEL")).get('signature'))
+    p.bike_frame = int(random.choice(GD.findall("./BIKEFRAMES/BIKEFRAME")).get('signature'))
+    p.run_shirt_type = int(random.choice(GD.findall("./RUNSHIRTS/RUNSHIRT")).get('signature'))
+    p.run_shorts_type = int(random.choice(GD.findall("./RUNSHORTS/RUNSHORT")).get('signature'))
+    p.run_shoes_type = int(random.choice(GD.findall("./RUNSHOES/RUNSHOE")).get('signature'))
+    return p
+
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
     args = request.args.getlist('id')
@@ -1635,22 +1649,11 @@ def api_profiles():
                 with open(profile_file, 'rb') as fd:
                     profile.ParseFromString(fd.read())
                     p = profiles.profiles.add()
-                    p.CopyFrom(profile)
+                    p.CopyFrom(random_profile(profile))
                     p.id = p_id
                     p.first_name = ''
                     p.last_name = span(global_ghosts[player_id].play.ghosts[ghostId-1].states[0]) + ' ago [ghost]'
-                    p.ride_helmet_type = int(random.choice(GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
-                    p.glasses_type = int(random.choice(GD.findall("./GLASSES/GLASS")).get('signature'))
-                    p.ride_shoes_type = int(random.choice(GD.findall("./BIKESHOES/BIKESHOE")).get('signature'))
-                    p.ride_socks_type = int(random.choice(GD.findall("./SOCKS/SOCK")).get('signature'))
-                    p.ride_jersey = int(random.choice(GD.findall("./JERSEYS/JERSEY")).get('signature'))
-                    p.bike_wheel_front = int(random.choice(GD.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")).get('signature'))
-                    p.bike_wheel_rear = int(random.choice(GD.findall("./BIKEREARWHEELS/BIKEREARWHEEL")).get('signature'))
-                    p.bike_frame = int(random.choice(GD.findall("./BIKEFRAMES/BIKEFRAME")).get('signature'))
                     p.country_code = 0
-                    p.run_shirt_type = int(random.choice(GD.findall("./RUNSHIRTS/RUNSHIRT")).get('signature'))
-                    p.run_shorts_type = int(random.choice(GD.findall("./RUNSHORTS/RUNSHORT")).get('signature'))
-                    p.run_shoes_type = int(random.choice(GD.findall("./RUNSHOES/RUNSHOE")).get('signature'))
         else:
             if p_id in global_pace_partners.keys():
                 profile = global_pace_partners[p_id].profile
