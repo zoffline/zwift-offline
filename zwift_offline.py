@@ -1373,20 +1373,14 @@ def do_api_profiles(profile_id, is_json):
     else:
         return profile.SerializeToString(), 200
 
-@app.route('/api/profiles/me', methods=['GET'])
+@app.route('/api/profiles/me', methods=['GET'], strict_slashes=False)
 @jwt_to_session_cookie
 @login_required
-def api_profiles_me_bin():
+def api_profiles_me():
     if(request.headers['Source'] == "zwift-companion"):
         return do_api_profiles(current_user.player_id, True)
     else:
         return do_api_profiles(current_user.player_id, False)
-
-@app.route('/api/profiles/me/', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def api_profiles_me_json():
-    return do_api_profiles(current_user.player_id, True)
 
 @app.route('/api/profiles/<int:profile_id>', methods=['GET'])
 @jwt_to_session_cookie
@@ -2437,78 +2431,26 @@ def add_player_to_world(player, course_world, is_pace_partner):
 
 
 def relay_worlds_generic(server_realm=None):
-    courses = courses_lookup.keys()
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
-        if request.content_type == 'application/x-protobuf-lite':
-            #chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
-            #serializedMessage = None
-            try:
-                player_update = udp_node_msgs_pb2.WorldAttribute()
-                player_update.ParseFromString(request.data)
-                #chat_message.ParseFromString(request.data[6:])
-                #serializedMessage = chat_message.SerializeToString()
-            except Exception as exc:
-                logger.warn('player_update_parse: %s' % repr(exc))
-                #Not able to decode as playerupdate, send dummy response
-                world = { 'currentDateTime': int(get_utc_time()),
-                        'currentWorldTime': world_time(),
-                        'friendsInWorld': [],
-                        'mapId': 1, #maybe, 13 for watopia?
-                        'name': 'Public Watopia',
-                        'playerCount': 0,
-                        'worldId': udp_node_msgs_pb2.ZofflineConstants.RealmID
-                        }
-                if server_realm:
-                    world['worldId'] = server_realm
-                    return jsonify(world)
-                else:
-                    return jsonify([ world ])
-
-            #PlayerUpdate
-            player_update.world_time_expire = world_time() + 60000
-            player_update.wa_f12 = 1
-            player_update.timestamp = int(get_utc_time()*1000000)
-            for receiving_player_id in online.keys():
-                should_receive = False
-                if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA or player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SR:
-                    receiving_player = online[receiving_player_id]
-                    #Chat message
-                    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
-                        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
-                        chat_message.ParseFromString(player_update.payload)
-                        sending_player_id = chat_message.player_id
-                        if sending_player_id in online:
-                            sending_player = online[sending_player_id]
-                            #Check that players are on same course and close to each other
-                            if is_nearby(sending_player, receiving_player):
-                                should_receive = True
-                    #Segment complete
-                    else:
-                        segment_complete = segment_result_pb2.SegmentResult()
-                        segment_complete.ParseFromString(player_update.payload)
-                        sending_player_id = segment_complete.player_id
-                        if sending_player_id in online:
-                            sending_player = online[sending_player_id]
-                            #Check that players are on same course
-                            if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
-                                should_receive = True
-                #Other PlayerUpdate, send to all
-                else:
-                    should_receive = True
-                if should_receive:
-                    enqueue_player_update(receiving_player_id, player_update.SerializeToString())
-            if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
-                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
-                chat_message.ParseFromString(player_update.payload)
-                discord.send_message(chat_message.message, chat_message.player_id)
-        return '{}', 200
+        world = { 'currentDateTime': int(get_utc_time()),
+                  'currentWorldTime': world_time(),
+                  'friendsInWorld': [],
+                  'mapId': 1, #maybe, 13 for watopia?
+                  'name': 'Public Watopia',
+                  'playerCount': 0,
+                  'worldId': udp_node_msgs_pb2.ZofflineConstants.RealmID
+                }
+        if server_realm:
+            world['worldId'] = server_realm
+            return jsonify(world)
+        else:
+            return jsonify([ world ])
     else:  # protobuf request
         worlds = world_pb2.DropInWorldList()
         world = None
         course_world = {}
-
-        for course in courses:
+        for course in courses_lookup.keys():
             world = worlds.worlds.add()
             world.id = udp_node_msgs_pb2.ZofflineConstants.RealmID
             world.name = 'Public Watopia'
@@ -2614,8 +2556,7 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     return jsonify({"events":json_events,"goals":json_goals,"activities":json_activities,"pendingPrivateEventFeed":ppeFeed,"acceptedPrivateEventFeed":apeFeed,"hasFolloweesToRideOn":False, \
     "worldName":"MAKURIISLANDS","playerCount": len(online),"followingPlayerCount":0,"followingPlayers":[]})
 
-@app.route('/relay/worlds/<int:server_realm>', methods=['GET'])
-@app.route('/relay/worlds/<int:server_realm>/', methods=['GET'])
+@app.route('/relay/worlds/<int:server_realm>', methods=['GET'], strict_slashes=False)
 def relay_worlds_id(server_realm):
     return relay_worlds_generic(server_realm)
 
@@ -2657,27 +2598,15 @@ def relay_worlds_hash_seeds():
     return seeds.SerializeToString(), 200
 
 
-# XXX: attributes have not been thoroughly investigated
 @app.route('/relay/worlds/<int:server_realm>/attributes', methods=['POST'])
-def relay_worlds_id_attributes(server_realm):
-# NOTE: This was previously a protobuf message in Zwift client, but later changed.
-#    attribs = world_pb2.WorldAttributes()
-#    attribs.world_time = world_time()
-#    return attribs.SerializeToString(), 200
-    return relay_worlds_generic(server_realm)
-
-
 @app.route('/relay/worlds/attributes', methods=['POST'])
-def relay_worlds_attributes():
-# PlayerUpdate was previously a json request handled in relay_worlds_generic()
-# now it's protobuf posted to this new route (at least in Windows client)
+def relay_worlds_attributes(server_realm=udp_node_msgs_pb2.ZofflineConstants.RealmID):
     player_update = udp_node_msgs_pb2.WorldAttribute()
     try:
         player_update.ParseFromString(request.data)
     except Exception as exc:
         logger.warn('player_update_parse: %s' % repr(exc))
         return '', 422
-
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
     player_update.timestamp = int(get_utc_time() * 1000000)
@@ -2699,7 +2628,7 @@ def relay_worlds_attributes():
                 segment_complete = segment_result_pb2.SegmentResult()
                 segment_complete.ParseFromString(player_update.payload)
                 sending_player_id = segment_complete.player_id
-                if sending_player_id in online:
+                if sending_player_id in online and receiving_player_id != sending_player_id:
                     sending_player = online[sending_player_id]
                     if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
                         should_receive = True
