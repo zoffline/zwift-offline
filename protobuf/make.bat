@@ -12,5 +12,6 @@ protoc --python_out=. tcp-node-msgs.proto
 protoc --python_out=. hash-seeds.proto
 protoc --python_out=. events.proto
 protoc --python_out=. variants.proto
+protoc --python_out=. playback.proto
 
 pause

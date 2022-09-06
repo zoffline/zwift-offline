@@ -17,6 +17,7 @@ import smtplib, ssl
 import requests
 import json
 import base64
+import uuid
 import xml.etree.ElementTree as ET
 from copy import copy, deepcopy
 from functools import wraps
@@ -53,6 +54,7 @@ import zfiles_pb2
 import hash_seeds_pb2
 import events_pb2
 import variants_pb2
+import playback_pb2
 import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -1665,6 +1667,71 @@ def api_profiles():
             p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
+class Playback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    uuid = db.Column(db.Text, nullable=False)
+    segment_id = db.Column(db.Text, nullable=False)
+    time = db.Column(db.Float, nullable=False)
+    world_time = db.Column(db.Integer, nullable=False)
+
+@app.route('/player-playbacks/player/playback', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def player_playbacks_player_playback():
+    pb_dir = '%s/playbacks' % STORAGE_DIR
+    try:
+        if not os.path.isdir(pb_dir):
+            os.makedirs(pb_dir)
+    except IOError as e:
+        logger.error("failed to create playbacks dir (%s):  %s", pb_dir, str(e))
+        return '', 400
+    stream = request.stream.read()
+    pb = playback_pb2.Playback()
+    pb.ParseFromString(stream)
+    if pb.time == 0:
+        return '', 200
+    new_uuid = str(uuid.uuid4())
+    new_pb = Playback(player_id=current_user.player_id, uuid=new_uuid, segment_id=str(pb.segment_id), time=pb.time, world_time=pb.world_time)
+    db.session.add(new_pb)
+    db.session.commit()
+    with open('%s/%s.playback' % (pb_dir, new_uuid), 'wb') as f:
+        f.write(stream)
+    return '', 200
+
+@app.route('/player-playbacks/player/me/playbacks/<segment_id>/pr', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def player_playbacks_player_me_playbacks_pr(segment_id):
+    segment_id = int(segment_id) & 0xffffffffffffffff
+    after = request.args.get('after')
+    before = request.args.get('before')
+    query = "SELECT * FROM playback WHERE player_id = '%s' AND segment_id = '%s'" % (current_user.player_id, segment_id)
+    if after:
+        query += " AND world_time > '%s'" % after
+    if before:
+        query += " AND world_time < '%s'" % before
+    query += " ORDER BY time"
+    row = db.session.execute(sqlalchemy.text(query)).first()
+    if not row:
+        return '', 200
+    pbr = playback_pb2.PlaybackResponse()
+    pbr.uuid = row.uuid
+    pbr.segment_id = int(row.segment_id)
+    pbr.time = row.time
+    pbr.world_time = row.world_time
+    pbr.url = 'https://cdn.zwift.com/player-playback/playbacks/%s.playback' % row.uuid
+    return pbr.SerializeToString(), 200
+
+@app.route('/player-playback/playbacks/<path:filename>')
+def player_playback_playbacks(filename):
+    return send_from_directory('%s/playbacks' % STORAGE_DIR, filename)
+
+@app.route('/route-results', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def route_results():
+    return '', 200
 
 def strava_upload(player_id, activity):
     try:

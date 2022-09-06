@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+message Playback {
+    required uint64 segment_id = 1;
+    required float time = 3;
+    required uint64 world_time = 4;
+}
+
+message PlaybackResponse {
+    required string uuid = 1;
+    required uint64 segment_id = 2;
+    required float time = 4;
+    required uint64 world_time = 5;
+    required string url = 6;
+}
