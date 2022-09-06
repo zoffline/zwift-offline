@@ -90,7 +90,6 @@
     },
     {
       "name": "game_1_20_disable_high_volume_send_mixpanel",
-      "value": true,
       "values": {}
     },
     {
@@ -195,16 +194,17 @@
     },
     {
       "name": "game_training_partners",
+      "value": true,
       "values": {
         "fields": {
           "screenshots_enabled": {
             "boolValue": false
           },
           "recording_enabled": {
-            "boolValue": false
+            "boolValue": true
           },
           "spawn_enabled": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -293,6 +293,7 @@
     },
     {
       "name": "game_1_26_memorable_screenshots",
+      "value": true,
       "values": {}
     },
     {
@@ -300,16 +301,16 @@
       "values": {
         "fields": {
           "ATVPopInitDist": {
-            "numberValue": 180.0
+            "numberValue": 250.0
           },
           "ATVPopInitDelay": {
-            "numberValue": 0.1
+            "numberValue": 0.22
           },
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
           "ATVPopDist": {
-            "numberValue": 120.0
+            "numberValue": 175.0
           },
           "ATVFriction": {
             "numberValue": 0.9
@@ -327,6 +328,7 @@
     },
     {
       "name": "game_1_27_goal_notable_moment",
+      "value": true,
       "values": {}
     },
     {
@@ -349,7 +351,6 @@
     },
     {
       "name": "kit_override_using_triggers",
-      "value": true,
       "values": {}
     },
     {
