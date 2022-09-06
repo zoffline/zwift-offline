@@ -1118,7 +1118,6 @@
         <BIKESHOE imageName="SpecializedMixTape2019" name="Specialized Mix Tape" signature="4004475280"/>
     </BIKESHOES>
     <BIKEFRONTWHEELS>
-        <BIKEFRONTWHEEL imageName="Wheel_ZwiftBW" name="Zwift Zwift BW Concept Front Wheel" signature="69023253"/>
         <BIKEFRONTWHEEL imageName="Wheel_EnveG23" name="Enve G23" signature="190867464"/>
         <BIKEFRONTWHEEL imageName="Wheel_RovalAlpinistCLX" name="Roval Alpinist CLX" signature="192959988"/>
         <BIKEFRONTWHEEL imageName="Wheel_ShimanoDuraAceC60" name="Shimano C60" signature="272842014"/>
@@ -1136,11 +1135,9 @@
         <BIKEFRONTWHEEL imageName="Wheel_ZwiftConcept" name="Zwift Concept" signature="998391700"/>
         <BIKEFRONTWHEEL imageName="Wheel_BoraUltra35" name="Campagnolo Bora Ultra 35" signature="1053884173"/>
         <BIKEFRONTWHEEL imageName="Wheel_ZwiftPlain" name="Zwift Plain" signature="1324365960"/>
-        <BIKEFRONTWHEEL imageName="Wheel_ZwiftBW" name="Zwift Zwift Trike" signature="1361038541"/>
         <BIKEFRONTWHEEL imageName="Wheel_Cadex42" name="Cadex CADEX 42" signature="1497226614"/>
         <BIKEFRONTWHEEL imageName="Wheel_Zipp808Firecrest" name="Zipp 808" signature="1500161707"/>
         <BIKEFRONTWHEEL imageName="Wheel_Zipp353" name="Zipp 353 NSW" signature="1544928391"/>
-        <BIKEFRONTWHEEL imageName="" name="Zwift Zwift Bat Wheel" signature="1547965258"/>
         <BIKEFRONTWHEEL imageName="Wheel_NovatecR4" name="Novatec Novatec R4" signature="1593377918"/>
         <BIKEFRONTWHEEL imageName="Wheel_ShimanoDuraAceC50" name="Shimano C50" signature="1742598126"/>
         <BIKEFRONTWHEEL imageName="Wheel_ZwiftSafety" name="Zwift Safety" signature="1763482218"/>
@@ -1162,10 +1159,8 @@
         <BIKEFRONTWHEEL imageName="Wheel_BoraUltra50" name="Campagnolo Bora Ultra 50" signature="2696607407"/>
         <BIKEFRONTWHEEL imageName="Wheel_CadexAR35" name="Cadex CADEX AR 35" signature="2755992695"/>
         <BIKEFRONTWHEEL imageName="Wheel_Enve78" name="Enve SES 7.8" signature="2866818884"/>
-        <BIKEFRONTWHEEL imageName="" name="Zwift 8-Bit" signature="2907165694"/>
         <BIKEFRONTWHEEL imageName="Wheel_Enve67" name="Enve SES 6.7" signature="3251069251"/>
         <BIKEFRONTWHEEL imageName="Wheel_ZwiftMountain" name="Zwift Mountain" signature="3787145210"/>
-        <BIKEFRONTWHEEL imageName="" name="Zwift Zwift Skeletal" signature="3849702821"/>
         <BIKEFRONTWHEEL imageName="Wheel_CampagnoloLow" name="Zwift 32mm Carbon" signature="4029436085"/>
         <BIKEFRONTWHEEL imageName="Wheel_Zipp858" name="Zipp 858" signature="4169703170"/>
         <BIKEFRONTWHEEL imageName="Wheel_MavicCosmicUltUST" name="Mavic Cosmic Ultimate UST" signature="4185901178"/>
@@ -1175,10 +1170,8 @@
     <BIKEREARWHEELS>
         <BIKEREARWHEEL imageName="Wheel_SpecializedRovalCLX64" name="Roval CLX64" signature="59917648"/>
         <BIKEREARWHEEL imageName="Wheel_Zipp808Firecrest" name="Zipp 808" signature="214800767"/>
-        <BIKEREARWHEEL imageName="Wheel_ZwiftBW" name="Zwift Zwift Trike" signature="345690674"/>
         <BIKEREARWHEEL imageName="Wheel_ZippDisc" name="Zipp 808/Super9" signature="393022867"/>
         <BIKEREARWHEEL imageName="Wheel_MavicCosmicUltUST" name="Mavic Cosmic Ultimate UST" signature="413360396"/>
-        <BIKEREARWHEEL imageName="Wheel_ZwiftBW" name="Zwift Zwift BW Concept Rear Wheel" signature="413430806"/>
         <BIKEREARWHEEL imageName="Wheel_Zipp454" name="Zipp 454" signature="461030369"/>
         <BIKEREARWHEEL imageName="Wheel_ShimanoDuraAceC40" name="Shimano C40" signature="530549195"/>
         <BIKEREARWHEEL imageName="Wheel_ZwiftPlain" name="Zwift Plain" signature="705669234"/>
@@ -1190,7 +1183,6 @@
         <BIKEREARWHEEL imageName="Wheel_CadexAR35" name="Cadex CADEX AR 35" signature="1248620278"/>
         <BIKEREARWHEEL imageName="Wheel_Cadex42" name="Cadex CADEX 42" signature="1347687916"/>
         <BIKEREARWHEEL imageName="Wheel_ZwiftClassic" name="Zwift Classic" signature="1437212052"/>
-        <BIKEREARWHEEL imageName="" name="Zwift Zwift Bat Wheel" signature="1547965258"/>
         <BIKEREARWHEEL imageName="Wheel_BoraUltra35" name="Campagnolo Bora Ultra 35" signature="1614586487"/>
         <BIKEREARWHEEL imageName="Wheel_EnveG23" name="Enve G23" signature="1694719327"/>
         <BIKEREARWHEEL imageName="Wheel_ZippZwift858" name="Zipp 858/Super9" signature="1758560098"/>
@@ -1200,7 +1192,6 @@
         <BIKEREARWHEEL imageName="Wheel_CampagnoloHigh" name="Zwift 50mm Carbon" signature="1848192392"/>
         <BIKEREARWHEEL imageName="Wheel_BoraUltra50" name="Campagnolo Bora Ultra 50" signature="1856021360"/>
         <BIKEREARWHEEL imageName="Wheel_Cadex36" name="Cadex 36" signature="1887739925"/>
-        <BIKEREARWHEEL imageName="" name="Zwift Zwift Skeletal" signature="1965395406"/>
         <BIKEREARWHEEL imageName="Wheel_Zipp353" name="Zipp 353 NSW" signature="2019751723"/>
         <BIKEREARWHEEL imageName="Wheel_Enve67" name="Enve SES 6.7" signature="2026413230"/>
         <BIKEREARWHEEL imageName="Wheel_DTSwissARC62" name="DTSwiss ARC 1100 DICUT 62" signature="2049111692"/>
@@ -1222,7 +1213,6 @@
         <BIKEREARWHEEL imageName="Wheel_Cadex65" name="Cadex CADEX 65" signature="3940857684"/>
         <BIKEREARWHEEL imageName="Wheel_MavicCometeProCarbonSLUST" name="Mavic Comete Pro Carbon SL UST" signature="4001596344"/>
         <BIKEREARWHEEL imageName="Wheel_MavicCosmicCXR60c" name="Mavic Cosmic CXR60c" signature="4064842315"/>
-        <BIKEREARWHEEL imageName="" name="Zwift 8-Bit" signature="4111310185"/>
         <BIKEREARWHEEL imageName="Wheel_CampagnoloLow" name="Zwift 32mm Carbon" signature="4137014419"/>
         <BIKEREARWHEEL imageName="Wheel_FFWDRYOT55" name="FFWD RYOT55" signature="4151096267"/>
         <BIKEREARWHEEL imageName="Wheel_NovatecR4" name="Novatec Novatec R4" signature="4182312168"/>
@@ -1239,7 +1229,6 @@
         <BIKEFRAME isTT="0" modelYear="0" name="Trek Emonda" signature="142926447"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Specialized Roubaix" signature="166263359"/>
         <BIKEFRAME isTT="1" modelYear="2017" name="DiamondBack Andean" signature="206931035"/>
-        <BIKEFRAME isTT="0" modelYear="0" name="Zwift Skeletal" signature="270803031"/>
         <BIKEFRAME isTT="1" modelYear="2021" name="Trek Speed Concept 2021" signature="291034584"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Zwift Mountain" signature="385270250"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="BMC SLR01" signature="389045293"/>
@@ -1270,7 +1259,6 @@
         <BIKEFRAME isTT="0" modelYear="2019" name="Canyon Grail" signature="1381140630"/>
         <BIKEFRAME isTT="1" modelYear="0" name="Specialized Shiv S-Works" signature="1418783338"/>
         <BIKEFRAME isTT="1" modelYear="2019" name="Felt IA" signature="1433973142"/>
-        <BIKEFRAME isTT="0" modelYear="0" name="Zwift DefaultOrange" signature="1444415023"/>
         <BIKEFRAME isTT="0" modelYear="2115" name="Zwift Concept Z1" signature="1456463855"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Canyon Aeroad 2015" signature="1520594784"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Cannondale EVO" signature="1532698216"/>
@@ -1288,7 +1276,6 @@
         <BIKEFRAME isTT="0" modelYear="2021" name="Cervelo CerveloS52021" signature="1972610461"/>
         <BIKEFRAME isTT="1" modelYear="2022" name="Scott ScottPlasma2022" signature="2002850191"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Cannondale System Six" signature="2005280203"/>
-        <BIKEFRAME isTT="0" modelYear="0" name="Zwift BigWheel-Concept" signature="2029842509"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Specialized Amira" signature="2044307781"/>
         <BIKEFRAME isTT="0" modelYear="2018" name="Cannondale Synapse" signature="2059853947"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Specialized Tarmac Pro" signature="2076241890"/>
@@ -1319,7 +1306,6 @@
         <BIKEFRAME isTT="0" modelYear="2018" name="Felt AR" signature="3002729519"/>
         <BIKEFRAME isTT="0" modelYear="2020" name="Merida Scultura" signature="3033010663"/>
         <BIKEFRAME isTT="0" modelYear="0" name="Trek Team" signature="3078441697"/>
-        <BIKEFRAME isTT="0" modelYear="0" name="Zwift BigWheel" signature="3079625256"/>
         <BIKEFRAME isTT="0" modelYear="2022" name="Scott ScottSparkMTB2022" signature="3133382714"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Pinarello Dogma F10" signature="3186772618"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Ribble Endurance" signature="3247466139"/>
@@ -1349,7 +1335,6 @@
         <BIKEFRAME isTT="0" modelYear="2015" name="Cervelo S3D" signature="4048415486"/>
         <BIKEFRAME isTT="0" modelYear="2021" name="Scott ScottAddict2021" signature="4100131524"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Trek Madone" signature="4129467727"/>
-        <BIKEFRAME isTT="0" modelYear="0" name="Zwift Bat" signature="4150853780"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Specialized Allez" signature="4200057616"/>
         <BIKEFRAME isTT="0" modelYear="2021" name="Pinarello Dogma F" signature="4208139356"/>
         <BIKEFRAME isTT="0" modelYear="2019" name="Ridley Noah Fast 2019" signature="4288910569"/>
