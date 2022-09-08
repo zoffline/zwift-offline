@@ -24,8 +24,8 @@ To install zoffline on Windows:
 * When done with Zwift, press Ctrl+C in the command line to close zoffline.
 </details>
 
-<details><summary>Linux, Windows, or Mac OS X (from source)</summary>
-To install zoffline on Linux, Windows, or Mac OS X:
+<details><summary>Linux, Windows, or macOS (from source)</summary>
+To install zoffline on Linux, Windows, or macOS:
 
 * Install Python 3 (https://www.python.org/downloads/) if not already installed
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
@@ -119,7 +119,7 @@ to generate your own certificates and do the same.
 
 </details>
 
-<details><summary>Mac OS X Instructions</summary>
+<details><summary>macOS Instructions</summary>
 
 * Install Zwift
   * If your Zwift version is 1.0.101500, you're all set.
@@ -135,7 +135,7 @@ to generate your own certificates and do the same.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
 * Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
-  * Append these keys:
+  * Insert in the main dict:
     ```
     <key>NSAppTransportSecurity</key>
    	<dict>
@@ -151,7 +151,7 @@ to generate your own certificates and do the same.
         </dict>
    	</dict>
     ```
-* For Big Sur run ``sudo codesign --force --deep --sign - /Applications/Zwift.app`` in terminal. See https://github.com/zoffline/zwift-offline/issues/132 for extra details.
+* Run ``sudo codesign --force --deep --sign - /Applications/Zwift.app`` in terminal. See https://github.com/zoffline/zwift-offline/issues/132 for extra details.
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
