@@ -920,6 +920,7 @@ def api_eventfeed():
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
+@app.route('/api/recommendation/profile', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
@@ -1453,18 +1454,16 @@ def api_profiles_id_privacy(player_id):
     return '', 200
 
 @app.route('/api/profiles/<int:m_player_id>/followers', methods=['GET']) #?start=0&limit=200&include-follow-requests=false
+@app.route('/api/profiles/<int:m_player_id>/followees', methods=['GET'])
+@app.route('/api/profiles/<int:m_player_id>/followees-in-common/<int:t_player_id>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
-def api_profiles_followers(m_player_id):
+def api_profiles_followers(m_player_id, t_player_id=0):
     rows = db.session.execute(sqlalchemy.text("SELECT player_id,first_name,last_name FROM user"))
     json_data_list = []
     for row in rows:
         player_id = row[0]
-        profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-        profile = profile_pb2.PlayerProfile()
-        profile_file = '%s/profile.bin' % profile_dir
-        with open(profile_file, 'rb') as fd:
-            profile.ParseFromString(fd.read())
+        profile = get_partial_profile(player_id)
         #all users are following favourites of this user (temp decision for small crouds)
         json_data_list.append({"id":0,"followerId":player_id,"followeeId":m_player_id,"status":"IS_FOLLOWING","isFolloweeFavoriteOfFollower":True, \
             "followerProfile":{"id":player_id,"firstName":row[1],"lastName":row[2],"imageSrc":imageSrc(player_id),"imageSrcLarge":imageSrc(player_id),"countryCode":profile.country_code}, \
@@ -1481,11 +1480,7 @@ def api_search_profiles():
     json_data_list = []
     for row in rows:
         player_id = row[0]
-        profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-        profile = profile_pb2.PlayerProfile()
-        profile_file = '%s/profile.bin' % profile_dir
-        with open(profile_file, 'rb') as fd:
-            profile.ParseFromString(fd.read())
+        profile = get_partial_profile(player_id)
         json_data_list.append({"id": player_id, "firstName": row[1], "lastName": row[2], "imageSrc": imageSrc(player_id), "imageSrcLarge": imageSrc(player_id), "countryCode": profile.country_code})
     return jsonify(json_data_list)
 
@@ -2268,11 +2263,6 @@ def relay_events_subgroups_id_late_join(meetup_id):
             lj.lj_f6 = 0
             lj.lj_f7 = 0
             return lj.SerializeToString(), 200
-    return '', 200
-
-@app.route('/api/profiles/<int:player_id>/campaigns/otm2020', methods=['GET'])
-@app.route('/api/profiles/<int:player_id>/followees', methods=['GET'])
-def api_profiles_followees(player_id):
     return '', 200
 
 
