@@ -59,6 +59,7 @@ class DiscordThread(threading.Thread):
 
         self.intents = discord.Intents.default()
         self.intents.members = True
+        self.intents.message_content = True
         self.loop = asyncio.get_event_loop()
         self.start()
 
