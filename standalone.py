@@ -358,7 +358,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print('No encryption key for relay ID %s' % relay_id)
                 return
             global_clients[ip] = global_relay[relay_id]
-        #print("TCPHandler hello: %s" % self.data.hex())
         if int.from_bytes(self.data[0:2], "big") != len(self.data) - 2:
             print("Wrong packet size")
             return
@@ -422,12 +421,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(struct.pack('!h', len(r)) + r)
 
         player_id = hello.player_id
-        #print("TCPHandler for %d" % player_id)
-
         self.request.settimeout(1) #make recv non-blocking
         while True:
             self.data = b''
-            t = int(zo.get_utc_time())
             try:
                 self.data = self.request.recv(1024)
                 i = 0
@@ -438,7 +434,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     iv.sn = relay.tcp_r_sn
                     p = decode_packet(packet[2:], relay.key, iv)
                     relay.tcp_r_sn += 1
-                    #print("TCPHandler: %s" % p.payload.hex())
                     if len(p.payload) > 1 and p.payload[1] == 1:
                         subscr = udp_node_msgs_pb2.ClientToServer()
                         try:
@@ -457,11 +452,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             r = encode_packet(payload1, relay.key, iv, None, None, None)
                             relay.tcp_t_sn += 1
                             self.request.sendall(struct.pack('!h', len(r)) + r)
-                            #print('TCPHandler subscr: %s' % msg1.ackSubsSegm)
                     i += size + 2
-            except Exception as exc:
-                #print('TCPHandler exception: %s' % repr(exc)) #timeout is ok here
-                pass
+            except:
+                pass #timeout is ok here
 
             try:
                 #if ZC need to be registered
@@ -480,7 +473,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     r = encode_packet(zc_params_payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
                     self.request.sendall(struct.pack('!h', len(r)) + r)
-                    #print("TCPHandler register_zc %d %s" % (player_id, zc_params_payload.hex()))
                     zo.zc_connect_queue.pop(player_id)
 
                 message = udp_node_msgs_pb2.ServerToClient()

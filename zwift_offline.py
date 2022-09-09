@@ -320,6 +320,12 @@ def get_online():
 def toSigned(n, byte_count):
     return int.from_bytes(n.to_bytes(byte_count, 'little'), 'little', signed=True)
 
+def imageSrc(player_id):
+    if os.path.isfile(os.path.join(STORAGE_DIR, str(player_id), 'avatarLarge.jpg')):
+        return "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
+    else:
+        return None
+
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
         #Read from disk
@@ -340,7 +346,7 @@ def get_partial_profile(player_id):
             else: return None
         partial_profile = PartialProfile()
         partial_profile.player_id = player_id
-        partial_profile.imageSrc = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
+        partial_profile.imageSrc = imageSrc(player_id)
         partial_profile.first_name = profile.first_name
         partial_profile.last_name = profile.last_name
         partial_profile.country_code = profile.country_code
@@ -899,7 +905,7 @@ def world_time():
 
 @app.route('/api/clubs/club/can-create', methods=['GET'])
 def api_clubs_club_cancreate():
-    return {"result":False}
+    return jsonify({"reason": "DISABLED", "result": False})
 
 @app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
 def api_eventfeed():
@@ -978,8 +984,14 @@ def api_servers():
     return {"baseUrl":"https://us-or-rly101.zwift.com/relay"}
 
 @app.route('/api/clubs/club/list/my-clubs', methods=['GET'])
+@app.route('/api/clubs/club/featured', methods=['GET'])
+@app.route('/api/clubs/club', methods=['GET'])
 def api_clubs():
-    return {"total":0,"results":[]}
+    return jsonify({"total": 0, "results": []})
+
+@app.route('/api/clubs/club/my-clubs-summary', methods=['GET'])
+def api_clubs_club_my_clubs_summary():
+    return jsonify({"invitedCount": 0, "requestedCount": 0, "results": []})
 
 @app.route('/api/clubs/club/list/my-clubs.proto', methods=['GET'])
 @app.route('/api/campaign/proto/campaigns', methods=['GET'])
@@ -1357,7 +1369,7 @@ def do_api_profiles(profile_id, is_json):
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
         jprofileFull = MessageToDict(profile)
         jprofile = {"id": profile.id, "firstName": jsf(profile, 'first_name'), "lastName": jsf(profile, 'last_name'), "preferredLanguage": jsf(profile, 'preferred_language'), "bodyType":jsv0(profile, 'body_type'), "male": jsb1(profile, 'is_male'), 
-"imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % profile.id, "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
+"imageSrc": imageSrc(profile.id), "imageSrcLarge": imageSrc(profile.id), "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
 "emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), "ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'),
 "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
 "socialFacts": jprofileFull.get('socialFacts'), "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'server_realm'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
@@ -1455,7 +1467,7 @@ def api_profiles_followers(m_player_id):
             profile.ParseFromString(fd.read())
         #all users are following favourites of this user (temp decision for small crouds)
         json_data_list.append({"id":0,"followerId":player_id,"followeeId":m_player_id,"status":"IS_FOLLOWING","isFolloweeFavoriteOfFollower":True, \
-            "followerProfile":{"id":player_id,"firstName":row[1],"lastName":row[2],"imageSrc":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id,"imageSrcLarge":"https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id,"countryCode":profile.country_code}, \
+            "followerProfile":{"id":player_id,"firstName":row[1],"lastName":row[2],"imageSrc":imageSrc(player_id),"imageSrcLarge":imageSrc(player_id),"countryCode":profile.country_code}, \
             "followeeProfile":None})
     return jsonify(json_data_list)
 
@@ -1474,7 +1486,7 @@ def api_search_profiles():
         profile_file = '%s/profile.bin' % profile_dir
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
-        json_data_list.append({"id": player_id, "firstName": row[1], "lastName": row[2], "imageSrc": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id, "imageSrcLarge": "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id, "countryCode": profile.country_code})
+        json_data_list.append({"id": player_id, "firstName": row[1], "lastName": row[2], "imageSrc": imageSrc(player_id), "imageSrcLarge": imageSrc(player_id), "countryCode": profile.country_code})
     return jsonify(json_data_list)
 
 @app.route('/api/profiles/<int:player_id>/statistics', methods=['GET'])
@@ -1500,7 +1512,7 @@ def api_profiles_me_phone():
         phoneSecretKey = base64.b64decode(request.json['secret'])
     zc_connect_queue[current_user.player_id] = (phoneAddress, phonePort, phoneSecretKey)
     #todo UDP scenario
-    logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey.hex()))
+    #logger.info("ZCompanion %d reg: %s:%d (key: %s)" % (current_user.player_id, phoneAddress, phonePort, phoneSecretKey.hex()))
     return '', 204
 
 @app.route('/api/profiles/me/<int:player_id>', methods=['PUT'])
@@ -1527,7 +1539,7 @@ def api_profiles_me_id(player_id):
     profile.use_metric = request.json['useMetric']
     profile.weight_in_grams = request.json['weight']
     #profile.large_avatar_url = request.json['imageSrcLarge']
-    profile.large_avatar_url = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % player_id
+    profile.large_avatar_url = imageSrc(player_id)
     #profile.age = request.json['age']
     with open(profile_file, 'wb') as fd:
         fd.write(profile.SerializeToString())
@@ -1535,7 +1547,7 @@ def api_profiles_me_id(player_id):
         current_user.first_name = profile.first_name
         current_user.last_name = profile.last_name
         db.session.commit()
-    return api_profiles_me_json()
+    return api_profiles_me()
 
 @app.route('/api/profiles/<int:player_id>', methods=['PUT'])
 @app.route('/api/profiles/<int:player_id>/in-game-fields', methods=['PUT'])
@@ -2093,7 +2105,7 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     json_pe['organizerFirstName'] = partial_profile.first_name
     json_pe['organizerLastName'] = partial_profile.last_name
     json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    json_pe['organizerImageUrl'] = "https://us-or-rly101.zwift.com/download/%s/avatarLarge.jpg" % current_user.player_id
+    json_pe['organizerImageUrl'] = imageSrc(current_user.player_id)
     eventInvites = [{"invitedProfile": partial_profile.to_json(), "status": "ACCEPTED"}]
     create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
 
@@ -3135,7 +3147,6 @@ def get_profile_saved_game_achiev2_40_bytes():
         else:
             return b''
 
-@app.route('/achievement/loadPlayerAchievements', methods=['GET'])
 @app.route('/api/achievement/loadPlayerAchievements', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
@@ -3152,8 +3163,6 @@ def achievement_loadPlayerAchievements():
     with open(achievements_file, 'rb') as f:
         return f.read(), 200
 
-
-@app.route('/achievement/unlock', methods=['POST'])
 @app.route('/api/achievement/unlock', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -3163,6 +3172,10 @@ def achievement_unlock():
     with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
         f.write(request.stream.read())
     return '', 202
+
+@app.route('/api/achievement/category/<category_id>', methods=['GET'])
+def api_achievement_category(category_id):
+    return jsonify([])
 
 
 def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
