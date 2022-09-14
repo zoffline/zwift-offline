@@ -245,7 +245,26 @@
       "values": {}
     },
     {
+      "name": "game_1_28_avoid_aborting_current_timing_sector_when_minimizing",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_27_add_lineup_to_leave_current_event",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
+      "values": {}
+    },
+    {
+      "name": "game_1_29_use_relay_spline_time_in_meetup_position_late_joiner",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_ignore_private_meetups_in_group_event_processing_logic",
       "value": true,
       "values": {}
     },
@@ -260,6 +279,7 @@
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
+      "value": true,
       "values": {
         "fields": {
           "initialDropInTime": {
@@ -288,7 +308,7 @@
       "values": {}
     },
     {
-      "name": "game_1_28_ble_middleware",
+      "name": "game_1_29_ble_middleware",
       "values": {}
     },
     {
@@ -298,6 +318,7 @@
     },
     {
       "name": "game_1_27_atv_remote_gestures",
+      "value": true,
       "values": {
         "fields": {
           "ATVPopInitDist": {
@@ -354,7 +375,51 @@
       "values": {}
     },
     {
-      "name": "game_1_28_event_core_feed_service",
+      "name": "game_1_29_get_started_workouts",
+      "values": {}
+    },
+    {
+      "name": "game_1_28_ftms_road_grade_lookahead_time_exposed",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_ble_cycling_speed_pairing_opt",
+      "values": {}
+    },
+    {
+      "name": "game_1_29_new_local_trainer_profile",
+      "values": {}
+    },
+    {
+      "name": "game_1_29_fix_stuck_zpower",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_event_carousel",
+      "value": true,
+      "values": {
+        "fields": {
+          "NUM_CARDS": {
+            "varintValue": "6"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_29_client_recommendations",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_level_60_cap_raise",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_logout_for_windows_and_mac",
+      "value": true,
       "values": {}
     },
     {
@@ -372,18 +437,50 @@
       "values": {}
     },
     {
-      "name": "game_1_26_watchdog_timer",
+      "name": "game_1_28_event_core_feed_service",
+      "values": {}
+    },
+    {
+      "name": "game_1_29_event_query_interval",
       "value": true,
       "values": {
         "fields": {
-          "timeoutInterval": {
-            "numberValue": 60.0
-          },
-          "abortEnabled": {
-            "boolValue": false
+          "GROUP_EVENT_QUERY_RATE_SECONDS": {
+            "numberValue": 120.0
           }
         }
       }
+    },
+    {
+      "name": "game_1_29_set_thread_names",
+      "values": {}
+    },
+    {
+      "name": "game_1_28_watchdog_timer",
+      "values": {
+        "fields": {
+          "abortEnabled": {
+            "boolValue": false
+          },
+          "renderTimeoutInterval": {
+            "numberValue": 30.0
+          },
+          "mainTimeoutInterval": {
+            "numberValue": 30.0
+          },
+          "reportTimeoutsOnLoad": {
+            "boolValue": false
+          },
+          "loadingTimeoutInterval": {
+            "numberValue": 60.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_29_hand_cycle",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_1_17_noesis_enabled",
@@ -398,6 +495,11 @@
     },
     {
       "name": "game_1_14_settings_refactor",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "workout_training_v2_release",
       "value": true,
       "values": {}
     },
