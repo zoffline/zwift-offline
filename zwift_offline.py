@@ -3135,9 +3135,11 @@ def achievement_unlock():
         f.write(request.stream.read())
     return '', 202
 
+# if we respond to this request with an empty json a "tutorial" will be presented in ZCA
+# and for each completed step it will POST /api/achievement/unlock/<id>
 @app.route('/api/achievement/category/<category_id>', methods=['GET'])
 def api_achievement_category(category_id):
-    return jsonify([])
+    return '', 404 # returning error for now, since some steps can't be completed
 
 
 def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
