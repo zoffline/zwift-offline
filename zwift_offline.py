@@ -1532,9 +1532,9 @@ def api_profiles_me_id(player_id):
     profile.is_male = request.json['male']
     profile.use_metric = request.json['useMetric']
     profile.weight_in_grams = request.json['weight']
-    #profile.large_avatar_url = request.json['imageSrcLarge']
-    profile.large_avatar_url = imageSrc(player_id)
-    #profile.age = request.json['age']
+    image = imageSrc(player_id)
+    if image is not None:
+        profile.large_avatar_url = image
     with open(profile_file, 'wb') as fd:
         fd.write(profile.SerializeToString())
     if MULTIPLAYER:
@@ -2223,7 +2223,8 @@ def jsonPrivateEventToProtobuf(je):
         inv.profile.player_id = jp['id']
         inv.profile.firstName = jp['firstName']
         inv.profile.lastName = jp['lastName']
-        inv.profile.imageSrc = jp['imageSrc']
+        if jp['imageSrc'] is not None:
+            inv.profile.imageSrc = jp['imageSrc']
         inv.profile.enrolledZwiftAcademy = jp['enrolledZwiftAcademy']
         inv.profile.male = jp['male']
         inv.profile.player_type = profile_pb2.PlayerType.Value(jp['playerType'])
