@@ -88,7 +88,7 @@ except IOError as e:
 
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
-DATABASE_CUR_VER = 2
+DATABASE_CUR_VER = 3
 
 PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
 
@@ -2896,8 +2896,13 @@ def migrate_database():
     if not os.access(DATABASE_PATH, os.W_OK):
         logging.error("zwift-offline.db is not writable. Unable to upgrade database!")
         return
-    version = db.session.execute('SELECT version FROM version').first()[0]
-    if version == DATABASE_CUR_VER:
+    row = Version.query.first()
+    if not row:
+        db.session.add(Version(version=DATABASE_CUR_VER))
+        db.session.commit()
+        return
+    version = row.version
+    if version != 2:
         return
     # Database needs to be upgraded, try to back it up first
     try:  # Try writing to storage dir
@@ -2908,18 +2913,36 @@ def migrate_database():
         except Exception as exc:
             logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
-    if version < 1:
-        # Adjust old world_time values in segment results to new rough estimate of Zwift's
-        logging.info("Upgrading zwift-offline.db to version 2")
-        db.session.execute('UPDATE segment_result SET world_time = world_time-1414016075000')
-        db.session.execute('UPDATE version SET version = 2')
-        db.session.commit()
+    db.session.execute('ALTER TABLE activity RENAME TO activity_old')
+    db.session.execute('ALTER TABLE goal RENAME TO goal_old')
+    db.session.execute('ALTER TABLE segment_result RENAME TO segment_result_old')
+    db.create_all(app=app)
 
-    if version == 1:
-        logging.info("Upgrading zwift-offline.db to version 2")
-        db.session.execute('UPDATE segment_result SET world_time = cast(world_time/64.4131403573055-1414016075 as int)*1000')
-        db.session.execute('UPDATE version SET version = 2')
-        db.session.commit()
+    rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity_old')
+    for row in rows:
+        d = {k: row[k] for k in row.keys()}
+        #d['player_id'] = int(d['player_id'])
+        #d['new_name'] = d.pop('f3')
+        db.session.add(Activity(**d))
+
+    rows = db.session.execute('SELECT * FROM goal_old')
+    for row in rows:
+        d = {k: row[k] for k in row.keys()}
+        del d['id']
+        db.session.add(Goal(**d))
+
+    rows = db.session.execute('SELECT * FROM segment_result_old')
+    for row in rows:
+        d = {k: row[k] for k in row.keys()}
+        del d['id']
+        db.session.add(SegmentResult(**d))
+
+    db.session.execute('DROP TABLE activity_old')
+    db.session.execute('DROP TABLE goal_old')
+    db.session.execute('DROP TABLE segment_result_old')
+
+    Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
+    db.session.commit()
 
 
 def check_columns():
@@ -2957,7 +2980,7 @@ def before_first_request():
     db.create_all(app=app)
     db.session.commit()
     check_columns()
-    #migrate_database()
+    migrate_database()
     db.session.close()
 
 
