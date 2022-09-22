@@ -87,7 +87,6 @@ except IOError as e:
     sys.exit(1)
 
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
-DATABASE_INIT_SQL = "%s/initialize_db.sql" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 2
 
@@ -164,10 +163,10 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     pass_hash = db.Column(db.String(100), nullable=False)
-    enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
-    new_home = db.Column(db.Integer, nullable=False, default=0)
-    is_admin = db.Column(db.Integer, nullable=False, default=0)
-    remember = db.Column(db.Integer, nullable=False, default=0)
+    enable_ghosts = db.Column(db.Integer, nullable=False, default=1) # Boolean
+    new_home = db.Column(db.Integer, nullable=False, default=0) # Boolean
+    is_admin = db.Column(db.Integer, nullable=False, default=0) # Boolean
+    remember = db.Column(db.Integer, nullable=False, default=0) # Boolean
 
     def __repr__(self):
         return self.username
@@ -200,6 +199,82 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
 
     def is_authenticated(self):
         return True
+
+class Activity(db.Model):
+    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
+    player_id = db.Column(db.Text) # BigInteger
+    f3 = db.Column(db.Integer)
+    name = db.Column(db.Text)
+    f5 = db.Column(db.Integer)
+    f6 = db.Column(db.Integer)
+    start_date = db.Column(db.Text)
+    end_date = db.Column(db.Text)
+    distance = db.Column(db.Float)
+    avg_heart_rate = db.Column(db.Float)
+    max_heart_rate = db.Column(db.Float)
+    avg_watts = db.Column(db.Float)
+    max_watts = db.Column(db.Float)
+    avg_cadence = db.Column(db.Float)
+    max_cadence = db.Column(db.Float)
+    avg_speed = db.Column(db.Float)
+    max_speed = db.Column(db.Float)
+    calories = db.Column(db.Float)
+    total_elevation = db.Column(db.Float)
+    strava_upload_id = db.Column(db.Text) # BigInteger
+    strava_activity_id = db.Column(db.Text) # BigInteger
+    f23 = db.Column(db.Integer)
+    fit = db.Column(db.LargeBinary)
+    fit_filename = db.Column(db.Text)
+    f29 = db.Column(db.Integer)
+    date = db.Column(db.Text)
+
+class SegmentResult(db.Model):
+    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
+    player_id = db.Column(db.Text) # BigInteger
+    f3 = db.Column(db.Integer)
+    f4 = db.Column(db.Integer)
+    segment_id = db.Column(db.Text) # BigInteger
+    event_subgroup_id = db.Column(db.Text) # BigInteger
+    first_name = db.Column(db.Text)
+    last_name = db.Column(db.Text)
+    world_time = db.Column(db.Text) # BigInteger
+    finish_time_str = db.Column(db.Text)
+    elapsed_ms = db.Column(db.Text) # BigInteger
+    f12 = db.Column(db.Numeric) # Boolean
+    f13 = db.Column(db.Integer)
+    f14 = db.Column(db.Integer)
+    f15 = db.Column(db.Integer)
+    f16 = db.Column(db.Numeric) # Boolean
+    f17 = db.Column(db.Text)
+    f18 = db.Column(db.Text) # BigInteger
+    f19 = db.Column(db.Integer)
+    f20 = db.Column(db.Integer)
+
+class Goal(db.Model):
+    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
+    player_id = db.Column(db.Text) # BigInteger
+    f3 = db.Column(db.Integer)
+    name = db.Column(db.Text)
+    type = db.Column(db.Integer)
+    periodicity = db.Column(db.Integer)
+    target_distance = db.Column(db.Float)
+    target_duration = db.Column(db.Float)
+    actual_distance = db.Column(db.Float)
+    actual_duration = db.Column(db.Float)
+    created_on = db.Column(db.Text) # BigInteger
+    period_end_date = db.Column(db.Text) # BigInteger
+    f13 = db.Column(db.Text) # BigInteger
+
+class Playback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False) # BigInteger
+    uuid = db.Column(db.Text, nullable=False)
+    segment_id = db.Column(db.Text, nullable=False) # BigInteger
+    time = db.Column(db.Float, nullable=False)
+    world_time = db.Column(db.Integer, nullable=False) # BigInteger
+
+class Version(db.Model):
+    version = db.Column(db.Integer, primary_key=True)
 
 class Relay:
     def __init__(self, key = b''):
@@ -838,36 +913,23 @@ def logout(username):
 # Set up protobuf_to_dict call map
 type_callable_map = copy(TYPE_CALLABLE_MAP)
 # Override base64 encoding of byte fields
-type_callable_map[FieldDescriptor.TYPE_BYTES] = str
+#type_callable_map[FieldDescriptor.TYPE_BYTES] = str
 # sqlite doesn't support uint64 so make them strings
 type_callable_map[FieldDescriptor.TYPE_UINT64] = str
 
 
 def insert_protobuf_into_db(table_name, msg):
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
-    columns = ', '.join(list(msg_dict.keys()))
-    placeholders = ':'+', :'.join(list(msg_dict.keys()))
-    query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
-    db.session.execute(query, msg_dict)
+    row = table_name(**msg_dict)
+    db.session.add(row)
     db.session.commit()
+    return row.id
 
 
 # XXX: can't be used to 'nullify' a column value
 def update_protobuf_in_db(table_name, msg, id):
-    try:
-        # If protobuf has an id field and it's uint64, make it a string
-        id_field = msg.DESCRIPTOR.fields_by_name['id']
-        if id_field.type == id_field.TYPE_UINT64:
-            id = str(id)
-    except AttributeError as exc:
-        logger.warn('update_protobuf_in_db: %s' % repr(exc))
-        pass
     msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
-    columns = ', '.join(list(msg_dict.keys()))
-    placeholders = ':'+', :'.join(list(msg_dict.keys()))
-    setters = ', '.join('{}=:{}'.format(key, key) for key in msg_dict)
-    query = 'UPDATE %s SET %s WHERE id=%s' % (table_name, setters, id)
-    db.session.execute(query, msg_dict)
+    table_name.query.filter_by(id=id).update(msg_dict)
     db.session.commit()
 
 
@@ -883,18 +945,6 @@ def row_to_protobuf(row, msg, exclude_fields=[]):
         else:
             setattr(msg, key, row[key])
     return msg
-
-
-# FIXME: I should really do this properly...
-def get_id(table_name):
-    while True:
-        # I think activity id is actually only uint32. On the off chance it's
-        # int32, stick with 31 bits.
-        ident = int(random.getrandbits(31))
-        row = db.session.execute(sqlalchemy.text("SELECT id FROM %s WHERE id = %s" % (table_name, ident))).first()
-        if not row:
-            break
-    return ident
 
 
 def world_time():
@@ -1591,8 +1641,7 @@ def api_profiles_activities(player_id):
             return '', 401
         activity = activity_pb2.Activity()
         activity.ParseFromString(request.stream.read())
-        activity.id = get_id('activity')
-        insert_protobuf_into_db('activity', activity)
+        activity.id = insert_protobuf_into_db(Activity, activity)
         return '{"id": %ld}' % activity.id, 200
 
     # request.method == 'GET'
@@ -1672,14 +1721,6 @@ def api_profiles():
             p = profiles.profiles.add()
             p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
-
-class Playback(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, nullable=False)
-    uuid = db.Column(db.Text, nullable=False)
-    segment_id = db.Column(db.Text, nullable=False)
-    time = db.Column(db.Float, nullable=False)
-    world_time = db.Column(db.Integer, nullable=False)
 
 @app.route('/player-playbacks/player/playback', methods=['POST'])
 @jwt_to_session_cookie
@@ -1913,7 +1954,7 @@ def api_profiles_activities_id(player_id, activity_id):
     activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
-    update_protobuf_in_db('activity', activity, activity_id)
+    update_protobuf_in_db(Activity, activity, activity_id)
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
@@ -2382,7 +2423,7 @@ def api_profiles_goals_put(player_id, goal_id):
     str_goal = request.stream.read()
     json_goal = json.loads(str_goal)
     goal = goalJsonToProtobuf(json_goal)
-    update_protobuf_in_db('goal', goal, goal.id)
+    update_protobuf_in_db(Goal, goal, goal.id)
     return jsonify(json_goal)
 
 def select_protobuf_goals(player_id, limit):
@@ -2400,7 +2441,7 @@ def select_protobuf_goals(player_id, limit):
             fill_in_goal_progress(goal, player_id)
         for goal in need_update:
             set_goal_end_date_now(goal)
-            update_protobuf_in_db('goal', goal, goal.id)
+            update_protobuf_in_db(Goal, goal, goal.id)
     return goals
 
 def convert_goals_to_json(goals):
@@ -2426,12 +2467,11 @@ def api_profiles_goals(player_id):
             str_goal = request.stream.read()
             json_goal = json.loads(str_goal)
             goal = goalJsonToProtobuf(json_goal)
-        goal.id = get_id('goal')
         now = get_utc_date_time()
         goal.created_on = unix_time_millis(now)
         set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
-        insert_protobuf_into_db('goal', goal)
+        goal.id = insert_protobuf_into_db(Goal, goal)
 
         if request.headers['Accept'] == 'application/json':
             return jsonify(goalProtobufToJson(goal))
@@ -2728,11 +2768,10 @@ def api_segment_results():
     result.ParseFromString(data)
     if result.segment_id == 1:
         return '', 400
-    result.id = get_id('segment_result')
     result.world_time = world_time()
     result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
     result.f20 = 0
-    insert_protobuf_into_db('segment_result', result)
+    result.id = insert_protobuf_into_db(SegmentResult, result)
 
     # Previously done in /relay/worlds/attributes
     player_update = udp_node_msgs_pb2.WorldAttribute()
@@ -2852,17 +2891,7 @@ def move_old_profile():
             os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
 
 
-def init_database():
-    if not os.path.exists(DATABASE_PATH) or not os.path.getsize(DATABASE_PATH):
-        # Create a new database
-        with open(DATABASE_INIT_SQL, 'r') as f:
-            sql_statements = f.read().split('\n\n')
-            for sql_statement in sql_statements:
-                db.session.execute(sql_statement)
-                db.session.commit()
-            db.session.execute('INSERT INTO version VALUES (:ver)', {'ver': DATABASE_CUR_VER})
-            db.session.commit()
-        return
+def migrate_database():
     # Migrate database if necessary
     if not os.access(DATABASE_PATH, os.W_OK):
         logging.error("zwift-offline.db is not writable. Unable to upgrade database!")
@@ -2925,10 +2954,10 @@ def send_server_back_online_message():
 @app.before_first_request
 def before_first_request():
     move_old_profile()
-    init_database()
     db.create_all(app=app)
-    db.session.commit()  # in case create_all created a table
+    db.session.commit()
     check_columns()
+    #migrate_database()
     db.session.close()
 
 
