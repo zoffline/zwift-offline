@@ -32,7 +32,7 @@ from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user,
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
-from protobuf_to_dict import protobuf_to_dict, TYPE_CALLABLE_MAP
+from protobuf_to_dict import protobuf_to_dict
 from flask_sqlalchemy import sqlalchemy, SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
@@ -286,6 +286,13 @@ class Playback(db.Model):
     segment_id = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Float, nullable=False)
     world_time = db.Column(db.Integer, nullable=False)
+
+class Zfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    folder = db.Column(db.Text, nullable=False)
+    filename = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.Integer, nullable=False)
+    player_id = db.Column(db.Integer, nullable=False)
 
 class Version(db.Model):
     version = db.Column(db.Integer, primary_key=True)
@@ -1293,14 +1300,66 @@ def relay_race_event_starting_line_id(event_id):
 
 
 @app.route('/api/zfiles', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
 def api_zfiles():
-    # Don't care about zfiles, but shuts up some errors in Zwift log.
     zfile = zfiles_pb2.ZFileProto()
-    zfile.id = int(random.getrandbits(31))
-    zfile.folder = "logfiles"
-    zfile.filename = "yep_took_good_care_of_that_file.txt"
-    zfile.timestamp = int(get_utc_time())
+    zfile.ParseFromString(request.stream.read())
+    zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile.folder)
+    try:
+        if not os.path.isdir(zfiles_dir):
+            os.makedirs(zfiles_dir)
+    except IOError as e:
+        logger.error("failed to create zfiles dir (%s):  %s", zfiles_dir, str(e))
+        return '', 400
+    with open(os.path.join(zfiles_dir, quote(zfile.filename, safe=' ')), 'wb') as fd:
+        fd.write(zfile.file)
+    row = Zfile.query.filter_by(folder=zfile.folder, filename=zfile.filename, player_id=current_user.player_id).first()
+    if not row:
+        zfile.timestamp = int(get_utc_time())
+        new_zfile = Zfile(folder=zfile.folder, filename=zfile.filename, timestamp=zfile.timestamp, player_id=current_user.player_id)
+        db.session.add(new_zfile)
+        db.session.commit()
+        zfile.id = new_zfile.id
+    else:
+        zfile.id = row.id
+        zfile.timestamp = row.timestamp
     return zfile.SerializeToString(), 200
+
+@app.route('/api/zfiles/list', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_zfiles_list():
+    folder = request.args.get('folder')
+    zfiles = zfiles_pb2.ZFilesProto()
+    rows = Zfile.query.filter_by(folder=folder, player_id=current_user.player_id)
+    for row in rows:
+        zfiles.zfiles.add(id=row.id, folder=row.folder, filename=row.filename, timestamp=row.timestamp)
+    return zfiles.SerializeToString(), 200
+
+@app.route('/api/zfiles/<int:file_id>/download', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_zfiles_download(file_id):
+    row = Zfile.query.filter_by(id=file_id).first()
+    zfile = os.path.join(STORAGE_DIR, str(row.player_id), row.folder, quote(row.filename, safe=' '))
+    if os.path.isfile(zfile):
+        return send_file(zfile, as_attachment=True, download_name=row.filename)
+    else:
+        return '', 404
+
+@app.route('/api/zfiles/<int:file_id>', methods=['DELETE'])
+@jwt_to_session_cookie
+@login_required
+def api_zfiles_delete(file_id):
+    row = Zfile.query.filter_by(id=file_id).first()
+    try:
+        os.remove(os.path.join(STORAGE_DIR, str(row.player_id), row.folder, quote(row.filename, safe=' ')))
+    except Exception as exc:
+        logger.warn('api_zfiles_delete: %s' % repr(exc))
+    db.session.delete(row)
+    db.session.commit()
+    return '', 200
 
 
 # Custom static data
@@ -1325,11 +1384,6 @@ def static_zc(filename):
 @app.route('/phoneicons/<path:filename>')
 def cdn_phoneicons(filename):
     return send_from_directory('%s/cdn/phoneicons' % SCRIPT_DIR, filename)
-
-# Probably don't need, haven't investigated
-@app.route('/api/zfiles/list', methods=['GET', 'POST'])
-def api_zfiles_list():
-    return '', 200
 
 # Disable telemetry (shuts up some errors in log)
 @app.route('/api/telemetry/config', methods=['GET'])
