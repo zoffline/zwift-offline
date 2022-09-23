@@ -163,10 +163,10 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     pass_hash = db.Column(db.String(100), nullable=False)
-    enable_ghosts = db.Column(db.Integer, nullable=False, default=1) # Boolean
-    new_home = db.Column(db.Integer, nullable=False, default=0) # Boolean
-    is_admin = db.Column(db.Integer, nullable=False, default=0) # Boolean
-    remember = db.Column(db.Integer, nullable=False, default=0) # Boolean
+    enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
+    new_home = db.Column(db.Integer, nullable=False, default=0)
+    is_admin = db.Column(db.Integer, nullable=False, default=0)
+    remember = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return self.username
@@ -201,8 +201,8 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
         return True
 
 class Activity(db.Model):
-    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
-    player_id = db.Column(db.Text) # BigInteger
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
     f3 = db.Column(db.Integer)
     name = db.Column(db.Text)
     f5 = db.Column(db.Integer)
@@ -220,8 +220,8 @@ class Activity(db.Model):
     max_speed = db.Column(db.Float)
     calories = db.Column(db.Float)
     total_elevation = db.Column(db.Float)
-    strava_upload_id = db.Column(db.Text) # BigInteger
-    strava_activity_id = db.Column(db.Text) # BigInteger
+    strava_upload_id = db.Column(db.Integer)
+    strava_activity_id = db.Column(db.Integer)
     f23 = db.Column(db.Integer)
     fit = db.Column(db.LargeBinary)
     fit_filename = db.Column(db.Text)
@@ -229,30 +229,30 @@ class Activity(db.Model):
     date = db.Column(db.Text)
 
 class SegmentResult(db.Model):
-    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
-    player_id = db.Column(db.Text) # BigInteger
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
     f3 = db.Column(db.Integer)
     f4 = db.Column(db.Integer)
-    segment_id = db.Column(db.Text) # BigInteger
-    event_subgroup_id = db.Column(db.Text) # BigInteger
+    segment_id = db.Column(db.Integer)
+    event_subgroup_id = db.Column(db.Integer)
     first_name = db.Column(db.Text)
     last_name = db.Column(db.Text)
-    world_time = db.Column(db.Text) # BigInteger
+    world_time = db.Column(db.Integer)
     finish_time_str = db.Column(db.Text)
-    elapsed_ms = db.Column(db.Text) # BigInteger
-    f12 = db.Column(db.Numeric) # Boolean
+    elapsed_ms = db.Column(db.Integer)
+    f12 = db.Column(db.Integer)
     f13 = db.Column(db.Integer)
     f14 = db.Column(db.Integer)
     f15 = db.Column(db.Integer)
-    f16 = db.Column(db.Numeric) # Boolean
+    f16 = db.Column(db.Integer)
     f17 = db.Column(db.Text)
-    f18 = db.Column(db.Text) # BigInteger
+    f18 = db.Column(db.Integer)
     f19 = db.Column(db.Integer)
     f20 = db.Column(db.Integer)
 
 class Goal(db.Model):
-    id = db.Column(db.BigInteger().with_variant(db.Integer, "sqlite"), primary_key=True)
-    player_id = db.Column(db.Text) # BigInteger
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
     f3 = db.Column(db.Integer)
     name = db.Column(db.Text)
     type = db.Column(db.Integer)
@@ -261,17 +261,17 @@ class Goal(db.Model):
     target_duration = db.Column(db.Float)
     actual_distance = db.Column(db.Float)
     actual_duration = db.Column(db.Float)
-    created_on = db.Column(db.Text) # BigInteger
-    period_end_date = db.Column(db.Text) # BigInteger
-    f13 = db.Column(db.Text) # BigInteger
+    created_on = db.Column(db.Integer)
+    period_end_date = db.Column(db.Integer)
+    f13 = db.Column(db.Integer)
 
 class Playback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, nullable=False) # BigInteger
+    player_id = db.Column(db.Integer, nullable=False)
     uuid = db.Column(db.Text, nullable=False)
-    segment_id = db.Column(db.Text, nullable=False) # BigInteger
+    segment_id = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Float, nullable=False)
-    world_time = db.Column(db.Integer, nullable=False) # BigInteger
+    world_time = db.Column(db.Integer, nullable=False)
 
 class Version(db.Model):
     version = db.Column(db.Integer, primary_key=True)
@@ -909,26 +909,16 @@ def logout(username):
     return redirect(url_for('login'))
 
 
-####
-# Set up protobuf_to_dict call map
-type_callable_map = copy(TYPE_CALLABLE_MAP)
-# Override base64 encoding of byte fields
-#type_callable_map[FieldDescriptor.TYPE_BYTES] = str
-# sqlite doesn't support uint64 so make them strings
-type_callable_map[FieldDescriptor.TYPE_UINT64] = str
-
-
 def insert_protobuf_into_db(table_name, msg):
-    msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
+    msg_dict = protobuf_to_dict(msg)
     row = table_name(**msg_dict)
     db.session.add(row)
     db.session.commit()
     return row.id
 
 
-# XXX: can't be used to 'nullify' a column value
 def update_protobuf_in_db(table_name, msg, id):
-    msg_dict = protobuf_to_dict(msg, type_callable_map=type_callable_map)
+    msg_dict = protobuf_to_dict(msg)
     table_name.query.filter_by(id=id).update(msg_dict)
     db.session.commit()
 
@@ -940,10 +930,7 @@ def row_to_protobuf(row, msg, exclude_fields=[]):
         if row[key] is None:
             continue
         field = msg.DESCRIPTOR.fields_by_name[key]
-        if field.type == field.TYPE_UINT64:
-            setattr(msg, key, int(row[key]))
-        else:
-            setattr(msg, key, row[key])
+        setattr(msg, key, row[key])
     return msg
 
 
@@ -1739,7 +1726,7 @@ def player_playbacks_player_playback():
     if pb.time == 0:
         return '', 200
     new_uuid = str(uuid.uuid4())
-    new_pb = Playback(player_id=current_user.player_id, uuid=new_uuid, segment_id=str(pb.segment_id), time=pb.time, world_time=pb.world_time)
+    new_pb = Playback(player_id=current_user.player_id, uuid=new_uuid, segment_id=pb.segment_id, time=pb.time, world_time=pb.world_time)
     db.session.add(new_pb)
     db.session.commit()
     with open('%s/%s.playback' % (pb_dir, new_uuid), 'wb') as f:
@@ -1750,7 +1737,7 @@ def player_playbacks_player_playback():
 @jwt_to_session_cookie
 @login_required
 def player_playbacks_player_me_playbacks(segment_id, option):
-    segment_id = int(segment_id) & 0xffffffffffffffff
+    segment_id = int(segment_id)
     after = request.args.get('after')
     before = request.args.get('before')
     query = "SELECT * FROM playback WHERE player_id = '%s' AND segment_id = '%s'" % (current_user.player_id, segment_id)
@@ -1767,7 +1754,7 @@ def player_playbacks_player_me_playbacks(segment_id, option):
         return '', 200
     pbr = playback_pb2.PlaybackResponse()
     pbr.uuid = row.uuid
-    pbr.segment_id = int(row.segment_id)
+    pbr.segment_id = row.segment_id
     pbr.time = row.time
     pbr.world_time = row.world_time
     pbr.url = 'https://cdn.zwift.com/player-playback/playbacks/%s.playback' % row.uuid
@@ -2799,7 +2786,7 @@ def api_segment_results():
 def api_personal_records_my_records():
     if not request.args.get('segmentId'):
         return '', 422
-    segment_id = int(request.args.get('segmentId')) & 0xffffffffffffffff
+    segment_id = int(request.args.get('segmentId'))
     from_date = request.args.get('from')
     to_date = request.args.get('to')
 
@@ -2826,11 +2813,10 @@ def live_segment_results_service_leaders():
     results.server_realm = 0
     results.segment_id = 0
     rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
-        JOIN (SELECT s.player_id, s.segment_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+        JOIN (SELECT s.player_id, s.segment_id, MIN(s.elapsed_ms) AS min_time
             FROM segment_result s WHERE world_time > '%s' GROUP BY s.player_id, s.segment_id) s2
-            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
-        GROUP BY s1.player_id, s1.elapsed_ms
-        ORDER BY CAST(s1.segment_id AS INTEGER), CAST(s1.elapsed_ms AS INTEGER)
+            ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms
         LIMIT 1000""" % (world_time()-(60*60*1000))))
     for row in rows:
         result = results.segment_results.add()
@@ -2840,17 +2826,16 @@ def live_segment_results_service_leaders():
 
 @app.route('/live-segment-results-service/leaderboard/<segment_id>', methods=['GET'])
 def live_segment_results_service_leaderboard_segment_id(segment_id):
-    id = int(segment_id) & 0xffffffffffffffff
+    segment_id = int(segment_id)
     results = segment_result_pb2.SegmentResults()
     results.server_realm = 0
-    results.segment_id = id
+    results.segment_id = segment_id
     rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
-        JOIN (SELECT s.player_id, MIN(CAST(s.elapsed_ms AS INTEGER)) AS min_time
+        JOIN (SELECT s.player_id, MIN(s.elapsed_ms) AS min_time
             FROM segment_result s WHERE segment_id = '%s' AND world_time > '%s' GROUP BY s.player_id) s2
-            ON s2.player_id = s1.player_id AND s2.min_time = CAST(s1.elapsed_ms AS INTEGER)
-        GROUP BY s1.player_id, s1.elapsed_ms
-        ORDER BY CAST(s1.elapsed_ms AS INTEGER)
-        LIMIT 1000""" % (id, (world_time()-(60*60*1000)))))
+            ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms
+        LIMIT 1000""" % (segment_id, (world_time()-(60*60*1000)))))
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
@@ -2916,12 +2901,13 @@ def migrate_database():
     db.session.execute('ALTER TABLE activity RENAME TO activity_old')
     db.session.execute('ALTER TABLE goal RENAME TO goal_old')
     db.session.execute('ALTER TABLE segment_result RENAME TO segment_result_old')
+    db.session.execute('ALTER TABLE playback RENAME TO playback_old')
     db.create_all(app=app)
 
     rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity_old')
     for row in rows:
         d = {k: row[k] for k in row.keys()}
-        #d['player_id'] = int(d['player_id'])
+        d['player_id'] = int(d['player_id'])
         #d['new_name'] = d.pop('f3')
         db.session.add(Activity(**d))
 
@@ -2929,17 +2915,33 @@ def migrate_database():
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
+        d['player_id'] = int(d['player_id'])
+        d['created_on'] = int(d['created_on'])
+        d['period_end_date'] = int(d['period_end_date'])
+        d['f13'] = int(d['f13'])
         db.session.add(Goal(**d))
 
     rows = db.session.execute('SELECT * FROM segment_result_old')
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
+        d['player_id'] = int(d['player_id'])
+        d['segment_id'] = toSigned(int(d['segment_id']), 8)
+        d['event_subgroup_id'] = int(d['event_subgroup_id'])
+        d['world_time'] = int(d['world_time'])
+        d['elapsed_ms'] = int(d['elapsed_ms'])
         db.session.add(SegmentResult(**d))
+
+    rows = db.session.execute('SELECT * FROM playback_old')
+    for row in rows:
+        d = {k: row[k] for k in row.keys()}
+        d['segment_id'] = toSigned(int(d['segment_id']), 8)
+        db.session.add(Playback(**d))
 
     db.session.execute('DROP TABLE activity_old')
     db.session.execute('DROP TABLE goal_old')
     db.session.execute('DROP TABLE segment_result_old')
+    db.session.execute('DROP TABLE playback_old')
 
     Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
     db.session.commit()
