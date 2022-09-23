@@ -1,22 +1,37 @@
 syntax = "proto2";
-//TODO: uncomment and use f14, rename fields in db
+import "profile.proto"; //enum Sport
 message Goal {
 	optional uint64 id = 1;
 	optional uint64 player_id = 2;
-	optional int64 f3 = 3;    //-> enum Sport sport
+	optional Sport sport = 3;
 	optional string name = 4; // i.e. "Monthly time goal"
-	optional int64 type = 5;  //-> enum GoalType 0=distance, 1=time
-	optional int64 periodicity = 6; //-> enum GoalPeriod 0=weekly, 1=monthly
+	optional GoalType type = 5;
+	optional GoalPeriod periodicity = 6;
 	optional float target_distance = 7;  //in meters. set to dur for dur goals
 	optional float target_duration = 8;  //in minutes. set to dist for dist goals
 	optional float actual_distance = 9;  //in meters. is also set for dur goals?
 	optional float actual_duration = 10; //in minutes. is also set for dist goals?
 	optional uint64 created_on = 11;     //in ms since epoch
 	optional uint64 period_end_date = 12;
-	optional uint64 f13 = 13;   //-> enum GoalStatus 0=active, 1=retired
-	//optional string f14 = 14; // timezone? (empty)
+	optional GoalStatus status = 13;
+	optional string timezone = 14;
 }
 
 message Goals {
 	repeated Goal goals = 1;
+}
+
+enum GoalType {
+	DISTANCE = 0;
+	TIME = 1;
+}
+
+enum GoalPeriod {
+	WEEKLY = 0;
+	MONTHLY = 1;
+}
+
+enum GoalStatus {
+	ACTIVE = 0;
+	RETIRED = 1;
 }

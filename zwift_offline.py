@@ -264,7 +264,7 @@ class SegmentResult(db.Model):
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer)
-    f3 = db.Column(db.Integer)
+    sport = db.Column(db.Integer)
     name = db.Column(db.Text)
     type = db.Column(db.Integer)
     periodicity = db.Column(db.Integer)
@@ -274,7 +274,8 @@ class Goal(db.Model):
     actual_duration = db.Column(db.Float)
     created_on = db.Column(db.Integer)
     period_end_date = db.Column(db.Integer)
-    f13 = db.Column(db.Integer)
+    status = db.Column(db.Integer)
+    timezone = db.Column(db.Text)
 
 class Playback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -2334,8 +2335,8 @@ def fill_in_goal_progress(goal, player_id):
                     WHERE player_id = %s AND sport = %s
                     AND strftime('%s', start_date) >= strftime('%s', '%s')
                     AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
-                    (player_id, goal.f3, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
-    if goal.type == 0:  # distance
+                    (player_id, goal.sport, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
+    if goal.type == goal_pb2.GoalType.DISTANCE:
         distance = db.session.execute(sqlalchemy.text('SELECT SUM(distanceInMeters) %s' % common_sql)).first()[0]
         if distance:
             goal.actual_distance = distance
@@ -2387,19 +2388,19 @@ def str_timestamp_json(ts):
         return str_timestamp(ts)
 
 def goalProtobufToJson(goal):
-    return {"id":goal.id,"profileId":goal.player_id,"sport":str_sport(goal.f3),"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
+    return {"id":goal.id,"profileId":goal.player_id,"sport":str_sport(goal.sport),"name":goal.name,"type":int(goal.type),"periodicity":int(goal.periodicity),
 "targetDistanceInMeters":goal.target_distance,"targetDurationInMinutes":goal.target_duration,"actualDistanceInMeters":goal.actual_distance,
 "actualDurationInMinutes":goal.actual_duration,"createdOn":str_timestamp_json(goal.created_on),
-"periodEndDate":str_timestamp_json(goal.period_end_date),"status":int(goal.f13),"timezone":""}
+"periodEndDate":str_timestamp_json(goal.period_end_date),"status":int(goal.status),"timezone":goal.timezone}
 
 def goalJsonToProtobuf(json_goal):
     goal = goal_pb2.Goal()
-    goal.f3 = sport_from_str(json_goal['sport'])
+    goal.sport = sport_from_str(json_goal['sport'])
     goal.id = json_goal['id']
     goal.name = json_goal['name']
     goal.periodicity = int(json_goal['periodicity'])
     goal.type = int(json_goal['type'])
-    goal.f13 = 0 #active
+    goal.status = goal_pb2.GoalStatus.ACTIVE
     goal.target_distance = json_goal['targetDistanceInMeters']
     goal.target_duration = json_goal['targetDurationInMinutes']
     goal.actual_distance = json_goal['actualDistanceInMeters']
@@ -2928,9 +2929,10 @@ def migrate_database():
         d = {k: row[k] for k in row.keys()}
         del d['id']
         d['player_id'] = int(d['player_id'])
+        d['sport'] = d.pop('f3')
         d['created_on'] = int(d['created_on'])
         d['period_end_date'] = int(d['period_end_date'])
-        d['f13'] = int(d['f13'])
+        d['status'] = int(d.pop('f13'))
         db.session.add(Goal(**d))
 
     rows = db.session.execute('SELECT * FROM segment_result_old')
