@@ -203,13 +203,13 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer)
-    f3 = db.Column(db.Integer)
+    course_id = db.Column(db.Integer)
     name = db.Column(db.Text)
     f5 = db.Column(db.Integer)
-    f6 = db.Column(db.Integer)
+    privateActivity = db.Column(db.Integer)
     start_date = db.Column(db.Text)
     end_date = db.Column(db.Text)
-    distance = db.Column(db.Float)
+    distanceInMeters = db.Column(db.Float)
     avg_heart_rate = db.Column(db.Float)
     max_heart_rate = db.Column(db.Float)
     avg_watts = db.Column(db.Float)
@@ -222,11 +222,22 @@ class Activity(db.Model):
     total_elevation = db.Column(db.Float)
     strava_upload_id = db.Column(db.Integer)
     strava_activity_id = db.Column(db.Integer)
+    f22 = db.Column(db.Text)
     f23 = db.Column(db.Integer)
     fit = db.Column(db.LargeBinary)
     fit_filename = db.Column(db.Text)
-    f29 = db.Column(db.Integer)
+    subgroupId = db.Column(db.Integer)
+    workoutHash = db.Column(db.Integer)
+    progressPercentage = db.Column(db.Float)
+    sport = db.Column(db.Integer)
     date = db.Column(db.Text)
+    act_f32 = db.Column(db.Float)
+    act_f33 = db.Column(db.Text)
+    act_f34 = db.Column(db.Text)
+    privacy = db.Column(db.Integer)
+    fitness_privacy = db.Column(db.Integer)
+    club_name = db.Column(db.Text)
+    movingTimeInMs = db.Column(db.Integer)
 
 class SegmentResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -924,12 +935,11 @@ def update_protobuf_in_db(table_name, msg, id):
 
 
 def row_to_protobuf(row, msg, exclude_fields=[]):
-    for key in list(msg.DESCRIPTOR.fields_by_name.keys()):
+    for key in row.keys():
         if key in exclude_fields:
             continue
         if row[key] is None:
             continue
-        field = msg.DESCRIPTOR.fields_by_name[key]
         setattr(msg, key, row[key])
     return msg
 
@@ -968,8 +978,8 @@ def activity_protobuf_to_json(activity):
     profile = get_partial_profile(activity.player_id)
     return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":profile.first_name,"lastName":profile.last_name, \
     "imageSrc":profile.imageSrc,"approvalRequired":None}, \
-    "worldId":activity.f3,"name":activity.name,"sport":str_sport(activity.f29),"startDate":activity.start_date, \
-    "endDate":activity.end_date,"distanceInMeters":activity.distance, \
+    "worldId":activity.course_id,"name":activity.name,"sport":str_sport(activity.sport),"startDate":activity.start_date, \
+    "endDate":activity.end_date,"distanceInMeters":activity.distanceInMeters, \
     "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"", \
     "feedImageThumbnailUrl":"", \
     "lastSaveDate":activity.date,"movingTimeInMs":activity_moving_time(activity), \
@@ -980,8 +990,7 @@ def select_activities_json(player_id, limit):
     ret = []
     if limit > 0:
         activities = activity_pb2.ActivityList()
-        # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
-        rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s ORDER BY date desc LIMIT %s" % (str(player_id), limit)))
+        rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = %s ORDER BY date desc LIMIT %s" % (player_id, limit)))
         allow_empty_end_date = True
         for row in rows:
             activity = activities.activities.add()
@@ -1523,7 +1532,7 @@ def api_search_profiles():
 @app.route('/api/profiles/<int:player_id>/statistics', methods=['GET'])
 def api_profiles_id_statistics(player_id):
     from_dt = request.args.get('startDateTime')
-    row = db.session.execute(sqlalchemy.text("SELECT sum(Cast ((JulianDay(date) - JulianDay(start_date)) * 24 * 60 As Integer)), sum(distance), sum(calories), sum(total_elevation) FROM activity WHERE player_id = %s and strftime('%%s', start_date) >= strftime('%%s', '%s')" % (str(player_id), from_dt))).first()
+    row = db.session.execute(sqlalchemy.text("SELECT sum(Cast ((JulianDay(date) - JulianDay(start_date)) * 24 * 60 As Integer)), sum(distanceInMeters), sum(calories), sum(total_elevation) FROM activity WHERE player_id = %s and strftime('%%s', start_date) >= strftime('%%s', '%s')" % (str(player_id), from_dt))).first()
     json_data = {"timeRiddenInMinutes": row[0], "distanceRiddenInMeters": row[1], "caloriesBurned": row[2], "heightClimbedInMeters": row[3]}
     return jsonify(json_data)
 
@@ -1633,15 +1642,14 @@ def api_profiles_activities(player_id):
 
     # request.method == 'GET'
     activities = activity_pb2.ActivityList()
-    # Select every column except 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
-    rows = db.session.execute(sqlalchemy.text("SELECT id, player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity WHERE player_id = %s" % str(player_id)))
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = %s" % player_id))
     should_remove = list()
     for row in rows:
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
         a = activity
         #Remove activities with less than 100m distance
-        if a.distance < 100:
+        if a.distanceInMeters < 100:
             should_remove.append(a)
     for a in should_remove:
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % a.id))
@@ -1946,7 +1954,7 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if activity.distance < 300:
+    if activity.distanceInMeters < 300:
         return response, 200
     player_id = current_user.player_id
     if current_user.enable_ghosts:
@@ -2323,12 +2331,12 @@ def fill_in_goal_progress(goal, player_id):
         first_dt, last_dt = get_month_range(local_now)
 
     common_sql = ("""FROM activity
-                    WHERE player_id = %s AND f29 = %s
+                    WHERE player_id = %s AND sport = %s
                     AND strftime('%s', start_date) >= strftime('%s', '%s')
                     AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
                     (player_id, goal.f3, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
     if goal.type == 0:  # distance
-        distance = db.session.execute(sqlalchemy.text('SELECT SUM(distance) %s' % common_sql)).first()[0]
+        distance = db.session.execute(sqlalchemy.text('SELECT SUM(distanceInMeters) %s' % common_sql)).first()[0]
         if distance:
             goal.actual_distance = distance
             goal.actual_duration = distance
@@ -2904,11 +2912,15 @@ def migrate_database():
     db.session.execute('ALTER TABLE playback RENAME TO playback_old')
     db.create_all(app=app)
 
+    # Select every column except 'id' and 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
     rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity_old')
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['player_id'] = int(d['player_id'])
-        #d['new_name'] = d.pop('f3')
+        d['course_id'] = d.pop('f3')
+        d['privateActivity'] = d.pop('f6')
+        d['distanceInMeters'] = d.pop('distance')
+        d['sport'] = d.pop('f29')
         db.session.add(Activity(**d))
 
     rows = db.session.execute('SELECT * FROM goal_old')
