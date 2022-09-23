@@ -125,8 +125,7 @@ try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
         client_id = f.readline().rstrip('\r\n')
         client_secret = f.readline().rstrip('\r\n')
-except Exception as exc:
-    #logger.warn('strava-client: %s' % repr(exc))
+except:
     client_id = '28117'
     client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
@@ -242,8 +241,8 @@ class Activity(db.Model):
 class SegmentResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer)
-    f3 = db.Column(db.Integer)
-    f4 = db.Column(db.Integer)
+    server_realm = db.Column(db.Integer)
+    course_id = db.Column(db.Integer)
     segment_id = db.Column(db.Integer)
     event_subgroup_id = db.Column(db.Integer)
     first_name = db.Column(db.Text)
@@ -251,15 +250,18 @@ class SegmentResult(db.Model):
     world_time = db.Column(db.Integer)
     finish_time_str = db.Column(db.Text)
     elapsed_ms = db.Column(db.Integer)
-    f12 = db.Column(db.Integer)
-    f13 = db.Column(db.Integer)
+    power_source_model = db.Column(db.Integer)
+    weight_in_grams = db.Column(db.Integer)
     f14 = db.Column(db.Integer)
-    f15 = db.Column(db.Integer)
-    f16 = db.Column(db.Integer)
-    f17 = db.Column(db.Text)
-    f18 = db.Column(db.Integer)
-    f19 = db.Column(db.Integer)
-    f20 = db.Column(db.Integer)
+    avg_power = db.Column(db.Integer)
+    is_male = db.Column(db.Integer)
+    time = db.Column(db.Text)
+    player_type = db.Column(db.Integer)
+    avg_hr = db.Column(db.Integer)
+    sport = db.Column(db.Integer)
+    activity_id = db.Column(db.Integer)
+    f22 = db.Column(db.Integer)
+    f23 = db.Column(db.Text)
 
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -2766,7 +2768,7 @@ def api_segment_results():
         return '', 400
     result.world_time = world_time()
     result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
-    result.f20 = 0
+    result.sport = 0
     result.id = insert_protobuf_into_db(SegmentResult, result)
 
     # Previously done in /relay/worlds/attributes
@@ -2811,7 +2813,7 @@ def api_personal_records_my_records():
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt))
     for row in rows:
         result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f3', 'f4', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'f17', 'f18'])
+        row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
 
     return results.SerializeToString(), 200
 
@@ -2829,7 +2831,7 @@ def live_segment_results_service_leaders():
         LIMIT 1000""" % (world_time()-(60*60*1000))))
     for row in rows:
         result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+        row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
     return results.SerializeToString(), 200
 
 
@@ -2847,7 +2849,7 @@ def live_segment_results_service_leaderboard_segment_id(segment_id):
         LIMIT 1000""" % (segment_id, (world_time()-(60*60*1000)))))
     for row in rows:
         result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f14', 'f17', 'f18'])
+        row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
     return results.SerializeToString(), 200
 
 
@@ -2940,10 +2942,20 @@ def migrate_database():
         d = {k: row[k] for k in row.keys()}
         del d['id']
         d['player_id'] = int(d['player_id'])
+        d['server_realm'] = d.pop('f3')
+        d['course_id'] = d.pop('f4')
         d['segment_id'] = toSigned(int(d['segment_id']), 8)
         d['event_subgroup_id'] = int(d['event_subgroup_id'])
         d['world_time'] = int(d['world_time'])
         d['elapsed_ms'] = int(d['elapsed_ms'])
+        d['power_source_model'] = d.pop('f12')
+        d['weight_in_grams'] = d.pop('f13')
+        d['avg_power'] = d.pop('f15')
+        d['is_male'] = d.pop('f16')
+        d['time'] = d.pop('f17')
+        d['player_type'] = d.pop('f18')
+        d['avg_hr'] = d.pop('f19')
+        d['sport'] = d.pop('f20')
         db.session.add(SegmentResult(**d))
 
     rows = db.session.execute('SELECT * FROM playback_old')
