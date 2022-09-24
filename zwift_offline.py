@@ -2979,7 +2979,8 @@ def migrate_database():
     db.session.execute('ALTER TABLE playback RENAME TO playback_old')
     db.create_all(app=app)
 
-    # Select every column except 'id' and cast 'fit' as hex - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
+    import ast
+    # Select every column except 'id' and cast 'fit' as hex - after 77ff84e fit data was stored incorrectly
     rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old')
     for row in rows:
         d = {k: row[k] for k in row.keys()}
@@ -2989,6 +2990,8 @@ def migrate_database():
         d['distanceInMeters'] = d.pop('distance')
         d['sport'] = d.pop('f29')
         fit_data = bytes.fromhex(d['hex(fit)'])
+        if fit_data[0:2] == b"b'":
+            fit_data = ast.literal_eval(fit_data.decode("ascii"))
         del d['hex(fit)']
         orm_act = Activity(**d)
         db.session.add(orm_act)
