@@ -125,7 +125,8 @@ try:
     with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
         client_id = f.readline().rstrip('\r\n')
         client_secret = f.readline().rstrip('\r\n')
-except:
+except Exception as exc:
+    #logger.warn('strava-client: %s' % repr(exc))
     client_id = '28117'
     client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
@@ -293,6 +294,16 @@ class Zfile(db.Model):
     filename = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.Integer, nullable=False)
     player_id = db.Column(db.Integer, nullable=False)
+
+class PrivateEvent(db.Model): # cached in glb_private_events
+    id = db.Column(db.Integer, primary_key=True)
+    json = db.Column(db.Text, nullable=False)
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, nullable=False)
+    player_id = db.Column(db.Integer, nullable=False)
+    json = db.Column(db.Text, nullable=False)
 
 class Version(db.Model):
     version = db.Column(db.Integer, primary_key=True)
@@ -2065,13 +2076,10 @@ def stime_to_timestamp(stime):
     utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     return int((datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp())
 
-glb_notifications = {} #player_id -> dictionary, todo: move to database
-glb_cur_notif_id = 1
 def create_zca_notification(player_id, private_event, organizer):
-    global glb_cur_notif_id
-    if not player_id in glb_notifications.keys():
-        glb_notifications[player_id] = {}
-    d = glb_notifications[player_id]
+    orm_not = Notification(event_id=private_event['id'], player_id=player_id, json='')
+    db.session.add(orm_not)
+    db.session.commit()
     argString0 = json.dumps({"eventId":private_event['id'],"eventStartDate": \
         stime_to_timestamp(private_event['eventStart']), \
         "otherInviteeCount":len(private_event['invitedProfileIds'])})
@@ -2090,50 +2098,62 @@ def create_zca_notification(player_id, private_event, organizer):
                 "followerStatusOfLoggedInPlayer": "IS_FOLLOWING" #todo
             }
         },
-        "id": glb_cur_notif_id, "lastModified": None, "read": False, "readDate": None,
+        "id": orm_not.id, "lastModified": None, "read": False, "readDate": None,
         "type": "PRIVATE_EVENT_INVITE" 
     }
-    d[glb_cur_notif_id] = n
-    glb_cur_notif_id += 1
+    orm_not.json = json.dumps(n)
+    db.session.commit()
 
 @app.route('/api/notifications', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_notifications():
     ret_notifications = []
-    if current_user.player_id in glb_notifications.keys():
-        for n in glb_notifications[current_user.player_id].values():
-            ret_notifications.append(n)
+    for row in Notification.query.filter_by(player_id=current_user.player_id):
+        ret_notifications.append(row.json)
     return jsonify(ret_notifications)
 
 @app.route('/api/notifications/<int:notif_id>', methods=['PUT'])
 @jwt_to_session_cookie
 @login_required
 def api_notifications_put(notif_id):
-    n = glb_notifications[current_user.player_id][notif_id]
-    n["read"] = request.json['read']
-    n["readDate"] = request.json['readDate']
-    n["lastModified"] = n["readDate"]
+    for orm_not in Notification.query.filter_by(id=notif_id):
+        n = json.loads(orm_not.json)
+        n["read"] = request.json['read']
+        n["readDate"] = request.json['readDate']
+        n["lastModified"] = n["readDate"]
+        orm_not.json = json.dumps(n)
+        db.session.commit()
     return '', 204
 
-glb_private_events = {} #todo: move to database
-glb_cur_pe_id = 1
+glb_private_events = {} #cache of actual PrivateEvent(db.Model)
+def ActualPrivateEvents():
+    if len(glb_private_events) == 0:
+        for row in db.session.query(PrivateEvent).order_by(PrivateEvent.id.desc()).limit(100):
+            if len(row.json):
+                glb_private_events[row.id] = json.loads(row.json)
+    return glb_private_events
+
 @app.route('/api/private_event/<int:meetup_id>', methods=['DELETE'])
 @jwt_to_session_cookie
 @login_required
 def api_private_event_remove(meetup_id):
-    glb_private_events.pop(meetup_id)
-    for d in glb_notifications.values():
-        if meetup_id in d.keys():
-            d.pop(meetup_id)
+    ActualPrivateEvents().pop(meetup_id)
+    PrivateEvent.query.filter_by(id=meetup_id).delete()
+    Notification.query.filter_by(event_id=meetup_id).delete()
+    db.session.commit()
     return '', 200
 
 def edit_private_event(player_id, meetup_id, decision):
-    if meetup_id in glb_private_events.keys():
-        e = glb_private_events[meetup_id]
+    ape = ActualPrivateEvents()
+    if meetup_id in ape.keys():
+        e = ape[meetup_id]
         for i in e['eventInvites']:
             if i['invitedProfile']['id'] == player_id:
                 i['status'] = decision
+        orm_event = PrivateEvent.query.get(meetup_id)
+        orm_event.json = json.dumps(e)
+        db.session.commit()
     return '', 204
 
 @app.route('/api/private_event/<int:meetup_id>/accept', methods=['PUT'])
@@ -2154,16 +2174,35 @@ def api_private_event_reject(meetup_id):
 def api_private_event_edit(meetup_id):
     str_pe = request.stream.read()
     json_pe = json.loads(str_pe)
-    org_json_pe = glb_private_events[meetup_id]
+    org_json_pe = ActualPrivateEvents()[meetup_id]
     for f in ('culling', 'distanceInMeters', 'durationInSeconds', 'eventStart', 'invitedProfileIds', 'laps', 'routeId', 'rubberbanding', 'showResults', 'sport', 'workoutHash'):
         org_json_pe[f] = json_pe[f]
     org_json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    for d in glb_notifications.values():
-        if meetup_id in d.keys():
-            n = d[meetup_id]
-            n['read'] = False
-            n['readDate'] = None
-            n['lastModified'] = org_json_pe['updateDate']
+    newEventInvites = []
+    newEventInviteeIds = []
+    for i in org_json_pe['eventInvites']:
+        profile_id = i['invitedProfile']['id']
+        if profile_id == org_json_pe['organizerProfileId'] or profile_id in json_pe['invitedProfileIds']:
+            newEventInvites.append(i)
+            newEventInviteeIds.append(profile_id)
+    player_update = create_wa_event_invites(org_json_pe)
+    for peer_id in json_pe['invitedProfileIds']:
+        if not peer_id in newEventInviteeIds:
+            create_zca_notification(peer_id, org_json_pe, newEventInvites[0]["invitedProfile"])
+            player_update.rel_id = peer_id
+            enqueue_wa_event_invites(peer_id, player_update)
+            p_partial_profile = get_partial_profile(peer_id)
+            newEventInvites.append({"invitedProfile": p_partial_profile.to_json(), "status": "PENDING"})
+    org_json_pe['eventInvites'] = newEventInvites
+    PrivateEvent.query.get(meetup_id).json = json.dumps(org_json_pe)
+    db.session.commit()
+    for orm_not in Notification.query.filter_by(event_id=meetup_id):
+        n = json.loads(orm_not.json)
+        n['read'] = False
+        n['readDate'] = None
+        n['lastModified'] = org_json_pe['updateDate']
+        orm_not.json = json.dumps(n)
+    db.session.commit()
     return jsonify({"id":meetup_id})
 
 def enqueue_wa_event_invites(player_id, wa):
@@ -2171,34 +2210,7 @@ def enqueue_wa_event_invites(player_id, wa):
         wa.wa_type = wat
         enqueue_player_update(player_id, wa.SerializeToString())
 
-@app.route('/api/private_event', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMeters":13800.0,"durationInSeconds":0,"eventStart":"2022-03-17T16:27:00Z","invitedProfileIds":[4357549,4486967],"laps":0,"routeId":2474227587,"rubberbanding":true,"showResults":false,"sport":"CYCLING","workoutHash":0}
-    global glb_cur_pe_id
-    str_pe = request.stream.read()
-    json_pe = json.loads(str_pe)
-    pe_id = glb_cur_pe_id * 10 + 1
-    glb_cur_pe_id += 1
-    json_pe['id'] = pe_id
-    ev_sg_id = pe_id + 2
-    json_pe['eventSubgroupId'] = ev_sg_id
-    json_pe['name'] = "Route #%s" % json_pe['routeId'] #todo: more readable
-    json_pe['acceptedTotalCount'] = len(json_pe['invitedProfileIds']) #todo: real count
-    json_pe['acceptedFolloweeCount'] = len(json_pe['invitedProfileIds']) + 1 #todo: real count
-    json_pe['invitedTotalCount'] = len(json_pe['invitedProfileIds']) + 1
-    partial_profile = get_partial_profile(current_user.player_id)
-    json_pe['organizerProfileId'] = current_user.player_id
-    json_pe['organizerId'] = current_user.player_id
-    json_pe['startLocation'] = 1 #todo_pe
-    json_pe['allowsLateJoin'] = True #todo_pe
-    json_pe['organizerFirstName'] = partial_profile.first_name
-    json_pe['organizerLastName'] = partial_profile.last_name
-    json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    json_pe['organizerImageUrl'] = imageSrc(current_user.player_id)
-    eventInvites = [{"invitedProfile": partial_profile.to_json(), "status": "ACCEPTED"}]
-    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
-
+def create_wa_event_invites(json_pe):
     pe = events_pb2.Event()
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -2207,7 +2219,7 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     player_update.wa_f12 = 1
     player_update.timestamp = int(get_utc_time()*1000000)
 
-    pe.id = pe_id
+    pe.id = json_pe['id']
     pe.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     pe.name = json_pe['name']
     if 'description' in json_pe:
@@ -2235,6 +2247,39 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     pe.lateJoinInMinutes = 30 #todo_pe
     #pe.course_id = 1 #todo_pe =f(json_pe['routeId']) ???
     player_update.payload = pe.SerializeToString()
+    return player_update
+
+@app.route('/api/private_event', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMeters":13800.0,"durationInSeconds":0,"eventStart":"2022-03-17T16:27:00Z","invitedProfileIds":[4357549,4486967],"laps":0,"routeId":2474227587,"rubberbanding":true,"showResults":false,"sport":"CYCLING","workoutHash":0}
+    str_pe = request.stream.read()
+    json_pe = json.loads(str_pe)
+
+    db_pe = PrivateEvent(json=str_pe)
+    db.session.add(db_pe)
+    db.session.commit()
+
+    json_pe['id'] = db_pe.id
+    ev_sg_id = db_pe.id
+    json_pe['eventSubgroupId'] = ev_sg_id
+    json_pe['name'] = "Route #%s" % json_pe['routeId'] #todo: more readable
+    json_pe['acceptedTotalCount'] = len(json_pe['invitedProfileIds']) #todo: real count
+    json_pe['acceptedFolloweeCount'] = len(json_pe['invitedProfileIds']) + 1 #todo: real count
+    json_pe['invitedTotalCount'] = len(json_pe['invitedProfileIds']) + 1
+    partial_profile = get_partial_profile(current_user.player_id)
+    json_pe['organizerProfileId'] = current_user.player_id
+    json_pe['organizerId'] = current_user.player_id
+    json_pe['startLocation'] = 1 #todo_pe
+    json_pe['allowsLateJoin'] = True #todo_pe
+    json_pe['organizerFirstName'] = partial_profile.first_name
+    json_pe['organizerLastName'] = partial_profile.last_name
+    json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    json_pe['organizerImageUrl'] = imageSrc(current_user.player_id)
+    eventInvites = [{"invitedProfile": partial_profile.to_json(), "status": "ACCEPTED"}]
+    create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
+
+    player_update = create_wa_event_invites(json_pe)
     enqueue_wa_event_invites(current_user.player_id, player_update)
 
     for peer_id in json_pe['invitedProfileIds']:
@@ -2245,8 +2290,11 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
         eventInvites.append({"invitedProfile": p_partial_profile.to_json(), "status": "PENDING"})
     json_pe['eventInvites'] = eventInvites
 
-    glb_private_events[pe_id] = json_pe
-    return jsonify({"id":pe_id}), 201
+    ActualPrivateEvents()[db_pe.id] = json_pe
+    db_pe.json = json.dumps(json_pe)
+    db.session.commit() #update db_pe
+
+    return jsonify({"id":db_pe.id}), 201
 
 def clone_and_append_social(player_id, private_event):
     ret = deepcopy(private_event)
@@ -2291,11 +2339,11 @@ def jsonPrivateEventFeedToProtobuf(jfeed):
 @login_required
 def api_private_event_feed():
     ret = []
-    for pe in glb_private_events.values():
+    for pe in ActualPrivateEvents().values():
         ret.append(clone_and_append_social(current_user.player_id, pe))
     if(request.headers['Accept'] == 'application/json'):
         return jsonify(ret)
-    return jsonPrivateEventFeedToProtobuf(ret).SerializeToString(), 200    
+    return jsonPrivateEventFeedToProtobuf(ret).SerializeToString(), 200
 
 def jsonPrivateEventToProtobuf(je):
     ret = events_pb2.PrivateEventProto()
@@ -2331,7 +2379,7 @@ def jsonPrivateEventToProtobuf(je):
 @jwt_to_session_cookie
 @login_required
 def api_private_event_id(event_id):
-    ret = clone_and_append_social(current_user.player_id, glb_private_events[event_id])
+    ret = clone_and_append_social(current_user.player_id, ActualPrivateEvents()[event_id])
     if(request.headers['Accept'] == 'application/json'):
         return jsonify(ret)
     return jsonPrivateEventToProtobuf(ret).SerializeToString(), 200
@@ -2345,8 +2393,9 @@ def api_private_event_entitlement():
 @login_required
 def relay_events_subgroups_id_late_join(meetup_id):
     id = meetup_id - 2
-    if id in glb_private_events.keys():
-        event = jsonPrivateEventToProtobuf(glb_private_events[id])
+    ape = ActualPrivateEvents()
+    if id in ape.keys():
+        event = jsonPrivateEventToProtobuf(ape[id])
         leader = event.organizerId
         if leader in online.keys():
             state = online[leader]
@@ -2689,7 +2738,7 @@ def convert_events_to_json(events):
 def transformPrivateEvents(player_id, max_count, status):
     ret = []
     if max_count > 0:
-        for e in glb_private_events.values():
+        for e in ActualPrivateEvents().values():
             for i in e['eventInvites']:
                 if i['invitedProfile']['id'] == player_id:
                     if i['status'] == status:
