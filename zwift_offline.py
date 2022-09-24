@@ -1989,9 +1989,7 @@ def zwift_upload(player_id, activity):
         logger.warn("Zwift upload failed. No internet? %s" % repr(exc))
 
 
-# With 64 bit ids Zwift can pass negative numbers due to overflow, which the flask int
-# converter does not handle so it's a string argument
-@app.route('/api/profiles/<int:player_id>/activities/<string:activity_id>', methods=['PUT', 'DELETE'])
+@app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_activities_id(player_id, activity_id):
@@ -2003,9 +2001,11 @@ def api_profiles_activities_id(player_id, activity_id):
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
         db.session.commit()
         return 'true', 200
-    activity_id = int(activity_id) & 0xffffffffffffffff
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
+    fit_filename = '%s - %s' % (activity_id, activity.fit_filename)
+    save_fit(player_id, fit_filename, activity.fit)
+    activity.fit = b''
     update_protobuf_in_db(Activity, activity, activity_id)
 
     response = '{"id":%s}' % activity_id
@@ -2940,6 +2940,16 @@ def move_old_profile():
         if os.path.isfile(strava_file):
             os.rename(strava_file, '%s/strava_token.txt' % profile_dir)
 
+def save_fit(player_id, name, data):
+    fit_dir = os.path.join(STORAGE_DIR, str(player_id), 'fit')
+    try:
+        if not os.path.isdir(fit_dir):
+            os.makedirs(fit_dir)
+    except IOError as e:
+        logger.error("failed to create fit dir (%s):  %s", fit_dir, str(e))
+        return
+    with open(os.path.join(fit_dir, name), 'wb') as f:
+        f.write(data)
 
 def migrate_database():
     # Migrate database if necessary
@@ -2969,8 +2979,8 @@ def migrate_database():
     db.session.execute('ALTER TABLE playback RENAME TO playback_old')
     db.create_all(app=app)
 
-    # Select every column except 'id' and 'fit' - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
-    rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, fit_filename, f29, date FROM activity_old')
+    # Select every column except 'id' and cast 'fit' as hex - despite being a blob python 3 treats it like a utf-8 string and tries to decode it
+    rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old')
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['player_id'] = int(d['player_id'])
@@ -2978,7 +2988,13 @@ def migrate_database():
         d['privateActivity'] = d.pop('f6')
         d['distanceInMeters'] = d.pop('distance')
         d['sport'] = d.pop('f29')
-        db.session.add(Activity(**d))
+        fit_data = bytes.fromhex(d['hex(fit)'])
+        del d['hex(fit)']
+        orm_act = Activity(**d)
+        db.session.add(orm_act)
+        db.session.flush()
+        fit_filename = '%s - %s' % (orm_act.id, d['fit_filename'])
+        save_fit(d['player_id'], fit_filename, fit_data)
 
     rows = db.session.execute('SELECT * FROM goal_old')
     for row in rows:
@@ -3025,6 +3041,7 @@ def migrate_database():
 
     Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
     db.session.commit()
+    db.session.execute('vacuum') #shrink database
 
 
 def check_columns():

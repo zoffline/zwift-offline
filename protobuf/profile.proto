@@ -25,6 +25,7 @@ enum PlayerType {
 	PRO_RUNNER = 9;
 }
 enum PowerType {
+	PT_UNKNOWN = -1;
 	PT_VIRTUAL = 0;
 	PT_METER = 1;
 }

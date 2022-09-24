@@ -12,7 +12,7 @@ message SegmentResult {
     optional uint64 world_time = 9;
     optional string finish_time_str = 10;
     required uint64 elapsed_ms = 11;
-    optional PowerType power_source_model = 12;  // + '-1'? (in ZNETWORK_RegisterPlayerSegmentResult from m_bikeEntity->m_hasPowerMeter)
+    optional PowerType power_source_model = 12;  //(in ZNETWORK_RegisterPlayerSegmentResult from m_bikeEntity->m_hasPowerMeter)
     optional uint32 weight_in_grams = 13;
     optional uint32 f14 = 14; //:=0 in Leaderboards::SetPlayerSegmentResult
     optional uint32 avg_power = 15;
@@ -21,7 +21,7 @@ message SegmentResult {
     optional PlayerType player_type = 18;
     optional uint32 avg_hr = 19; //(ZNETWORK_RaceResultEntrySaveRequest):=m_computer.m_accumHeartRate/m_computer.m_accumTime @ZNETWORK_RegisterLocalPlayersSegmentResult (or 0.0)
     optional Sport sport = 20;
-    optional uint64 activity_id = 21; //(may be -1)
+    optional int64 activity_id = 21; //(may be -1)
     optional bool f22 = 22;
     optional string f23 = 23; //only first letter of first_name
 }
