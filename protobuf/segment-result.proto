@@ -1,35 +1,34 @@
 syntax = "proto2";
-//import "profile.proto"; //enums PlayerType and Sport
-//TODO: incorporate new fields, rename db fields
+import "profile.proto"; //enums PowerType, PlayerType and Sport
 message SegmentResult {
     optional uint64 id = 1;
     required uint64 player_id = 2;
-    optional uint64 f3 = 3; //=g_CurrentServerRealmID
-    optional uint64 f4 = 4; //=CourseID
-    optional uint64 segment_id = 5;
+    optional uint64 server_realm = 3;
+    optional uint64 course_id = 4;
+    optional int64 segment_id = 5;
     optional uint64 event_subgroup_id = 6;
     required string first_name = 7; //only first letter
     required string last_name = 8;
     optional uint64 world_time = 9;
     optional string finish_time_str = 10;
     required uint64 elapsed_ms = 11;
-    optional int64 f12 = 12;  //-> enum PowerType + '-1'? (in ZNETWORK_RegisterPlayerSegmentResult from m_bikeEntity->m_hasPowerMeter)
-    optional uint32 f13 = 13; //weight_in_grams
+    optional PowerType power_source_model = 12;  //(in ZNETWORK_RegisterPlayerSegmentResult from m_bikeEntity->m_hasPowerMeter)
+    optional uint32 weight_in_grams = 13;
     optional uint32 f14 = 14; //:=0 in Leaderboards::SetPlayerSegmentResult
-    optional uint32 f15 = 15; //avg_power
-    optional bool f16 = 16;   //:= isMale
-    optional string f17 = 17; //ISO8601 time (magicLeaderboardBirthday := const @ ZNETWORK_Initialize)
-    optional uint64 f18 = 18; //-> enum PlayerType player_type
-    optional uint32 f19 = 19; //avg_hr(ZNETWORK_RaceResultEntrySaveRequest):=m_computer.m_accumHeartRate/m_computer.m_accumTime @ZNETWORK_RegisterLocalPlayersSegmentResult (or 0.0)
-    optional int64 f20 = 20;  //-> enum Sport sport
-    //optional uint64 f21 = 21; //:=activityId (may be -1)
-    //optional bool f22 = 22;
-    //optional string f23 = 23; //only first letter of first_name
+    optional uint32 avg_power = 15;
+    optional bool is_male = 16;
+    optional string time = 17; //ISO8601 (magicLeaderboardBirthday := const @ ZNETWORK_Initialize)
+    optional PlayerType player_type = 18;
+    optional uint32 avg_hr = 19; //(ZNETWORK_RaceResultEntrySaveRequest):=m_computer.m_accumHeartRate/m_computer.m_accumTime @ZNETWORK_RegisterLocalPlayersSegmentResult (or 0.0)
+    optional Sport sport = 20;
+    optional int64 activity_id = 21; //(may be -1)
+    optional bool f22 = 22;
+    optional string f23 = 23; //only first letter of first_name
 }
 
 message SegmentResults {
     required uint64 server_realm = 1;
-    required uint64 segment_id = 2;
+    required int64 segment_id = 2;
     optional uint64 event_subgroup_id = 3;
     repeated SegmentResult segment_results = 4;
 }

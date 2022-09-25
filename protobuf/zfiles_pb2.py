@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0czfiles.proto\"Y\n\nZFileProto\x12\n\n\x02id\x18\x01 \x02(\x04\x12\x0e\n\x06\x66older\x18\x02 \x02(\t\x12\x10\n\x08\x66ilename\x18\x03 \x02(\t\x12\n\n\x02\x66\x34\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x02(\x04\"*\n\x0bZFilesProto\x12\x1b\n\x06zfiles\x18\x01 \x03(\x0b\x32\x0b.ZFileProto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0czfiles.proto\"[\n\nZFileProto\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x66older\x18\x02 \x02(\t\x12\x10\n\x08\x66ilename\x18\x03 \x02(\t\x12\x0c\n\x04\x66ile\x18\x04 \x01(\x0c\x12\x11\n\ttimestamp\x18\x05 \x01(\x04\"*\n\x0bZFilesProto\x12\x1b\n\x06zfiles\x18\x01 \x03(\x0b\x32\x0b.ZFileProto')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'zfiles_pb2', globals())
@@ -21,7 +21,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _ZFILEPROTO._serialized_start=16
-  _ZFILEPROTO._serialized_end=105
-  _ZFILESPROTO._serialized_start=107
-  _ZFILESPROTO._serialized_end=149
+  _ZFILEPROTO._serialized_end=107
+  _ZFILESPROTO._serialized_start=109
+  _ZFILESPROTO._serialized_end=151
 # @@protoc_insertion_point(module_scope)
