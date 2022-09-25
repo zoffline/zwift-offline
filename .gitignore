@@ -5,6 +5,3 @@ __pycache__/
 build/
 dist/
 logs/
-.vscode
-/protobuf/profile_ed.proto
-/protobuf/protoc.exe

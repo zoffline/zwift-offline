@@ -62,12 +62,6 @@ logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
 
-if os.name == 'nt' and platform.release() == '10' and platform.version() >= '10.0.14393':
-    # Fix ANSI color in Windows 10 version 10.0.14393 (Windows Anniversary Update)
-    import ctypes
-    kernel32 = ctypes.windll.kernel32
-    kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
-
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
@@ -121,14 +115,8 @@ if MULTIPLAYER:
     with open(CREDENTIALS_KEY_FILE, 'rb') as f:
         credentials_key = f.read()
 
-try:
-    with open('%s/strava-client.txt' % STORAGE_DIR, 'r') as f:
-        client_id = f.readline().rstrip('\r\n')
-        client_secret = f.readline().rstrip('\r\n')
-except Exception as exc:
-    #logger.warn('strava-client: %s' % repr(exc))
-    client_id = '28117'
-    client_secret = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
+STRAVA_CLIENT_ID = '28117'
+STRAVA_CLIENT_SECRET = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
 from tokens import *
 
@@ -435,24 +423,24 @@ def imageSrc(player_id):
 
 def get_partial_profile(player_id):
     if not player_id in player_partial_profiles:
-        #Read from disk
+        partial_profile = PartialProfile()
+        partial_profile.player_id = player_id
         if player_id in global_pace_partners.keys():
             profile = global_pace_partners[player_id].profile
         elif player_id in global_bots.keys():
             profile = global_bots[player_id].profile
         else:
+            #Read from disk
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
             if os.path.isfile(profile_file):
-                try:
-                    with open(profile_file, 'rb') as fd:
-                        profile = profile_pb2.PlayerProfile()
-                        profile.ParseFromString(fd.read())
-                except Exception as exc:
-                    logger.warn('get_partial_profile: %s' % repr(exc))
-                    return None
-            else: return None
-        partial_profile = PartialProfile()
-        partial_profile.player_id = player_id
+                with open(profile_file, 'rb') as fd:
+                    profile = profile_pb2.PlayerProfile()
+                    profile.ParseFromString(fd.read())
+            else:
+                user = User.query.filter_by(player_id=player_id).first()
+                partial_profile.first_name = user.first_name
+                partial_profile.last_name = user.last_name
+                return partial_profile
         partial_profile.imageSrc = imageSrc(player_id)
         partial_profile.first_name = profile.first_name
         partial_profile.last_name = profile.last_name
@@ -676,7 +664,7 @@ def strava():
         flash("stravalib is not installed. Skipping Strava authorization attempt.")
         return redirect('/user/%s/' % current_user.username)
     client = Client()
-    url = client.authorization_url(client_id=client_id,
+    url = client.authorization_url(client_id=STRAVA_CLIENT_ID,
                                    redirect_uri='https://launcher.zwift.com/authorization',
                                    scope='activity:write')
     return redirect(url)
@@ -689,10 +677,10 @@ def authorization():
     try: 
         client = Client()
         code = request.args.get('code')
-        token_response = client.exchange_code_for_token(client_id=client_id, client_secret=client_secret, code=code)
+        token_response = client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET, code=code)
         with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'strava_token.txt'), 'w') as f:
-            f.write(client_id + '\n');
-            f.write(client_secret + '\n');
+            f.write(STRAVA_CLIENT_ID + '\n');
+            f.write(STRAVA_CLIENT_SECRET + '\n');
             f.write(token_response['access_token'] + '\n');
             f.write(token_response['refresh_token'] + '\n');
             f.write(str(token_response['expires_at']) + '\n');
@@ -2048,28 +2036,27 @@ def api_profiles_activities_id(player_id, activity_id):
 def api_profiles_activities_rideon(receiving_player_id):
     sending_player_id = request.json['profileId']
     profile = get_partial_profile(sending_player_id)
-    if not profile == None:
-        player_update = udp_node_msgs_pb2.WorldAttribute()
-        player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-        player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
-        player_update.world_time_born = world_time()
-        player_update.world_time_expire = player_update.world_time_born + 9890
-        player_update.timestamp = int(get_utc_time() * 1000000)
+    player_update = udp_node_msgs_pb2.WorldAttribute()
+    player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
+    player_update.world_time_born = world_time()
+    player_update.world_time_expire = player_update.world_time_born + 9890
+    player_update.timestamp = int(get_utc_time() * 1000000)
 
-        ride_on = udp_node_msgs_pb2.RideOn()
-        ride_on.player_id = int(sending_player_id)
-        ride_on.to_player_id = int(receiving_player_id)
-        ride_on.firstName = profile.first_name
-        ride_on.lastName = profile.last_name
-        ride_on.countryCode = profile.country_code
+    ride_on = udp_node_msgs_pb2.RideOn()
+    ride_on.player_id = int(sending_player_id)
+    ride_on.to_player_id = int(receiving_player_id)
+    ride_on.firstName = profile.first_name
+    ride_on.lastName = profile.last_name
+    ride_on.countryCode = profile.country_code
 
-        player_update.payload = ride_on.SerializeToString()
+    player_update.payload = ride_on.SerializeToString()
 
-        enqueue_player_update(receiving_player_id, player_update.SerializeToString())
+    enqueue_player_update(receiving_player_id, player_update.SerializeToString())
 
-        receiver = get_partial_profile(receiving_player_id)
-        message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
-        discord.send_message(message, sending_player_id)
+    receiver = get_partial_profile(receiving_player_id)
+    message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
+    discord.send_message(message, sending_player_id)
     return '{}', 200
 
 def stime_to_timestamp(stime):
@@ -2618,29 +2605,28 @@ def add_player_to_world(player, course_world, is_pace_partner):
     course_id = get_course(player)
     if course_id in course_world.keys():
         partial_profile = get_partial_profile(player.id)
-        if not partial_profile == None:
-            online_player = None
-            if is_pace_partner:
-                online_player = course_world[course_id].pacer_bots.add()
-                online_player.route = partial_profile.route
-                if player.sport == profile_pb2.Sport.CYCLING:
-                    online_player.ride_power = player.power
-                else:
-                    online_player.speed = player.speed
+        online_player = None
+        if is_pace_partner:
+            online_player = course_world[course_id].pacer_bots.add()
+            online_player.route = partial_profile.route
+            if player.sport == profile_pb2.Sport.CYCLING:
+                online_player.ride_power = player.power
             else:
-                online_player = course_world[course_id].others.add()
-            online_player.id = player.id
-            online_player.firstName = partial_profile.first_name
-            online_player.lastName = partial_profile.last_name
-            online_player.distance = player.distance
-            online_player.time = player.time
-            online_player.country_code = partial_profile.country_code
-            online_player.sport = player.sport
-            online_player.power = player.power
-            online_player.x = player.x
-            online_player.y_altitude = player.y_altitude
-            online_player.z = player.z
-            course_world[course_id].zwifters += 1
+                online_player.speed = player.speed
+        else:
+            online_player = course_world[course_id].others.add()
+        online_player.id = player.id
+        online_player.firstName = partial_profile.first_name
+        online_player.lastName = partial_profile.last_name
+        online_player.distance = player.distance
+        online_player.time = player.time
+        online_player.country_code = partial_profile.country_code
+        online_player.sport = player.sport
+        online_player.power = player.power
+        online_player.x = player.x
+        online_player.y_altitude = player.y_altitude
+        online_player.z = player.z
+        course_world[course_id].zwifters += 1
 
 
 def relay_worlds_generic(server_realm=None):
@@ -2961,6 +2947,71 @@ def relay_worlds_leave(server_realm):
     return '{"worldtime":%ld}' % world_time()
 
 
+@app.route('/experimentation/v1/variant', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def experimentation_v1_variant():
+    variants = variants_pb2.FeatureResponse()
+    if b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
+        v1 = variants.variants.add()
+        v1.name = "game_1_26_2_data_encryption"
+        v1.value = True
+        v2 = variants.variants.add()
+        v2.name = "game_1_27_0_disable_encryption_bypass"
+        v2.value = True
+    else:
+        with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
+            Parse(f.read(), variants)
+        v = variants.variants.add()
+        v.name = "game_1_20_home_screen"
+        v.value = current_user.new_home
+    return variants.SerializeToString(), 200
+
+def get_profile_saved_game_achiev2_40_bytes():
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
+    if not os.path.isfile(profile_file):
+        return b''
+    with open(profile_file, 'rb') as fd:
+        profile = profile_pb2.PlayerProfile()
+        profile.ParseFromString(fd.read())
+        if len(profile.saved_game) > 0x150 and profile.saved_game[0x108] == 2: #checking 2 from 0x10000002: achiev_badges2_40
+            return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
+        else:
+            return b''
+
+@app.route('/api/achievement/loadPlayerAchievements', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def achievement_loadPlayerAchievements():
+    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
+    if not os.path.isfile(achievements_file):
+        converted = profile_pb2.Achievements()
+        old_achiev_bits = get_profile_saved_game_achiev2_40_bytes()
+        for ach_id in range(8 * len(old_achiev_bits)):
+            if (old_achiev_bits[ach_id // 8] >> (ach_id % 8)) & 0x1:
+                converted.achievements.add().id = ach_id
+        with open(achievements_file, 'wb') as f:
+            f.write(converted.SerializeToString())
+    with open(achievements_file, 'rb') as f:
+        return f.read(), 200
+
+@app.route('/api/achievement/unlock', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def achievement_unlock():
+    if not request.stream:
+        return '', 400
+    with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
+        f.write(request.stream.read())
+    return '', 202
+
+# if we respond to this request with an empty json a "tutorial" will be presented in ZCA
+# and for each completed step it will POST /api/achievement/unlock/<id>
+@app.route('/api/achievement/category/<category_id>', methods=['GET'])
+def api_achievement_category(category_id):
+    return '', 404 # returning error for now, since some steps can't be completed
+
+
 @app.teardown_request
 def teardown_request(exception):
     db.session.close()
@@ -3096,9 +3147,9 @@ def migrate_database():
     db.session.execute('vacuum') #shrink database
 
 
-def check_columns():
-    rows = db.session.execute(sqlalchemy.text("PRAGMA table_info(user)"))
-    should_have_columns = User.metadata.tables['user'].columns
+def check_columns(table_class, table_name):
+    rows = db.session.execute(sqlalchemy.text("PRAGMA table_info(%s)" % table_name))
+    should_have_columns = table_class.metadata.tables[table_name].columns
     current_columns = list()
     for row in rows:
         current_columns.append(row[1])
@@ -3114,7 +3165,7 @@ def check_columns():
                 defaulttext = ""
             else:
                 defaulttext = " DEFAULT %s" % column.default.arg
-            db.session.execute(sqlalchemy.text("ALTER TABLE user ADD %s %s %s%s;" % (column.name, str(column.type), nulltext, defaulttext)))
+            db.session.execute(sqlalchemy.text("ALTER TABLE %s ADD %s %s %s%s;" % (table_name, column.name, str(column.type), nulltext, defaulttext)))
             db.session.commit()
 
 
@@ -3130,7 +3181,7 @@ def before_first_request():
     move_old_profile()
     db.create_all(app=app)
     db.session.commit()
-    check_columns()
+    check_columns(User, 'user')
     migrate_database()
     db.session.close()
 
@@ -3278,71 +3329,6 @@ def auth_realms_zwift_tokens_access_codes():
         return fake_jwt_with_session_cookie(remember_token), 200
     else:
         return FAKE_JWT, 200
-
-
-@app.route('/experimentation/v1/variant', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def experimentation_v1_variant():
-    variants = variants_pb2.FeatureResponse()
-    if b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
-        v1 = variants.variants.add()
-        v1.name = "game_1_26_2_data_encryption"
-        v1.value = True
-        v2 = variants.variants.add()
-        v2.name = "game_1_27_0_disable_encryption_bypass"
-        v2.value = True
-    else:
-        with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
-            Parse(f.read(), variants)
-        v = variants.variants.add()
-        v.name = "game_1_20_home_screen"
-        v.value = current_user.new_home
-    return variants.SerializeToString(), 200
-
-def get_profile_saved_game_achiev2_40_bytes():
-    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
-    if not os.path.isfile(profile_file):
-        return b''
-    with open(profile_file, 'rb') as fd:
-        profile = profile_pb2.PlayerProfile()
-        profile.ParseFromString(fd.read())
-        if len(profile.saved_game) > 0x150 and profile.saved_game[0x108] == 2: #checking 2 from 0x10000002: achiev_badges2_40
-            return profile.saved_game[0x110:0x110+0x40] #0x110 = accessories1_100 + 2x8-byte headers
-        else:
-            return b''
-
-@app.route('/api/achievement/loadPlayerAchievements', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def achievement_loadPlayerAchievements():
-    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
-    if not os.path.isfile(achievements_file):
-        converted = profile_pb2.Achievements()
-        old_achiev_bits = get_profile_saved_game_achiev2_40_bytes()
-        for ach_id in range(8 * len(old_achiev_bits)):
-            if (old_achiev_bits[ach_id // 8] >> (ach_id % 8)) & 0x1:
-                converted.achievements.add().id = ach_id
-        with open(achievements_file, 'wb') as f:
-            f.write(converted.SerializeToString())
-    with open(achievements_file, 'rb') as f:
-        return f.read(), 200
-
-@app.route('/api/achievement/unlock', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def achievement_unlock():
-    if not request.stream:
-        return '', 400
-    with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
-        f.write(request.stream.read())
-    return '', 202
-
-# if we respond to this request with an empty json a "tutorial" will be presented in ZCA
-# and for each completed step it will POST /api/achievement/unlock/<id>
-@app.route('/api/achievement/category/<category_id>', methods=['GET'])
-def api_achievement_category(category_id):
-    return '', 404 # returning error for now, since some steps can't be completed
 
 
 def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
