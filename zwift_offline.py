@@ -931,6 +931,8 @@ def logout(username):
 
 def insert_protobuf_into_db(table_name, msg):
     msg_dict = protobuf_to_dict(msg)
+    if 'id' in msg_dict:
+        del msg_dict['id']
     row = table_name(**msg_dict)
     db.session.add(row)
     db.session.commit()
