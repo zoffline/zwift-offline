@@ -94,6 +94,7 @@
     },
     {
       "name": "game_1_21_add_device_jet_black_swb",
+      "value": true,
       "values": {}
     },
     {
@@ -145,11 +146,6 @@
     },
     {
       "name": "game_1_21_ftms_bike_trainer_v3",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_22_ble_device_name_hash_v2",
       "value": true,
       "values": {}
     },
@@ -446,7 +442,7 @@
       "values": {
         "fields": {
           "GROUP_EVENT_QUERY_RATE_SECONDS": {
-            "numberValue": 120.0
+            "numberValue": 15.0
           }
         }
       }
