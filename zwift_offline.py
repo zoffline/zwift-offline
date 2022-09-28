@@ -2004,8 +2004,10 @@ def api_profiles_activities_id(player_id, activity_id):
     activity.ParseFromString(request.stream.read())
     fit_filename = '%s - %s' % (activity_id, activity.fit_filename)
     save_fit(player_id, fit_filename, activity.fit)
-    activity.fit = b''
-    update_protobuf_in_db(Activity, activity, activity_id)
+    msg_dict = protobuf_to_dict(activity)
+    msg_dict['fit'] = b''
+    Activity.query.filter_by(id=activity_id).update(msg_dict)
+    db.session.commit()
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
