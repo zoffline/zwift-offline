@@ -929,8 +929,10 @@ def logout(username):
     return redirect(url_for('login'))
 
 
-def insert_protobuf_into_db(table_name, msg):
+def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
     msg_dict = protobuf_to_dict(msg)
+    for key in exclude_fields:
+        del msg_dict[key]
     if 'id' in msg_dict:
         del msg_dict['id']
     row = table_name(**msg_dict)
@@ -939,8 +941,10 @@ def insert_protobuf_into_db(table_name, msg):
     return row.id
 
 
-def update_protobuf_in_db(table_name, msg, id):
+def update_protobuf_in_db(table_name, msg, id, exclude_fields=[]):
     msg_dict = protobuf_to_dict(msg)
+    for key in exclude_fields:
+        del msg_dict[key]
     table_name.query.filter_by(id=id).update(msg_dict)
     db.session.commit()
 
@@ -1374,17 +1378,6 @@ def custom_style(filename):
 def static_web_launcher(filename):
     return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
 
-@app.route('/static/world_headers/<path:filename>')
-def static_world_headers(filename):
-    return send_from_directory('%s/cdn/static/world_headers' % SCRIPT_DIR, filename)
-
-@app.route('/static/zc/<path:filename>')
-def static_zc(filename):
-    return send_from_directory('%s/cdn/static/zc' % SCRIPT_DIR, filename)
-
-@app.route('/phoneicons/<path:filename>')
-def cdn_phoneicons(filename):
-    return send_from_directory('%s/cdn/phoneicons' % SCRIPT_DIR, filename)
 
 # Disable telemetry (shuts up some errors in log)
 @app.route('/api/telemetry/config', methods=['GET'])
@@ -1695,7 +1688,7 @@ def api_profiles_activities(player_id):
             return '', 401
         activity = activity_pb2.Activity()
         activity.ParseFromString(request.stream.read())
-        activity.id = insert_protobuf_into_db(Activity, activity)
+        activity.id = insert_protobuf_into_db(Activity, activity, ['fit'])
         return '{"id": %ld}' % activity.id, 200
 
     # request.method == 'GET'
@@ -2004,12 +1997,9 @@ def api_profiles_activities_id(player_id, activity_id):
         return 'true', 200
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
+    update_protobuf_in_db(Activity, activity, activity_id, ['fit'])
     fit_filename = '%s - %s' % (activity_id, activity.fit_filename)
     save_fit(player_id, fit_filename, activity.fit)
-    msg_dict = protobuf_to_dict(activity)
-    msg_dict['fit'] = b''
-    Activity.query.filter_by(id=activity_id).update(msg_dict)
-    db.session.commit()
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
@@ -2580,13 +2570,12 @@ def api_profiles_goals(player_id):
         return goals.SerializeToString(), 200 # protobuf for ZG
 
 
-@app.route('/api/profiles/<int:player_id>/goals/<string:goal_id>', methods=['DELETE'])
+@app.route('/api/profiles/<int:player_id>/goals/<int:goal_id>', methods=['DELETE'])
 @jwt_to_session_cookie
 @login_required
 def api_profiles_goals_id(player_id, goal_id):
     if player_id != current_user.player_id:
         return '', 401
-    goal_id = int(goal_id) & 0xffffffffffffffff
     db.session.execute(sqlalchemy.text("DELETE FROM goal WHERE id = %s" % goal_id))
     db.session.commit()
     return '', 200
@@ -2784,10 +2773,6 @@ def relay_worlds_id_players_id(server_realm, player_id):
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
     return ""
-
-@app.route('/relay/worlds/<int:server_realm>/my-hash-seeds', methods=['GET'])
-def relay_worlds_my_hash_seeds(server_realm):
-    return '[{"expiryDate":196859639979,"seed1":-733221030,"seed2":-2142448243},{"expiryDate":196860425476,"seed1":1528095532,"seed2":-2078218472},{"expiryDate":196862212008,"seed1":1794747796,"seed2":-1901929955},{"expiryDate":196862637148,"seed1":-1411883466,"seed2":1171710140},{"expiryDate":196863874267,"seed1":670195825,"seed2":-317830991}]'
 
 
 @app.route('/relay/worlds/hash-seeds', methods=['GET'])
@@ -3317,22 +3302,6 @@ def start_zwift():
         if MULTIPLAYER:
             response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
         return response
-
-
-# Called by Mac, but not Windows
-@app.route('/auth/realms/zwift/tokens/access/codes', methods=['POST'])
-def auth_realms_zwift_tokens_access_codes():
-    if MULTIPLAYER:
-        if "code" in request.form:
-            remember_token = unquote(request.form['code'])
-            return fake_jwt_with_session_cookie(remember_token), 200
-        elif "refresh_token" in request.form:
-            token = jwt.decode(request.form['refresh_token'], options=({'verify_signature': False, 'verify_aud': False}))
-            return fake_jwt_with_session_cookie(token['session_cookie'])
-        remember_token = unquote(request.form['code'])
-        return fake_jwt_with_session_cookie(remember_token), 200
-    else:
-        return FAKE_JWT, 200
 
 
 def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_player_update_queue, passed_discord):
