@@ -232,7 +232,7 @@ message LateJoinInformation {
 	optional uint64 road_id = 1;
 	optional float road_time = 2;
 	optional bool is_forward = 3;
-	optional uint64 player_id = 4; // leader of meetup or -1
+	optional int64 organizerId = 4; // leader of meetup or -1
 	optional uint32 lj_f5 = 5; //64 on wire
 	optional uint32 lj_f6 = 6; //64 on wire
 	optional uint32 lj_f7 = 7; //64 on wire

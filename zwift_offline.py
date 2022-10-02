@@ -2305,7 +2305,8 @@ def jsonPrivateEventFeedToProtobuf(jfeed):
         pef.invitedTotalCount = jpef['invitedTotalCount']
         pef.acceptedFolloweeCount = jpef['acceptedFolloweeCount']
         pef.acceptedTotalCount = jpef['acceptedTotalCount']
-        pef.organizerImageUrl = jpef['organizerImageUrl']
+        if jpef['organizerImageUrl'] is not None:
+            pef.organizerImageUrl = jpef['organizerImageUrl']
         pef.organizerProfileId = jpef['organizerProfileId']
         pef.organizerFirstName = jpef['organizerFirstName']
         pef.organizerLastName = jpef['organizerLastName']
@@ -2373,10 +2374,9 @@ def api_private_event_entitlement():
 @jwt_to_session_cookie
 @login_required
 def relay_events_subgroups_id_late_join(meetup_id):
-    id = meetup_id - 2
     ape = ActualPrivateEvents()
-    if id in ape.keys():
-        event = jsonPrivateEventToProtobuf(ape[id])
+    if meetup_id in ape.keys():
+        event = jsonPrivateEventToProtobuf(ape[meetup_id])
         leader = event.organizerId
         if leader in online.keys():
             state = online[leader]
@@ -2384,7 +2384,7 @@ def relay_events_subgroups_id_late_join(meetup_id):
             lj.road_id = road_id(state)
             lj.road_time = state.roadTime / 1005000
             lj.is_forward = is_forward(state)
-            lj.player_id = leader
+            lj.organizerId = leader
             lj.lj_f5 = 0
             lj.lj_f6 = 0
             lj.lj_f7 = 0
