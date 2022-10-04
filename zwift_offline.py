@@ -1156,7 +1156,8 @@ def get_events(limit, sport):
     event_id = 1000
     cnt = 0
     events = events_pb2.Events()
-    const_delay_ms = 60000
+    eventStart = int(get_time()) * 1000 + 60000
+    eventStartWT = world_time() + 60000
     if sport == 'CYCLING':
         sport = profile_pb2.Sport.CYCLING
     else:
@@ -1171,7 +1172,6 @@ def get_events(limit, sport):
         event.course_id = item[2]
         event.sport = sport
         event.lateJoinInMinutes = 30
-        eventStart = int(get_time()) * 1000 + const_delay_ms
         event.eventStart = eventStart
         event.visible = True
         event.overrideMapPreferences = False
@@ -1191,21 +1191,21 @@ def get_events(limit, sport):
         for cat in range(1,5):
             event_cat = event.category.add()
             event_cat.id = event_id + cat
-            #need good value#event_cat.registrationStart = eventStart - 30000
-            #need good value#event_cat.registrationStartWT = world_time()
+            #event_cat.registrationStart = eventStart - 30 * 60000
+            #event_cat.registrationStartWT = eventStartWT - 30 * 60000
             event_cat.registrationEnd = eventStart
-            event_cat.registrationEndWT = world_time() + const_delay_ms
-            #need good value#event_cat.lineUpStart = eventStart - 15000
-            #need good value#event_cat.lineUpStartWT = world_time() + const_delay_ms - 15000
-            #need good value#event_cat.lineUpEnd = eventStart
-            #need good value#event_cat.lineUpEndWT = world_time() + const_delay_ms
-            #need good value#event_cat.eventSubgroupStart = eventStart
-            #need good value#event_cat.eventSubgroupStartWT = world_time() + const_delay_ms
+            event_cat.registrationEndWT = eventStartWT
+            #event_cat.lineUpStart = eventStart - 5 * 60000
+            #event_cat.lineUpStartWT = eventStartWT - 5 * 60000
+            #event_cat.lineUpEnd = eventStart
+            #event_cat.lineUpEndWT = eventStartWT
+            #event_cat.eventSubgroupStart = eventStart
+            #event_cat.eventSubgroupStartWT = eventStartWT
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
             event_cat.label = cat
             event_cat.lateJoinInMinutes = 30
-            event_cat.name = "Cat.%s" % cats[cat - 1]
+            event_cat.name = "Cat. %s" % cats[cat - 1]
             event_cat.description = "#zwiftoffline"
             event_cat.course_id = event.course_id
             event_cat.paceType = 1 #1 almost everywhere, 2 sometimes
@@ -1219,7 +1219,7 @@ def get_events(limit, sport):
             #event_cat.jerseyHash = 36; // 493134166, tag672
             #event_cat.tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
         event_id += 1000
-        cnt = cnt + 1
+        cnt += 1
         if cnt > limit:
             break
     return events
@@ -1262,6 +1262,9 @@ def create_event_wat(rel_id, wa_type, pe, dest_ids):
     player_update.payload = pe.SerializeToString()
     player_update_s = player_update.SerializeToString()
 
+    if not current_user.player_id in dest_ids:
+        dest_ids = list(dest_ids)
+        dest_ids.append(current_user.player_id)
     for receiving_player_id in dest_ids:
         enqueue_player_update(receiving_player_id, player_update_s)
 
@@ -3062,6 +3065,7 @@ def migrate_database():
         except Exception as exc:
             logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
+    logging.warn("Migrating database, please wait")
     db.session.execute('ALTER TABLE activity RENAME TO activity_old')
     db.session.execute('ALTER TABLE goal RENAME TO goal_old')
     db.session.execute('ALTER TABLE segment_result RENAME TO segment_result_old')
@@ -3134,6 +3138,7 @@ def migrate_database():
     Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
     db.session.commit()
     db.session.execute('vacuum') #shrink database
+    logging.warn("Database migration completed")
 
 
 def check_columns(table_class, table_name):

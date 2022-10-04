@@ -77,86 +77,6 @@ global_relay = {}
 global_clients = {}
 start_time = time.time()
 
-def boolean(s):
-    if s.lower() in ['true', 'yes', '1']: return True
-    if s.lower() in ['false', 'no', '0']: return False
-    return None
-
-def save_ghost(name, player_id):
-    global global_ghosts
-    if not player_id in global_ghosts.keys(): return
-    ghosts = global_ghosts[player_id]
-    if len(ghosts.rec.states) > 0:
-        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(ghosts.rec.states[0]), zo.road_id(ghosts.rec.states[0]))
-        if not zo.is_forward(ghosts.rec.states[0]): folder += '/reverse'
-        try:
-            if not os.path.isdir(folder):
-                os.makedirs(folder)
-        except Exception as exc:
-            print('save_ghost: %s' % repr(exc))
-        f = '%s/%s-%s.bin' % (folder, zo.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
-        with open(f, 'wb') as fd:
-            fd.write(ghosts.rec.SerializeToString())
-    ghosts.rec = None
-
-def organize_ghosts(player_id):
-    # organize ghosts in course/road_id directory structure
-    # previously they were saved directly in player_id/ghosts
-    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
-    if not os.path.isdir(folder): return
-    for f in os.listdir(folder):
-        if f.endswith('.bin'):
-            file = os.path.join(folder, f)
-            with open(file, 'rb') as fd:
-                g = udp_node_msgs_pb2.Ghost()
-                g.ParseFromString(fd.read())
-                dest = '%s/%s/%s' % (folder, zo.get_course(g.states[0]), zo.road_id(g.states[0]))
-                if not zo.is_forward(g.states[0]): dest += '/reverse'
-                try:
-                    if not os.path.isdir(dest):
-                        os.makedirs(dest)
-                except Exception as exc:
-                    print('organize_ghosts: %s' % repr(exc))
-            os.rename(file, os.path.join(dest, f))
-
-def load_ghosts(player_id, state, ghosts):
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))
-    if not zo.is_forward(state): folder += '/reverse'
-    if not os.path.isdir(folder): return
-    s = list()
-    for f in os.listdir(folder):
-        if f.endswith('.bin'):
-            with open(os.path.join(folder, f), 'rb') as fd:
-                g = ghosts.play.ghosts.add()
-                g.ParseFromString(fd.read())
-                s.append(g.states[0].roadTime)
-    ghosts.start_road = zo.road_id(state)
-    ghosts.start_rt = 0
-    if os.path.isfile(START_LINES_FILE):
-        with open(START_LINES_FILE, 'r') as fd:
-            sl = [tuple(line) for line in csv.reader(fd)]
-            rt = [t for t in sl if t[0] == str(zo.get_course(state)) and t[1] == str(zo.road_id(state)) and (boolean(t[2]) == zo.is_forward(state) or not t[2])]
-            if rt:
-                ghosts.start_road = int(rt[0][3])
-                ghosts.start_rt = int(rt[0][4])
-    if not ghosts.start_rt:
-        s.append(state.roadTime)
-        if zo.is_forward(state): ghosts.start_rt = max(s)
-        else: ghosts.start_rt = min(s)
-    for g in ghosts.play.ghosts:
-        try:
-            while zo.road_id(g.states[0]) != ghosts.start_road:
-                del g.states[0]
-            if zo.is_forward(g.states[0]):
-                while g.states[0].roadTime < ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
-                    del g.states[0]
-            else:
-                while g.states[0].roadTime > ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
-                    del g.states[0]
-        except IndexError:
-            pass
-
-
 def sigint_handler(num, frame):
     httpd.shutdown()
     httpd.server_close()
@@ -458,7 +378,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             try:
                 #if ZC need to be registered
-                if player_id in zo.zc_connect_queue: # and player_id in online:
+                if player_id in zo.zc_connect_queue:
                     zc_params = udp_node_msgs_pb2.ServerToClient()
                     zc_params.player_id = player_id
                     zc_params.world_time = 0
@@ -481,7 +401,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.world_time = zo.world_time()
 
                 #PlayerUpdate
-                if player_id in player_update_queue and len(player_update_queue[player_id]) > 0 and player_id in online:
+                if player_id in player_update_queue and len(player_update_queue[player_id]) > 0:
                     added_player_updates = list()
                     for player_update_proto in player_update_queue[player_id]:
                         player_update = message.updates.add()
@@ -536,6 +456,85 @@ class GhostsVariables:
     start_rt = 0
     course = 0
     last_package_time = 0
+
+def boolean(s):
+    if s.lower() in ['true', 'yes', '1']: return True
+    if s.lower() in ['false', 'no', '0']: return False
+    return None
+
+def save_ghost(name, player_id):
+    global global_ghosts
+    if not player_id in global_ghosts.keys(): return
+    ghosts = global_ghosts[player_id]
+    if len(ghosts.rec.states) > 0:
+        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(ghosts.rec.states[0]), zo.road_id(ghosts.rec.states[0]))
+        if not zo.is_forward(ghosts.rec.states[0]): folder += '/reverse'
+        try:
+            if not os.path.isdir(folder):
+                os.makedirs(folder)
+        except Exception as exc:
+            print('save_ghost: %s' % repr(exc))
+        f = '%s/%s-%s.bin' % (folder, zo.get_utc_date_time().strftime("%Y-%m-%d-%H-%M-%S"), name)
+        with open(f, 'wb') as fd:
+            fd.write(ghosts.rec.SerializeToString())
+    ghosts.rec = None
+
+def organize_ghosts(player_id):
+    # organize ghosts in course/road_id directory structure
+    # previously they were saved directly in player_id/ghosts
+    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
+    if not os.path.isdir(folder): return
+    for f in os.listdir(folder):
+        if f.endswith('.bin'):
+            file = os.path.join(folder, f)
+            with open(file, 'rb') as fd:
+                g = udp_node_msgs_pb2.Ghost()
+                g.ParseFromString(fd.read())
+                dest = '%s/%s/%s' % (folder, zo.get_course(g.states[0]), zo.road_id(g.states[0]))
+                if not zo.is_forward(g.states[0]): dest += '/reverse'
+                try:
+                    if not os.path.isdir(dest):
+                        os.makedirs(dest)
+                except Exception as exc:
+                    print('organize_ghosts: %s' % repr(exc))
+            os.rename(file, os.path.join(dest, f))
+
+def load_ghosts(player_id, state, ghosts):
+    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))
+    if not zo.is_forward(state): folder += '/reverse'
+    if not os.path.isdir(folder): return
+    s = list()
+    for f in os.listdir(folder):
+        if f.endswith('.bin'):
+            with open(os.path.join(folder, f), 'rb') as fd:
+                g = ghosts.play.ghosts.add()
+                g.ParseFromString(fd.read())
+                s.append(g.states[0].roadTime)
+    ghosts.start_road = zo.road_id(state)
+    ghosts.start_rt = 0
+    if os.path.isfile(START_LINES_FILE):
+        with open(START_LINES_FILE, 'r') as fd:
+            sl = [tuple(line) for line in csv.reader(fd)]
+            rt = [t for t in sl if t[0] == str(zo.get_course(state)) and t[1] == str(zo.road_id(state)) and (boolean(t[2]) == zo.is_forward(state) or not t[2])]
+            if rt:
+                ghosts.start_road = int(rt[0][3])
+                ghosts.start_rt = int(rt[0][4])
+    if not ghosts.start_rt:
+        s.append(state.roadTime)
+        if zo.is_forward(state): ghosts.start_rt = max(s)
+        else: ghosts.start_rt = min(s)
+    for g in ghosts.play.ghosts:
+        try:
+            while zo.road_id(g.states[0]) != ghosts.start_road:
+                del g.states[0]
+            if zo.is_forward(g.states[0]):
+                while g.states[0].roadTime < ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
+                    del g.states[0]
+            else:
+                while g.states[0].roadTime > ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
+                    del g.states[0]
+        except IndexError:
+            pass
 
 class PacePartnerVariables:
     profile = None
