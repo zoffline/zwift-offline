@@ -3084,7 +3084,10 @@ def migrate_database():
         d['sport'] = d.pop('f29')
         fit_data = bytes.fromhex(d['hex(fit)'])
         if fit_data[0:2] == b"b'":
-            fit_data = ast.literal_eval(fit_data.decode("ascii"))
+            try:
+                fit_data = ast.literal_eval(fit_data.decode("ascii"))
+            except:
+                d['fit_filename'] = 'corrupted'
         del d['hex(fit)']
         orm_act = Activity(**d)
         db.session.add(orm_act)
