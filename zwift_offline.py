@@ -1005,7 +1005,8 @@ def select_activities_json(player_id, limit):
     ret = []
     if limit > 0:
         activities = activity_pb2.ActivityList()
-        rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = %s ORDER BY date desc LIMIT %s" % (player_id, limit)))
+        stmt = sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p ORDER BY date DESC LIMIT :l")
+        rows = db.session.execute(stmt, {"p": player_id, "l": limit})
         allow_empty_end_date = True
         for row in rows:
             activity = activities.activities.add()
@@ -1556,7 +1557,7 @@ def api_profiles_id_privacy(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_followers(m_player_id, t_player_id=0):
-    rows = db.session.execute(sqlalchemy.text("SELECT player_id,first_name,last_name FROM user"))
+    rows = db.session.execute("SELECT player_id, first_name, last_name FROM user")
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -1575,7 +1576,8 @@ def api_search_profiles():
     query = request.json['query']
     start = request.args.get('start')
     limit = request.args.get('limit')
-    rows = db.session.execute(sqlalchemy.text("SELECT player_id,first_name,last_name FROM user WHERE first_name like '%%%s%%' or last_name like '%%%s%%' limit %s offset %s" % (query, query, limit, start)))
+    stmt = sqlalchemy.text("SELECT player_id, first_name, last_name FROM user WHERE first_name LIKE :n OR last_name LIKE :n LIMIT :l OFFSET :o")
+    rows = db.session.execute(stmt, {"n": "%"+query+"%", "l": limit, "o": start})
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -1586,7 +1588,8 @@ def api_search_profiles():
 @app.route('/api/profiles/<int:player_id>/statistics', methods=['GET'])
 def api_profiles_id_statistics(player_id):
     from_dt = request.args.get('startDateTime')
-    row = db.session.execute(sqlalchemy.text("SELECT sum(Cast ((JulianDay(date) - JulianDay(start_date)) * 24 * 60 As Integer)), sum(distanceInMeters), sum(calories), sum(total_elevation) FROM activity WHERE player_id = %s and strftime('%%s', start_date) >= strftime('%%s', '%s')" % (str(player_id), from_dt))).first()
+    stmt = sqlalchemy.text("SELECT SUM(CAST((julianday(date)-julianday(start_date))*24*60 AS integer)), SUM(distanceInMeters), SUM(calories), SUM(total_elevation) FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :d)")
+    row = db.session.execute(stmt, {"p": player_id, "d": from_dt}).first()
     json_data = {"timeRiddenInMinutes": row[0], "distanceRiddenInMeters": row[1], "caloriesBurned": row[2], "heightClimbedInMeters": row[3]}
     return jsonify(json_data)
 
@@ -1696,17 +1699,16 @@ def api_profiles_activities(player_id):
 
     # request.method == 'GET'
     activities = activity_pb2.ActivityList()
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = %s" % player_id))
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id})
     should_remove = list()
     for row in rows:
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
-        a = activity
         #Remove activities with less than 100m distance
-        if a.distanceInMeters < 100:
-            should_remove.append(a)
+        if activity.distanceInMeters < 100:
+            should_remove.append(activity)
     for a in should_remove:
-        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % a.id))
+        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": a.id})
         db.session.commit()
         activities.activities.remove(a)
     return activities.SerializeToString(), 200
@@ -1802,16 +1804,19 @@ def player_playbacks_player_me_playbacks(segment_id, option):
     segment_id = int(segment_id)
     after = request.args.get('after')
     before = request.args.get('before')
-    query = "SELECT * FROM playback WHERE player_id = '%s' AND segment_id = '%s'" % (current_user.player_id, segment_id)
+    query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s"
+    args = {"p": current_user.player_id, "s": segment_id}
     if after:
-        query += " AND world_time > '%s'" % after
+        query += " AND world_time > :a"
+        args.update({"a": after})
     if before:
-        query += " AND world_time < '%s'" % before
+        query += " AND world_time < :b"
+        args.update({"b": before})
     if option == 'pr':
         query += " ORDER BY time"
     elif option == 'latest':
         query += " ORDER BY world_time DESC"
-    row = db.session.execute(sqlalchemy.text(query)).first()
+    row = db.session.execute(sqlalchemy.text(query), args).first()
     if not row:
         return '', 200
     pbr = playback_pb2.PlaybackResponse()
@@ -1995,7 +2000,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if current_user.player_id != player_id:
         return '', 401
     if request.method == 'DELETE':
-        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = %s" % activity_id))
+        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": activity_id})
         db.session.commit()
         return 'true', 200
     activity = activity_pb2.Activity()
@@ -2420,13 +2425,13 @@ def fill_in_goal_progress(goal, player_id):
     else:  # monthly
         first_dt, last_dt = get_month_range(local_now)
 
-    common_sql = ("""FROM activity
-                    WHERE player_id = %s AND sport = %s
-                    AND strftime('%s', start_date) >= strftime('%s', '%s')
-                    AND strftime('%s', start_date) <= strftime('%s', '%s')""" %
-                    (player_id, goal.sport, '%s', '%s', first_dt - utc_offset, '%s', '%s', last_dt - utc_offset))
+    common_sql = """FROM activity
+                    WHERE player_id = :p AND sport = :s
+                    AND strftime('%s', start_date) >= strftime('%s', :f)
+                    AND strftime('%s', start_date) <= strftime('%s', :l)"""
+    args = {"p": player_id, "s": goal.sport, "f": first_dt-utc_offset, "l": last_dt-utc_offset}
     if goal.type == goal_pb2.GoalType.DISTANCE:
-        distance = db.session.execute(sqlalchemy.text('SELECT SUM(distanceInMeters) %s' % common_sql)).first()[0]
+        distance = db.session.execute(sqlalchemy.text('SELECT SUM(distanceInMeters) %s' % common_sql), args).first()[0]
         if distance:
             goal.actual_distance = distance
             goal.actual_duration = distance
@@ -2435,7 +2440,7 @@ def fill_in_goal_progress(goal, player_id):
             goal.actual_duration = 0.0
 
     else:  # duration
-        duration = db.session.execute(sqlalchemy.text('SELECT SUM(julianday(end_date) - julianday(start_date)) %s' % common_sql)).first()[0]
+        duration = db.session.execute(sqlalchemy.text('SELECT SUM(julianday(end_date)-julianday(start_date)) %s' % common_sql), args).first()[0]
         if duration:
             goal.actual_duration = duration*1440  # convert from days to minutes
             goal.actual_distance = duration*1440
@@ -2514,7 +2519,8 @@ def api_profiles_goals_put(player_id, goal_id):
 def select_protobuf_goals(player_id, limit):
     goals = goal_pb2.Goals()
     if limit > 0:
-        rows = db.session.execute(sqlalchemy.text("SELECT * FROM goal WHERE player_id = %s LIMIT %s" % (player_id, limit)))
+        stmt = sqlalchemy.text("SELECT * FROM goal WHERE player_id = :p LIMIT :l")
+        rows = db.session.execute(stmt, {"p": player_id, "l": limit})
         need_update = list()
         for row in rows:
             goal = goals.goals.add()
@@ -2579,7 +2585,7 @@ def api_profiles_goals(player_id):
 def api_profiles_goals_id(player_id, goal_id):
     if player_id != current_user.player_id:
         return '', 401
-    db.session.execute(sqlalchemy.text("DELETE FROM goal WHERE id = %s" % goal_id))
+    db.session.execute(sqlalchemy.text("DELETE FROM goal WHERE id = :i"), {"i": goal_id})
     db.session.commit()
     return '', 200
 
@@ -2886,12 +2892,15 @@ def api_personal_records_my_records():
     results.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     results.segment_id = segment_id
 
-    where_stmt = ("WHERE segment_id = '%s' AND player_id = '%s'" % (segment_id, current_user.player_id))
+    where_stmt = "WHERE segment_id = :s AND player_id = :p"
+    args = {"s": segment_id, "p": current_user.player_id}
     if from_date:
-        where_stmt += (" AND strftime('%s', finish_time_str) > strftime('%s', '%s')" % ('%s', '%s', from_date))
+        where_stmt += " AND strftime('%s', finish_time_str) > strftime('%s', :f)"
+        args.update({"f": from_date})
     if to_date:
-        where_stmt += (" AND strftime('%s', finish_time_str) < strftime('%s', '%s')" % ('%s', '%s', to_date))
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt))
+        where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', :t)"
+        args.update({"t": to_date})
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args)
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
@@ -2904,12 +2913,12 @@ def live_segment_results_service_leaders():
     results = segment_result_pb2.SegmentResults()
     results.server_realm = 0
     results.segment_id = 0
-    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+    stmt = sqlalchemy.text("""SELECT s1.* FROM segment_result s1
         JOIN (SELECT s.player_id, s.segment_id, MIN(s.elapsed_ms) AS min_time
-            FROM segment_result s WHERE world_time > '%s' GROUP BY s.player_id, s.segment_id) s2
+            FROM segment_result s WHERE world_time > :w GROUP BY s.player_id, s.segment_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms
-        LIMIT 1000""" % (world_time()-(60*60*1000))))
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 1000""")
+    rows = db.session.execute(stmt, {"w": world_time()-60*60*1000})
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
@@ -2922,12 +2931,12 @@ def live_segment_results_service_leaderboard_segment_id(segment_id):
     results = segment_result_pb2.SegmentResults()
     results.server_realm = 0
     results.segment_id = segment_id
-    rows = db.session.execute(sqlalchemy.text("""SELECT s1.* FROM segment_result s1
+    stmt = sqlalchemy.text("""SELECT s1.* FROM segment_result s1
         JOIN (SELECT s.player_id, MIN(s.elapsed_ms) AS min_time
-            FROM segment_result s WHERE segment_id = '%s' AND world_time > '%s' GROUP BY s.player_id) s2
+            FROM segment_result s WHERE segment_id = :s AND world_time > :w GROUP BY s.player_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms
-        LIMIT 1000""" % (segment_id, (world_time()-(60*60*1000)))))
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 1000""")
+    rows = db.session.execute(stmt, {"s": segment_id, "w": world_time()-60*60*1000})
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
@@ -3145,7 +3154,7 @@ def migrate_database():
 
 
 def check_columns(table_class, table_name):
-    rows = db.session.execute(sqlalchemy.text("PRAGMA table_info(%s)" % table_name))
+    rows = db.session.execute("PRAGMA table_info(%s)" % table_name)
     should_have_columns = table_class.metadata.tables[table_name].columns
     current_columns = list()
     for row in rows:
@@ -3162,7 +3171,7 @@ def check_columns(table_class, table_name):
                 defaulttext = ""
             else:
                 defaulttext = " DEFAULT %s" % column.default.arg
-            db.session.execute(sqlalchemy.text("ALTER TABLE %s ADD %s %s %s%s;" % (table_name, column.name, str(column.type), nulltext, defaulttext)))
+            db.session.execute("ALTER TABLE %s ADD %s %s %s%s" % (table_name, column.name, column.type, nulltext, defaulttext))
             db.session.commit()
 
 
