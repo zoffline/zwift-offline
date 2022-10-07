@@ -4,6 +4,8 @@ block_cipher = None
 
 import sys
 sys.modules['FixTk'] = None
+import xml.etree.ElementTree as ET
+version = ET.parse('cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml').getroot().get('version')
 
 a = Analysis(['standalone.py'],
              pathex=['protobuf'],
@@ -26,7 +28,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='zoffline',
+          name='zoffline_' + version,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -38,4 +40,4 @@ import subprocess
 subprocess.call(['C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe', 'sign',
                 '/f', 'ssl\\cert-zwift-com.p12',
                 '/t', 'http://timestamp.digicert.com',
-                'dist\\zoffline.exe'])
+                'dist\\zoffline_%s.exe' % version])
