@@ -27,13 +27,14 @@ from logging.handlers import RotatingFileHandler
 from urllib.parse import unquote, quote
 
 import jwt
+import sqlalchemy
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
 from protobuf_to_dict import protobuf_to_dict
-from flask_sqlalchemy import sqlalchemy, SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -130,8 +131,9 @@ if not os.path.exists(SECRET_KEY_FILE):
 with open(SECRET_KEY_FILE, 'rb') as f:
     app.config['SECRET_KEY'] = f.read()
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+db = SQLAlchemy()
+db.init_app(app)
 
-db = SQLAlchemy(app)
 online = {}
 global_pace_partners = {}
 global_bots = {}
@@ -164,14 +166,13 @@ class User(UserMixin, db.Model):
 
     def get_token(self):
         dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-        return jwt_encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
+        return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
     def verify_token(token):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
-        except Exception as exc:
-            logger.warn('jwt.decode: %s' % repr(exc))
+        except:
             return None
         id = data.get('user')
         if id:
@@ -356,14 +357,6 @@ courses_lookup = {
 
 tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
 GD = tree.getroot()
-
-
-def jwt_encode(payload, key, **kwargs):
-    # For pyjwt >= 2.0.0 compatibility (Issue #108)
-    if jwt.__version__[0] == '1':
-        return jwt.encode(payload, key, **kwargs).decode('utf-8')
-    else:
-        return jwt.encode(payload, key, **kwargs)
 
 
 def get_utc_date_time():
@@ -3079,7 +3072,7 @@ def migrate_database():
     db.session.execute('ALTER TABLE goal RENAME TO goal_old')
     db.session.execute('ALTER TABLE segment_result RENAME TO segment_result_old')
     db.session.execute('ALTER TABLE playback RENAME TO playback_old')
-    db.create_all(app=app)
+    db.create_all()
 
     import ast
     # Select every column except 'id' and cast 'fit' as hex - after 77ff84e fit data was stored incorrectly
@@ -3185,7 +3178,7 @@ def send_server_back_online_message():
 @app.before_first_request
 def before_first_request():
     move_old_profile()
-    db.create_all(app=app)
+    db.create_all()
     db.session.commit()
     check_columns(User, 'user')
     migrate_database()
@@ -3231,14 +3224,14 @@ def launch_zwift():
 def fake_refresh_token_with_session_cookie(session_cookie):
     refresh_token = jwt.decode(REFRESH_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     refresh_token['session_cookie'] = session_cookie
-    refresh_token = jwt_encode(refresh_token, 'nosecret')
+    refresh_token = jwt.encode(refresh_token, 'nosecret')
     return refresh_token
 
 
 def fake_jwt_with_session_cookie(session_cookie):
     access_token = jwt.decode(ACCESS_TOKEN, options=({'verify_signature': False, 'verify_aud': False}))
     access_token['session_cookie'] = session_cookie
-    access_token = jwt_encode(access_token, 'nosecret')
+    access_token = jwt.encode(access_token, 'nosecret')
 
     refresh_token = fake_refresh_token_with_session_cookie(session_cookie)
 
