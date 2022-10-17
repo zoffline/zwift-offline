@@ -14,6 +14,10 @@
       "values": {}
     },
     {
+      "name": "game_1_30_for_you_carousel",
+      "values": {}
+    },
+    {
       "name": "game_1_19_system_alerts",
       "values": {}
     },
@@ -117,11 +121,6 @@
       "values": {}
     },
     {
-      "name": "game_1_21_android_novus_ble_refactor",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_21_0_gpu_deprecation_warning_message",
       "value": true,
       "values": {}
@@ -164,7 +163,8 @@
       "values": {}
     },
     {
-      "name": "game_1_23_ble_cycling_speed_pairing_fix",
+      "name": "game_1_30_ble_cycling_speed_pairing_exception",
+      "value": true,
       "values": {}
     },
     {
@@ -178,23 +178,12 @@
       "values": {}
     },
     {
-      "name": "game_1_25_pack_steering_collision_reduction",
-      "value": true,
-      "values": {
-        "fields": {
-          "game_1_25_pack_steering_collision_reduction": {
-            "boolValue": true
-          }
-        }
-      }
-    },
-    {
       "name": "game_training_partners",
       "value": true,
       "values": {
         "fields": {
           "screenshots_enabled": {
-            "boolValue": false
+            "boolValue": true
           },
           "recording_enabled": {
             "boolValue": true
@@ -206,18 +195,7 @@
       }
     },
     {
-      "name": "game_1_26_sq_null_pointer_guards",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_26_increase_workout_line_spacing_scale",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_27_enable_dynamic_workout_trigger_events",
-      "value": true,
+      "name": "game_workout_partners",
       "values": {}
     },
     {
@@ -246,7 +224,12 @@
       "values": {}
     },
     {
-      "name": "game_1_27_add_lineup_to_leave_current_event",
+      "name": "game_1_30_enable_autobraking_on_adz",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_30_clear_powerups_on_event_start",
       "value": true,
       "values": {}
     },
@@ -350,6 +333,7 @@
     },
     {
       "name": "game_1_28_hub_firmware_update",
+      "value": true,
       "values": {}
     },
     {
@@ -380,7 +364,8 @@
       "values": {}
     },
     {
-      "name": "game_1_29_ble_cycling_speed_pairing_opt",
+      "name": "game_1_30_ble_cycling_speed_pairing_opt",
+      "value": true,
       "values": {}
     },
     {
@@ -414,8 +399,72 @@
       "values": {}
     },
     {
+      "name": "game_1_30_position_accuracy_over_network_london",
+      "values": {}
+    },
+    {
+      "name": "game_1_30_position_accuracy_over_network_global",
+      "values": {}
+    },
+    {
       "name": "game_1_29_logout_for_windows_and_mac",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_30_pack_dynamics_v4",
+      "values": {
+        "fields": {
+          "minDraftLimitShallowDown": {
+            "varintValue": "42"
+          },
+          "brakingAmount": {
+            "numberValue": 0.6
+          },
+          "downhillSlopeLimit": {
+            "numberValue": -150.0
+          },
+          "minSpeedLimitDown": {
+            "numberValue": 45.0
+          },
+          "minDraftLimitFlat": {
+            "varintValue": "38"
+          },
+          "minSpeedLimitShallowDown": {
+            "numberValue": 40.0
+          },
+          "minSpeedLimitFlat": {
+            "numberValue": 28.0
+          },
+          "minDraftLimitDown": {
+            "varintValue": "90"
+          },
+          "powerCeilingPercentage": {
+            "numberValue": 120.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_30_campaign_fullscreen_modal",
+      "values": {
+        "fields": {
+          "shortNames": {
+            "stringValue": "tomi2022"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_30_enable_scale_setting_for_mobile",
+      "values": {}
+    },
+    {
+      "name": "game_1_30_enable_join_zwifter",
+      "values": {}
+    },
+    {
+      "name": "game_1_30_set_default_mobile_scale_to_small",
       "values": {}
     },
     {
@@ -453,16 +502,17 @@
     },
     {
       "name": "game_1_28_watchdog_timer",
+      "value": true,
       "values": {
         "fields": {
           "abortEnabled": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
-            "numberValue": 30.0
+            "numberValue": 60.0
           },
           "mainTimeoutInterval": {
-            "numberValue": 30.0
+            "numberValue": 60.0
           },
           "reportTimeoutsOnLoad": {
             "boolValue": false
@@ -476,6 +526,10 @@
     {
       "name": "game_1_29_hand_cycle",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_player_hightlight",
       "values": {}
     },
     {

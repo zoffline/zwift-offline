@@ -1766,7 +1766,7 @@ def api_profiles():
             p.CopyFrom(profile)
     return profiles.SerializeToString(), 200
 
-@app.route('/player-playbacks/player/playback', methods=['POST'])
+@app.route('/api/player-playbacks/player/playback', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def player_playbacks_player_playback():
@@ -1790,7 +1790,7 @@ def player_playbacks_player_playback():
         f.write(stream)
     return '', 200
 
-@app.route('/player-playbacks/player/me/playbacks/<segment_id>/<option>', methods=['GET'])
+@app.route('/api/player-playbacks/player/me/playbacks/<segment_id>/<option>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def player_playbacks_player_me_playbacks(segment_id, option):
