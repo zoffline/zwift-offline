@@ -1706,14 +1706,28 @@ def api_profiles_activities(player_id):
         activities.activities.remove(a)
     return activities.SerializeToString(), 200
 
-def span(state):
+def time_since(state):
     seconds = (world_time() - state.worldTime) // 1000
-    if seconds < 7200: return '%s minutes' % (seconds // 60)
-    elif seconds < 172800: return '%s hours' % (seconds // 3600)
-    elif seconds < 1209600: return '%s days' % (seconds // 86400)
-    elif seconds < 5259492: return '%s weeks' % (seconds // 604800)
-    elif seconds < 63113904: return '%s months' % (seconds // 2629746)
-    else: return '%s years' % (seconds // 31556952)
+    interval = seconds // 31536000
+    if interval > 0: interval_type = 'year'
+    else:
+        interval = seconds // 2592000
+        if interval > 0: interval_type = 'month'
+        else:
+            interval = seconds // 604800
+            if interval > 0: interval_type = 'week'
+            else:
+                interval = seconds // 86400
+                if interval > 0: interval_type = 'day'
+                else:
+                    interval = seconds // 3600
+                    if interval > 0: interval_type = 'hour'
+                    else:
+                        interval = seconds // 60
+                        if interval > 0: interval_type = 'minute'
+                        else: return 'Just now'
+    if interval > 1: interval_type += 's'
+    return '%s %s ago' % (interval, interval_type)
 
 def random_profile(p):
     p.ride_helmet_type = int(random.choice(GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
@@ -1747,7 +1761,7 @@ def api_profiles():
                     p.CopyFrom(random_profile(profile))
                     p.id = p_id
                     p.first_name = ''
-                    p.last_name = span(global_ghosts[player_id].play.ghosts[ghostId-1].states[0]) + ' ago [ghost]'
+                    p.last_name = time_since(global_ghosts[player_id].play.ghosts[ghostId-1].states[0])
                     p.country_code = 0
         else:
             if p_id in global_pace_partners.keys():

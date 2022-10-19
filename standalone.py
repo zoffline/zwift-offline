@@ -588,7 +588,7 @@ def load_bots():
                             bot.route.ParseFromString(fd.read())
                         bot.position = random.randrange(len(bot.route.states))
                         p.first_name = ''
-                        p.last_name = zo.span(bot.route.states[0]) + ' ago [bot]'
+                        p.last_name = zo.time_since(bot.route.states[0])
                         p.is_male = bool(random.getrandbits(1))
                         p.country_code = 0
                         bot.profile = p
