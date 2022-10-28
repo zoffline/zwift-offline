@@ -359,22 +359,11 @@ tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
 GD = tree.getroot()
 
 
-def get_utc_date_time():
-    return datetime.datetime.utcnow()
-
-
-def get_seconds_from_date_time(dt):
-    return (time.mktime(dt.timetuple()) * 1000.0 + dt.microsecond / 1000.0) / 1000
-
-
 def get_utc_time():
-    dt = get_utc_date_time()
-    return get_seconds_from_date_time(dt)
-
+    return datetime.datetime.utcnow().timestamp()
 
 def get_time():
-    dt = datetime.datetime.now()
-    return get_seconds_from_date_time(dt)
+    return datetime.datetime.now().timestamp()
 
 
 def get_online():
@@ -2421,7 +2410,7 @@ def get_month_range(dt):
 
 
 def unix_time_millis(dt):
-    return int(get_seconds_from_date_time(dt)*1000)
+    return int(dt.timestamp()*1000)
 
 
 def fill_in_goal_progress(goal, player_id):
@@ -2533,8 +2522,7 @@ def select_protobuf_goals(player_id, limit):
             goal = goals.goals.add()
             row_to_protobuf(row, goal)
             end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-            now = get_utc_date_time()
-            if end_dt < now:
+            if end_dt < datetime.datetime.utcnow():
                 need_update.append(goal)
             fill_in_goal_progress(goal, player_id)
         for goal in need_update:
@@ -2565,8 +2553,7 @@ def api_profiles_goals(player_id):
             str_goal = request.stream.read()
             json_goal = json.loads(str_goal)
             goal = goalJsonToProtobuf(json_goal)
-        now = get_utc_date_time()
-        goal.created_on = unix_time_millis(now)
+        goal.created_on = unix_time_millis(datetime.datetime.utcnow())
         set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
         goal.id = insert_protobuf_into_db(Goal, goal)
@@ -2861,7 +2848,7 @@ def api_segment_results():
     if result.segment_id == 1:
         return '', 400
     result.world_time = world_time()
-    result.finish_time_str = get_utc_date_time().strftime("%Y-%m-%dT%H:%M:%SZ")
+    result.finish_time_str = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     result.sport = 0
     result.id = insert_protobuf_into_db(SegmentResult, result)
 

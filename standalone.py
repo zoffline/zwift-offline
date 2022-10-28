@@ -10,18 +10,13 @@ import csv
 import math
 import random
 import itertools
+import socketserver
+from http.server import SimpleHTTPRequestHandler
+from http.cookies import SimpleCookie
 from collections import deque
 from datetime import datetime, timedelta
 from shutil import copyfile
 from Crypto.Cipher import AES
-if sys.version_info[0] > 2:
-    import socketserver
-    from http.server import SimpleHTTPRequestHandler
-    from http.cookies import SimpleCookie
-else:
-    import SocketServer as socketserver
-    from SimpleHTTPServer import SimpleHTTPRequestHandler
-    from Cookie import SimpleCookie
 
 import zwift_offline as zo
 import udp_node_msgs_pb2
@@ -80,7 +75,6 @@ start_time = time.time()
 def sigint_handler(num, frame):
     httpd.shutdown()
     httpd.server_close()
-    tcpthreadevent.set()
     tcpserver.shutdown()
     tcpserver.server_close()
     udpserver.shutdown()
@@ -878,7 +872,6 @@ zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
 
-tcpthreadevent = threading.Event()
 tcpserver = socketserver.ThreadingTCPServer(('', 3025), TCPHandler)
 tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
