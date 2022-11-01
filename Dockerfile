@@ -1,4 +1,4 @@
-FROM python:3-alpine as builder
+FROM python:3.10.8-alpine as builder
 
 WORKDIR /usr/src/app
 
@@ -7,7 +7,7 @@ RUN pip install --user flask flask_sqlalchemy flask-login pyjwt gevent protobuf 
 
 RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
 
-FROM python:3-alpine
+FROM python:3.10.8-alpine
 MAINTAINER zoffline <zoffline@tutanota.com>
 
 WORKDIR /usr/src/app
