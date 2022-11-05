@@ -2949,21 +2949,21 @@ def relay_worlds_leave(server_realm):
 @jwt_to_session_cookie
 @login_required
 def experimentation_v1_variant():
+    stream = variants_pb2.FeatureResponse()
+    stream.ParseFromString(request.stream.read())
     variants = variants_pb2.FeatureResponse()
-    if b'game_1_27_0_disable_encryption_bypass' in request.stream.read():
-        v1 = variants.variants.add()
-        v1.name = "game_1_26_2_data_encryption"
-        v1.value = True
-        v2 = variants.variants.add()
-        v2.name = "game_1_27_0_disable_encryption_bypass"
-        v2.value = True
-    else:
-        with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
-            Parse(f.read(), variants)
-        v = variants.variants.add()
-        v.name = "game_1_20_home_screen"
-        v.value = current_user.new_home
-    return variants.SerializeToString(), 200
+    with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
+        Parse(f.read(), variants)
+    response = variants_pb2.FeatureResponse()
+    for req in stream.variants:
+        for res in variants.variants:
+            if req.name == res.name:
+                v = response.variants.add()
+                v.CopyFrom(res)
+                if v.name == "game_1_20_home_screen":
+                    v.value = current_user.new_home
+                break
+    return response.SerializeToString(), 200
 
 def get_profile_saved_game_achiev2_40_bytes():
     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)

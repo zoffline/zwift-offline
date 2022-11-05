@@ -1,6 +1,20 @@
 {
   "variants": [
     {
+      "name": "game_1_26_2_data_encryption",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_27_0_disable_encryption_bypass",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_training_partners_survey",
+      "values": {}
+    },
+    {
       "name": "game_1_26_ninety_day_prs",
       "value": true,
       "values": {}
@@ -37,10 +51,6 @@
     },
     {
       "name": "game_1_18_new_welcome_ride",
-      "values": {}
-    },
-    {
-      "name": "game_1_18_holiday_mode",
       "values": {}
     },
     {
@@ -185,10 +195,13 @@
           "screenshots_enabled": {
             "boolValue": true
           },
-          "recording_enabled": {
-            "boolValue": true
+          "SOLO_WORKOUT_recording_disabled": {
+            "boolValue": false
           },
           "spawn_enabled": {
+            "boolValue": true
+          },
+          "recording_enabled": {
             "boolValue": true
           }
         }
@@ -224,16 +237,6 @@
       "values": {}
     },
     {
-      "name": "game_1_30_enable_autobraking_on_adz",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_30_clear_powerups_on_event_start",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
       "values": {}
     },
@@ -244,6 +247,15 @@
     },
     {
       "name": "game_1_29_ignore_private_meetups_in_group_event_processing_logic",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_30_enable_autobraking_on_adz",
+      "values": {}
+    },
+    {
+      "name": "game_1_30_clear_powerups_on_event_start",
       "value": true,
       "values": {}
     },
@@ -261,11 +273,11 @@
       "value": true,
       "values": {
         "fields": {
-          "initialDropInTime": {
-            "numberValue": 10000.0
-          },
           "initialDropInFrames": {
             "numberValue": 1000.0
+          },
+          "initialDropInTime": {
+            "numberValue": 10000.0
           },
           "extendedDropInTime": {
             "numberValue": 60000.0
@@ -300,23 +312,23 @@
       "value": true,
       "values": {
         "fields": {
-          "ATVPopInitDist": {
-            "numberValue": 250.0
-          },
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
-          },
-          "ATVMoveSensitivity": {
-            "varintValue": "5"
-          },
-          "ATVPopDist": {
-            "numberValue": 175.0
+          "ATVPopDelay": {
+            "numberValue": 0.15
           },
           "ATVFriction": {
             "numberValue": 0.9
           },
-          "ATVPopDelay": {
-            "numberValue": 0.15
+          "ATVPopInitDist": {
+            "numberValue": 250.0
+          },
+          "ATVMoveSensitivity": {
+            "varintValue": "5"
+          },
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
+          },
+          "ATVPopDist": {
+            "numberValue": 175.0
           }
         }
       }
@@ -360,7 +372,6 @@
     },
     {
       "name": "game_1_28_ftms_road_grade_lookahead_time_exposed",
-      "value": true,
       "values": {}
     },
     {
@@ -413,13 +424,14 @@
     },
     {
       "name": "game_1_30_pack_dynamics_v4",
+      "value": true,
       "values": {
         "fields": {
           "minDraftLimitShallowDown": {
-            "varintValue": "42"
+            "varintValue": "45"
           },
           "brakingAmount": {
-            "numberValue": 0.6
+            "numberValue": 0.5
           },
           "downhillSlopeLimit": {
             "numberValue": -150.0
@@ -428,7 +440,7 @@
             "numberValue": 45.0
           },
           "minDraftLimitFlat": {
-            "varintValue": "38"
+            "varintValue": "40"
           },
           "minSpeedLimitShallowDown": {
             "numberValue": 40.0
@@ -437,16 +449,17 @@
             "numberValue": 28.0
           },
           "minDraftLimitDown": {
-            "varintValue": "90"
+            "varintValue": "95"
           },
           "powerCeilingPercentage": {
-            "numberValue": 120.0
+            "numberValue": 105.0
           }
         }
       }
     },
     {
       "name": "game_1_30_campaign_fullscreen_modal",
+      "value": true,
       "values": {
         "fields": {
           "shortNames": {
@@ -465,6 +478,7 @@
     },
     {
       "name": "game_1_30_set_default_mobile_scale_to_small",
+      "value": true,
       "values": {}
     },
     {
@@ -502,26 +516,48 @@
     },
     {
       "name": "game_1_28_watchdog_timer",
-      "value": true,
       "values": {
         "fields": {
-          "abortEnabled": {
-            "boolValue": false
-          },
-          "renderTimeoutInterval": {
-            "numberValue": 60.0
-          },
           "mainTimeoutInterval": {
+            "numberValue": 30.0
+          },
+          "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
           "reportTimeoutsOnLoad": {
             "boolValue": false
           },
-          "loadingTimeoutInterval": {
-            "numberValue": 60.0
+          "renderTimeoutInterval": {
+            "numberValue": 30.0
+          },
+          "abortEnabled": {
+            "boolValue": false
           }
         }
       }
+    },
+    {
+      "name": "game_1_23_workout_auto_pause",
+      "values": {
+        "fields": {
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
+          },
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
+          },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_18_holiday_mode",
+      "values": {}
     },
     {
       "name": "game_1_29_hand_cycle",
@@ -544,6 +580,11 @@
       }
     },
     {
+      "name": "game_1_20_home_screen",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_14_settings_refactor",
       "value": true,
       "values": {}
@@ -552,25 +593,6 @@
       "name": "workout_training_v2_release",
       "value": true,
       "values": {}
-    },
-    {
-      "name": "game_1_23_workout_auto_pause",
-      "values": {
-        "fields": {
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
-          },
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
-          },
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          }
-        }
-      }
     }
   ]
 }
