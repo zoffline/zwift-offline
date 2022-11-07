@@ -519,14 +519,14 @@ def load_ghosts(player_id, state, ghosts):
         else: ghosts.start_rt = min(s)
     for g in ghosts.play.ghosts:
         try:
-            while zo.road_id(g.states[0]) != ghosts.start_road:
-                del g.states[0]
-            if zo.is_forward(g.states[0]):
-                while g.states[0].roadTime < ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
-                    del g.states[0]
+            while zo.road_id(g.states[g.position]) != ghosts.start_road:
+                g.position += 1
+            if zo.is_forward(g.states[g.position]):
+                while g.states[g.position].roadTime < ghosts.start_rt or abs(g.states[g.position].roadTime - ghosts.start_rt) > 500000:
+                    g.position += 1
             else:
-                while g.states[0].roadTime > ghosts.start_rt or abs(g.states[0].roadTime - ghosts.start_rt) > 500000:
-                    del g.states[0]
+                while g.states[g.position].roadTime > ghosts.start_rt or abs(g.states[g.position].roadTime - ghosts.start_rt) > 500000:
+                    g.position += 1
         except IndexError:
             pass
 
@@ -543,6 +543,8 @@ def regroup_ghosts(player_id):
             g.position = 0
             while g.states[g.position].roadTime != c[0] or g.states[g.position].distance != c[1]:
                 g.position += 1
+    if not ghosts.started and ghosts.play.ghosts:
+        ghosts.started = True
 
 class PacePartnerVariables:
     profile = None
