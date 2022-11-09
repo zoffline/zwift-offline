@@ -543,6 +543,7 @@ def regroup_ghosts(player_id):
             g.position = 0
             while g.states[g.position].roadTime != c[0] or g.states[g.position].distance != c[1]:
                 g.position += 1
+            g.position += 1
     if not ghosts.started and ghosts.play.ghosts:
         ghosts.started = True
 
