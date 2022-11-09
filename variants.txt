@@ -15,6 +15,59 @@
       "values": {}
     },
     {
+      "name": "game_1_28_enable_workout_hud_hiding",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_display_pr_hud_in_dynamic_workouts",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_fix_leaderboard_hud_starting_display_road_time",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_render_profile_screen_drop_down_box_title_text",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_28_avoid_aborting_current_timing_sector_when_minimizing",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
+      "values": {}
+    },
+    {
+      "name": "game_1_29_use_relay_spline_time_in_meetup_position_late_joiner",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_29_ignore_private_meetups_in_group_event_processing_logic",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_30_clear_powerups_on_event_start",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_30_enable_autobraking_on_adz",
+      "values": {}
+    },
+    {
+      "name": "game_1_31_enable_join_zwifter",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_26_ninety_day_prs",
       "value": true,
       "values": {}
@@ -208,58 +261,6 @@
       }
     },
     {
-      "name": "game_workout_partners",
-      "values": {}
-    },
-    {
-      "name": "game_1_28_enable_workout_hud_hiding",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_28_display_pr_hud_in_dynamic_workouts",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_28_fix_leaderboard_hud_starting_display_road_time",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_28_render_profile_screen_drop_down_box_title_text",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_28_avoid_aborting_current_timing_sector_when_minimizing",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
-      "values": {}
-    },
-    {
-      "name": "game_1_29_use_relay_spline_time_in_meetup_position_late_joiner",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_29_ignore_private_meetups_in_group_event_processing_logic",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_30_enable_autobraking_on_adz",
-      "values": {}
-    },
-    {
-      "name": "game_1_30_clear_powerups_on_event_start",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_upload_route_results_v2",
       "value": true,
       "values": {}
@@ -315,8 +316,8 @@
           "ATVPopDelay": {
             "numberValue": 0.15
           },
-          "ATVFriction": {
-            "numberValue": 0.9
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
           },
           "ATVPopInitDist": {
             "numberValue": 250.0
@@ -324,8 +325,8 @@
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
+          "ATVFriction": {
+            "numberValue": 0.9
           },
           "ATVPopDist": {
             "numberValue": 175.0
@@ -375,6 +376,17 @@
       "values": {}
     },
     {
+      "name": "game_1_29_event_carousel",
+      "value": true,
+      "values": {
+        "fields": {
+          "NUM_CARDS": {
+            "varintValue": "6"
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_30_ble_cycling_speed_pairing_opt",
       "value": true,
       "values": {}
@@ -389,19 +401,12 @@
       "values": {}
     },
     {
-      "name": "game_1_29_event_carousel",
-      "value": true,
-      "values": {
-        "fields": {
-          "NUM_CARDS": {
-            "varintValue": "6"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_29_client_recommendations",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_workout_partners",
       "values": {}
     },
     {
@@ -410,11 +415,11 @@
       "values": {}
     },
     {
-      "name": "game_1_30_position_accuracy_over_network_london",
+      "name": "game_1_30_position_accuracy_over_network_global",
       "values": {}
     },
     {
-      "name": "game_1_30_position_accuracy_over_network_global",
+      "name": "game_1_30_position_accuracy_over_network_london",
       "values": {}
     },
     {
@@ -427,32 +432,35 @@
       "value": true,
       "values": {
         "fields": {
-          "minDraftLimitShallowDown": {
-            "varintValue": "45"
+          "reducedPowerPercentage": {
+            "numberValue": 99.0
+          },
+          "powerCeilingPercentage": {
+            "numberValue": 110.0
           },
           "brakingAmount": {
             "numberValue": 0.5
           },
           "downhillSlopeLimit": {
-            "numberValue": -150.0
+            "numberValue": -200.0
+          },
+          "minDraftLimitFlat": {
+            "varintValue": "39"
           },
           "minSpeedLimitDown": {
             "numberValue": 45.0
           },
-          "minDraftLimitFlat": {
-            "varintValue": "40"
+          "minSpeedLimitFlat": {
+            "numberValue": 28.0
           },
           "minSpeedLimitShallowDown": {
             "numberValue": 40.0
           },
-          "minSpeedLimitFlat": {
-            "numberValue": 28.0
-          },
           "minDraftLimitDown": {
             "varintValue": "95"
           },
-          "powerCeilingPercentage": {
-            "numberValue": 105.0
+          "minDraftLimitShallowDown": {
+            "varintValue": "44"
           }
         }
       }
@@ -473,10 +481,6 @@
       "values": {}
     },
     {
-      "name": "game_1_30_enable_join_zwifter",
-      "values": {}
-    },
-    {
       "name": "game_1_30_set_default_mobile_scale_to_small",
       "value": true,
       "values": {}
@@ -494,6 +498,19 @@
       "name": "game_1_21_perf_analytics",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_31_rlog",
+      "values": {
+        "fields": {
+          "DISABLED_LEVELS": {
+            "stringValue": "DEBUG,INFO,WARNING"
+          },
+          "DISABLED_TYPES": {
+            "stringValue": ""
+          }
+        }
+      }
     },
     {
       "name": "game_1_28_event_core_feed_service",
@@ -537,23 +554,9 @@
       }
     },
     {
-      "name": "game_1_23_workout_auto_pause",
-      "values": {
-        "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
-          },
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
-          }
-        }
-      }
+      "name": "game_1_31_pp_data",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_1_18_holiday_mode",
@@ -593,6 +596,25 @@
       "name": "workout_training_v2_release",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_23_workout_auto_pause",
+      "values": {
+        "fields": {
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
+          },
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
+          },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
+          }
+        }
+      }
     }
   ]
 }

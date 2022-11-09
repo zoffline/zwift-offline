@@ -2598,7 +2598,7 @@ def api_tcp_config():
     return infos.SerializeToString(), 200
 
 
-def add_player_to_world(player, course_world, is_pace_partner):
+def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=False):
     course_id = get_course(player)
     if course_id in course_world.keys():
         partial_profile = get_partial_profile(player.id)
@@ -2610,8 +2610,10 @@ def add_player_to_world(player, course_world, is_pace_partner):
                 online_player.ride_power = player.power
             else:
                 online_player.speed = player.speed
-        else:
+        elif is_bot:
             online_player = course_world[course_id].others.add()
+        else: # to be able to join zwifter using new home screen
+            online_player = course_world[course_id].followees.add()
         online_player.id = player.id
         online_player.firstName = partial_profile.first_name
         online_player.lastName = partial_profile.last_name
@@ -2657,15 +2659,15 @@ def relay_worlds_generic(server_realm=None):
             course_world[course] = world
         for p_id in online.keys():
             player = online[p_id]
-            add_player_to_world(player, course_world, False)
+            add_player_to_world(player, course_world)
         for p_id in global_pace_partners.keys():
             pace_partner_variables = global_pace_partners[p_id]
             pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
-            add_player_to_world(pace_partner, course_world, True)
+            add_player_to_world(pace_partner, course_world, is_pace_partner=True)
         for p_id in global_bots.keys():
             bot_variables = global_bots[p_id]
             bot = bot_variables.route.states[bot_variables.position]
-            add_player_to_world(bot, course_world, False)
+            add_player_to_world(bot, course_world, is_bot=True)
         if server_realm:
             world.id = server_realm
             return world.SerializeToString()
