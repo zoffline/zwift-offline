@@ -19,21 +19,19 @@ import json
 import base64
 import uuid
 import xml.etree.ElementTree as ET
-from copy import copy, deepcopy
+from copy import deepcopy
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
 from logging.handlers import RotatingFileHandler
-from urllib.parse import unquote, quote
+from urllib.parse import quote
 
 import jwt
 import sqlalchemy
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
-from google.protobuf.descriptor import FieldDescriptor
-from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
-from protobuf_to_dict import protobuf_to_dict
+from google.protobuf.json_format import MessageToDict, Parse
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
@@ -912,7 +910,7 @@ def logout(username):
 
 
 def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
-    msg_dict = protobuf_to_dict(msg)
+    msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
         del msg_dict[key]
     if 'id' in msg_dict:
@@ -924,7 +922,7 @@ def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
 
 
 def update_protobuf_in_db(table_name, msg, id, exclude_fields=[]):
-    msg_dict = protobuf_to_dict(msg)
+    msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
         del msg_dict[key]
     table_name.query.filter_by(id=id).update(msg_dict)
