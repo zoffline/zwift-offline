@@ -2380,8 +2380,15 @@ def relay_events_subgroups_id_late_join(meetup_id):
     ape = ActualPrivateEvents()
     if meetup_id in ape.keys():
         event = jsonPrivateEventToProtobuf(ape[meetup_id])
-        leader = event.organizerId
-        if leader in online.keys():
+        leader = None
+        if event.organizerId in online and online[event.organizerId].groupId == meetup_id and event.organizerId != current_user.player_id:
+            leader = event.organizerId
+        else:
+            for player_id in online.keys():
+                if online[player_id].groupId == meetup_id and player_id != current_user.player_id:
+                    leader = player_id
+                    break
+        if leader is not None:
             state = online[leader]
             lj = events_pb2.LateJoinInformation()
             lj.road_id = road_id(state)
@@ -2951,18 +2958,19 @@ def relay_worlds_leave(server_realm):
 def experimentation_v1_variant():
     stream = variants_pb2.FeatureResponse()
     stream.ParseFromString(request.stream.read())
-    variants = variants_pb2.FeatureResponse()
+    variants = {}
     with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
-        Parse(f.read(), variants)
+        vs = variants_pb2.FeatureResponse()
+        Parse(f.read(), vs)
+        for v in vs.variants:
+            variants[v.name] = v
+    variants['game_1_20_home_screen'].value = current_user.new_home
     response = variants_pb2.FeatureResponse()
     for req in stream.variants:
-        for res in variants.variants:
-            if req.name == res.name:
-                v = response.variants.add()
-                v.CopyFrom(res)
-                if v.name == "game_1_20_home_screen":
-                    v.value = current_user.new_home
-                break
+        if req.name in variants:
+            response.variants.append(variants[req.name])
+        else:
+            logger.info("Unknown feature: " + req.name)
     return response.SerializeToString(), 200
 
 def get_profile_saved_game_achiev2_40_bytes():
