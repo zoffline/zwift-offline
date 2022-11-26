@@ -33,15 +33,15 @@ To install zoffline on Linux, Windows, or macOS:
 * Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, pycryptodome, stravalib (optional)
   * e.g., on Linux/Mac: ``pip3 install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib``
   * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python<version>\Scripts\pip.exe`` instead of just ``pip``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Run standalone.py before starting Zwift
   * e.g., on Linux/Mac: ``sudo ./standalone.py``
     * sudo is needed because we're binding to the privileged ports 80 and 443.
-    * If using Python 3, but Python 3 is not your system default run ``sudo python3 standalone.py``
+    * If Python 3 is not your system default run ``sudo python3 standalone.py``
   * e.g., on Windows in command prompt: ``python standalone.py``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\python.exe`` instead of just ``python``
+    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python<version>\python.exe`` instead of just ``python``
 * Start Zwift with standalone.py running (__after completing step 2__)
 * Note: When upgrading zoffline, be sure to retain the ``storage`` directory. It contains your Zwift progress state.
 
