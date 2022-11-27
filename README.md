@@ -69,6 +69,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 * Install docker-compose
 * Either use the ``docker-compose.yml`` file in this repo which will build from the Dockerfile, or use this example compose file:
    ```
+  version: "3.3"
   services:
       zoffline:
            image: zoffline/zoffline:latest
