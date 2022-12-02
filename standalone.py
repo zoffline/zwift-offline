@@ -320,13 +320,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
         wdetails1 = msg.udp_config_vod_1.relay_addresses_vod.add()
         wdetails1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         wdetails1.lb_course = 6 # watopia crowd
-        details3 = wdetails1.relay_addresses.add()
-        details3.CopyFrom(details1)
+        wdetails1.relay_addresses.append(details1)
         wdetails2 = msg.udp_config_vod_1.relay_addresses_vod.add()
         wdetails2.lb_realm = 0  #generic load balancing realm
         wdetails2.lb_course = 0 #generic load balancing course
-        details4 = wdetails2.relay_addresses.add()
-        details4.CopyFrom(details2)
+        wdetails2.relay_addresses.append(details2)
         msg.udp_config_vod_1.port = 3022
         payload = msg.SerializeToString()
         iv.ct = ChannelType.TcpServer
@@ -441,14 +439,12 @@ class GhostsVariables:
     loaded = False
     started = False
     rec = None
-    play = None
+    play = []
     last_rec = 0
     last_play = 0
     last_rt = 0
     start_road = 0
     start_rt = 0
-    course = 0
-    last_package_time = 0
 
 def boolean(s):
     if s.lower() in ['true', 'yes', '1']: return True
@@ -456,7 +452,6 @@ def boolean(s):
     return None
 
 def save_ghost(name, player_id):
-    global global_ghosts
     if not player_id in global_ghosts.keys(): return
     ghosts = global_ghosts[player_id]
     if len(ghosts.rec.states) > 0:
@@ -467,30 +462,12 @@ def save_ghost(name, player_id):
                 os.makedirs(folder)
         except Exception as exc:
             print('save_ghost: %s' % repr(exc))
+            return
+        ghosts.rec.player_id = player_id
         f = '%s/%s-%s.bin' % (folder, datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
-    ghosts.rec = None
-
-def organize_ghosts(player_id):
-    # organize ghosts in course/road_id directory structure
-    # previously they were saved directly in player_id/ghosts
-    folder = '%s/%s/ghosts' % (STORAGE_DIR, player_id)
-    if not os.path.isdir(folder): return
-    for f in os.listdir(folder):
-        if f.endswith('.bin'):
-            file = os.path.join(folder, f)
-            with open(file, 'rb') as fd:
-                g = udp_node_msgs_pb2.Ghost()
-                g.ParseFromString(fd.read())
-                dest = '%s/%s/%s' % (folder, zo.get_course(g.states[0]), zo.road_id(g.states[0]))
-                if not zo.is_forward(g.states[0]): dest += '/reverse'
-                try:
-                    if not os.path.isdir(dest):
-                        os.makedirs(dest)
-                except Exception as exc:
-                    print('organize_ghosts: %s' % repr(exc))
-            os.rename(file, os.path.join(dest, f))
+        del ghosts.rec.states[:]
 
 def load_ghosts(player_id, state, ghosts):
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))
@@ -500,9 +477,10 @@ def load_ghosts(player_id, state, ghosts):
     for f in os.listdir(folder):
         if f.endswith('.bin'):
             with open(os.path.join(folder, f), 'rb') as fd:
-                g = ghosts.play.ghosts.add()
+                g = udp_node_msgs_pb2.Ghost()
                 g.ParseFromString(fd.read())
                 g.position = 0
+                ghosts.play.append(g)
                 s.append(g.states[0].roadTime)
     ghosts.start_road = zo.road_id(state)
     ghosts.start_rt = 0
@@ -517,7 +495,7 @@ def load_ghosts(player_id, state, ghosts):
         s.append(state.roadTime)
         if zo.is_forward(state): ghosts.start_rt = max(s)
         else: ghosts.start_rt = min(s)
-    for g in ghosts.play.ghosts:
+    for g in ghosts.play:
         try:
             while zo.road_id(g.states[g.position]) != ghosts.start_road:
                 g.position += 1
@@ -533,7 +511,7 @@ def load_ghosts(player_id, state, ghosts):
 def regroup_ghosts(player_id):
     p = online[player_id]
     ghosts = global_ghosts[player_id]
-    for g in ghosts.play.ghosts:
+    for g in ghosts.play:
         states = []
         for s in g.states:
             if zo.road_id(s) == zo.road_id(p) and zo.is_forward(s) == zo.is_forward(p):
@@ -544,7 +522,7 @@ def regroup_ghosts(player_id):
             while g.states[g.position].roadTime != c[0] or g.states[g.position].distance != c[1]:
                 g.position += 1
             g.position += 1
-    if not ghosts.started and ghosts.play.ghosts:
+    if not ghosts.started and ghosts.play:
         ghosts.started = True
 
 class PacePartnerVariables:
@@ -606,7 +584,6 @@ def load_bots():
                         i += 1
 
 def play_bots():
-    global global_bots
     while True:
         if zo.reload_pacer_bots:
             zo.reload_pacer_bots = False
@@ -624,19 +601,9 @@ def play_bots():
 
 def remove_inactive():
     while True:
-        remove_players = list()
-        for p_id in online.keys():
+        for p_id in list(online.keys()):
             if zo.world_time() > online[p_id].worldTime + 10000:
-                remove_players.insert(0, p_id)
-        for p_id in remove_players:
-            zo.logout_player(p_id)
-
-        remove_players = list()
-        for p_id in global_ghosts.keys():
-            if zo.get_utc_time() > global_ghosts[p_id].last_package_time + 10:
-                remove_players.insert(0, p_id)
-        for p_id in remove_players:
-            global_ghosts.pop(p_id)
+                zo.logout_player(p_id)
         rithreadevent.wait(timeout=1)
 
 def get_empty_message(player_id):
@@ -729,26 +696,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         #Add handling of ghosts for player if it's missing
         if not player_id in global_ghosts.keys():
             global_ghosts[player_id] = GhostsVariables()
+            global_ghosts[player_id].rec = udp_node_msgs_pb2.Ghost()
 
         ghosts = global_ghosts[player_id]
-        ghosts.last_package_time = t
-
-        if recv.seqno == 1:
-            ghosts.rec = None
-            organize_ghosts(player_id)
-
-        #Changed course
-        if zo.get_course(state) and ghosts.course != zo.get_course(state):
-            ghosts.rec = None
-            ghosts.course = zo.get_course(state)
-
-        if ghosts.rec == None:
-            ghosts.rec = udp_node_msgs_pb2.Ghost()
-            ghosts.play = udp_node_msgs_pb2.Ghosts()
-            ghosts.last_rt = 0
-            ghosts.loaded = False
-            ghosts.started = False
-            ghosts.rec.player_id = player_id
 
         if player_id in ghosts_enabled and ghosts_enabled[player_id]:
             #Load ghosts for current course
@@ -758,11 +708,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
             #Save player state as ghost if moving
             if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
                 if t >= ghosts.last_rec + ghost_update_freq:
-                    s = ghosts.rec.states.add()
-                    s.CopyFrom(state)
+                    ghosts.rec.states.append(state)
                     ghosts.last_rec = t
                 #Start loaded ghosts
-                if not ghosts.started and ghosts.play.ghosts and zo.road_id(state) == ghosts.start_road:
+                if not ghosts.started and ghosts.play and zo.road_id(state) == ghosts.start_road:
                     if zo.is_forward(state):
                         if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
                             ghosts.started = True
@@ -786,7 +735,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             bot = global_bots[state.watchingRiderId]
             watching_state = bot.route.states[bot.position]
         elif state.watchingRiderId > 10000000:
-            ghost = ghosts.play.ghosts[math.floor(state.watchingRiderId / 10000000) - 1]
+            ghost = ghosts.play[math.floor(state.watchingRiderId / 10000000) - 1]
             if len(ghost.states) > ghost.position:
                 watching_state = ghost.states[ghost.position]
 
@@ -817,7 +766,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         elif ghosts.started and t >= ghosts.last_play + ghost_update_freq:
             ghosts.last_play = t
             ghost_id = 1
-            for g in ghosts.play.ghosts:
+            for g in ghosts.play:
                 if len(g.states) > g.position:
                     is_nearby, distance = nearby_distance(watching_state, g.states[g.position])
                     if is_nearby:
@@ -844,7 +793,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     player = bot_variables.route.states[bot_variables.position]
                 elif p_id > 10000000:
                     player = udp_node_msgs_pb2.PlayerState()
-                    ghost = ghosts.play.ghosts[math.floor(p_id / 10000000) - 1]
+                    ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
                     player.CopyFrom(ghost.states[ghost.position - 1])
                     player.id = p_id
                     player.worldTime = zo.world_time()
@@ -859,8 +808,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         socket.sendto(r, client_address)
                         message.msgnum += 1
                         del message.states[:]
-                    s = message.states.add()
-                    s.CopyFrom(player)
+                    message.states.append(player)
         else:
             message.num_msgs = 1
         message.world_time = zo.world_time()

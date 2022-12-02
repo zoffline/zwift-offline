@@ -18,6 +18,8 @@ import requests
 import json
 import base64
 import uuid
+import jwt
+import sqlalchemy
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from functools import wraps
@@ -25,9 +27,6 @@ from io import BytesIO
 from shutil import copyfile
 from logging.handlers import RotatingFileHandler
 from urllib.parse import quote
-
-import jwt
-import sqlalchemy
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
@@ -1094,6 +1093,10 @@ def logout_player(player_id):
     if player_id in online:
         online.pop(player_id)
         discord.change_presence(len(online))
+    if player_id in global_ghosts:
+        del global_ghosts[player_id].rec.states[:]
+        global_ghosts[player_id].play.clear()
+        global_ghosts.pop(player_id)
     if player_id in player_partial_profiles:
         player_partial_profiles.pop(player_id)
 
@@ -1749,7 +1752,7 @@ def api_profiles():
                     p.CopyFrom(random_profile(profile))
                     p.id = p_id
                     p.first_name = ''
-                    p.last_name = time_since(global_ghosts[player_id].play.ghosts[ghostId-1].states[0])
+                    p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].states[0])
                     p.country_code = 0
         else:
             if p_id in global_pace_partners.keys():
@@ -1764,8 +1767,7 @@ def api_profiles():
                             profile.ParseFromString(fd.read())
                     except Exception as exc:
                         logger.warn('api_profiles: %s' % repr(exc))
-            p = profiles.profiles.add()
-            p.CopyFrom(profile)
+            profiles.profiles.append(profile)
     return profiles.SerializeToString(), 200
 
 @app.route('/api/player-playbacks/player/playback', methods=['POST'])

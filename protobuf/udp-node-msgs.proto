@@ -296,10 +296,6 @@ message Ghost { //not from the Zwift game, zoffline-specific!
 	optional int32 position = 3;
 }
 
-message Ghosts { //not from the Zwift game, zoffline-specific!
-	repeated Ghost ghosts = 1;
-}
-
 message RideOn {
 	required int64 player_id = 1;
 	required int64 to_player_id = 2;
