@@ -467,7 +467,6 @@ def save_ghost(name, player_id):
         f = '%s/%s-%s.bin' % (folder, datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
-        del ghosts.rec.states[:]
 
 def load_ghosts(player_id, state, ghosts):
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))

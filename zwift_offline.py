@@ -139,7 +139,6 @@ ghosts_enabled = {}
 player_update_queue = {}
 zc_connect_queue = {}
 player_partial_profiles = {}
-save_ghost = None
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
@@ -1104,7 +1103,6 @@ def logout_player(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_users_logout():
-    logout_player(current_user.player_id)
     return '', 204
 
 
@@ -1637,10 +1635,6 @@ def api_profiles_me_id(player_id):
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
-    if player_id == 0:
-        # Zwift client 1.0.60239 calls /api/profiles/0 instead of /api/users/logout
-        logout_player(current_user.player_id)
-        return '', 204
     if current_user.player_id != player_id:
         return '', 401
     stream = request.stream.read()
@@ -1999,6 +1993,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.method == 'DELETE':
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": activity_id})
         db.session.commit()
+        logout_player(player_id)
         return 'true', 200
     activity = activity_pb2.Activity()
     activity.ParseFromString(request.stream.read())
@@ -2011,7 +2006,6 @@ def api_profiles_activities_id(player_id, activity_id):
         return response, 200
     if activity.distanceInMeters < 300:
         return response, 200
-    player_id = current_user.player_id
     if current_user.enable_ghosts:
         try:
             save_ghost(quote(activity.name, safe=' '), player_id)
@@ -2027,6 +2021,7 @@ def api_profiles_activities_id(player_id, activity_id):
     garmin_upload(player_id, activity)
     runalyze_upload(player_id, activity)
     zwift_upload(player_id, activity)
+    logout_player(player_id)
     return response, 200
 
 @app.route('/api/profiles/<int:receiving_player_id>/activities/0/rideon', methods=['POST']) #activity_id Seem to always be 0, even when giving ride on to ppl with 30km+
