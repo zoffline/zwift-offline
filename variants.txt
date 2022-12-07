@@ -20,6 +20,21 @@
       "values": {}
     },
     {
+      "name": "game_1_31_fquery",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_32_server_power_curves",
+      "values": {
+        "fields": {
+          "view_enabled": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_28_enable_workout_hud_hiding",
       "value": true,
       "values": {}
@@ -64,12 +79,20 @@
       "values": {}
     },
     {
-      "name": "game_1_30_enable_autobraking_on_adz",
+      "name": "game_1_32_enable_autobraking_in_watopia",
+      "values": {}
+    },
+    {
+      "name": "game_1_31_workout_network_service",
       "values": {}
     },
     {
       "name": "game_1_31_enable_join_zwifter",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_32_meetups_rubberbanding_v2",
       "values": {}
     },
     {
@@ -250,6 +273,9 @@
       "value": true,
       "values": {
         "fields": {
+          "route_spawning_enabled": {
+            "boolValue": false
+          },
           "screenshots_enabled": {
             "boolValue": true
           },
@@ -258,6 +284,9 @@
           },
           "spawn_enabled": {
             "boolValue": true
+          },
+          "route_recording_enabled": {
+            "boolValue": false
           },
           "recording_enabled": {
             "boolValue": true
@@ -443,14 +472,20 @@
           "powerCeilingPercentage": {
             "numberValue": 110.0
           },
+          "speedDifferenceHigh": {
+            "numberValue": 3.0
+          },
           "brakingAmount": {
             "numberValue": 0.5
+          },
+          "cdaPenaltyMultiplier": {
+            "numberValue": 1.0
           },
           "downhillSlopeLimit": {
             "numberValue": -200.0
           },
           "minDraftLimitFlat": {
-            "varintValue": "39"
+            "varintValue": "38"
           },
           "minSpeedLimitDown": {
             "numberValue": 45.0
@@ -476,7 +511,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022"
+            "stringValue": "tomi2022,tdz2023ride"
           }
         }
       }
@@ -573,6 +608,31 @@
       "values": {}
     },
     {
+      "name": "game_1_32_pack_dynamics_v4_global",
+      "values": {
+        "fields": {
+          "watopia": {
+            "boolValue": false
+          },
+          "auto_braking_visuals": {
+            "boolValue": false
+          },
+          "double_draft_global": {
+            "boolValue": false
+          },
+          "global": {
+            "boolValue": false
+          },
+          "auto_braking_visuals_events": {
+            "boolValue": true
+          },
+          "makuri": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_29_player_hightlight",
       "values": {}
     },
@@ -600,6 +660,10 @@
     {
       "name": "workout_training_v2_release",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_VideoCapture",
       "values": {}
     },
     {
