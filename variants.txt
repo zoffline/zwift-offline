@@ -467,7 +467,7 @@
       "values": {
         "fields": {
           "reducedPowerPercentage": {
-            "numberValue": 99.0
+            "numberValue": 98.0
           },
           "powerCeilingPercentage": {
             "numberValue": 110.0
@@ -485,16 +485,16 @@
             "numberValue": -200.0
           },
           "minDraftLimitFlat": {
-            "varintValue": "38"
+            "varintValue": "39"
           },
           "minSpeedLimitDown": {
             "numberValue": 45.0
           },
           "minSpeedLimitFlat": {
-            "numberValue": 28.0
+            "numberValue": 26.0
           },
           "minSpeedLimitShallowDown": {
-            "numberValue": 40.0
+            "numberValue": 38.0
           },
           "minDraftLimitDown": {
             "varintValue": "95"
@@ -600,6 +600,7 @@
     },
     {
       "name": "game_1_18_holiday_mode",
+      "value": true,
       "values": {}
     },
     {
@@ -609,6 +610,7 @@
     },
     {
       "name": "game_1_32_pack_dynamics_v4_global",
+      "value": true,
       "values": {
         "fields": {
           "watopia": {

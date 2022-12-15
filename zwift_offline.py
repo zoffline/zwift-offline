@@ -1130,7 +1130,6 @@ def get_events(limit, sport):
                    ('Neokyo Crit', 1127056801, 13),
                    ('The Magnificent 8', 2207442179, 6),
                    ('Ventop Downhill', 2891361683, 14),
-                   ('Watopia\'s Waistband', 1064303857, 6),
                    ('WBR Climbing Series', 2218409282, 6),
                    ('Zwift Bambino Fondo', 3621162212, 6),
                    ('Zwift Medio Fondo', 3748780161, 6),
