@@ -1,0 +1,32 @@
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - run: pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib git+https://github.com/oldnapalm/garmin-uploader.git dnspython pyinstaller
+    - run: pyinstaller standalone.spec
+
+    - uses: vimtor/action-zip@v1
+      with:
+        files: dist
+        dest: zoffline-nightly.zip
+
+    - uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: https://uploads.github.com/repos/zoffline/zwift-offline/releases/87551648/assets{?name,label}
+        release_id: 87551648
+        asset_path: zoffline-nightly.zip
+        asset_name: zoffline-nightly.zip
+        asset_content_type: application/zip
