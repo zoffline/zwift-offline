@@ -1,3 +1,5 @@
+name: pyinstaller
+
 on:
   push:
 
@@ -12,6 +14,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.10'
+
+    - uses: engineerd/configurator@v0.0.8
+      with:
+        name: "upx.exe"
+        url: "https://github.com/upx/upx/releases/download/v4.0.1/upx-4.0.1-win64.zip"
+        pathInArchive: "upx-4.0.1-win64/upx.exe"
 
     - run: pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib git+https://github.com/oldnapalm/garmin-uploader.git dnspython pyinstaller
     - run: pyinstaller standalone.spec
