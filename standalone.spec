@@ -19,7 +19,9 @@ a = Analysis(['standalone.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-a.binaries = [x for x in a.binaries if not os.path.dirname(x[1]).startswith("C:\\Program Files")]
+a.binaries = [x for x in a.binaries
+              if not os.path.dirname(x[1]).startswith("C:\\Program Files")
+              and not os.path.dirname(x[1]).startswith("C:\\Windows\\system32")]
 a.datas += Tree('cdn', prefix='cdn')
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
