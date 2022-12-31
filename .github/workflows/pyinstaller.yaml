@@ -21,7 +21,7 @@ jobs:
         url: "https://github.com/upx/upx/releases/download/v4.0.1/upx-4.0.1-win64.zip"
         pathInArchive: "upx-4.0.1-win64/upx.exe"
 
-    - run: pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib git+https://github.com/oldnapalm/garmin-uploader.git dnspython pyinstaller
+    - run: pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib git+https://github.com/oldnapalm/garmin-uploader.git dnspython git+https://github.com/oldnapalm/pyinstaller.git
     - run: pyinstaller standalone.spec
 
     - uses: vimtor/action-zip@v1
