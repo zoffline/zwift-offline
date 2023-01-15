@@ -114,6 +114,7 @@
     },
     {
       "name": "game_1_19_system_alerts",
+      "value": true,
       "values": {}
     },
     {

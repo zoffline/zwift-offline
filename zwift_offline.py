@@ -447,19 +447,15 @@ def road_id(state):
 def is_forward(state):
     return (state.f19 & 4) != 0
 
-
 def is_nearby(s1, s2):
     if s1 is None or s2 is None:
         return False
-    try:
-        if s1.watchingRiderId == s2.id or s2.watchingRiderId == s1.id:
+    if s1.watchingRiderId == s2.id or s2.watchingRiderId == s1.id:
+        return True
+    if get_course(s1) == get_course(s2):
+        dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
+        if dist <= 100000 or road_id(s1) == road_id(s2):
             return True
-        if get_course(s1) == get_course(s2):
-            dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
-            if dist <= 100000 or road_id(s1) == road_id(s2):
-                return True
-    except Exception as exc:
-        logger.warn('is_nearby: %s' % repr(exc))
     return False
 
 
@@ -1108,6 +1104,7 @@ def api_users_logout():
 
 @app.route('/api/analytics/event', methods=['POST'])
 def api_analytics_event():
+    #print(json.dumps(request.json, indent=4))
     return '', 200
 
 
@@ -1363,10 +1360,19 @@ def static_web_launcher(filename):
     return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
 
 
-# Disable telemetry (shuts up some errors in log)
 @app.route('/api/telemetry/config', methods=['GET'])
 def api_telemetry_config():
-    return jsonify({"isEnabled": False})
+    return jsonify({"analyticsEvents": True, "batchInterval": 120, "innermostCullingRadius": 1500, "isEnabled": True,
+        "key": "aXBSdlpza3p1aVlNOENrMTBQSzZEZ004Z2pwRm8zZUE6", "remoteLogLevel": 3, "sampleInterval": 60,
+        "url": "https://us-or-rly101.zwift.com/v1/track", # used if no urlBatch (https://api.segment.io/v1/track)
+        "urlBatch": "https://us-or-rly101.zwift.com/hvc-ingestion-service/batch"})
+
+@app.route('/v1/track', methods=['POST'])
+@app.route('/hvc-ingestion-service/batch', methods=['POST'])
+def hvc_ingestion_service_batch():
+    #print(json.dumps(request.json, indent=4))
+    return jsonify({"success": True})
+
 
 def age(dob):
     today = datetime.date.today()
@@ -1443,6 +1449,8 @@ def do_api_profiles(profile_id, is_json):
                 profile.email = 'user@email.com'
             if profile.entitlements:
                 del profile.entitlements[:]
+            if not profile.mix_panel_distinct_id:
+                profile.mix_panel_distinct_id = str(uuid.uuid4())
     if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
         if profile.dob != "":
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
@@ -1639,9 +1647,9 @@ def api_profiles_id(player_id):
     stream = request.stream.read()
     with open('%s/%s/profile.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
-    profile = profile_pb2.PlayerProfile()
-    profile.ParseFromString(stream)
     if MULTIPLAYER:
+        profile = profile_pb2.PlayerProfile()
+        profile.ParseFromString(stream)
         current_user.first_name = profile.first_name
         current_user.last_name = profile.last_name
         db.session.commit()
@@ -2794,13 +2802,11 @@ def relay_worlds_hash_seeds():
 
 
 @app.route('/relay/worlds/attributes', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
 def relay_worlds_attributes():
     player_update = udp_node_msgs_pb2.WorldAttribute()
-    try:
-        player_update.ParseFromString(request.data)
-    except Exception as exc:
-        logger.warn('player_update_parse: %s' % repr(exc))
-        return '', 422
+    player_update.ParseFromString(request.stream.read())
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
     player_update.timestamp = int(get_utc_time() * 1000000)

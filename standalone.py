@@ -628,13 +628,10 @@ def is_state_new_for(peer_player_state, player_id):
 def nearby_distance(s1, s2):
     if s1 is None or s2 is None:
         return False, None
-    try:
-        if zo.get_course(s1) == zo.get_course(s2):
-            dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
-            if dist <= 100000 or zo.road_id(s1) == zo.road_id(s2):
-                return True, dist
-    except Exception as exc:
-        print('nearby_distance: %s' % repr(exc))
+    if zo.get_course(s1) == zo.get_course(s2):
+        dist = math.sqrt((s2.x - s1.x)**2 + (s2.z - s1.z)**2 + (s2.y_altitude - s1.y_altitude)**2)
+        if dist <= 100000 or zo.road_id(s1) == zo.road_id(s2):
+            return True, dist
     return False, None
 
 class UDPHandler(socketserver.BaseRequestHandler):
