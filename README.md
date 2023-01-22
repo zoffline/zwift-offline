@@ -101,11 +101,10 @@ zoffline can be installed on the same machine as Zwift or another local machine.
   * If your Zwift version is newer than 1.0.106405 and zoffline is not running from source: wait for zoffline to be updated.
 * __NOTE:__ instead of performing the steps below you can instead just run the __configure_client__ script from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper
 * On your Windows machine running Zwift, copy the following files in this repo to a known location:
-  * ``ssl/cert-zwift-com.p12``
-  * ``ssl/cert-zwift-com.pem``
+  * [ssl/cert-zwift-com.p12](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.p12)
+  * [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem)
 * Open Command Prompt as an admin, cd to that location and run
   * ``certutil.exe -importpfx Root cert-zwift-com.p12``
-    * For Windows 7: run ``certutil.exe -importpfx cert-zwift-com.p12`` instead
   * If you're prompted for a password, just leave it blank. There is no password.
 * Open Notepad as an admin and open ``C:\Program Files (x86)\Zwift\data\cacert.pem``
   * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
@@ -128,8 +127,8 @@ to generate your own certificates and do the same.
   * If Zwift is not installed, install it before installing zoffline.
   * If your Zwift version is newer than 1.0.106405: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
 * On your Mac machine running Zwift, copy the following files in this repo to a known location:
-  * ``ssl/cert-zwift-com.p12``
-  * ``ssl/cert-zwift-com.pem``
+  * [ssl/cert-zwift-com.p12](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.p12)
+  * [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem)
 * Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
     * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
@@ -310,7 +309,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
-* Copy the file ``ssl/cert-zwift-com.pem`` in this repo and the Zwift Companion apk (e.g. ``zca.apk``) to a known location
+* Copy the file [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem) in this repo and the Zwift Companion apk (e.g. ``zca.apk``) to a known location
 * Open Command Prompt, cd to that location and run
   * ``apk-mitm --certificate cert-zwift-com.pem zca.apk``
 * Copy ``zca-patched.apk`` to your phone and install it
