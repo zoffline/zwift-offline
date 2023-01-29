@@ -1546,7 +1546,7 @@ def api_profiles_id_privacy(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_followers(m_player_id, t_player_id=0):
-    rows = db.session.execute("SELECT player_id, first_name, last_name FROM user")
+    rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user"))
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -3082,15 +3082,15 @@ def migrate_database():
             logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
     logging.warn("Migrating database, please wait")
-    db.session.execute('ALTER TABLE activity RENAME TO activity_old')
-    db.session.execute('ALTER TABLE goal RENAME TO goal_old')
-    db.session.execute('ALTER TABLE segment_result RENAME TO segment_result_old')
-    db.session.execute('ALTER TABLE playback RENAME TO playback_old')
+    db.session.execute(sqlalchemy.text('ALTER TABLE activity RENAME TO activity_old'))
+    db.session.execute(sqlalchemy.text('ALTER TABLE goal RENAME TO goal_old'))
+    db.session.execute(sqlalchemy.text('ALTER TABLE segment_result RENAME TO segment_result_old'))
+    db.session.execute(sqlalchemy.text('ALTER TABLE playback RENAME TO playback_old'))
     db.create_all()
 
     import ast
     # Select every column except 'id' and cast 'fit' as hex - after 77ff84e fit data was stored incorrectly
-    rows = db.session.execute('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old')
+    rows = db.session.execute(sqlalchemy.text('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old'))
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['player_id'] = int(d['player_id'])
@@ -3111,7 +3111,7 @@ def migrate_database():
         fit_filename = '%s - %s' % (orm_act.id, d['fit_filename'])
         save_fit(d['player_id'], fit_filename, fit_data)
 
-    rows = db.session.execute('SELECT * FROM goal_old')
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM goal_old'))
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
@@ -3122,7 +3122,7 @@ def migrate_database():
         d['status'] = int(d.pop('f13'))
         db.session.add(Goal(**d))
 
-    rows = db.session.execute('SELECT * FROM segment_result_old')
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM segment_result_old'))
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
@@ -3143,25 +3143,25 @@ def migrate_database():
         d['sport'] = d.pop('f20')
         db.session.add(SegmentResult(**d))
 
-    rows = db.session.execute('SELECT * FROM playback_old')
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM playback_old'))
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['segment_id'] = toSigned(int(d['segment_id']), 8)
         db.session.add(Playback(**d))
 
-    db.session.execute('DROP TABLE activity_old')
-    db.session.execute('DROP TABLE goal_old')
-    db.session.execute('DROP TABLE segment_result_old')
-    db.session.execute('DROP TABLE playback_old')
+    db.session.execute(sqlalchemy.text('DROP TABLE activity_old'))
+    db.session.execute(sqlalchemy.text('DROP TABLE goal_old'))
+    db.session.execute(sqlalchemy.text('DROP TABLE segment_result_old'))
+    db.session.execute(sqlalchemy.text('DROP TABLE playback_old'))
 
     Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
     db.session.commit()
-    db.session.execute('vacuum') #shrink database
+    db.session.execute(sqlalchemy.text('vacuum')) #shrink database
     logging.warn("Database migration completed")
 
 
 def check_columns(table_class, table_name):
-    rows = db.session.execute("PRAGMA table_info(%s)" % table_name)
+    rows = db.session.execute(sqlalchemy.text("PRAGMA table_info(%s)" % table_name))
     should_have_columns = table_class.metadata.tables[table_name].columns
     current_columns = list()
     for row in rows:
@@ -3178,7 +3178,7 @@ def check_columns(table_class, table_name):
                 defaulttext = ""
             else:
                 defaulttext = " DEFAULT %s" % column.default.arg
-            db.session.execute("ALTER TABLE %s ADD %s %s %s%s" % (table_name, column.name, column.type, nulltext, defaulttext))
+            db.session.execute(sqlalchemy.text("ALTER TABLE %s ADD %s %s %s%s" % (table_name, column.name, column.type, nulltext, defaulttext)))
             db.session.commit()
 
 
