@@ -987,7 +987,7 @@ def select_activities_json(player_id, limit):
     if limit > 0:
         activities = activity_pb2.ActivityList()
         stmt = sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p ORDER BY date DESC LIMIT :l")
-        rows = db.session.execute(stmt, {"p": player_id, "l": limit})
+        rows = db.session.execute(stmt, {"p": player_id, "l": limit}).mappings()
         allow_empty_end_date = True
         for row in rows:
             activity = activities.activities.add()
@@ -1558,7 +1558,7 @@ def api_profiles_id_privacy(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_followers(m_player_id, t_player_id=0):
-    rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user"))
+    rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user")).mappings()
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -1578,7 +1578,7 @@ def api_search_profiles():
     start = request.args.get('start')
     limit = request.args.get('limit')
     stmt = sqlalchemy.text("SELECT player_id, first_name, last_name FROM user WHERE first_name LIKE :n OR last_name LIKE :n LIMIT :l OFFSET :o")
-    rows = db.session.execute(stmt, {"n": "%"+query+"%", "l": limit, "o": start})
+    rows = db.session.execute(stmt, {"n": "%"+query+"%", "l": limit, "o": start}).mappings()
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -1696,7 +1696,7 @@ def api_profiles_activities(player_id):
 
     # request.method == 'GET'
     activities = activity_pb2.ActivityList()
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id})
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id}).mappings()
     should_remove = list()
     for row in rows:
         activity = activities.activities.add()
@@ -2538,7 +2538,7 @@ def select_protobuf_goals(player_id, limit):
     goals = goal_pb2.Goals()
     if limit > 0:
         stmt = sqlalchemy.text("SELECT * FROM goal WHERE player_id = :p LIMIT :l")
-        rows = db.session.execute(stmt, {"p": player_id, "l": limit})
+        rows = db.session.execute(stmt, {"p": player_id, "l": limit}).mappings()
         need_update = list()
         for row in rows:
             goal = goals.goals.add()
@@ -2918,7 +2918,7 @@ def api_personal_records_my_records():
     if to_date:
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', :t)"
         args.update({"t": to_date})
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args)
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args).mappings()
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
@@ -2936,7 +2936,7 @@ def live_segment_results_service_leaders():
             FROM segment_result s WHERE world_time > :w GROUP BY s.player_id, s.segment_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
         GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 1000""")
-    rows = db.session.execute(stmt, {"w": world_time()-60*60*1000})
+    rows = db.session.execute(stmt, {"w": world_time()-60*60*1000}).mappings()
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
@@ -2954,7 +2954,7 @@ def live_segment_results_service_leaderboard_segment_id(segment_id):
             FROM segment_result s WHERE segment_id = :s AND world_time > :w GROUP BY s.player_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
         GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 1000""")
-    rows = db.session.execute(stmt, {"s": segment_id, "w": world_time()-60*60*1000})
+    rows = db.session.execute(stmt, {"s": segment_id, "w": world_time()-60*60*1000}).mappings()
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
@@ -3102,7 +3102,7 @@ def migrate_database():
 
     import ast
     # Select every column except 'id' and cast 'fit' as hex - after 77ff84e fit data was stored incorrectly
-    rows = db.session.execute(sqlalchemy.text('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old'))
+    rows = db.session.execute(sqlalchemy.text('SELECT player_id, f3, name, f5, f6, start_date, end_date, distance, avg_heart_rate, max_heart_rate, avg_watts, max_watts, avg_cadence, max_cadence, avg_speed, max_speed, calories, total_elevation, strava_upload_id, strava_activity_id, f23, hex(fit), fit_filename, f29, date FROM activity_old')).mappings()
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['player_id'] = int(d['player_id'])
@@ -3123,7 +3123,7 @@ def migrate_database():
         fit_filename = '%s - %s' % (orm_act.id, d['fit_filename'])
         save_fit(d['player_id'], fit_filename, fit_data)
 
-    rows = db.session.execute(sqlalchemy.text('SELECT * FROM goal_old'))
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM goal_old')).mappings()
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
@@ -3134,7 +3134,7 @@ def migrate_database():
         d['status'] = int(d.pop('f13'))
         db.session.add(Goal(**d))
 
-    rows = db.session.execute(sqlalchemy.text('SELECT * FROM segment_result_old'))
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM segment_result_old')).mappings()
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         del d['id']
@@ -3155,7 +3155,7 @@ def migrate_database():
         d['sport'] = d.pop('f20')
         db.session.add(SegmentResult(**d))
 
-    rows = db.session.execute(sqlalchemy.text('SELECT * FROM playback_old'))
+    rows = db.session.execute(sqlalchemy.text('SELECT * FROM playback_old')).mappings()
     for row in rows:
         d = {k: row[k] for k in row.keys()}
         d['segment_id'] = toSigned(int(d['segment_id']), 8)
