@@ -348,7 +348,8 @@ courses_lookup = {
     13: 'Makuri Islands',
     14: 'France',
     15: 'Paris',
-    16: 'Gravel Mountain'  # event specific
+    16: 'Gravel Mountain',  # event specific
+    17: 'Scotland'  # event specific
 }
 
 tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
@@ -407,6 +408,12 @@ def get_partial_profile(player_id):
             profile = global_pace_partners[player_id].profile
         elif player_id in global_bots.keys():
             profile = global_bots[player_id].profile
+        elif player_id > 10000000:
+            g_id = math.floor(player_id / 10000000)
+            p_id = player_id - g_id * 10000000
+            partial_profile.first_name = ''
+            partial_profile.last_name = time_since(global_ghosts[p_id].play[g_id-1].states[0])
+            return partial_profile
         else:
             #Read from disk
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
@@ -1115,7 +1122,12 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit, sport):
-    events_list = [('2022 Bambino Fondo', 3368626651, 6),
+    events_list = [('City and the Sgurr', 4107749591, 17),
+                   ('Glasgow Crit Circuit', 3765339356, 17),
+                   ('Loch Loop', 742057576, 17),
+                   ('Rolling Highlands', 46799750, 17),
+                   ('The Muckle Yin', 3662705581, 17),
+                   ('2022 Bambino Fondo', 3368626651, 6),
                    ('2022 Medio Fondo', 2900074211, 6),
                    ('2022 Gran Fondo', 1327147942, 6),
                    ('Alpe du Zwift Downhill', 1480439148, 6),
