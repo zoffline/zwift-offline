@@ -1558,7 +1558,7 @@ def api_profiles_id_privacy(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_followers(m_player_id, t_player_id=0):
-    rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user")).mappings()
+    rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user"))
     json_data_list = []
     for row in rows:
         player_id = row[0]
@@ -1578,7 +1578,7 @@ def api_search_profiles():
     start = request.args.get('start')
     limit = request.args.get('limit')
     stmt = sqlalchemy.text("SELECT player_id, first_name, last_name FROM user WHERE first_name LIKE :n OR last_name LIKE :n LIMIT :l OFFSET :o")
-    rows = db.session.execute(stmt, {"n": "%"+query+"%", "l": limit, "o": start}).mappings()
+    rows = db.session.execute(stmt, {"n": "%"+query+"%", "l": limit, "o": start})
     json_data_list = []
     for row in rows:
         player_id = row[0]
