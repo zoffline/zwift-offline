@@ -134,7 +134,7 @@ to generate your own certificates and do the same.
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
     * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
-  * Append the contents of ``ssl/cert-zwift-com.pem`` to cacert.pem
+  * Append the contents of the SSL certificate ``ssl/cert-zwift-com.pem`` to cacert.pem (only the certificate and not the included private key)
 * Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
   * Insert in the main dict:
     ```
