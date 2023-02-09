@@ -172,7 +172,7 @@ class User(UserMixin, db.Model):
             return None
         id = data.get('user')
         if id:
-            return User.query.get(id)
+            return db.session.get(User, id)
         return None
 
 class AnonUser(User, AnonymousUserMixin, db.Model):
@@ -1819,6 +1819,8 @@ def player_playbacks_player_me_playbacks(segment_id, option):
     before = request.args.get('before')
     query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s"
     args = {"p": current_user.player_id, "s": segment_id}
+    # in version 1.0.107565 'before' is always 0 and 'after' is always 18446744065933551616
+    # also there's a new argument 'type' (SEGMENT/ROUTE) which we are disregarding for now
     #if after:
     #    query += " AND world_time > :a"
     #    args.update({"a": after})
@@ -2154,7 +2156,7 @@ def edit_private_event(player_id, meetup_id, decision):
         for i in e['eventInvites']:
             if i['invitedProfile']['id'] == player_id:
                 i['status'] = decision
-        orm_event = PrivateEvent.query.get(meetup_id)
+        orm_event = db.session.get(PrivateEvent, meetup_id)
         orm_event.json = json.dumps(e)
         db.session.commit()
     return '', 204
@@ -2197,7 +2199,7 @@ def api_private_event_edit(meetup_id):
             p_partial_profile = get_partial_profile(peer_id)
             newEventInvites.append({"invitedProfile": p_partial_profile.to_json(), "status": "PENDING"})
     org_json_pe['eventInvites'] = newEventInvites
-    PrivateEvent.query.get(meetup_id).json = json.dumps(org_json_pe)
+    db.session.get(PrivateEvent, meetup_id).json = json.dumps(org_json_pe)
     db.session.commit()
     for orm_not in Notification.query.filter_by(event_id=meetup_id):
         n = json.loads(orm_not.json)
@@ -3024,8 +3026,17 @@ def achievement_loadPlayerAchievements():
 def achievement_unlock():
     if not request.stream:
         return '', 400
-    with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin'), 'wb') as f:
-        f.write(request.stream.read())
+    new = profile_pb2.Achievements()
+    new.ParseFromString(request.stream.read())
+    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
+    achievements = profile_pb2.Achievements()
+    if os.path.isfile(achievements_file):
+        with open(achievements_file, 'rb') as f:
+            achievements.ParseFromString(f.read())
+    for achievement in new.achievements:
+        achievements.achievements.add().id = achievement.id
+    with open(achievements_file, 'wb') as f:
+        f.write(achievements.SerializeToString())
     return '', 202
 
 # if we respond to this request with an empty json a "tutorial" will be presented in ZCA
@@ -3388,7 +3399,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
 
     @login_manager.user_loader
     def load_user(uid):
-        return User.query.get(int(uid))
+        return db.session.get(User, int(uid))
 
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
