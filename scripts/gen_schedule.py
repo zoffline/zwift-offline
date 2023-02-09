@@ -9,8 +9,8 @@ import xml.etree.ElementTree as ET
 
 from xml.dom import minidom
 
-# Make london and new york more likely
-MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'MAKURIISLANDS' ] + [ 'NEWYORK' ] * 2 + [ 'RICHMOND' ] + [ 'YORKSHIRE' ]
+# Make london and makuri islands more likely
+MAPS = [ 'FRANCE' ] + [ 'INNSBRUCK' ] + [ 'LONDON' ] * 2 + [ 'MAKURIISLANDS' ] * 2 + [ 'NEWYORK' ] + [ 'RICHMOND' ] + [ 'SCOTLAND' ] + [ 'YORKSHIRE' ]
 
 
 dom = minidom.parseString('<MapSchedule><appointments></appointments><VERSION>1</VERSION></MapSchedule>')
@@ -29,7 +29,7 @@ for i in range(0, 500):
 
     appts.appendChild(appt)
     # Shorter duration for UCI course maps
-    if map_choice in [ 'INNSBRUCK', 'RICHMOND', 'YORKSHIRE' ]:
+    if map_choice in [ 'INNSBRUCK', 'RICHMOND', 'SCOTLAND', 'YORKSHIRE' ]:
         now += datetime.timedelta(days=random.randint(1,2))
     else:
         now += datetime.timedelta(days=random.randint(1,5))

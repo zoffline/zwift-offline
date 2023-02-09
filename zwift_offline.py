@@ -334,6 +334,7 @@ class Online:
     yorkshire = 0
     france = 0
     paris = 0
+    scotland = 0
 
 courses_lookup = {
     2: 'Richmond',
@@ -349,7 +350,7 @@ courses_lookup = {
     14: 'France',
     15: 'Paris',
     16: 'Gravel Mountain',  # event specific
-    17: 'Scotland'  # event specific
+    17: 'Scotland'
 }
 
 tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
@@ -387,6 +388,8 @@ def get_online():
             online_in_region.france += 1
         elif course_name == 'Paris':
             online_in_region.paris += 1
+        elif course_name == 'Scotland':
+            online_in_region.scotland += 1
         online_in_region.total += 1
     return online_in_region
 
@@ -1816,12 +1819,12 @@ def player_playbacks_player_me_playbacks(segment_id, option):
     before = request.args.get('before')
     query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s"
     args = {"p": current_user.player_id, "s": segment_id}
-    if after:
-        query += " AND world_time > :a"
-        args.update({"a": after})
-    if before:
-        query += " AND world_time < :b"
-        args.update({"b": before})
+    #if after:
+    #    query += " AND world_time > :a"
+    #    args.update({"a": after})
+    #if before:
+    #    query += " AND world_time < :b"
+    #    args.update({"b": before})
     if option == 'pr':
         query += " ORDER BY time"
     elif option == 'latest':
