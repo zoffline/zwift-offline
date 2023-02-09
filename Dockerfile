@@ -3,9 +3,12 @@ FROM python:3.10-alpine as builder
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache git gcc g++ musl-dev libffi-dev openssl-dev file make
-RUN pip install --user flask flask_sqlalchemy flask-login pyjwt gevent protobuf stravalib garmin-uploader requests dnspython pycryptodome
 
 RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
+
+COPY requirements.txt requirements.txt
+RUN pip install --user --requirement requirements.txt
+RUN pip install --user dnspython==2.3.0 git+https://github.com/oldnapalm/garmin-uploader.git
 
 FROM python:3.10-alpine
 MAINTAINER zoffline <zoffline@tutanota.com>

@@ -1,0 +1,8 @@
+flask==2.2.2
+flask-login==0.6.2
+flask_sqlalchemy==3.0.3
+gevent==22.10.2
+protobuf==4.21.12
+pycryptodome==3.17
+pyjwt==2.6.0
+stravalib==1.1.0

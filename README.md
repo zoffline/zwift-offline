@@ -30,9 +30,9 @@ To install zoffline on Linux, Windows, or macOS:
 
 * Install Python 3 (https://www.python.org/downloads/) if not already installed
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
-* Install dependencies: flask, flask_sqlalchemy, flask-login, pyjwt, gevent, python-protobuf, pycryptodome, stravalib (optional)
-  * e.g., on Linux/Mac: ``pip3 install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib``
-  * e.g., on Windows in command prompt: ``pip install flask flask_sqlalchemy flask-login pyjwt gevent protobuf pycryptodome stravalib``
+* Install dependencies
+  * e.g., on Linux/Mac: ``pip3 install -r requirements.txt``
+  * e.g., on Windows in command prompt: ``pip install -r requirements.txt``
     * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python<version>\Scripts\pip.exe`` instead of just ``pip``
 * Clone or download this repo
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
@@ -361,24 +361,17 @@ Docker
 
 * Python 3 (https://www.python.org/downloads/)
   * On Windows, installing Python via the Microsoft Store is highly recommend! If using a Python installer, ensure that in the first Python installer screen "Add Python 3.x to PATH" is checked.
-* Flask (http://flask.pocoo.org/)
-  * ``pip3 install flask``
+* Flask (https://flask.palletsprojects.com/)
 * python-protobuf (https://pypi.org/project/protobuf/)
-  * ``pip3 install protobuf``
 * pyJWT (https://pyjwt.readthedocs.io/)
-  * ``pip3 install pyjwt``
-* Flask-Login (https://flask-login.readthedocs.io/en/latest/)
-  * ``pip3 install flask-login``
-* Flask-SQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/en/latest/)
-  * ``pip3 install flask_sqlalchemy``
+* Flask-Login (https://flask-login.readthedocs.io/)
+* Flask-SQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/)
 * gevent (http://www.gevent.org/)
-  * ``pip3 install gevent``
 * pycryptodome (https://pypi.org/project/pycryptodome/)
-  * ``pip3 install pycryptodome``
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
-  * ``pip3 install stravalib``
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
-  * ``pip3 install garmin-uploader``
+* OPTIONAL: discord.py (https://discordpy.readthedocs.io/)
+* OPTIONAL: dnspython (https://www.dnspython.org/)
 
 
 ## Note
