@@ -127,9 +127,9 @@ class CDNHandler(SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(PoolManager().request('GET', 'http://cdn.zwift.com%s' % self.path).data)
+                return
             except Exception as exc:
                 print('Error trying to proxy: %s' % repr(exc))
-            return
 
         SimpleHTTPRequestHandler.do_GET(self)
 
