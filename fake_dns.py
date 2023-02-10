@@ -45,7 +45,8 @@ class DNSServer:
     def __init__(self, port=53):
         DNSServer.namemap = {}
         DNSServer.resolver = dns.resolver.Resolver()
-        DNSServer.resolver.nameservers = ['8.8.8.8']
+        DNSServer.resolver.nameservers = ['8.8.8.8', '8.8.4.4']
+        DNSServer.resolver.cache = dns.resolver.Cache()
         self.port = port
     def addname(self, name, ip):
         DNSServer.namemap[name] = ip
