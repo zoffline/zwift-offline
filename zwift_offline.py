@@ -693,10 +693,9 @@ def profile(username):
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
                 profile = online_sync.query_player_profile(session, access_token)
-                with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
+                with open('%s/profile.bin' % profile_dir, 'wb') as f:
                     f.write(profile)
                 online_sync.logout(session, refresh_token)
-                os.rename('%s/profile.bin' % SCRIPT_DIR, '%s/profile.bin' % profile_dir)
                 flash("Zwift profile installed locally.")
             except Exception as exc:
                 logger.warn('Zwift profile: %s' % repr(exc))
