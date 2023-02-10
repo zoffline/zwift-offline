@@ -11,6 +11,7 @@ import math
 import random
 import itertools
 import socketserver
+from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from collections import deque
@@ -83,19 +84,6 @@ def sigint_handler(num, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-hostname = 'cdn.zwift.com'
-
-def merge_two_dicts(x, y):
-    z = x.copy()
-    z.update(y)
-    return z
-
-def set_header():
-    headers = {
-        'Host': hostname
-    }
-    return headers
-
 class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
         path = SimpleHTTPRequestHandler.translate_path(self, path)
@@ -135,37 +123,15 @@ class CDNHandler(SimpleHTTPRequestHandler):
             # PROXYPASS_FILE existence indicates we know what we're doing and
             # we can try to obtain the official map schedule and update files.
             # This can only work if we're running on a different machine than the Zwift client.
-            import requests
             try:
-                url = 'http://{}{}'.format(hostname, self.path)
-                req_header = self.parse_headers()
-                resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(PoolManager().request('GET', 'http://cdn.zwift.com%s' % self.path).data)
             except Exception as exc:
                 print('Error trying to proxy: %s' % repr(exc))
-                self.send_error(404, 'error trying to proxy')
-                return
-            self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
-            self.wfile.write(resp.content)
             return
 
         SimpleHTTPRequestHandler.do_GET(self)
-
-    def parse_headers(self):
-        req_header = {}
-        for line in self.headers:
-            line_parts = [o.strip() for o in line.split(':', 1)]
-            if len(line_parts) == 2:
-                req_header[line_parts[0]] = line_parts[1]
-        return req_header
-
-    def send_resp_headers(self, resp):
-        respheaders = resp.headers
-        for key in respheaders:
-            if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
-                self.send_header(key, respheaders[key])
-        self.send_header('Content-Length', len(resp.content))
-        self.end_headers()
 
 class DeviceType:
     Relay = 1
