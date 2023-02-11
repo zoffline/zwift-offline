@@ -177,7 +177,6 @@ to generate your own certificates and do the same.
   ```
   * Run `Host Changer`, select created `hosts.txt` file and press the button
   * Optionally, instead of using the "Host Changer" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
-    * If running from source, install the required module with ``pip3 install dnspython``
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
 * Patch after every installation or update:
   * Install/update Zwift from Google play, but do not start it yet.
@@ -321,7 +320,6 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 ```
 * Run "Host Changer", select created ``hosts.txt`` file and press the button
 * Optionally, instead of using the "Host Changer" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
-  * If running from source, install the required module with ``pip3 install dnspython``
 * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Host Changer" app or changing your phone DNS.
 
 </details>
@@ -330,7 +328,6 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 
 <details><summary>Expand</summary>
 
-* To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
 * To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
 * To enable the Discord bridge bot: ``pip3 install discord`` and create a ``discord.cfg`` file in the ``storage`` directory containing
   ```
@@ -368,10 +365,10 @@ Docker
 * Flask-SQLAlchemy (https://flask-sqlalchemy.palletsprojects.com/)
 * gevent (http://www.gevent.org/)
 * pycryptodome (https://pypi.org/project/pycryptodome/)
+* dnspython (https://www.dnspython.org/)
 * OPTIONAL: stravalib (https://github.com/hozn/stravalib)
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
 * OPTIONAL: discord.py (https://discordpy.readthedocs.io/)
-* OPTIONAL: dnspython (https://www.dnspython.org/)
 
 
 ## Note

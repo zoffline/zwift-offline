@@ -24,7 +24,7 @@ jobs:
         pathInArchive: "upx-4.0.1-win64/upx.exe"
 
     - run: pip install -r requirements.txt
-    - run: pip install dnspython==2.3.0 git+https://github.com/oldnapalm/garmin-uploader.git git+https://github.com/oldnapalm/pyinstaller.git
+    - run: pip install git+https://github.com/oldnapalm/garmin-uploader.git git+https://github.com/oldnapalm/pyinstaller.git
     - run: pyinstaller standalone.spec
 
     - uses: vimtor/action-zip@v1
