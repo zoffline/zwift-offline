@@ -328,7 +328,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 
 <details><summary>Expand</summary>
 
-* To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to enable the "Less secure app access" in the account settings and you may need to access https://accounts.google.com/DisplayUnlockCaptcha to allow the login from the server.
+* To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to access https://security.google.com/settings/security/apppasswords and create an app password to allow the login from the server.
 * To enable the Discord bridge bot: ``pip3 install discord`` and create a ``discord.cfg`` file in the ``storage`` directory containing
   ```
   [discord]
