@@ -1,34 +1,42 @@
 <GameDictionary>
     <JERSEYS>
+        <JERSEY imageName="ZARoadFinalist12022_thumb" name="Zwift Academy Finalist" signature="1962443"/>
         <JERSEY imageName="TBR2020_thumb" name="TBR 2020" signature="3523119"/>
         <JERSEY imageName="OffTheMaap2021_thumb" name="Off the Maap 2021 Kit" signature="27953592"/>
         <JERSEY imageName="WeduOG2021_thumb" name="WEDU Kit" signature="55762178"/>
         <JERSEY imageName="RideAustralia_thumb" name="Ride Australia" signature="63314504"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - Netherlands" signature="67952083"/>
         <JERSEY imageName="GiantAlpecin_thumb" name="Sunweb" signature="69260263"/>
+        <JERSEY imageName="Radpack2022_thumb" name="RAD RACE 2023" signature="82507874"/>
         <JERSEY imageName="CrohnsColitis2021_thumb" name="Crohn&apos;s &amp; Colitis Foundation" signature="83047882"/>
-        <JERSEY imageName="WTRL2020_thumb" name="WTRL" signature="84221876"/>
         <JERSEY imageName="SpainElite2020_thumb" name="Spain Elite" signature="85605155"/>
         <JERSEY imageName="IntermarcheWG2022_thumb" name="Intermarché–Wanty–Gobert Matériaux" signature="88121645"/>
+        <JERSEY imageName="jumbo_visma_men_thumb" name="Team Jumbo-Visma Men 2023" signature="88214615"/>
         <JERSEY imageName="ZwiftStandardOrange_thumb" name="Zwift Standard Orange" signature="90433914"/>
         <JERSEY imageName="PAC_thumb" name="PAC" signature="91616735"/>
         <JERSEY imageName="CLS2019_thumb" name="Team CLS 2019" signature="97396552"/>
         <JERSEY imageName="WNTRotor2019_thumb" name="Ceratizit-WNT" signature="97975537"/>
+        <JERSEY imageName="flora_duffy_thumb" name="Flora Duffy" signature="98617285"/>
         <JERSEY imageName="Velos2022_thumb" name="Velos" signature="119884741"/>
         <JERSEY imageName="SuperLeagueCommunity2021_thumb" name="Super League Community 2021 Kit" signature="120279066"/>
         <JERSEY imageName="TourOfWatopia2019_thumb" name="Tour Of Watopia" signature="121390527"/>
+        <JERSEY imageName="UCIFederationHongKong2023_thumb" name="UCI Federation 2023 Hong Kong" signature="121442316"/>
         <JERSEY imageName="SpecializedBicycledelics2021_thumb" name="Specialized Bicycledelics Kit" signature="122407386"/>
         <JERSEY imageName="Zwift_Ski01_thumb" name="Alpine Slopes 1" signature="123854412"/>
+        <JERSEY imageName="lucy_charles_barclay_thumb" name="Team Charles-Barclay" signature="138392085"/>
         <JERSEY imageName="BearMountaineers2021_thumb" name="BMTR Community Club" signature="139090872"/>
         <JERSEY imageName="CollinsCupBlue2020_thumb" name="Collins Cup Europe" signature="141416810"/>
         <JERSEY imageName="AssosSuperleger2021_thumb" name="Assos Superleger" signature="142676981"/>
         <JERSEY imageName="Finesse2021_thumb" name="Finesse 2021" signature="153074962"/>
         <JERSEY imageName="SZR_thumb" name="SZR" signature="158338255"/>
+        <JERSEY imageName="ZwiftFood03_thumb" name="Donut" signature="158595409"/>
         <JERSEY imageName="MaratonaDolomiti_thumb" name="Maratona Dolomiti" signature="167026782"/>
         <JERSEY imageName="CastelliVirtualClimber_Light_thumb" name="Castelli Virtual Aero Light" signature="172691656"/>
         <JERSEY imageName="ColombiaFederation2020_thumb" name="Colombia Elite" signature="173668358"/>
+        <JERSEY imageName="UCIFederationArgentina2023_thumb" name="UCI Federation 2023 Argentina" signature="177191477"/>
         <JERSEY imageName="EchelonCannondale2021_thumb" name="Echelon-Cannondale-4iiii" signature="179248736"/>
         <JERSEY imageName="Toyota2020_thumb" name="Toyota" signature="179750023"/>
+        <JERSEY imageName="UCIFederationBelgium2023_thumb" name="UCI Federation 2023 Belgium" signature="183399003"/>
         <JERSEY imageName="ZFondo2020Feb_thumb" name="Z Fondo February" signature="188440276"/>
         <JERSEY imageName="CanyonSRAMGen2022_thumb" name="CANYON//SRAM Generation" signature="189587516"/>
         <JERSEY imageName="Wattbike_thumb" name="Wattbike" signature="197716012"/>
@@ -50,6 +58,7 @@
         <JERSEY imageName="Continental2018_thumb" name="Continental" signature="273275384"/>
         <JERSEY imageName="DempseyChallenge2020_thumb" name="Dempsey Challenge" signature="281027822"/>
         <JERSEY imageName="GCN_2017_thumb" name="GCN" signature="292465293"/>
+        <JERSEY imageName="TourDeZwift2023_thumb" name="Tour de Zwift 2023" signature="295857680"/>
         <JERSEY imageName="VW_2015_thumb" name="VW" signature="298968645"/>
         <JERSEY imageName="Cadex2021_thumb" name="Cadex Kit" signature="303167268"/>
         <JERSEY imageName="Lava2015_thumb" name="Lava" signature="304856285"/>
@@ -70,6 +79,7 @@
         <JERSEY imageName="Tower262021_thumb" name="Tower 26 Triathlon" signature="405683158"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - South Africa" signature="407278237"/>
         <JERSEY imageName="HUUB2019_thumb" name="HUUB" signature="407394860"/>
+        <JERSEY imageName="ZwiftAnimals03_thumb" name="Cow Print" signature="408159995"/>
         <JERSEY imageName="Radavist_thumb" name="Radavist" signature="409344255"/>
         <JERSEY imageName="Chapter32022_thumb" name="CHPT3" signature="410321313"/>
         <JERSEY imageName="ZwiftAcademyTri2018_thumb" name="Zwift Academy Tri 2018" signature="410869722"/>
@@ -84,7 +94,7 @@
         <JERSEY imageName="Tri2472019_thumb" name="Tri 247" signature="434724571"/>
         <JERSEY imageName="BCNationalChampion2019_thumb" name="BC National Champion" signature="435322285"/>
         <JERSEY imageName="TeamDauner2021_thumb" name="Team Dauner" signature="438222824"/>
-        <JERSEY imageName="TrainingPeaks_thumb" name="Training Peaks" signature="442921983"/>
+        <JERSEY imageName="TrainingPeaks_thumb" name="TrainingPeaks" signature="442921983"/>
         <JERSEY imageName="ZwiftAcademyWomen2020_thumb" name="Zwift Academy 2020 Womens" signature="448644816"/>
         <JERSEY imageName="4iii_thumb" name="4iiii" signature="459579137"/>
         <JERSEY imageName="Docomo_thumb" name="Docomo" signature="462436923"/>
@@ -94,6 +104,7 @@
         <JERSEY imageName="Team3R2018_thumb" name="Team 3R" signature="493134166"/>
         <JERSEY imageName="SLT2022white_thumb" name="Super League Tri Arena Games - White Jersey" signature="501435498"/>
         <JERSEY imageName="Saxo_thumb" name="Saxo" signature="513440680"/>
+        <JERSEY imageName="UCIFederationCyclingCanada2023_thumb" name="UCI Federation 2023 Canada" signature="518109091"/>
         <JERSEY imageName="ClashOfClubs2020_thumb" name="Clash Of Clubs Blue" signature="520081294"/>
         <JERSEY imageName="EvoCyclingClub2020_thumb" name="Evo Cycling Club 2020" signature="528534981"/>
         <JERSEY imageName="Sky_2014_thumb" name="Sky" signature="532913371"/>
@@ -116,8 +127,10 @@
         <JERSEY imageName="PowerUp2020_thumb" name="Power Up" signature="605422273"/>
         <JERSEY imageName="Garneau2018_thumb" name="Garneau 2018" signature="608088435"/>
         <JERSEY imageName="FrenchFederationElite2020_thumb" name="France Elite" signature="608333324"/>
+        <JERSEY imageName="UCIBlackFlagColombia2023_thumb" name="UCI Federation 2023 Colombia" signature="612633962"/>
         <JERSEY imageName="SLT2022green_thumb" name="Super League Tri Arena Games - Green Jersey" signature="614640035"/>
         <JERSEY imageName="ZwiftAcademyTri2019_thumb" name="Zwift Academy Tri" signature="622687850"/>
+        <JERSEY imageName="ZwiftAnimals02_thumb" name="Cheetah Print" signature="624176971"/>
         <JERSEY imageName="GuerraVision_thumb" name="Guerra Vision" signature="630051236"/>
         <JERSEY imageName="TeamItaly2019_thumb" name="Team Italy" signature="631173451"/>
         <JERSEY imageName="ZwiftFluoro02_thumb" name="Fluoro 2" signature="635726644"/>
@@ -130,10 +143,13 @@
         <JERSEY imageName="UCIBlackTT2022_thumb" name="Trinidad and Tobago Federation Elite 2022" signature="673116471"/>
         <JERSEY imageName="PhilGaimonCookie2021_thumb" name="Phil&apos;s Cookie Fondo Kit" signature="677436092"/>
         <JERSEY imageName="Zwift_Retro_01_thumb" name="Vintage 1" signature="681866314"/>
+        <JERSEY imageName="UCIFederationBritish2023_thumb" name="UCI Federation 2023 British Cycling" signature="682712544"/>
         <JERSEY imageName="UCIBlackEritrea2022_thumb" name="Eritrea Federation Elite 2022" signature="706154061"/>
         <JERSEY imageName="ElectricSpirit2022_thumb" name="Electric Spirit Community Team" signature="709797933"/>
         <JERSEY imageName="RideLikeKing2019_thumb" name="Giant Ride Like King" signature="713852384"/>
+        <JERSEY imageName="ZwiftLVL60_thumb" name="Level 60" signature="715624988"/>
         <JERSEY imageName="VCGH_thumb" name="VCGH" signature="716189513"/>
+        <JERSEY imageName="kristian_blummenfelt_thumb" name="Kristian Blummenfelt" signature="728048032"/>
         <JERSEY imageName="Zwift_LVL15_Jersey_thumb" name="Level 15" signature="732880966"/>
         <JERSEY imageName="RichieCarapazCC2021_thumb" name="Richie Carapaz Cycling Club" signature="733758360"/>
         <JERSEY imageName="TourDeZwift2022_thumb" name="Tour de Zwift 2022 Ride Kit" signature="750929824"/>
@@ -144,6 +160,7 @@
         <JERSEY imageName="AlienWare_thumb" name="AlienWare" signature="773720424"/>
         <JERSEY imageName="NovatorGreen2021_thumb" name="Norvator Green" signature="774250347"/>
         <JERSEY imageName="RaphaWomens1002021_thumb" name="Rapha Womens 100 2021" signature="775444693"/>
+        <JERSEY imageName="ZARoadFinalist32022_thumb" name="Zwift Academy Finalist" signature="787208525"/>
         <JERSEY imageName="MarkAllenCoaching2018_thumb" name="Mark Allen Coaching" signature="799948511"/>
         <JERSEY imageName="StKildaCC2015_thumb" name="St Kilda CC" signature="801304718"/>
         <JERSEY imageName="HerSpirit2022_thumb" name="Her Spirit" signature="804393467"/>
@@ -163,6 +180,7 @@
         <JERSEY imageName="HPHFan2022_thumb" name="Human Powered Health Fan" signature="854534852"/>
         <JERSEY imageName="BritishCyclingMember_thumb" name="British Cycling Member" signature="858896296"/>
         <JERSEY imageName="BlackSheep2018_thumb" name="Black Sheep" signature="866555848"/>
+        <JERSEY imageName="ZwiftFood02_thumb" name="Espresso" signature="873713889"/>
         <JERSEY imageName="BGDB2022_thumb" name="Black Girls Do Bike" signature="875545637"/>
         <JERSEY imageName="HincapieRacing2019_thumb" name="Hincapie Racing" signature="875567104"/>
         <JERSEY imageName="ATOC_Leader_2017" name="ATOC Overall" signature="876762852"/>
@@ -182,7 +200,9 @@
         <JERSEY imageName="Zipp2019_thumb" name="Zipp" signature="949542640"/>
         <JERSEY imageName="Zwift_TourOfWatopia2018_thumb" name="Tour of Watopia 2018" signature="955816145"/>
         <JERSEY imageName="HauteRoutexZwift2020_thumb" name="Haute Route x Zwift" signature="958209686"/>
+        <JERSEY imageName="UCIFederationJapan2023_thumb" name="UCI Federation 2023 Japan" signature="958295510"/>
         <JERSEY imageName="JumboVismaMen2022_thumb" name="Team Jumbo-Visma Men" signature="958696823"/>
+        <JERSEY imageName="ZARoadFinalist22022_thumb" name="Zwift Academy Finalist" signature="965790990"/>
         <JERSEY imageName="Bicycling_thumb" name="Bicycling" signature="971980441"/>
         <JERSEY imageName="Ekoi2022_thumb" name="Ekoi Elegance R-Waves" signature="972716108"/>
         <JERSEY imageName="DeloitteDigital_thumb" name="Deloitte Digital" signature="980654946"/>
@@ -196,6 +216,7 @@
         <JERSEY imageName="Tibco2020_thumb" name="TIBCO-Silicon Valley Bank" signature="1022287351"/>
         <JERSEY imageName="AndreGreipel2019_thumb" name="Fight ALS" signature="1025753934"/>
         <JERSEY imageName="AHDRGiantBison_thumb" name="AHDR Giant Bison" signature="1028356106"/>
+        <JERSEY imageName="UCIFederationCzechRepublic2023_thumb" name="UCI Federation 2023 Czech Republic" signature="1033566112"/>
         <JERSEY imageName="Sub82022_thumb" name="Sub 8" signature="1033576880"/>
         <JERSEY imageName="2XUCycling2021_thumb" name="2XU Cycling" signature="1040478737"/>
         <JERSEY imageName="ZFondo2021Mar_thumb" name="zFondo Mar 2021" signature="1055383332"/>
@@ -211,6 +232,8 @@
         <JERSEY imageName="CollinsCupRed2020_thumb" name="Collins Cup USA" signature="1088165651"/>
         <JERSEY imageName="Zwift_eFondo_Aug_thumb" name="Zwift eFondo August" signature="1092846644"/>
         <JERSEY imageName="Computrainer_thumb" name="Computrainer" signature="1097944869"/>
+        <JERSEY imageName="ScotlandKit2023_thumb" name="Scotland Jersey" signature="1106501889"/>
+        <JERSEY imageName="UCIFederationItaly2023_thumb" name="UCI Federation 2023 Italy" signature="1112024311"/>
         <JERSEY imageName="SpecializedDolmansSLPro_thumb" name="Specialized F" signature="1126295234"/>
         <JERSEY imageName="ArkeaWomens2020_thumb" name="Arkea" signature="1128201030"/>
         <JERSEY imageName="Espresso2022_thumb" name="Espresso Cycle &amp; Tri Coaching" signature="1137000404"/>
@@ -237,6 +260,7 @@
         <JERSEY imageName="LSRFPodcast2022_thumb" name="LSRF &apos;22" signature="1235387122"/>
         <JERSEY imageName="Ribble2019_thumb" name="Ribble Pro Cycling" signature="1236323268"/>
         <JERSEY imageName="Zwift_zFondo2018_Sept_thumb" name="Zwift zFondo September" signature="1247156896"/>
+        <JERSEY imageName="ZARoadFinalist42022_thumb" name="Zwift Academy Finalist" signature="1250604164"/>
         <JERSEY imageName="SASCycleClub_thumb" name="SAINTS" signature="1276763333"/>
         <JERSEY imageName="LivRacingXstra2022_thumb" name="Liv Racing Xstra" signature="1277618322"/>
         <JERSEY imageName="DimensionData_thumb" name="Dimension Data" signature="1278086739"/>
@@ -261,6 +285,7 @@
         <JERSEY imageName="FinlandUCI2022_thumb" name="Finland Federation Elite 2022" signature="1324536719"/>
         <JERSEY imageName="Parlee2020_thumb" name="Parlee" signature="1327508500"/>
         <JERSEY imageName="DimensionData_thumb" name="DD Cavendish" signature="1331639420"/>
+        <JERSEY imageName="UCIFederationFrance2023_thumb" name="UCI Federation 2023 France" signature="1335138594"/>
         <JERSEY imageName="Trainsharp_thumb" name="Trainsharp" signature="1338967652"/>
         <JERSEY imageName="BMC_2014_thumb" name="BMC" signature="1346889258"/>
         <JERSEY imageName="ZwiftAcademyMen2019_thumb" name="Zwift Academy Men" signature="1370848124"/>
@@ -296,12 +321,14 @@
         <JERSEY imageName="JumboVismaWomen2022_thumb" name="Team Jumbo Visma-Women" signature="1541349594"/>
         <JERSEY imageName="BRTWomens2019_thumb" name="Bolt Race Team Hellcatz" signature="1561591671"/>
         <JERSEY imageName="LaGrange2019_thumb" name="La Grange" signature="1567544184"/>
+        <JERSEY imageName="ZARoadFinalist52022_thumb" name="Zwift Academy Finalist" signature="1576116423"/>
         <JERSEY imageName="ZFondo2021Jan_thumb" name="zFondo Jan 2021" signature="1582340905"/>
         <JERSEY imageName="AG2R2020_thumb" name="AG2R La Mondiale" signature="1587982785"/>
         <JERSEY imageName="BIGLA2019UCI_thumb" name="BIGLA UCI" signature="1589345470"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - Canada" signature="1599435973"/>
         <JERSEY imageName="TourOfWatopiaRed2021_thumb" name="Tour of Watopia Finishers Kit" signature="1599692741"/>
         <JERSEY imageName="BCBR2020_thumb" name="BC BR" signature="1609094897"/>
+        <JERSEY imageName="USParalympicCyclingTeam2022_thumb" name="LOC_CYCLING_JERSEY_SKIP_NAME" signature="1609969033"/>
         <JERSEY imageName="Shimano2021_thumb" name="Shimano" signature="1617481982"/>
         <JERSEY imageName="FreedomMachine2019_thumb" name="Machines Hive" signature="1619804500"/>
         <JERSEY imageName="ZARoad2022_thumb" name="Zwift Academy 2022" signature="1621456855"/>
@@ -315,10 +342,11 @@
         <JERSEY imageName="ZwiftFluoro01_thumb" name="Fluoro 1" signature="1648628196"/>
         <JERSEY imageName="BettyDesignsPink_thumb" name="Betty Designs Pink" signature="1650733257"/>
         <JERSEY imageName="NextEnshored2021_thumb" name="Next-Enshored Kit" signature="1652462599"/>
+        <JERSEY imageName="ZwiftAnimals01_thumb" name="Tiger Print" signature="1653888411"/>
         <JERSEY imageName="ZRScotland2022_thumb" name="Zwift Riders Scotland" signature="1665932906"/>
         <JERSEY imageName="IndoorSpecialist_thumb" name="Indoor Specialist" signature="1677202555"/>
         <JERSEY imageName="KiwiCrew2022_thumb" name="Kiwi Crew" signature="1697837945"/>
-        <JERSEY imageName="AssosSpeedClub2019_thumb" name="Assos Speed Club 2019" signature="1701380341"/>
+        <JERSEY imageName="AssosSpeedClub2019_thumb" name="Assos Speed Club 2022" signature="1701380341"/>
         <JERSEY imageName="CyclingWeekly2021_thumb" name="Cycling Weekly Kit" signature="1716914056"/>
         <JERSEY imageName="ZATri2021_thumb" name="2021 ZA Tri Kit" signature="1718052948"/>
         <JERSEY imageName="UCIBlackHK2022_thumb" name="Hong Kong Federation Elite 2022" signature="1727340017"/>
@@ -328,9 +356,11 @@
         <JERSEY imageName="UnoXPro2022_thumb" name="UnoXPro2022" signature="1756517729"/>
         <JERSEY imageName="Elite_thumb" name="Elite" signature="1766102862"/>
         <JERSEY imageName="SwedenFederationSupport2022_thumb" name="SWE Cycling Member 2022" signature="1769311524"/>
+        <JERSEY imageName="UCIFederationGermany2023_thumb" name="UCI Federation 2023 Germany" signature="1769856110"/>
         <JERSEY imageName="RaphaWomens1002022_thumb" name="Rapha Womens 100 2022" signature="1771577861"/>
         <JERSEY imageName="TrekSegafredoTrain2022_thumb" name="Trek Segafredo Training" signature="1776034995"/>
         <JERSEY imageName="TourDeZwift2021_thumb" name="Tour de Zwift 2021 Kit" signature="1801600368"/>
+        <JERSEY imageName="ZwiftHub2022_thumb" name="Zwift Hub" signature="1802089334"/>
         <JERSEY imageName="ViniFantini2019_thumb" name="Vini Fantini" signature="1805412330"/>
         <JERSEY imageName="TourDeTucson2020_thumb" name="Tour De Tucson" signature="1808939337"/>
         <JERSEY imageName="TeamDraft2019_thumb" name="Team Draft" signature="1809990475"/>
@@ -352,10 +382,12 @@
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - Korea" signature="1900024720"/>
         <JERSEY imageName="BTCNJ_thumb" name="BTCNJ" signature="1900079957"/>
         <JERSEY imageName="InnsbruckWorldChampionships2018_thumb" name="Innsbruck Fan Kit" signature="1905817600"/>
+        <JERSEY imageName="HEP2022_thumb" name="HEP" signature="1911101758"/>
         <JERSEY imageName="EnduranceNation2019_thumb" name="Endurance Nation" signature="1912822249"/>
         <JERSEY imageName="BikeExchangeWomen2022_thumb" name="Team BikeExchange Women" signature="1935761488"/>
         <JERSEY imageName="ZBR_thumb" name="ZBR" signature="1936574954"/>
         <JERSEY imageName="PanMass2021_thumb" name="Pan Mass Challenge" signature="1939003542"/>
+        <JERSEY imageName="ZwiftFood01_thumb" name="Avocado" signature="1941154353"/>
         <JERSEY imageName="AHDRLivBison_thumb" name="AHDR Liv Bison" signature="1947253559"/>
         <JERSEY imageName="RuhrRiders2022_thumb" name="Ruhrrider 2022" signature="1953455256"/>
         <JERSEY imageName="Astana2020_thumb" name="ASTANA PRO TEAM" signature="1969335676"/>
@@ -370,6 +402,7 @@
         <JERSEY imageName="QuintanaRoo2022_thumb" name="Quintana Roo Team" signature="2015391514"/>
         <JERSEY imageName="Zwift_zFondo_Nov_thumb" name="Zwift zFondo November" signature="2021712776"/>
         <JERSEY imageName="PrideOn2019_thumb" name="Pride On 2019" signature="2027807142"/>
+        <JERSEY imageName="UCIFederationNetherlands2023_thumb" name="UCI Federation 2023 Netherlands" signature="2049543282"/>
         <JERSEY imageName="BrisithTriathlonElite2018_thumb" name="British Triathlon Elite" signature="2050061293"/>
         <JERSEY imageName="Scott2020_thumb" name="Scott" signature="2050259031"/>
         <JERSEY imageName="Zwift_LVL30_thumb" name="Level 30" signature="2053768111"/>
@@ -390,9 +423,11 @@
         <JERSEY imageName="TeamVegan2020_thumb" name="Team Vegan" signature="2134531491"/>
         <JERSEY imageName="Zwift_zFondo_Feb_thumb" name="Zwift zFondo February" signature="2140454859"/>
         <JERSEY imageName="Trek_2017_Red_thumb" name="Trek-Segafredo Men" signature="2140478849"/>
+        <JERSEY imageName="WTRL2022_thumb" name="WTRL" signature="2143636692"/>
         <JERSEY imageName="Sugoi2018_thumb" name="Sugoi" signature="2150370418"/>
         <JERSEY imageName="BahrainMclaren2020_thumb" name="Bahrain McLaren" signature="2155858980"/>
         <JERSEY imageName="TdFLetape2020_thumb" name="TdF Letape" signature="2163356336"/>
+        <JERSEY imageName="ineos_2023_thumb" name="INEOS Grenadiers 2023" signature="2167019024"/>
         <JERSEY imageName="ChicksRideBikes2021_thumb" name="Chicks Who Ride Bikes" signature="2174450522"/>
         <JERSEY imageName="Zwift_Color03_thumb" name="Prism 3" signature="2179290363"/>
         <JERSEY imageName="TeamVelocity2019_thumb" name="Team Velocity" signature="2189302920"/>
@@ -407,12 +442,12 @@
         <JERSEY imageName="Zwift_zFondo_Mar_thumb" name="Zwift zFondo March" signature="2262974117"/>
         <JERSEY imageName="INEOSGrenadiersFan2021_thumb" name="INEOS Grenadiers 2022 Training" signature="2280956876"/>
         <JERSEY imageName="BikeNBeer_thumb" name="Bike &amp; Beer" signature="2282933836"/>
-        <JERSEY imageName="ChasingCancellara2020_thumb" name="Chasing Cancellara" signature="2289295452"/>
         <JERSEY imageName="UCIZwiftWildcard2020_thumb" name="Zwift UCI 2020 Wildcard" signature="2291562618"/>
         <JERSEY imageName="Assos2017_thumb" name="Assos 2017" signature="2298505566"/>
         <JERSEY imageName="RideLikeKing2018_thumb" name="Giant Ride Like King 2018" signature="2299049488"/>
         <JERSEY imageName="Zwift_WomensDay_thumb" name="Zwift Women&apos;s Day" signature="2300165841"/>
         <JERSEY imageName="EnjoyYourBike2022_thumb" name="Enjoy Your Bike" signature="2303114199"/>
+        <JERSEY imageName="UCIFederationDenmark2023_thumb" name="UCI Federation 2023 Denmark" signature="2306504757"/>
         <JERSEY imageName="PrideOn2022_thumb" name="Pride 2022" signature="2308547097"/>
         <JERSEY imageName="WahooClimb2022_thumb" name="Wahoo Climbers" signature="2327670378"/>
         <JERSEY imageName="L39ION2022_thumb" name="L39ION of LA 2022" signature="2330819669"/>
@@ -431,12 +466,13 @@
         <JERSEY imageName="Varlo2022_thumb" name="Varlo Cycling" signature="2389611207"/>
         <JERSEY imageName="GearPatrol2015_thumb" name="GearPatrol" signature="2394699876"/>
         <JERSEY imageName="CafeDuCycliste2021_thumb" name="Cafe du Cycliste" signature="2397240918"/>
-        <JERSEY imageName="RoadCC_thumb" name="RoadCC" signature="2398622818"/>
+        <JERSEY imageName="RoadCC_thumb" name="Road.cc" signature="2398622818"/>
         <JERSEY imageName="ZwiftClassy03_thumb" name="Classy 3" signature="2405730976"/>
         <JERSEY imageName="ZwiftTeamPL_thumb" name="Team Poland" signature="2411042224"/>
         <JERSEY imageName="ZFondo202202_thumb" name="ZFondo February 2022" signature="2411973716"/>
         <JERSEY imageName="INEOSEnergyStation2021_thumb" name="INEOS Energy Station" signature="2414198484"/>
         <JERSEY imageName="JLT_Condor_thumb" name="JLT Condor" signature="2418675542"/>
+        <JERSEY imageName="UCIBlackFlagSlovenia2023_thumb" name="UCI Federation 2023 Slovenia" signature="2419799133"/>
         <JERSEY imageName="Precision2022_thumb" name="Precision Fuel &amp; Hydration" signature="2422367611"/>
         <JERSEY imageName="EoloKometa2021_thumb" name="Eolo Kometa" signature="2422819298"/>
         <JERSEY imageName="BlackSheepManRide2019_thumb" name="Black Sheep Man Ride" signature="2426765558"/>
@@ -477,6 +513,7 @@
         <JERSEY imageName="TeamGreece2022_thumb" name="Team Greece" signature="2636119382"/>
         <JERSEY imageName="Rave2022_thumb" name="Rave" signature="2643412332"/>
         <JERSEY imageName="FreeSpeed2015_thumb" name="FreeSpeed" signature="2644587674"/>
+        <JERSEY imageName="daniela_ryf_thumb" name="Daniela Ryf" signature="2654375510"/>
         <JERSEY imageName="Alpentroedler2022_thumb" name="Alpentroedler Velo Club" signature="2662676193"/>
         <JERSEY imageName="VatternRundan2019_thumb" name="Vattern Rundan" signature="2668995113"/>
         <JERSEY imageName="TheBreakawayApp2022_thumb" name="The Breakaway" signature="2676350104"/>
@@ -487,6 +524,7 @@
         <JERSEY imageName="WorldCancerDay2021_thumb" name="World Cancer Day" signature="2697671308"/>
         <JERSEY imageName="Alinghi_thumb" name="Alinghi" signature="2701885115"/>
         <JERSEY imageName="TourDeTohoku2018_thumb" name="Tour de Tohoku" signature="2708360718"/>
+        <JERSEY imageName="jumbo_visma_women_thumb" name="Team Jumbo-Visma Women 2023" signature="2713824438"/>
         <JERSEY imageName="ZFondo2020Dec_thumb" name="zFondo Dec 2020" signature="2714003021"/>
         <JERSEY imageName="BingoalPauwels2022_thumb" name="Bingoal Pauwels Sauces WB" signature="2715375431"/>
         <JERSEY imageName="PortugalElite2020_thumb" name="Portugal Elite" signature="2721512078"/>
@@ -519,6 +557,7 @@
         <JERSEY imageName="SLTRhinos2022_thumb" name="Super League Triathlon Rhinos" signature="2808241362"/>
         <JERSEY imageName="Plain_06_thumb" name="Champion" signature="2810981379"/>
         <JERSEY imageName="BikeExchangeMen2022_thumb" name="Team BikeExchange Men" signature="2813571014"/>
+        <JERSEY imageName="groupama_fdj_thumb" name="Groupama FDJ 2023" signature="2814449542"/>
         <JERSEY imageName="Zwift_CamoPix_01_thumb" name="DigiCamo 1" signature="2818028945"/>
         <JERSEY imageName="Zwift_80s_thumb" name="La Z Claire" signature="2825077965"/>
         <JERSEY imageName="Zwift_Monochrome01_thumb" name="Monochrome 1" signature="2826950973"/>
@@ -533,6 +572,7 @@
         <JERSEY imageName="ZwiftAcademyWomen2018_thumb" name="Zwift Academy Women 2018" signature="2891579327"/>
         <JERSEY imageName="Quickstep2020_thumb" name="Deceuninck-Quick-Step" signature="2906189156"/>
         <JERSEY imageName="TrekFactoryRacingWomensMTB2020_thumb" name="Trek Factory Racing Womens MTB" signature="2911653862"/>
+        <JERSEY imageName="RaphaFestive5002022_thumb" name="2022 Rapha Festive 500" signature="2911779990"/>
         <JERSEY imageName="VoxWomen2019_thumb" name="Vox Women 2019" signature="2918338388"/>
         <JERSEY imageName="TdFFemmes2022_thumb" name="Watch the Femmes" signature="2918420406"/>
         <JERSEY imageName="ZwiftAcademyTri2020_thumb" name="Zwift Academy Tri 2019" signature="2929288885"/>
@@ -556,10 +596,10 @@
         <JERSEY imageName="WKGWattsUp_thumb" name="WKG" signature="3027591243"/>
         <JERSEY imageName="SLT2022red_thumb" name="Super League Tri Arena Games - Red Jersey" signature="3053089758"/>
         <JERSEY imageName="CastelliVirtualAero_Red_thumb" name="Castelli Virtual Aero Red" signature="3058092866"/>
+        <JERSEY imageName="no_limits_thumb" name="Lionel Sanders No Limits" signature="3058164798"/>
         <JERSEY imageName="RoweAndKing_thumb" name="Rowe &amp; King" signature="3061523465"/>
         <JERSEY imageName="CyclingTips_thumb" name="Cycling Tips" signature="3068939527"/>
         <JERSEY imageName="HauteRoute2021_thumb" name="Haute Route Watopia 2021 Kit" signature="3073658735"/>
-        <JERSEY imageName="RadRace_thumb" name="Rad Race" signature="3084206699"/>
         <JERSEY imageName="ZRacingA_thumb" name="Z Racing A" signature="3090729076"/>
         <JERSEY imageName="GoodGuys2022_thumb" name="Good Guys Racing" signature="3094259953"/>
         <JERSEY imageName="SLTScorpions2022_thumb" name="Super League Triathlon Scorpions" signature="3094952450"/>
@@ -579,6 +619,7 @@
         <JERSEY imageName="TeamType1_thumb" name="Team Type 1" signature="3173711529"/>
         <JERSEY imageName="BCBRGravel2021_thumb" name="BCBR Gravel Explorer Kit" signature="3185255681"/>
         <JERSEY imageName="BiehlerSyndicate2021_thumb" name="Biehler Syndicate Jersey" signature="3189709644"/>
+        <JERSEY imageName="TourOfMakuri2022_thumb" name="Tour of Makuri Islands" signature="3194421153"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - Great Britain" signature="3203180937"/>
         <JERSEY imageName="BritishTriathlonMember2018_thumb" name="British Triathlon Member" signature="3206315444"/>
         <JERSEY imageName="AustraliaElite2020_thumb" name="Australia Elite" signature="3206625974"/>
@@ -610,11 +651,13 @@
         <JERSEY imageName="TeamdZi_Red_thumb" name="dZi Red" signature="3351653575"/>
         <JERSEY imageName="CanyonEsports2021_thumb" name="Canyon Esports 2021" signature="3352564281"/>
         <JERSEY imageName="Souigneur_thumb" name="Souigneur" signature="3352739305"/>
+        <JERSEY imageName="fdj_suez_women_thumb" name="FDJ Suez 2023" signature="3360845221"/>
         <JERSEY imageName="ZFondo202201_thumb" name="ZFondo January 2022" signature="3361977988"/>
         <JERSEY imageName="Yeoleo2022_thumb" name="Yoeleo 4Mind" signature="3365175761"/>
         <JERSEY imageName="TrekTour2019_thumb" name="Trek Tour" signature="3370254609"/>
         <JERSEY imageName="Zwift_Orange_KOM" name="Overall/KOM" signature="3371519326"/>
         <JERSEY imageName="ValcarCylance2019_thumb" name="Valcar-Travel and Service" signature="3372672430"/>
+        <JERSEY imageName="UCIFederationNewZealand2023_thumb" name="UCI Federation New Zealand 2023" signature="3382087244"/>
         <JERSEY imageName="USAC_thumb" name="USAC Elite" signature="3382526362"/>
         <JERSEY imageName="AndroniGiocattoli2019_thumb" name="Androni Giocattoli-Sidermec" signature="3384238636"/>
         <JERSEY imageName="ScottSRAMMTBWC2022_thumb" name="SCOTT-SRAM MTB Racing Team World Champ" signature="3384559345"/>
@@ -623,6 +666,7 @@
         <JERSEY imageName="TeamRolandCogeas2022_thumb" name="Team Roland Cogeas Edelweiss" signature="3398931495"/>
         <JERSEY imageName="EvoqBike2020_thumb" name="Evoq.Bike" signature="3405367476"/>
         <JERSEY imageName="ATOC_KOM_2017" name="ATOC KOM" signature="3405631997"/>
+        <JERSEY imageName="TourOfWatopia2023_thumb" name="Tour of Watopia 2023" signature="3407359920"/>
         <JERSEY imageName="WBRKit2019_thumb" name="World Bicycle Relief" signature="3407909128"/>
         <JERSEY imageName="SansegoTri2022_thumb" name="Sansego" signature="3415411505"/>
         <JERSEY imageName="Agowatt2021_thumb" name="Agowatt" signature="3419241775"/>
@@ -630,7 +674,7 @@
         <JERSEY imageName="Rapha100km2018_thumb" name="Rapha W100" signature="3421325459"/>
         <JERSEY imageName="AbsqueFines2021_thumb" name="Absque Fines" signature="3423381874"/>
         <JERSEY imageName="CyclingCanada2020_thumb" name="Canada Elite" signature="3424931689"/>
-        <JERSEY imageName="TealPink2020_thumb" name="April Fools" signature="3427039185"/>
+        <JERSEY imageName="TealPink2020_thumb" name="1980s" signature="3427039185"/>
         <JERSEY imageName="RideLikeKing2018_thumb" name="Liv Ride Like King 2018" signature="3427652207"/>
         <JERSEY imageName="ZATri2022_thumb" name="2022 ZA Tri Team Design" signature="3430221138"/>
         <JERSEY imageName="JanFrodeno2019_thumb" name="Jan Frodeno" signature="3439799665"/>
@@ -640,6 +684,7 @@
         <JERSEY imageName="RaphaSouplesse02_thumb" name="Rapha Women&apos;s Souplesse" signature="3451819302"/>
         <JERSEY imageName="PlushGlobal2021_thumb" name="Plush Global Kit" signature="3455961079"/>
         <JERSEY imageName="TRWB2022_thumb" name="Team Racing Without Borders Kit" signature="3456451761"/>
+        <JERSEY imageName="UCIFederationAustralia2023_thumb" name="UCI Federation 2023 Australia" signature="3458852017"/>
         <JERSEY imageName="SchleckGranFondo2018_thumb" name="Schleck Gran Fondo" signature="3459652898"/>
         <JERSEY imageName="PrideOn2021_thumb" name="2021 Pride On Cycling Jersey" signature="3459897545"/>
         <JERSEY imageName="RestartRacing2021_thumb" name="Restart Racing 2021" signature="3465825532"/>
@@ -647,6 +692,7 @@
         <JERSEY imageName="AstanaWomens_thumb" name="ASTANA WOMEN PRO TEAM" signature="3471138888"/>
         <JERSEY imageName="RaphaWomens100T2022_thumb" name="Rapha Womens 100 10th Anniversary" signature="3474634232"/>
         <JERSEY imageName="TodaysPlan_thumb" name="Today&apos;s Plan" signature="3488472716"/>
+        <JERSEY imageName="DoddieAid2023_thumb" name="Doddie Aid" signature="3502306062"/>
         <JERSEY imageName="Bardiani2019_thumb" name="Bardiani 2019" signature="3503002798"/>
         <JERSEY imageName="Ryzon2021_thumb" name="Ryzon 2021" signature="3526847660"/>
         <JERSEY imageName="Zwift_Monochrome03_thumb" name="Monochrome 3" signature="3535768157"/>
@@ -681,6 +727,7 @@
         <JERSEY imageName="PASRacing2022_thumb" name="PAS Racing" signature="3657231940"/>
         <JERSEY imageName="WSR_thumb" name="World Social Riders" signature="3660609812"/>
         <JERSEY imageName="ZwiftAcademyMen2020_thumb" name="Zwift Academy 2020 Mens" signature="3660671907"/>
+        <JERSEY imageName="Lederhosen2022_thumb" name="Lederhose" signature="3672963209"/>
         <JERSEY imageName="KZRwhite_thumb" name="KZR white" signature="3674985275"/>
         <JERSEY imageName="BettyDesignsSignature_thumb" name="Betty Designs Signature" signature="3687043191"/>
         <JERSEY imageName="Internationelles2021_thumb" name="Internationelles" signature="3694781490"/>
@@ -702,6 +749,7 @@
         <JERSEY imageName="RaphaClassic02_thumb" name="Rapha Women&apos;s Classic" signature="3775109784"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - Sweden" signature="3783244115"/>
         <JERSEY imageName="GermanyElite2020_thumb" name="Germany Elite" signature="3784612177"/>
+        <JERSEY imageName="UCIFederationSpain2023_thumb" name="UCI Federation Spain 2023" signature="3785243528"/>
         <JERSEY imageName="Zwift_Green_Jersey_01" name="Sprint" signature="3793210489"/>
         <JERSEY imageName="Sub72022_thumb" name="Sub 7" signature="3793940065"/>
         <JERSEY imageName="TeamDIRT2019_thumb" name="Team DIRT" signature="3795276190"/>
@@ -713,6 +761,7 @@
         <JERSEY imageName="RideLikeAKing2021_thumb" name="Ride Like King 13" signature="3824368360"/>
         <JERSEY imageName="NSI2015_thumb" name="NSI" signature="3839989188"/>
         <JERSEY imageName="Felt2021_thumb" name="Felt Cycling" signature="3840427844"/>
+        <JERSEY imageName="UCIFederationPortugal2023_thumb" name="UCI Federation Portugal 2023" signature="3847642573"/>
         <JERSEY imageName="ZSUN_thumb" name="ZSUN" signature="3858299788"/>
         <JERSEY imageName="ODZ2018Womens_thumb" name="Team ODivaZ 2018" signature="3858579217"/>
         <JERSEY imageName="TheCarnival2020_thumb" name="The Carnival 2020" signature="3859182028"/>
@@ -731,6 +780,7 @@
         <JERSEY imageName="TorontoHustle2021_thumb" name="Toronto Hustle Kit" signature="3891106714"/>
         <JERSEY imageName="BeastMode2021_thumb" name="Beastmode" signature="3891872995"/>
         <JERSEY imageName="QhubekaAssos2021_thumb" name="Qhubeka Assos Pro Team Kit" signature="3895671417"/>
+        <JERSEY imageName="UCIFederationIreland2023_thumb" name="UCI Federation 2023 Ireland" signature="3897344494"/>
         <JERSEY imageName="ZwiftNationalChampions_thumb" name="ZNC - USA" signature="3900171318"/>
         <JERSEY imageName="MandelaDay2021_thumb" name="Mandela Day 2021" signature="3901439314"/>
         <JERSEY imageName="BikesFrance2022_thumb" name="Bikes France" signature="3902243512"/>
@@ -768,9 +818,11 @@
         <JERSEY imageName="CyclingHub2018_thumb" name="Cycling Hub" signature="4051240783"/>
         <JERSEY imageName="HPHP2022_thumb" name="Human Powered Health Pro" signature="4053742767"/>
         <JERSEY imageName="TeamKalas2020_thumb" name="Team Kalas" signature="4055466522"/>
+        <JERSEY imageName="ZFondoBambino2023_thumb" name="22-&apos;23 ZFondo Bambino" signature="4058671073"/>
         <JERSEY imageName="ZFondo2020Mar_thumb" name="Z Fondo March" signature="4065189818"/>
         <JERSEY imageName="RaphaRising2022_thumb" name="Rapha Rising 2022" signature="4070625544"/>
         <JERSEY imageName="TOW2022_thumb" name="Tour of Watopia 2022" signature="4071133758"/>
+        <JERSEY imageName="ChasingCancellara2022_thumb" name="Chasing Cancellara 2022" signature="4071863100"/>
         <JERSEY imageName="USATri2022_thumb" name="USA Triathlon" signature="4072760162"/>
         <JERSEY imageName="Optum2015_thumb" name="Optum" signature="4074781084"/>
         <JERSEY imageName="POAuto2020_thumb" name="PO AUTO" signature="4076007077"/>
@@ -784,12 +836,14 @@
         <JERSEY imageName="SLT2022pink_thumb" name="Super League Tri Arena Games - Pink Jersey" signature="4107861598"/>
         <JERSEY imageName="RaphaLegionLA2020_thumb" name="Rapha Legion LA" signature="4108702181"/>
         <JERSEY imageName="DutchNational_thumb" name="Dutch National" signature="4109295337"/>
+        <JERSEY imageName="ZFondoGran2023_thumb" name="22-&apos;23 ZFondo Gran" signature="4113146346"/>
         <JERSEY imageName="TeamZoot2022_thumb" name="Team Zoot 2022" signature="4113250696"/>
         <JERSEY imageName="HagensBermanSupermint2019_thumb" name="Hagens Berman Supermint" signature="4115647532"/>
         <JERSEY imageName="ZwiftClassy01_thumb" name="Classy 1" signature="4121221568"/>
         <JERSEY imageName="KoaSports2019_thumb" name="KOA Sports" signature="4123532946"/>
         <JERSEY imageName="Lotto_2015_thumb" name="Lotto" signature="4130579852"/>
         <JERSEY imageName="KOM_01" name="KOM" signature="4137478375"/>
+        <JERSEY imageName="ZFondoMedio2023_thumb" name="22-&apos;23 ZFondo Medio" signature="4140697669"/>
         <JERSEY imageName="ZwiftZFondoApr2019_thumb" name="Zwift zFondo April 2019" signature="4143072100"/>
         <JERSEY imageName="NorthhamptonCC_thumb" name="Northhampton CC" signature="4144972561"/>
         <JERSEY imageName="SwedenFederation2022_thumb" name="SWE Cycling Elite 2022" signature="4151786516"/>
@@ -836,12 +890,14 @@
         <RUNSHIRT imageName="Shirt09" name="Zwift Running Shirt 9" signature="527816476"/>
         <RUNSHIRT imageName="Shirt08" name="Zwift Running Shirt 8" signature="571866796"/>
         <RUNSHIRT imageName="RunFestivalWhite2021_thumb" name="Run Festival White Kit 2021" signature="614033845"/>
+        <RUNSHIRT imageName="TourDeZwift2023_thumb" name="Tour de Zwift 2023" signature="640108508"/>
         <RUNSHIRT imageName="GTNRun2022_thumb" name="GTN" signature="662489813"/>
         <RUNSHIRT imageName="SLTRun2022purple_thumb" name="Super League Tri Arena Games - Purple Jersey" signature="684551673"/>
         <RUNSHIRT imageName="ZATriRun2022v2_thumb" name="Zwift Academy 2022" signature="693699163"/>
         <RUNSHIRT imageName="BlackHistoryMonthRun2021_thumb" name="Black Celebration Series Shirt" signature="698898733"/>
         <RUNSHIRT imageName="LARR2019_thumb" name="LA Road Runners" signature="708384525"/>
         <RUNSHIRT imageName="SLTScorpions2022_thumb" name="Super League Triathlon Scorpions" signature="714879408"/>
+        <RUNSHIRT imageName="TourOfMakuri2022_thumb" name="Tour of Makuri Islands" signature="746845203"/>
         <RUNSHIRT imageName="SLTRun2022yellow_thumb" name="Super League Tri Arena Games - Yellow Jersey" signature="769877933"/>
         <RUNSHIRT imageName="Shirt01" name="Zwift Running Shirt 1" signature="788896989"/>
         <RUNSHIRT imageName="NightOwl2019" name="Night Owl" signature="822087460"/>
@@ -851,7 +907,7 @@
         <RUNSHIRT imageName="SLTRun2022orange_thumb" name="Super League Tri Arena Games - Orange Jersey" signature="891026381"/>
         <RUNSHIRT imageName="NewBalance2019_thumb" name="New Balance" signature="911708174"/>
         <RUNSHIRT imageName="ZwiftAcademyTri2020_thumb" name="Zwift Academy Tri 2019" signature="937248222"/>
-        <RUNSHIRT imageName="TankTop02" name="Zwift Men&apos;s Tank Top 2" signature="942454936"/>
+        <RUNSHIRT imageName="TankTop02" name="Blue Tank Kit" signature="942454936"/>
         <RUNSHIRT imageName="CollinsCupRunBlue2020_thumb" name="Collins Cup Europe" signature="956101230"/>
         <RUNSHIRT imageName="RunFestivalBlack2021_thumb" name="Run Festival Black Kit 2021" signature="969205573"/>
         <RUNSHIRT imageName="XterraRun2020_thumb" name="Xterra Running Shirt 2020" signature="991511341"/>
@@ -860,10 +916,12 @@
         <RUNSHIRT imageName="DempseyChallengeRun2021_thumb" name="Dempsey Challenge" signature="1155013846"/>
         <RUNSHIRT imageName="RFTO2022_thumb" name="2022 adidas RFTO" signature="1207872178"/>
         <RUNSHIRT imageName="SLTRun2022white_thumb" name="Super League Tri Arena Games - White Jersey" signature="1288766544"/>
+        <RUNSHIRT imageName="Scotland2023_thumb" name="Scotland Jersey" signature="1352916435"/>
         <RUNSHIRT imageName="Gosh2020_thumb" name="Gosh" signature="1416964875"/>
-        <RUNSHIRT imageName="ZARun2022_thumb" name="ZA Run 2022" signature="1434311728"/>
+        <RUNSHIRT imageName="ZARun2022_thumb" name="Zwift Academy 2023" signature="1434311728"/>
         <RUNSHIRT imageName="Shirt03" name="Zwift Running Shirt 3" signature="1439027133"/>
         <RUNSHIRT imageName="Movember2019_thumb" name="Movember" signature="1450618808"/>
+        <RUNSHIRT imageName="FluoroTank01_thumb" name="Fluoro Tank Kit" signature="1465869638"/>
         <RUNSHIRT imageName="ParkToPeak2019Thumb" name="Park To Peak" signature="1502224542"/>
         <RUNSHIRT imageName="ZwiftAcademyRun2020_thumb" name="Zwift Academy 2020 Run" signature="1507195181"/>
         <RUNSHIRT imageName="Saucony2021_thumb" name="Saucony Stopwatch Run Shirt" signature="1531810507"/>
@@ -892,14 +950,14 @@
         <RUNSHIRT imageName="TourOfWatopiaYellow2021_thumb" name="Tour of Watopia Starter Kit" signature="2083092750"/>
         <RUNSHIRT imageName="ZATri2021_thumb" name="ZA Tri Team Run Shirt 2020" signature="2094340627"/>
         <RUNSHIRT imageName="RunningDay2019" name="Running Day" signature="2103673476"/>
-        <RUNSHIRT imageName="TankTop01" name="Zwift Men&apos;s Tank Top 1" signature="2139931208"/>
+        <RUNSHIRT imageName="TankTop01" name="Orange Tank Kit" signature="2139931208"/>
         <RUNSHIRT imageName="Shirt13" name="Zwift Running Shirt 13" signature="2163717482"/>
         <RUNSHIRT imageName="SuperLeague2020_thumb" name="Super League Community 2021 Shirt" signature="2179055389"/>
         <RUNSHIRT imageName="TealPink2020_thumb" name="April Fools" signature="2180457818"/>
         <RUNSHIRT imageName="ZRSFall2020_thumb" name="ZRS Fall" signature="2183061867"/>
         <RUNSHIRT imageName="JanFrodeno2019_thumb" name="Jan Frodeno" signature="2208084455"/>
         <RUNSHIRT imageName="PrideOn2022_thumb" name="Pride 2022" signature="2292871545"/>
-        <RUNSHIRT imageName="TankTop02" name="Zwift Women&apos;s Tank Top 2" signature="2296133418"/>
+        <RUNSHIRT imageName="TankTop02" name="Blue Tank Kit" signature="2296133418"/>
         <RUNSHIRT imageName="LucyCharles2021_thumb" name="Team LCB Run Shirt" signature="2299250124"/>
         <RUNSHIRT imageName="ZRSCiele2020_thumb" name="ZRS Ciele" signature="2300977237"/>
         <RUNSHIRT imageName="ZRS022021_thumb" name="ZRS Summer 2021 Shirt" signature="2307701209"/>
@@ -916,13 +974,16 @@
         <RUNSHIRT imageName="ZLDR2021_thumb" name="ZLDR" signature="2665274070"/>
         <RUNSHIRT imageName="ZRS032021_thumb" name="ZRS Fall 2021 Shirt" signature="2667031962"/>
         <RUNSHIRT imageName="Shirt07" name="Zwift Running Shirt 7" signature="2688903549"/>
+        <RUNSHIRT imageName="LederhosenRun2022_thumb" name="Lederhose" signature="2697662835"/>
         <RUNSHIRT imageName="ZRSFirecracker2019" name="ZRS Firecracker" signature="2703204057"/>
         <RUNSHIRT imageName="SLTRun2022blue_thumb" name="Super League Tri Arena Games - Blue Jersey" signature="2719460263"/>
+        <RUNSHIRT imageName="MonochromeTank01_thumb" name="Monochrome Pattern Tank Kit" signature="2722487491"/>
         <RUNSHIRT imageName="RunningChannel2021_thumb" name="The Running Channel Shirt" signature="2734666004"/>
         <RUNSHIRT imageName="LionelSanders2019_thumb" name="Lionel Sanders" signature="2768891314"/>
         <RUNSHIRT imageName="HaloIDRun2022_thumb" name="Halo ID" signature="2795593609"/>
         <RUNSHIRT imageName="TourOfWatopia2020" name="Tour Of Watopia" signature="2839896779"/>
         <RUNSHIRT imageName="ZRSCieleJune2020_thumb" name="ZRS June" signature="2852192250"/>
+        <RUNSHIRT imageName="FluoroTank01_thumb" name="Fluoro Tank Kit" signature="2921978652"/>
         <RUNSHIRT imageName="PRRC2019" name="PRRC" signature="2944680840"/>
         <RUNSHIRT imageName="ZRS012021_thumb" name="ZRS Spring 2021 Shirt" signature="2952889628"/>
         <RUNSHIRT imageName="HilltopHustle2019" name="Hilltop Hustle" signature="3052272503"/>
@@ -940,7 +1001,8 @@
         <RUNSHIRT imageName="ZwiftWomensRun2022_thumb" name="Women&apos;s Run Series 2022" signature="3392923864"/>
         <RUNSHIRT imageName="TeamAscendersRun2022_thumb" name="Ascenders Team" signature="3430427983"/>
         <RUNSHIRT imageName="PrideOn2021_thumb" name="2021 Pride On Run Shirt" signature="3473542057"/>
-        <RUNSHIRT imageName="TankTop01" name="Zwift Women&apos;s Tank Top 1" signature="3481030138"/>
+        <RUNSHIRT imageName="TankTop01" name="Orange Tank Kit" signature="3481030138"/>
+        <RUNSHIRT imageName="MonochromeTank01_thumb" name="Monochrome Pattern Tank Kit" signature="3483051353"/>
         <RUNSHIRT imageName="TTLRun2022_thumb" name="That Triathlon Life" signature="3516157437"/>
         <RUNSHIRT imageName="NYRR2019_thumb" name="NY Road Runners" signature="3526863900"/>
         <RUNSHIRT imageName="TeamZootRun2022_thumb" name="Team Zoot 2022" signature="3630589926"/>
@@ -948,6 +1010,7 @@
         <RUNSHIRT imageName="USATriRun2022_thumb" name="USA Triathlon" signature="3660321537"/>
         <RUNSHIRT imageName="Shirt05" name="Zwift Running Shirt 5" signature="3666164253"/>
         <RUNSHIRT imageName="Adidas2019_thumb" name="Adidas" signature="3689678773"/>
+        <RUNSHIRT imageName="TeamType12022_thumb" name="Team Type 1" signature="3707587096"/>
         <RUNSHIRT imageName="SLTRhinos2022_thumb" name="Super League Triathlon Rhinos" signature="3712333096"/>
         <RUNSHIRT imageName="FeelsLikeSummer2019Thumb" name="Feels Like Summer" signature="3719335274"/>
         <RUNSHIRT imageName="CredoTriRun2022_thumb" name="CredoTri" signature="3742868537"/>
@@ -957,6 +1020,7 @@
         <RUNSHIRT imageName="SlowTwitch2020_thumb" name="Slowtwitch" signature="3917042036"/>
         <RUNSHIRT imageName="SLTSharks2022_thumb" name="Super League Triathlon Sharks" signature="3946960086"/>
         <RUNSHIRT imageName="TrueTreadmill2021_thumb" name="True Treadmill Shirt" signature="3958869815"/>
+        <RUNSHIRT imageName="TourOfWatopia2023_thumb" name="Tour of Watopia 2023" signature="4007991323"/>
         <RUNSHIRT imageName="TourDeZwiftRun2022_thumb" name="Tour de Zwift 2022 Run Shirt" signature="4042707032"/>
         <RUNSHIRT imageName="PrideOn2020_thumb" name="Pride On" signature="4067041817"/>
         <RUNSHIRT imageName="SansegoTriRun2022_thumb" name="Sansego" signature="4116498457"/>
@@ -987,11 +1051,13 @@
         <RUNSHORT imageName="CollinsCupRunRed2020_thumb" name="Collins Cup USA" signature="641588231"/>
         <RUNSHORT imageName="USATriRun2022_thumb" name="USA Triathlon" signature="703761467"/>
         <RUNSHORT imageName="SLTRhinos2022_thumb" name="Super League Triathlon Rhinos" signature="781920786"/>
+        <RUNSHORT imageName="TeamType12022_thumb" name="Team Type 1" signature="790877474"/>
         <RUNSHORT imageName="SLTRun2022green_thumb" name="Super League Tri Arena Games - Green Jersey" signature="814301931"/>
         <RUNSHORT imageName="Shorts09" name="Zwift Running Shorts 9" signature="832602111"/>
         <RUNSHORT imageName="RunFestivalThumb" name="Zwift Run Festival" signature="837111845"/>
         <RUNSHORT imageName="ZSunRun2022_thumb" name="ZSun" signature="844694699"/>
         <RUNSHORT imageName="ZRS032021_thumb" name="ZRS Fall 2021 Shorts" signature="866715834"/>
+        <RUNSHORT imageName="Scotland2023_thumb" name="Scotland Jersey" signature="927838145"/>
         <RUNSHORT imageName="RFTO2021_thumb" name="MARATHON 20 PRIMEBLUE" signature="963884552"/>
         <RUNSHORT imageName="USMES2021_thumb" name="US Military Endurance Sports" signature="1073721685"/>
         <RUNSHORT imageName="JanFrodeno2019_thumb" name="Jan Frodeno Shorts" signature="1164162762"/>
@@ -1003,9 +1069,11 @@
         <RUNSHORT imageName="ZwiftAcademyTriRun2020_thumb" name="Zwift Academy 2020 Tri Run" signature="1294390938"/>
         <RUNSHORT imageName="EricMinHolidayRun2021_thumb" name="2021 Zwift Holiday Run Shorts" signature="1306892875"/>
         <RUNSHORT imageName="SLTCheetahs2022_thumb" name="Super League Triathlon Cheetahs" signature="1350060991"/>
+        <RUNSHORT imageName="LederhosenRun2022_thumb" name="Lederhose" signature="1393921609"/>
         <RUNSHORT imageName="ZATriRun2021_thumb" name="2021 ZA Tri Run Shorts" signature="1422442217"/>
         <RUNSHORT imageName="HaloIDRun2022_thumb" name="Halo ID" signature="1434435763"/>
         <RUNSHORT imageName="WhoopRun2021_thumb" name="WHOOP Run Shorts" signature="1625357719"/>
+        <RUNSHORT imageName="TourDeZwift2023_thumb" name="Tour de Zwift 2023" signature="1665066158"/>
         <RUNSHORT imageName="SLTRun2022blue_thumb" name="Super League Tri Arena Games - Blue Jersey" signature="1692970122"/>
         <RUNSHORT imageName="DempseyChallengeRun2021_thumb" name="Dempsey Challenge" signature="1747240866"/>
         <RUNSHORT imageName="SLTRun2022red_thumb" name="Super League Tri Arena Games - Red Jersey" signature="1842805541"/>
@@ -1038,6 +1106,7 @@
         <RUNSHORT imageName="Shorts13" name="Zwift Running Shorts 13" signature="3118125824"/>
         <RUNSHORT imageName="PrideOn2022_thumb" name="Pride 2022" signature="3146952674"/>
         <RUNSHORT imageName="RunningDay2019" name="Running Day" signature="3147597225"/>
+        <RUNSHORT imageName="TourOfWatopia2023_thumb" name="Tour of Watopia 2023" signature="3157505060"/>
         <RUNSHORT imageName="SLTRun2022grey_thumb" name="Super League Tri Arena Games - Grey Jersey" signature="3173989733"/>
         <RUNSHORT imageName="ZARun2021_thumb" name="2021 ZA Run Shorts" signature="3213034432"/>
         <RUNSHORT imageName="PrideOn2020_thumb" name="Pride On" signature="3243441282"/>
@@ -1062,7 +1131,7 @@
         <RUNSHORT imageName="NewBalance2019_thumb" name="New Balance" signature="4037580579"/>
         <RUNSHORT imageName="Shorts05" name="Zwift Running Shorts 5" signature="4098921214"/>
         <RUNSHORT imageName="LionelSanders2019_thumb" name="Lionel Sanders Shorts" signature="4158603661"/>
-        <RUNSHORT imageName="ZARun2022_thumb" name="ZA Run 2022" signature="4163074320"/>
+        <RUNSHORT imageName="ZARun2022_thumb" name="Zwift Academy 2023" signature="4163074320"/>
         <RUNSHORT imageName="SLTRun2022black_thumb" name="Super League Tri Arena Games - Black Jersey" signature="4191775939"/>
         <RUNSHORT imageName="PrideOn2021_thumb" name="2021 Pride On Run Shorts" signature="4231189810"/>
         <RUNSHORT imageName="Shorts10" name="Zwift Running Shorts 10" signature="4269451728"/>
@@ -1077,10 +1146,12 @@
         <RUNSHOE imageName="RunningShoesZATri2022_thumb" name="Zwift Academy Tri 2022" signature="798247478"/>
         <RUNSHOE imageName="RunningShoe_Black" name="Zwift Black" signature="888731925"/>
         <RUNSHOE imageName="RunningShoe_TourOfWatopia2020" name="Tour Of Watopia" signature="1031530322"/>
-        <RUNSHOE imageName="RunningShoesZARun2022_thumb" name="ZA Run 2022" signature="1100805829"/>
+        <RUNSHOE imageName="RunningShoesZARun2022_thumb" name="Zwift Academy 2023" signature="1100805829"/>
         <RUNSHOE imageName="RunningShoe_NewBalanceFuelCell" name="Fuel Cell" signature="1385330702"/>
         <RUNSHOE imageName="RunningShoesZARun2021_thumb" name="2021 ZA Run Shoes" signature="1612131925"/>
         <RUNSHOE imageName="" name="Zante V4" signature="1784111512"/>
+        <RUNSHOE imageName="Runningshoe_Lederhose2022_thumb" name="Alpine" signature="2031493632"/>
+        <RUNSHOE imageName="RunningShoes_TourofWatopia2023_thumb" name="Tour of Watopia 2023" signature="2061213058"/>
         <RUNSHOE imageName="RunningShoe_Blue" name="Zwift Blue" signature="2457594239"/>
         <RUNSHOE imageName="RunningShoesRFTO2022_thumb" name="adidas ULTRABOOST 22" signature="2810712238"/>
         <RUNSHOE imageName="" name="HOVR Machina 2" signature="3055713810"/>
@@ -1092,16 +1163,18 @@
         <RUNSHOE imageName="RunningShoesRFTO2021_thumb" name="UB21 Primeblue Shoes" signature="3760745086"/>
         <RUNSHOE imageName="" name="Adios Pro" signature="3778542725"/>
         <RUNSHOE imageName="RunningShoe_ZRSKit032021" name="ZRS Running Shoes 3" signature="3851989283"/>
-        <RUNSHOE imageName="" name="Saucony Endorphin Pro" signature="3913112068"/>
+        <RUNSHOE imageName="" name="Saucony Endorphin" signature="3913112068"/>
         <RUNSHOE imageName="" name="Hoka Clifton 5" signature="3939519764"/>
         <RUNSHOE imageName="RunningShoe_ZRSKit022021" name="ZRS Running Shoes 2" signature="4075005280"/>
         <RUNSHOE imageName="RunningShoe_Magenta" name="Zwift Magenta" signature="4228783761"/>
         <RUNSHOE imageName="RunningShoe_Green" name="Zwift Green" signature="4255700797"/>
     </RUNSHOES>
     <BIKESHOES>
+        <BIKESHOE imageName="Lederhose2022" name="Alpine" signature="138403836"/>
         <BIKESHOE imageName="zwiftbetashoe" name="Zwift Beta Shoe" signature="560768614"/>
         <BIKESHOE imageName="zwiftblack" name="Zwift Black" signature="725344338"/>
         <BIKESHOE imageName="TourOfWatopia2020" name="Tour Of Watopia" signature="1039719545"/>
+        <BIKESHOE imageName="CyclingShoes_TourofWatopia2023_thumb" name="Tour of Watopia 2023" signature="1424136009"/>
         <BIKESHOE imageName="SworksSpSeven" name="Sworks SP7" signature="1614109799"/>
         <BIKESHOE imageName="Adidas2021" name="Adidas Indoor Cycling Shoes" signature="1982081400"/>
         <BIKESHOE imageName="BontHelix" name="Bont Helix" signature="2095963351"/>
@@ -1164,6 +1237,7 @@
         <BIKEFRONTWHEEL imageName="Wheel_CampagnoloLow" name="Zwift 32mm Carbon" signature="4029436085"/>
         <BIKEFRONTWHEEL imageName="Wheel_Zipp858" name="Zipp 858" signature="4169703170"/>
         <BIKEFRONTWHEEL imageName="Wheel_MavicCosmicUltUST" name="Mavic Cosmic Ultimate UST" signature="4185901178"/>
+        <BIKEFRONTWHEEL imageName="Wheel_CampagnoloHigh" name="Zwift Handcycle" signature="4221174482"/>
         <BIKEFRONTWHEEL imageName="Wheel_ShimanoDuraAceC40" name="Shimano C40" signature="4235764609"/>
         <BIKEFRONTWHEEL imageName="Wheel_FFWDRYOT55" name="FFWD RYOT55" signature="4237316283"/>
     </BIKEFRONTWHEELS>
@@ -1198,6 +1272,7 @@
         <BIKEREARWHEEL imageName="Wheel_RovalAlpinistCLX" name="Roval Alpinist CLX" signature="2235474271"/>
         <BIKEREARWHEEL imageName="Wheel_Enve89" name="Enve SES 8.9" signature="2402320131"/>
         <BIKEREARWHEEL imageName="Wheel_ZwiftFunIsFast" name="Zwift Supersonic Wheelset" signature="2506347267"/>
+        <BIKEREARWHEEL imageName="Wheel_CampagnoloHigh" name="Zwift Handcycle" signature="2602078812"/>
         <BIKEREARWHEEL imageName="Wheel_Enve22" name="Enve SES 2.2" signature="2649189525"/>
         <BIKEREARWHEEL imageName="Wheel_ZwiftGravel" name="Zwift Gravel" signature="2771477956"/>
         <BIKEREARWHEEL imageName="Wheel_DTSwissARC1100AeroTT" name="DTSwiss ARC 1100 DICUT DISC" signature="2783190436"/>
@@ -1312,6 +1387,7 @@
         <BIKEFRAME isTT="0" modelYear="0" name="Zwift Aero" signature="3284970806"/>
         <BIKEFRAME isTT="1" modelYear="2015" name="Pinarello Bolide" signature="3367169312"/>
         <BIKEFRAME isTT="1" modelYear="2015" name="BMC Timemachine01" signature="3373750102"/>
+        <BIKEFRAME isTT="1" modelYear="2022" name="Cadex CadexTri2022" signature="3402382031"/>
         <BIKEFRAME isTT="0" modelYear="2020" name="Factor One" signature="3469325930"/>
         <BIKEFRAME isTT="1" modelYear="2015" name="Canyon Speedmax Team Edition" signature="3483005256"/>
         <BIKEFRAME isTT="0" modelYear="2018" name="Liv Langma Advanced SL" signature="3495124341"/>
@@ -1323,6 +1399,7 @@
         <BIKEFRAME isTT="0" modelYear="1885" name="Zwift Safety" signature="3710262807"/>
         <BIKEFRAME isTT="1" modelYear="2015" name="Specialized Shiv" signature="3772124007"/>
         <BIKEFRAME isTT="0" modelYear="2021" name="Lauf Lauf True Grit" signature="3787085621"/>
+        <BIKEFRAME isTT="0" modelYear="0" name="Zwift Handcycle" signature="3814159195"/>
         <BIKEFRAME isTT="0" modelYear="2020" name="Focus Izalco Max 2020" signature="3867639546"/>
         <BIKEFRAME isTT="0" modelYear="2022" name="BMC BmcTeamMachine2022" signature="3868468027"/>
         <BIKEFRAME isTT="0" modelYear="2015" name="Specialized Ruby" signature="3914093169"/>
@@ -1354,6 +1431,7 @@
         <SOCK imageName="CalorieChallenge2020" name="Calorie Challenge" signature="535265719"/>
         <SOCK imageName="Socks_ZARoad2022" name="Zwift Academy 2022" signature="583553384"/>
         <SOCK imageName="Socks_OffTheMaap2021" name="Off the MAAP 2021 SOCKS" signature="595416697"/>
+        <SOCK imageName="Cute01" name="Shiba" signature="620709508"/>
         <SOCK imageName="SocksZwiftAcademyWomen2020" name="Zwift Academy 2020 Womens" signature="657449117"/>
         <SOCK imageName="SocksZwiftAcademyTriOrange2019" name="Zwift Academy Tri Orange 2019" signature="690995707"/>
         <SOCK imageName="CritCrusher" name="CritCrusher Plan Socks" signature="708573979"/>
@@ -1379,6 +1457,7 @@
         <SOCK imageName="SolidDarkBlue" name="Solid Dark Blue" signature="1621746523"/>
         <SOCK imageName="SolidWhite" name="Solid White" signature="1659626293"/>
         <SOCK imageName="BuildMeUp" name="Build Me Up Plan Socks" signature="1662777809"/>
+        <SOCK imageName="Cute02" name="Tabby" signature="1667185748"/>
         <SOCK imageName="Socks_OffTheMaap2022" name="Off the MAAP" signature="1692216489"/>
         <SOCK imageName="Socks_ZARoad2021" name="ZA Road 2021 Socks" signature="1701325752"/>
         <SOCK imageName="Socks_RaphaRising2022" name="Rapha Rising 2022" signature="1731120091"/>
@@ -1388,17 +1467,22 @@
         <SOCK imageName="SocksDotBlue" name="Dots Blue" signature="1886629477"/>
         <SOCK imageName="ZRS2021Socks01" name="ZRS Socks 1" signature="2007102130"/>
         <SOCK imageName="BikeTo10K" name="Cyclist to 10k Plan Socks" signature="2008761065"/>
-        <SOCK imageName="TealPink2020" name="April Fools" signature="2098463286"/>
+        <SOCK imageName="TealPink2020" name="1980s" signature="2098463286"/>
+        <SOCK imageName="TourDeZwift2023" name="Tour de Zwift 2023" signature="2217505987"/>
         <SOCK imageName="Socks_TourDeZwiftRun2022" name="Tour de Zwift 2022 Run Socks" signature="2218100751"/>
+        <SOCK imageName="FlameTrails" name="Fire Socks" signature="2247184434"/>
         <SOCK imageName="Socks_ZippB2021" name="Zipp" signature="2309812449"/>
-        <SOCK imageName="Socks_ZARun2022" name="ZA Run 2022" signature="2423356766"/>
+        <SOCK imageName="Socks_ZARun2022" name="Zwift Academy 2023" signature="2423356766"/>
         <SOCK imageName="MultiSportMixer" name="Multi-Sport Mixer Plan Socks" signature="2434443470"/>
         <SOCK imageName="SocksZwfitAcademyWomens2018" name="Zwift Academy Women 2018" signature="2446055922"/>
         <SOCK imageName="SocksZwiftAcademyRun2021" name="ZA Run Team Socks 2021" signature="2446251922"/>
         <SOCK imageName="SolidBlack" name="Solid Black" signature="2465867988"/>
         <SOCK imageName="Socks_PrideOn2021" name="2021 Pride On Socks" signature="2510625778"/>
         <SOCK imageName="SolidPink" name="Solid Pink" signature="2524584466"/>
+        <SOCK imageName="Animals02" name="Animal Socks" signature="2574303941"/>
         <SOCK imageName="Socks_Vitality2021" name="Team Vitality Socks" signature="2629062357"/>
+        <SOCK imageName="Fruits02" name="Fruit Socks" signature="2644465467"/>
+        <SOCK imageName="TourOfMakuri2022" name="Tour of Makuri Islands" signature="2703880917"/>
         <SOCK imageName="SolidLightBlue" name="Solid Light Blue" signature="2712186425"/>
         <SOCK imageName="Socks_PrideOn2020" name="Pride On" signature="2831495746"/>
         <SOCK imageName="SocksZwiftAcademyWomen2019" name="Zwift Academy Women" signature="2896949314"/>
@@ -1426,10 +1510,13 @@
         <SOCK imageName="Socks_ZARun2021" name="2021 ZA Run Socks" signature="3620800398"/>
         <SOCK imageName="201Run" name="201 Running Plan Socks" signature="3642635650"/>
         <SOCK imageName="Socks_AAPI2022" name="AAPI Heritage Month" signature="3643312501"/>
+        <SOCK imageName="Fruits01" name="Fruit Socks" signature="3661573611"/>
         <SOCK imageName="Stripes01Blue" name="Striped Blue" signature="3696890221"/>
+        <SOCK imageName="Animals01" name="Animal Socks" signature="3738220565"/>
         <SOCK imageName="SocksRFTO2021" name="Ultralight Crew Performance Socks" signature="3782188179"/>
         <SOCK imageName="Socks_INEOSGrenadiers2021_white" name="INEOS Grenadiers" signature="3811667861"/>
         <SOCK imageName="Stripes04OrangeBlue" name="Striped Orange Blue" signature="3814348865"/>
+        <SOCK imageName="Lederhose2022" name="Alpine" signature="3828604711"/>
         <SOCK imageName="ZwiftOrange" name="Generic Orange" signature="3871721080"/>
         <SOCK imageName="PebblePounder" name="Pebble Pounder Plan Socks" signature="3930950032"/>
         <SOCK imageName="SocksZwiftAcademyTriRun2020" name="Zwift Academy 2020 Tri Run" signature="3953741983"/>
@@ -1448,7 +1535,8 @@
         <GLASS imageName="Glasses_Original" name="Oakley Radar" signature="478032186"/>
         <GLASS imageName="Glasses_Generic01" name="Wave Wearers" signature="817902595"/>
         <GLASS imageName="Glasses_Goodr_thumb" name="Goodr" signature="821811498"/>
-        <GLASS imageName="Glasses_TealPink2020Glasses01_thumb" name="April Fools" signature="1220623368"/>
+        <GLASS imageName="Glasses_RearView" name="Rearview Mirror Glasses" signature="1163597738"/>
+        <GLASS imageName="Glasses_TealPink2020Glasses02_thumb" name="1980s" signature="1220623368"/>
         <GLASS imageName="none" name="None" signature="1225125243"/>
         <GLASS imageName="Glasses_Generic03" name="Top Guns" signature="1241540451"/>
         <GLASS imageName="Glasses_Generic04" name="Zwift Glasses #1" signature="1541295082"/>
@@ -1461,6 +1549,7 @@
         <GLASS imageName="Glasses_ZA2018Mens" name="Oakley Flight Jacket" signature="2344157440"/>
         <GLASS imageName="Glasses_ZRS2021Glasses02" name="ZRS Glasses 2" signature="2364395919"/>
         <GLASS imageName="Glasses_POCClarityAspire" name="POC Clarity Aspire" signature="2472441074"/>
+        <GLASS imageName="Glasses_TourOfMakuri2022" name="Tour of Makuri Islands" signature="2628706018"/>
         <GLASS imageName="Glasses_ZRS2021Glasses03" name="ZRS Glasses 3" signature="2978871359"/>
         <GLASS imageName="Glasses_Goggles" name="Vintage Goggles" signature="3027735239"/>
         <GLASS imageName="Glasses_Generic06" name="Rockstar" signature="3309343427"/>
@@ -1475,6 +1564,7 @@
         <HEADGEAR imageName="RunnerCapEddieIzzardCelebration2021_thumb" name="Eddie Izzard Celebration Run Cap" signature="284363248"/>
         <HEADGEAR imageName="GiroVanquish" name="Giro Vanquish" signature="302247979"/>
         <HEADGEAR imageName="SpecializedZATri2022" name="2022 ZA Tri Team Design" signature="322596379"/>
+        <HEADGEAR imageName="CyclingCapJumboVisma2022_thumb" name="Team Jumbo-Visma 2022" signature="341420555"/>
         <HEADGEAR imageName="CyclingCapTourDeZwift2022_thumb" name="Tour de Zwift 2022 Ride Cap" signature="407446488"/>
         <HEADGEAR imageName="RunningCapTOW2022_thumb" name="Tour of Watopia 2022" signature="444961024"/>
         <HEADGEAR imageName="RunnerCapRunFestival2021_thumb" name="Run Festival Hat" signature="471358119"/>
@@ -1502,10 +1592,11 @@
         <HEADGEAR imageName="none" name="None" signature="1225125243"/>
         <HEADGEAR imageName="CyclingCap_Orange" name="Zwift Cycling Cap" signature="1247929422"/>
         <HEADGEAR imageName="LazerBullet" name="LOC_ACCESSORY_LAZERBULLET" signature="1292376041"/>
+        <HEADGEAR imageName="CylcingCapHEP_thumb2022" name="HEP" signature="1295867791"/>
         <HEADGEAR imageName="GiroEclipse2021" name="Giro Eclipse" signature="1356164614"/>
         <HEADGEAR imageName="CyclingCapZwiftAcademyTri2019_thumb" name="Zwift Academy Tri 2019" signature="1367469675"/>
         <HEADGEAR imageName="RunnerCapZRSKit012021_thumb" name="ZRS Running Cap 1" signature="1378476431"/>
-        <HEADGEAR imageName="RunningCapZARun2022_thumb" name="ZA Run 2022" signature="1379982027"/>
+        <HEADGEAR imageName="RunningCapZARun2022_thumb" name="Zwift Academy 2023" signature="1379982027"/>
         <HEADGEAR imageName="AbusGameChangerWhite2021" name="ABUS GameChanger" signature="1387973863"/>
         <HEADGEAR imageName="NeokyoHelmet2021" name="2021 Neokyo Helmet" signature="1394595133"/>
         <HEADGEAR imageName="LimarAirSpeedWhite2021" name="Limar Air Speed White" signature="1409224145"/>
@@ -1513,6 +1604,8 @@
         <HEADGEAR imageName="RunnerCapRFTO2021_thumb" name="AEROREADY PRIMEBLUE Runner Low Cap" signature="1498204581"/>
         <HEADGEAR imageName="CyclingCapTourDeZwift2021_thumb" name="Tour de Zwift 2021 Ride Cap" signature="1609128200"/>
         <HEADGEAR imageName="BackwardsCapZCTraining2022_thumb" name="ZC Training Cap" signature="1684913570"/>
+        <HEADGEAR imageName="CyclingCapTourOfWatopia2023_thumb" name="Tour of Watopia 2023" signature="1713458564"/>
+        <HEADGEAR imageName="Visor_TourOfMakuri2022" name="Tour of Makuri Islands" signature="1720452859"/>
         <HEADGEAR imageName="Giro2019_thumb" name="Giro d&apos;Italia" signature="1774524673"/>
         <HEADGEAR imageName="RunnerCapZRSKit022021_thumb" name="ZRS Running Cap 2" signature="1805966666"/>
         <HEADGEAR imageName="zwifthelmetpartdeux" name="Zwift Helmet Part Deux" signature="1880866806"/>
@@ -1539,10 +1632,12 @@
         <HEADGEAR imageName="CyclingCapZwiftAcademyMen2020_thumb" name="Zwift Academy 2020 Mens" signature="2930635682"/>
         <HEADGEAR imageName="RunningCap_ZA2018_Mens" name="Zwift Academy Men 2018" signature="2937771968"/>
         <HEADGEAR imageName="RunnerCapZwiftAcademy2020_thumb" name="Zwift Academy 2020 Run" signature="2952938549"/>
+        <HEADGEAR imageName="LederhoseHat2022_thumb" name="Alpine" signature="3027813077"/>
         <HEADGEAR imageName="BellJavelin" name="Bell Javelin" signature="3033412906"/>
         <HEADGEAR imageName="HJCFurion" name="HJC Furion" signature="3104058090"/>
         <HEADGEAR imageName="SworksEvade" name="S-Works Evade" signature="3109903878"/>
         <HEADGEAR imageName="Headband_Orange" name="Zwift Head Band" signature="3137618299"/>
+        <HEADGEAR imageName="CyclingCapZwiftProTraining2022_thumb" name="Zwift Pro Training Camp 2022" signature="3249347051"/>
         <HEADGEAR imageName="RcZRSCiele2020_thumb" name="ZRS Ciele" signature="3291118897"/>
         <HEADGEAR imageName="CyclingCapRaphaRising2022_thumb" name="Rapha Rising 2022" signature="3324753264"/>
         <HEADGEAR imageName="GiroEclipseCanyonSRAM2021" name="Giro Eclipse Canyon SRAM" signature="3346861673"/>
@@ -1553,6 +1648,7 @@
         <HEADGEAR imageName="ProtonKaskINEOS2021" name="Protone INEOS Grenadier" signature="3438211262"/>
         <HEADGEAR imageName="RunningCapZARun2021_thumb" name="2021 ZA Run Hat" signature="3500373581"/>
         <HEADGEAR imageName="BackwardsCapZARun2021_thumb" name="2021 ZA Tri Hat Backwards" signature="3525135378"/>
+        <HEADGEAR imageName="RunningCapTourOfWatopia2023_thumb" name="Tour of Watopia 2023" signature="3599973897"/>
         <HEADGEAR imageName="BackwardsCyclingCapGiant2022_thumb" name="Giant Backwards Cap" signature="3630601017"/>
         <HEADGEAR imageName="SpecializedZA2021" name="ZA Tri Team Helmet 2020" signature="3633294398"/>
         <HEADGEAR imageName="CyclingCapRaphaLetape2019_thumb" name="Rapha L&apos;Etape" signature="3644241871"/>
@@ -1566,10 +1662,14 @@
         <HEADGEAR imageName="SworksZA2020" name="Zwift Academy 2020 Sworks" signature="3826988747"/>
         <HEADGEAR imageName="GiroEclipseFDJ2021" name="Giro Eclipse FDJ" signature="3912703277"/>
         <HEADGEAR imageName="CyclingCapLeCol2022_thumb" name="Le Col CC" signature="3961081102"/>
+        <HEADGEAR imageName="VisorBold01_thumb" name="Orange Sun Visor" signature="3997506118"/>
+        <HEADGEAR imageName="CyclingCapMovistar2022_thumb" name="Team Movistar 2022" signature="4039413009"/>
         <HEADGEAR imageName="RunningCapPrecision2022_thumb" name="RunningCapPrecision2022" signature="4144877717"/>
         <HEADGEAR imageName="CyclingCapINEOSGrenadiers2021_thumb" name="INEOS Grenadiers" signature="4226117447"/>
+        <HEADGEAR imageName="BackwardsCapTourDeZwift2023_thumb" name="Tour de Zwift 2023" signature="4227553526"/>
         <HEADGEAR imageName="AbusGameChanger2021" name="ABUS GameChanger Movistar Team" signature="4241132751"/>
         <HEADGEAR imageName="CyclingCapZwiftAcademyWomen2020_thumb" name="Zwift Academy 2020 Womens" signature="4252145787"/>
+        <HEADGEAR imageName="BackwardsCapFluoro01_thumb" name="Black &amp; Gold Cap" signature="4289252182"/>
         <HEADGEAR imageName="RunnerCapZwiftAcademyRun2021_thumb" name="ZA Run Team Hat 2021" signature="4291019094"/>
     </HEADGEARS>
 </GameDictionary>
