@@ -272,6 +272,7 @@ class Playback(db.Model):
     segment_id = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Float, nullable=False)
     world_time = db.Column(db.Integer, nullable=False)
+    type = db.Column(db.Integer)
 
 class Zfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1797,17 +1798,17 @@ def player_playbacks_player_playback():
         logger.error("failed to create playbacks dir (%s):  %s", pb_dir, str(e))
         return '', 400
     stream = request.stream.read()
-    pb = playback_pb2.Playback()
+    pb = playback_pb2.PlaybackData()
     pb.ParseFromString(stream)
     if pb.time == 0:
         return '', 200
     new_uuid = str(uuid.uuid4())
-    new_pb = Playback(player_id=current_user.player_id, uuid=new_uuid, segment_id=pb.segment_id, time=pb.time, world_time=pb.world_time)
+    new_pb = Playback(player_id=current_user.player_id, uuid=new_uuid, segment_id=pb.segment_id, time=pb.time, world_time=pb.world_time, type=pb.type)
     db.session.add(new_pb)
     db.session.commit()
     with open('%s/%s.playback' % (pb_dir, new_uuid), 'wb') as f:
         f.write(stream)
-    return '', 200
+    return new_uuid, 201
 
 @app.route('/api/player-playbacks/player/me/playbacks/<segment_id>/<option>', methods=['GET'])
 @jwt_to_session_cookie
@@ -1816,16 +1817,15 @@ def player_playbacks_player_me_playbacks(segment_id, option):
     segment_id = int(segment_id)
     after = request.args.get('after')
     before = request.args.get('before')
-    query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s"
-    args = {"p": current_user.player_id, "s": segment_id}
-    # in version 1.0.107565 'before' is always 0 and 'after' is always 18446744065933551616
-    # also there's a new argument 'type' (SEGMENT/ROUTE) which we are disregarding for now
-    #if after:
-    #    query += " AND world_time > :a"
-    #    args.update({"a": after})
-    #if before:
-    #    query += " AND world_time < :b"
-    #    args.update({"b": before})
+    pb_type = playback_pb2.PlaybackType.Value(request.args.get('type'))
+    query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s AND type = :t"
+    args = {"p": current_user.player_id, "s": segment_id, "t": pb_type}
+    if after != '18446744065933551616':
+        query += " AND world_time > :a"
+        args.update({"a": after})
+    if before != '0':
+        query += " AND world_time < :b"
+        args.update({"b": before})
     if option == 'pr':
         query += " ORDER BY time"
     elif option == 'latest':
@@ -1833,12 +1833,14 @@ def player_playbacks_player_me_playbacks(segment_id, option):
     row = db.session.execute(sqlalchemy.text(query), args).first()
     if not row:
         return '', 200
-    pbr = playback_pb2.PlaybackResponse()
+    pbr = playback_pb2.PlaybackMetadata()
     pbr.uuid = row.uuid
     pbr.segment_id = row.segment_id
     pbr.time = row.time
     pbr.world_time = row.world_time
     pbr.url = 'https://cdn.zwift.com/player-playback/playbacks/%s.playback' % row.uuid
+    if pb_type:
+        pbr.type = pb_type
     return pbr.SerializeToString(), 200
 
 @app.route('/player-playback/playbacks/<path:filename>')
@@ -3184,6 +3186,16 @@ def migrate_database():
     db.session.execute(sqlalchemy.text('vacuum')) #shrink database
     logging.warn("Database migration completed")
 
+def update_playback():
+    for row in Playback.query.all():
+        try:
+            with open('%s/playbacks/%s.playback' % (STORAGE_DIR, row.uuid), 'rb') as f:
+                pb = playback_pb2.PlaybackData()
+                pb.ParseFromString(f.read())
+                row.type = pb.type
+        except Exception as exc:
+            logging.warn("update_playback: %s" % repr(exc))
+    db.session.commit()
 
 def check_columns(table_class, table_name):
     rows = db.session.execute(sqlalchemy.text("PRAGMA table_info(%s)" % table_name))
@@ -3191,6 +3203,7 @@ def check_columns(table_class, table_name):
     current_columns = list()
     for row in rows:
         current_columns.append(row[1])
+    added = False
     for column in should_have_columns:
         if not column.name in current_columns:
             nulltext = None
@@ -3205,7 +3218,8 @@ def check_columns(table_class, table_name):
                 defaulttext = " DEFAULT %s" % column.default.arg
             db.session.execute(sqlalchemy.text("ALTER TABLE %s ADD %s %s %s%s" % (table_name, column.name, column.type, nulltext, defaulttext)))
             db.session.commit()
-
+            added = True
+    return added
 
 def send_server_back_online_message():
     time.sleep(30)
@@ -3220,6 +3234,8 @@ def before_first_request():
     db.create_all()
     db.session.commit()
     check_columns(User, 'user')
+    if check_columns(Playback, 'playback'):
+        update_playback()
     migrate_database()
     db.session.close()
 

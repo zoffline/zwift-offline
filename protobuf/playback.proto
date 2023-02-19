@@ -1,15 +1,22 @@
 syntax = "proto2";
 
-message Playback {
+enum PlaybackType {
+    SEGMENT = 0;
+    ROUTE = 1;
+}
+
+message PlaybackData {
     required int64 segment_id = 1;
     required float time = 3;
     required uint64 world_time = 4;
+    optional PlaybackType type = 11;
 }
 
-message PlaybackResponse {
+message PlaybackMetadata {
     required string uuid = 1;
     required int64 segment_id = 2;
     required float time = 4;
     required uint64 world_time = 5;
     required string url = 6;
+    optional PlaybackType type = 8;
 }
