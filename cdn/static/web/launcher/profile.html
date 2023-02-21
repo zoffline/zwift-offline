@@ -1,23 +1,25 @@
 {% extends "./layout.html" %}
 {% block content %}
   <h1><div class="text-shadow">Download Zwift profile</div></h1>
-  <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  {% if username != "zoffline" %}
+    <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  {% endif %}
   <div class="row">
     <div class="col-sm-6 col-md-5">
       <form id="profile" action="{{ url_for('profile', username=username) }}" method="post">
         <div class="row">
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">Zwift Username</label>
+            <label class="col-form-label col-form-label-sm text-shadow">Zwift username</label>
             <input type="text" id="username" name="username" class="form-control form-control-sm">
           </div>
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">Zwift Password</label>
+            <label class="col-form-label col-form-label-sm text-shadow">Zwift password</label>
             <input type="password" id="password" name="password" class="form-control form-control-sm">
           </div>
           <div class="col-md-12 top-buffer">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="save_zwift" name="save_zwift">
-              <label class="form-check-label text-shadow" for="save_zwift">Save credentials (will automatically update activities to Zwift)</label>
+              <input class="form-check-input" type="checkbox" id="achievements" name="achievements">
+              <label class="form-check-label text-shadow" for="achievements">Download achievements</label>
             </div>
           </div>
         </div>

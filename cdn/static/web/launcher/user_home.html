@@ -1,36 +1,38 @@
 {% extends "./layout.html" %}
 {% block content %}
   <h1><div class="text-shadow">Zwift Launcher</div></h1>
-  {% if username %}
+  {% if username != "zoffline" %}
     <h2 class="text-shadow">Logged in as {{ username }}</h2>
-      {% if restarting %}
-      <div class="row">
-        <div class="col-sm-6 col-md-5">
-          <p class="alert alert-info">Server is restarting in {{ restarting_in_minutes }} minutes</p>
-        </div>
-      </div>
-      {% endif %}
+  {% endif %}
+  {% if restarting %}
     <div class="row">
-      <div class="col-md-12">
-        <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-secondary">Profile</a>
-        <a href="{{ url_for('reset', username=username) }}" class="btn btn-sm btn-secondary">Change password</a>
-        <a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava</a>
-        <a href="{{ url_for('garmin', username=username) }}" class="btn btn-sm btn-secondary">Garmin</a>
-        {% if server_ip %}
-          <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Get Zwift profile</a>
-        {% endif %}
-        <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
-        {% if is_admin and not restarting %}
-          <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
-        {% elif is_admin %}
-          <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
-        {% endif %}
-        {% if is_admin %}
-          <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
-        {% endif %}
+      <div class="col-sm-6 col-md-5">
+        <p class="alert alert-info">Server is restarting in {{ restarting_in_minutes }} minutes</p>
       </div>
     </div>
   {% endif %}
+  <div class="row">
+    <div class="col-md-12">
+      <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-secondary">Profile</a>
+      {% if username != "zoffline" %}
+        <a href="{{ url_for('reset', username=username) }}" class="btn btn-sm btn-secondary">Change password</a>
+      {% endif %}
+      <a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava</a>
+      <a href="{{ url_for('garmin', username=username) }}" class="btn btn-sm btn-secondary">Garmin</a>
+      <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Get Zwift profile</a>
+      {% if username != "zoffline" %}
+        <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
+      {% endif %}
+      {% if is_admin and not restarting %}
+        <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
+      {% elif is_admin %}
+        <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
+      {% endif %}
+      {% if is_admin %}
+        <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
+      {% endif %}
+    </div>
+  </div>
   <div class="row">
     <div class="col-sm-6 col-md-5">
       <form method="POST" action="/start-zwift" class="top-buffer">

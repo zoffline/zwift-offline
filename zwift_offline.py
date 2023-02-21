@@ -110,12 +110,13 @@ if MULTIPLAYER:
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
     logger.addHandler(logHandler)
-    CREDENTIALS_KEY_FILE = "%s/credentials-key.bin" % STORAGE_DIR
-    if not os.path.exists(CREDENTIALS_KEY_FILE):
-        with open(CREDENTIALS_KEY_FILE, 'wb') as f:
-            f.write(get_random_bytes(32))
-    with open(CREDENTIALS_KEY_FILE, 'rb') as f:
-        credentials_key = f.read()
+
+CREDENTIALS_KEY_FILE = "%s/credentials-key.bin" % STORAGE_DIR
+if not os.path.exists(CREDENTIALS_KEY_FILE):
+    with open(CREDENTIALS_KEY_FILE, 'wb') as f:
+        f.write(get_random_bytes(32))
+with open(CREDENTIALS_KEY_FILE, 'rb') as f:
+    credentials_key = f.read()
 
 STRAVA_CLIENT_ID = '28117'
 STRAVA_CLIENT_SECRET = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
@@ -697,27 +698,18 @@ def profile(username):
         try:
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
-                profile = online_sync.query_player_profile(session, access_token)
+                profile = online_sync.query(session, access_token, "api/profiles/me")
                 with open('%s/profile.bin' % profile_dir, 'wb') as f:
                     f.write(profile)
+                if request.form.get("achievements"):
+                    achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
+                    with open('%s/achievements.bin' % profile_dir, 'wb') as f:
+                        f.write(achievements)
                 online_sync.logout(session, refresh_token)
                 flash("Zwift profile installed locally.")
             except Exception as exc:
                 logger.warning('Zwift profile: %s' % repr(exc))
                 flash("Error downloading profile.")
-            if request.form.get("save_zwift", None) != None:
-                try:
-                    zwift_credentials = (username + '\n' + password).encode('UTF-8')
-                    cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-                    ciphered_text = cipher_suite.encrypt(zwift_credentials)
-                    file_path = os.path.join(profile_dir, 'zwift_credentials.bin')
-                    with open(file_path, 'wb') as fw:
-                        fw.write(cipher_suite.iv)
-                        fw.write(ciphered_text)
-                    flash("Zwift credentials saved. Go to \"Profile\" to remove credentials.")
-                except Exception as exc:
-                    logger.warning('zwift_credentials: %s' % repr(exc))
-                    flash("Error saving 'zwift_credentials.bin' file.")
         except Exception as exc:
             logger.warning('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
@@ -754,7 +746,7 @@ def garmin(username):
 @login_required
 def user_home(username):
     return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), new_home=bool(current_user.new_home),
-        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes, server_ip=os.path.exists(SERVER_IP_FILE))
+        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
 def enqueue_player_update(player_id, wa_bytes):
     if not player_id in player_update_queue:
@@ -851,7 +843,7 @@ def upload(username):
         else:
             flash("Invalid file name.")
 
-    name = ''
+    name = "%s %s" % (current_user.first_name, current_user.last_name)
     profile = None
     profile_file = os.path.join(profile_dir, 'profile.bin')
     if os.path.isfile(profile_file):
@@ -861,6 +853,11 @@ def upload(username):
             p = profile_pb2.PlayerProfile()
             p.ParseFromString(fd.read())
             name = "%s %s" % (p.first_name, p.last_name)
+    achievements = None
+    achievements_file = os.path.join(profile_dir, 'achievements.bin')
+    if os.path.isfile(achievements_file):
+        stat = os.stat(achievements_file)
+        achievements = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
     token = None
     token_file = os.path.join(profile_dir, 'strava_token.txt')
     if os.path.isfile(token_file):
@@ -871,21 +868,16 @@ def upload(username):
     if os.path.isfile(garmin_file):
         stat = os.stat(garmin_file)
         garmin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-    zwift = None
-    zwift_file = os.path.join(profile_dir, 'zwift_credentials.bin')
-    if os.path.isfile(zwift_file):
-        stat = os.stat(zwift_file)
-        zwift = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
 
-    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token, garmin=garmin, zwift=zwift)
+    return render_template("upload.html", username=current_user.username, profile=profile, name=name, token=token, garmin=garmin, achievements=achievements)
 
 
-@app.route("/download/profile.bin", methods=["GET"])
+@app.route("/download/<filename>", methods=["GET"])
 @login_required
-def download_profile():
-    profile_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'profile.bin')
-    if os.path.isfile(profile_file):
-        return send_file(profile_file)
+def download(filename):
+    file = os.path.join(STORAGE_DIR, str(current_user.player_id), filename)
+    if os.path.isfile(file):
+        return send_file(file)
 
 @app.route("/download/<int:player_id>/avatarLarge.jpg", methods=["GET"])
 def download_avatarLarge(player_id):
@@ -899,7 +891,7 @@ def download_avatarLarge(player_id):
 @login_required
 def delete(filename):
     player_id = current_user.player_id
-    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.bin', 'zwift_credentials.bin']:
+    if filename not in ['profile.bin', 'strava_token.txt', 'garmin_credentials.bin', 'achievements.bin']:
         return '', 403
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
     delete_file = os.path.join(profile_dir, filename)
@@ -1446,15 +1438,8 @@ def bikeFrameToStr(val):
     return "---"
 
 def do_api_profiles(profile_id, is_json):
-    profile_dir = '%s/%s' % (STORAGE_DIR, profile_id)
-    try:
-        if not os.path.isdir(profile_dir):
-            os.makedirs(profile_dir)
-    except IOError as e:
-        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        return '', 500
     profile = profile_pb2.PlayerProfile()
-    profile_file = '%s/profile.bin' % profile_dir
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
     if not os.path.isfile(profile_file):
         profile.id = profile_id
         profile.email = current_user.username
@@ -1972,45 +1957,6 @@ def runalyze_upload(player_id, activity):
         logger.warning("Runalyze upload failed. No internet? %s" % repr(exc))
 
 
-def zwift_upload(player_id, activity):
-    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    zwift_credentials = '%s/zwift_credentials.bin' % profile_dir
-    if not os.path.exists(zwift_credentials):
-        logger.info("zwift_credentials.bin missing, skip Zwift activity update")
-        return
-    if not os.path.exists(SERVER_IP_FILE):
-        logger.info("server_ip.txt missing, skip Zwift activity update")
-        return
-    try:
-        with open(zwift_credentials, 'rb') as f:
-            iv = f.read(16)
-            ciphered_text = f.read()
-            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
-            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
-            split_credentials = unciphered_text.splitlines()
-            username = split_credentials[0]
-            password = split_credentials[1]
-    except Exception as exc:
-        logger.warning("Failed to read %s. Skipping Zwift upload attempt. %s" % (zwift_credentials, repr(exc)))
-        return
-    
-    try:
-        session = requests.session()
-        try:
-            access_token, refresh_token = online_sync.login(session, username, password)
-            activity.player_id = online_sync.get_player_id(session, access_token)
-            res = online_sync.upload_activity(session, access_token, activity)
-            if res == 200:
-                logger.info("Zwift activity upload succesfull")
-            else:
-                logger.warning("Zwift activity upload failed:%s:" %res)
-            online_sync.logout(session, refresh_token)
-        except Exception as exc:
-            logger.warning("Error uploading activity to Zwift Server. %s" % repr(exc))
-    except Exception as exc:
-        logger.warning("Zwift upload failed. No internet? %s" % repr(exc))
-
-
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
 @login_required
@@ -2049,7 +1995,6 @@ def api_profiles_activities_id(player_id, activity_id):
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
     runalyze_upload(player_id, activity)
-    zwift_upload(player_id, activity)
     logout_player(player_id)
     return response, 200
 
@@ -3271,7 +3216,7 @@ def launch_zwift():
         if MULTIPLAYER:
             return redirect(url_for('login'))
         else:
-            return render_template("user_home.html", username="", enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), new_home=os.path.exists(NEWHOME_FILE), online=get_online(),
+            return render_template("user_home.html", username=current_user.username, enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), new_home=os.path.exists(NEWHOME_FILE), online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -3412,6 +3357,13 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
                 break
         if not player_id:
             player_id = 1
+            profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
+            try:
+                if not os.path.isdir(profile_dir):
+                    os.makedirs(profile_dir)
+            except IOError as e:
+                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+                sys.exit(1)
         AnonUser.player_id = player_id
         login_manager.anonymous_user = AnonUser
     login_manager.init_app(app)

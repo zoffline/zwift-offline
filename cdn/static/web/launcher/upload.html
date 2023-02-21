@@ -1,6 +1,6 @@
 {% extends "./layout.html" %}
 {% block content %}
-  <h1><div class="text-shadow">Logged in as {{ username }} ({{ name }})</div></h1>
+  <h1><div class="text-shadow">{% if username != "zoffline" %}Logged in as {{ username }}{% else %}{{ name }}{% endif %}</div></h1>
   <div class="row">
     <div class="col-sm-8 col-md-7">
       <ul class="list-group">
@@ -11,6 +11,17 @@
                 <table width="420px"><td><label class="text-shadow">profile.bin - {{ profile }}</label></td>
                 <td align="right"><a href="/download/profile.bin"><div class="btn btn-sm btn-light">Download</div></a></td>
                 <td align="right"><a href="/delete/profile.bin"><div class="btn btn-sm btn-light">Delete</div></a></td></table>
+              </div>
+            </div>
+          </li>
+        {% endif %}
+        {% if achievements %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-12">
+                <table width="420px"><td><label class="text-shadow">achievements.bin - {{ achievements }}</label></td>
+                <td align="right"><a href="/download/achievements.bin"><div class="btn btn-sm btn-light">Download</div></a></td>
+                <td align="right"><a href="/delete/achievements.bin"><div class="btn btn-sm btn-light">Delete</div></a></td></table>
               </div>
             </div>
           </li>
@@ -31,16 +42,6 @@
               <div class="col-md-12">
                 <table width="420px"><td><label class="text-shadow">garmin_credentials.bin - {{ garmin }}</label></td>
                 <td align="right"><a href="/delete/garmin_credentials.bin"><div class="btn btn-sm btn-light">Delete</div></a></td></table>
-              </div>
-            </div>
-          </li>
-        {% endif %}
-        {% if zwift %}
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col-md-12">
-                <table width="420px"><td><label class="text-shadow">zwift_credentials.bin - {{ zwift }}</label></td>
-                <td align="right"><a href="/delete/zwift_credentials.bin"><div class="btn btn-sm btn-light">Delete</div></a></td></table>
               </div>
             </div>
           </li>

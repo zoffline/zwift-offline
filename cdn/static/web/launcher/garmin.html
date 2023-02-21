@@ -1,17 +1,19 @@
 {% extends "./layout.html" %}
 {% block content %}
   <h1><div class="text-shadow">Garmin Connect credentials</div></h1>
-  <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  {% if username != "zoffline" %}
+    <h2 class="text-shadow">Logged in as {{ username }} </h2>
+  {% endif %}
   <div class="row">
     <div class="col-sm-6 col-md-5">
       <form id="garmin" action="{{ url_for('garmin', username=username) }}" method="post">
         <div class="row">
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">Garmin Username</label>
+            <label class="col-form-label col-form-label-sm text-shadow">Garmin username</label>
             <input type="text" id="username" name="username" class="form-control form-control-sm">
           </div>
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">Garmin Password</label>
+            <label class="col-form-label col-form-label-sm text-shadow">Garmin password</label>
             <input type="password" id="password" name="password" class="form-control form-control-sm">
           </div>
         </div>
