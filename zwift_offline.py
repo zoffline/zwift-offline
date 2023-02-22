@@ -20,7 +20,6 @@ import base64
 import uuid
 import jwt
 import sqlalchemy
-import warnings
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from functools import wraps
@@ -60,9 +59,6 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
-
-warnings.simplefilter("ignore", ResourceWarning)
-warnings.simplefilter("ignore", DeprecationWarning)
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -117,6 +113,10 @@ if not os.path.exists(CREDENTIALS_KEY_FILE):
         f.write(get_random_bytes(32))
 with open(CREDENTIALS_KEY_FILE, 'rb') as f:
     credentials_key = f.read()
+
+import warnings
+with warnings.catch_warnings():
+    from stravalib.client import Client
 
 STRAVA_CLIENT_ID = '28117'
 STRAVA_CLIENT_SECRET = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
@@ -647,12 +647,6 @@ def reset(username):
 @app.route("/strava", methods=['GET'])
 @login_required
 def strava():
-    try:
-        from stravalib.client import Client
-    except ImportError as exc:
-        logger.warning('stravalib: %s' % repr(exc))
-        flash("stravalib is not installed. Skipping Strava authorization attempt.")
-        return redirect('/user/%s/' % current_user.username)
     client = Client()
     url = client.authorization_url(client_id=STRAVA_CLIENT_ID,
                                    redirect_uri='https://launcher.zwift.com/authorization',
@@ -663,7 +657,6 @@ def strava():
 @app.route("/authorization", methods=["GET", "POST"])
 @login_required
 def authorization():
-    from stravalib.client import Client
     try: 
         client = Client()
         code = request.args.get('code')
@@ -1843,12 +1836,6 @@ def route_results():
     return '', 200
 
 def strava_upload(player_id, activity):
-    try:
-        from stravalib.client import Client
-    except ImportError as exc:
-        logger.warning('stravalib: %s' % repr(exc))
-        logger.warning("stravalib is not installed. Skipping Strava upload attempt.")
-        return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     strava_token = '%s/strava_token.txt' % profile_dir
     if not os.path.exists(strava_token):
@@ -3177,8 +3164,7 @@ def send_server_back_online_message():
     discord.send_message(message)
 
 
-@app.before_first_request
-def before_first_request():
+with app.app_context():
     move_old_profile()
     db.create_all()
     db.session.commit()
