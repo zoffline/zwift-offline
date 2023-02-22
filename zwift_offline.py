@@ -1571,6 +1571,10 @@ def api_search_profiles():
         json_data_list.append({"id": player_id, "firstName": row[1], "lastName": row[2], "imageSrc": imageSrc(player_id), "imageSrcLarge": imageSrc(player_id), "countryCode": profile.country_code})
     return jsonify(json_data_list)
 
+@app.route('/api/profiles/<int:player_id>/membership-status', methods=['GET'])
+def api_profiles_membership_status(player_id):
+    return jsonify({"status":"active"}) # {"title":"25km","description":"renews.1677628800000","status":"active","upcoming":null,"subscription":null,"promotions":[],"hasStackedPromos":false,"startedPortability":false,"grandfathered":false,"grandfatheringGroup":null,"freeTrialKmLeft":18}
+
 @app.route('/api/profiles/<int:player_id>/statistics', methods=['GET'])
 def api_profiles_id_statistics(player_id):
     from_dt = request.args.get('startDateTime')
