@@ -10,11 +10,11 @@
         <div class="row">
           <div class="col-md-12">
             <label class="col-form-label col-form-label-sm text-shadow">Garmin username</label>
-            <input type="text" id="username" name="username" class="form-control form-control-sm">
+            <input type="text" id="username" name="username" value="{{ uname }}" class="form-control form-control-sm">
           </div>
           <div class="col-md-12">
             <label class="col-form-label col-form-label-sm text-shadow">Garmin password</label>
-            <input type="password" id="password" name="password" class="form-control form-control-sm">
+            <input type="password" id="password" name="password" value="{{ passw }}" class="form-control form-control-sm">
           </div>
         </div>
         <div class="row">
@@ -24,6 +24,13 @@
           </div>
         </div>
       </form>
+      {% if uname or passw %}
+        <div class="row">
+          <div class="col-md-12">
+            <a href="/delete/garmin_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
+          </div>
+        </div>
+      {% endif %}
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="list-group top-buffer">

@@ -27,6 +27,7 @@
 
 import json
 import requests
+import profile_pb2
 
 
 def post_credentials(session, username, password):
@@ -114,3 +115,71 @@ def logout(session, refresh_token):
 def login(session, user, password):
     access_token, refresh_token, expired_in = post_credentials(session, user, password)
     return access_token, refresh_token
+
+
+def create_activity(session, access_token, activity):
+    try:
+        response = session.post(
+            url="https://us-or-rly101.zwift.com/api/profiles/%s/activities" % activity.player_id,
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
+                "Accept": "application/json",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            data=activity.SerializeToString(),
+        )
+
+        json_dict = json.loads(response.content)
+        return json_dict["id"]
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def upload_activity(session, access_token, activity):
+    try:
+        response = session.put(
+            url="https://us-or-rly101.zwift.com/api/profiles/%s/activities/%s" % (activity.player_id, activity.id),
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
+                "Accept": "application/json",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            data=activity.SerializeToString(),
+        )
+
+        return response.status_code
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def get_player_id(session, access_token):
+    try:
+        response = session.get(
+            url="https://us-or-rly101.zwift.com/api/profiles/me",
+            headers={
+                "Accept-Encoding": "gzip, deflate",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+        )
+
+        profile = profile_pb2.PlayerProfile()
+        profile.ParseFromString(response.content)
+        return profile.id
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)

@@ -23,16 +23,20 @@
       {% if username != "zoffline" %}
         <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
       {% endif %}
-      {% if is_admin and not restarting %}
-        <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
-      {% elif is_admin %}
-        <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
-      {% endif %}
-      {% if is_admin %}
-        <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
-      {% endif %}
     </div>
   </div>
+  {% if is_admin %}
+    <div class="row">
+      <div class="col-md-12 top-buffer">
+        {% if not restarting %}
+          <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
+        {% else %}
+          <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
+        {% endif %}
+        <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
+      </div>
+    </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm-6 col-md-5">
       <form method="POST" action="/start-zwift" class="top-buffer">

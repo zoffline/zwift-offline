@@ -10,16 +10,20 @@
         <div class="row">
           <div class="col-md-12">
             <label class="col-form-label col-form-label-sm text-shadow">Zwift username</label>
-            <input type="text" id="username" name="username" class="form-control form-control-sm">
+            <input type="text" id="username" name="username" value="{{ uname }}" class="form-control form-control-sm">
           </div>
           <div class="col-md-12">
             <label class="col-form-label col-form-label-sm text-shadow">Zwift password</label>
-            <input type="password" id="password" name="password" class="form-control form-control-sm">
+            <input type="password" id="password" name="password" value="{{ passw }}" class="form-control form-control-sm">
           </div>
           <div class="col-md-12 top-buffer">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="achievements" name="achievements">
               <label class="form-check-label text-shadow" for="achievements">Download achievements</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="save_zwift" name="save_zwift">
+              <label class="form-check-label text-shadow" for="save_zwift">Save credentials (activities will be uploaded to Zwift)</label>
             </div>
           </div>
         </div>
@@ -30,6 +34,13 @@
           </div>
         </div>
       </form>
+      {% if uname or passw %}
+        <div class="row">
+          <div class="col-md-12">
+            <a href="/delete/zwift_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
+          </div>
+        </div>
+      {% endif %}
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="list-group top-buffer">
