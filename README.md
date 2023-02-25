@@ -253,17 +253,14 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* Install dependencies: stravalib
-  * e.g., on Linux/Mac: ``pip3 install stravalib``
-  * e.g., on Windows in command prompt: ``pip install stravalib``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
-  * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py`` below.
 * [OPTIONAL] Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
+  * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py``
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
   * If multiplayer is enabled, use the Strava button in the launcher window to authorize.
+* If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
 
@@ -271,12 +268,8 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* Install dependencies: garmin-uploader
-  * e.g., on Linux/Mac: ``pip3 install garmin-uploader``
-  * e.g., on Windows in command prompt: ``pip install garmin-uploader``
-    * You may need to use ``C:\Users\<username>\AppData\Local\Programs\Python\Python39\Scripts\pip.exe`` instead of just ``pip``
-  * You may need to use the cloudscraper branch if upload fails: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/La0/garmin-uploader.git@cloudscraper``
-  * If cloudscraper doesn't work you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
+* If running from source, install garmin-uploader: ``pip install git+https://github.com/oldnapalm/garmin-uploader.git``
+  * If the upload fails you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
 * Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>
@@ -365,7 +358,7 @@ Docker
 * gevent (http://www.gevent.org/)
 * pycryptodome (https://pypi.org/project/pycryptodome/)
 * dnspython (https://www.dnspython.org/)
-* OPTIONAL: stravalib (https://github.com/hozn/stravalib)
+* stravalib (https://github.com/hozn/stravalib)
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
 * OPTIONAL: discord.py (https://discordpy.readthedocs.io/)
 
