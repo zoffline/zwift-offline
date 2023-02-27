@@ -42,6 +42,7 @@ else:
     START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
+CDN_PROXY = os.path.isfile('%s/cdn-proxy.txt' % STORAGE_DIR)
 
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
@@ -85,18 +86,22 @@ def sigint_handler(num, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-resolver = dns.resolver.Resolver()
-resolver.nameservers = ['8.8.8.8', '8.8.4.4']
-resolver.cache = dns.resolver.Cache()
-
-_orig_create_connection = connection.create_connection
-
-def patched_create_connection(address, *args, **kwargs):
-    host, port = address
-    answer = resolver.resolve(host)[0].to_text()
-    return _orig_create_connection((answer, port), *args, **kwargs)
-
-connection.create_connection = patched_create_connection
+if not CDN_PROXY:
+    # If CDN proxy is disabled, try to use Google public DNS
+    try:
+        resolver = dns.resolver.Resolver()
+        resolver.nameservers = ['8.8.8.8', '8.8.4.4']
+        resolver.cache = dns.resolver.Cache()
+        resolver.resolve('google.com')
+        _orig_create_connection = connection.create_connection
+        def patched_create_connection(address, *args, **kwargs):
+            host, port = address
+            answer = resolver.resolve(host)[0].to_text()
+            return _orig_create_connection((answer, port), *args, **kwargs)
+        connection.create_connection = patched_create_connection
+        CDN_PROXY = True
+    except:
+        pass
 
 class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -133,7 +138,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
         exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
                       'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
                       'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
-        if self.path.startswith('/gameassets/') and not path_end in exceptions:
+        if CDN_PROXY and self.path.startswith('/gameassets/') and not path_end in exceptions:
             try:
                 self.send_response(200)
                 self.end_headers()
