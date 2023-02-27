@@ -1,23 +1,28 @@
 {% extends "./layout.html" %}
 {% block content %}
-  <h1><div class="text-shadow">Change password</div></h1>
-  <h4 class="text-shadow">Logged in as {{ username }}</h4>
+  <h1><div class="text-shadow">Intervals.icu credentials</div></h1>
+  {% if username != "zoffline" %}
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
+  {% endif %}
   <div class="row">
     <div class="col-md-12">
       <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+      {% if aid or akey %}
+        <a href="/delete/intervals_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
+      {% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-sm-6 col-md-5 top-buffer">
-      <form id="reset" action="{{ url_for('reset', username=username) }}" method="post">
+      <form id="intervals" action="{{ url_for('intervals', username=username) }}" method="post">
         <div class="row">
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">New password</label>
-            <input type="password" id="password" name="password" class="form-control form-control-sm">
+            <label class="col-form-label col-form-label-sm text-shadow">Athlete ID</label>
+            <input type="text" id="athlete_id" name="athlete_id" value="{{ aid }}" class="form-control form-control-sm">
           </div>
           <div class="col-md-12">
-            <label class="col-form-label col-form-label-sm text-shadow">Confirm password</label>
-            <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-sm">
+            <label class="col-form-label col-form-label-sm text-shadow">API key</label>
+            <input type="text" id="api_key" name="api_key" value="{{ akey }}" class="form-control form-control-sm">
           </div>
         </div>
         <div class="row">

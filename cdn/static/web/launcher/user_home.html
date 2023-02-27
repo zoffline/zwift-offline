@@ -2,7 +2,7 @@
 {% block content %}
   <h1><div class="text-shadow">Zwift Launcher</div></h1>
   {% if username != "zoffline" %}
-    <h2 class="text-shadow">Logged in as {{ username }}</h2>
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
   {% endif %}
   {% if restarting %}
     <div class="row">
@@ -13,30 +13,20 @@
   {% endif %}
   <div class="row">
     <div class="col-md-12">
-      <a href="{{ url_for('upload', username=username) }}" class="btn btn-sm btn-secondary">Profile</a>
-      {% if username != "zoffline" %}
-        <a href="{{ url_for('reset', username=username) }}" class="btn btn-sm btn-secondary">Change password</a>
-      {% endif %}
-      <a href="{{ url_for('strava') }}" target="_blank" class="btn btn-sm btn-secondary">Strava</a>
-      <a href="{{ url_for('garmin', username=username) }}" class="btn btn-sm btn-secondary">Garmin</a>
-      <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Get Zwift profile</a>
-      {% if username != "zoffline" %}
-        <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
-      {% endif %}
-    </div>
-  </div>
-  {% if is_admin %}
-    <div class="row">
-      <div class="col-md-12 top-buffer">
+      <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Settings</a>
+      {% if is_admin %}
         {% if not restarting %}
           <a href="/restart" class="btn btn-sm btn-danger">Restart server</a>
         {% else %}
           <a href="/cancelrestart" class="btn btn-sm btn-danger">Cancel restart</a>
         {% endif %}
         <a href="/reloadbots" class="btn btn-sm btn-warning">Reload bots</a>
-      </div>
+      {% endif %}
+      {% if username != "zoffline" %}
+        <a href="{{ url_for('logout', username=username) }}" class="btn btn-sm btn-secondary">Logout</a>
+      {% endif %}
     </div>
-  {% endif %}
+  </div>
   <div class="row">
     <div class="col-sm-6 col-md-5">
       <form method="POST" action="/start-zwift" class="top-buffer">

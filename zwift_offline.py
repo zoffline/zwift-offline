@@ -640,7 +640,7 @@ def reset(username):
         current_user.pass_hash = hashed_pwd
         db.session.commit()
         flash("Password changed.")
-
+        return redirect(url_for('settings', username=current_user.username))
     return render_template("reset.html", username=current_user.username)
 
 
@@ -667,12 +667,11 @@ def authorization():
             f.write(token_response['access_token'] + '\n');
             f.write(token_response['refresh_token'] + '\n');
             f.write(str(token_response['expires_at']) + '\n');
-        flash("Strava authorized. Go to \"Profile\" to remove authorization.")
+        flash("Strava authorized.")
     except Exception as exc:
         logger.warning('Strava: %s' % repr(exc))
-        flash("Strava canceled.")
-    flash("Please close this window and return to Zwift Launcher.")
-    return render_template("strava.html", username=current_user.username)
+        flash("Strava authorization canceled.")
+    return redirect(url_for('settings', username=current_user.username))
 
 
 def encrypt_credentials(file, cred):
@@ -709,11 +708,9 @@ def profile(username):
         if request.form['username'] == "" or request.form['password'] == "":
             flash("Zwift credentials can't be empty.")
             return render_template("profile.html", username=current_user.username)
-
         username = request.form['username']
         password = request.form['password']
         session = requests.session()
-
         try:
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
@@ -725,7 +722,6 @@ def profile(username):
                     with open('%s/achievements.bin' % profile_dir, 'wb') as f:
                         f.write(achievements)
                 online_sync.logout(session, refresh_token)
-                flash("Zwift profile installed locally.")
                 if request.form.get("save_zwift"):
                     encrypt_credentials(file, (username, password))
             except Exception as exc:
@@ -734,7 +730,7 @@ def profile(username):
         except Exception as exc:
             logger.warning('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
-        return redirect(url_for('user_home', username=current_user.username))
+        return redirect(url_for('settings', username=current_user.username))
     cred = decrypt_credentials(file)
     return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
 
@@ -748,9 +744,23 @@ def garmin(username):
             flash("Garmin credentials can't be empty.")
             return render_template("garmin.html", username=current_user.username)
         encrypt_credentials(file, (request.form['username'], request.form['password']))
-        return redirect(url_for('user_home', username=current_user.username))
+        return redirect(url_for('settings', username=current_user.username))
     cred = decrypt_credentials(file)
     return render_template("garmin.html", username=current_user.username, uname=cred[0], passw=cred[1])
+
+
+@app.route("/intervals/<username>/", methods=["GET", "POST"])
+@login_required
+def intervals(username):
+    file = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, current_user.player_id)
+    if request.method == "POST":
+        if request.form['athlete_id'] == "" or request.form['api_key'] == "":
+            flash("Intervals.icu credentials can't be empty.")
+            return render_template("intervals.html", username=current_user.username)
+        encrypt_credentials(file, (request.form['athlete_id'], request.form['api_key']))
+        return redirect(url_for('settings', username=current_user.username))
+    cred = decrypt_credentials(file)
+    return render_template("intervals.html", username=current_user.username, aid=cred[0], akey=cred[1])
 
 
 @app.route("/user/<username>/")
@@ -840,42 +850,29 @@ def reload_bots():
     return redirect(url_for('user_home', username=current_user.username))
 
 
-@app.route("/upload/<username>/", methods=["GET", "POST"])
+@app.route("/settings/<username>/", methods=["GET", "POST"])
 @login_required
-def upload(username):
+def settings(username):
     profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
-
     if request.method == 'POST':
         uploaded_file = request.files['file']
         if uploaded_file.filename in ['profile.bin', 'achievements.bin']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             uploaded_file.save(file_path)
-            flash("File %s uploaded." % uploaded_file.filename)
         else:
             flash("Invalid file name.")
-
-    name = "%s %s" % (current_user.first_name, current_user.last_name)
     profile = None
     profile_file = os.path.join(profile_dir, 'profile.bin')
     if os.path.isfile(profile_file):
         stat = os.stat(profile_file)
         profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-        with open(profile_file, 'rb') as fd:
-            p = profile_pb2.PlayerProfile()
-            p.ParseFromString(fd.read())
-            name = "%s %s" % (p.first_name, p.last_name)
     achievements = None
     achievements_file = os.path.join(profile_dir, 'achievements.bin')
     if os.path.isfile(achievements_file):
         stat = os.stat(achievements_file)
         achievements = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-    token = None
-    token_file = os.path.join(profile_dir, 'strava_token.txt')
-    if os.path.isfile(token_file):
-        stat = os.stat(token_file)
-        token = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-
-    return render_template("upload.html", username=current_user.username, name=name, profile=profile, achievements=achievements, token=token)
+    token = os.path.isfile(os.path.join(profile_dir, 'strava_token.txt'))
+    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements, token=token)
 
 
 @app.route("/download/<filename>", methods=["GET"])
@@ -897,7 +894,7 @@ def download_avatarLarge(player_id):
 @login_required
 def delete(filename):
     player_id = current_user.player_id
-    credentials = ['garmin_credentials.bin', 'zwift_credentials.bin']
+    credentials = ['garmin_credentials.bin', 'zwift_credentials.bin', 'intervals_credentials.bin']
     if filename not in ['profile.bin', 'achievements.bin', 'strava_token.txt'] and filename not in credentials:
         return '', 403
     profile_dir = os.path.join(STORAGE_DIR, str(player_id))
@@ -906,10 +903,7 @@ def delete(filename):
         os.remove("%s" % delete_file)
     if filename in credentials:
         flash("Credentials removed.")
-        url = 'user_home'
-    else:
-        url = 'upload'
-    return redirect(url_for(url, username=current_user.username))
+    return redirect(url_for('settings', username=current_user.username))
 
 @app.route("/logout/<username>")
 @login_required
@@ -1923,6 +1917,8 @@ def garmin_upload(player_id, activity):
     except Exception as exc:
         logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
         return
+    with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
+        f.write(activity.fit)
     try:
         w = Workflow(['%s/last_activity.fit' % profile_dir], activity_name=activity.name, username=username, password=password)
         w.run()
@@ -1930,8 +1926,7 @@ def garmin_upload(player_id, activity):
         logger.warning("Garmin upload failed. No internet? %s" % repr(exc))
 
 def runalyze_upload(player_id, activity):
-    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    runalyze_token = '%s/runalyze_token.txt' % profile_dir
+    runalyze_token = '%s/%s/runalyze_token.txt' % (STORAGE_DIR, player_id)
     if not os.path.exists(runalyze_token):
         logger.info("runalyze_token.txt missing, skip Runalyze activity update")
         return
@@ -1943,11 +1938,30 @@ def runalyze_upload(player_id, activity):
         return
     try:
         r = requests.post("https://runalyze.com/api/v1/activities/uploads",
-                          files={'file': open('%s/last_activity.fit' % profile_dir, "rb")},
-                          headers={"token": runtoken})
+                          files={'file': BytesIO(activity.fit)}, headers={"token": runtoken})
         logger.info(r.text)
     except Exception as exc:
         logger.warning("Runalyze upload failed. No internet? %s" % repr(exc))
+
+
+def intervals_upload(player_id, activity):
+    intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
+    if not os.path.exists(intervals_credentials):
+        logger.info("intervals_credentials.bin missing, skip Intervals.icu activity update")
+        return
+    try:
+        cred = decrypt_credentials(intervals_credentials)
+        athlete_id = cred[0]
+        api_key = cred[1]
+    except Exception as exc:
+        logger.warning("Failed to read %s. Skipping Intervals.icu upload attempt: %s" % (intervals_credentials, repr(exc)))
+        return
+    try:
+        from requests.auth import HTTPBasicAuth
+        url = 'http://intervals.icu/api/v1/athlete/%s/activities?name=%s' % (athlete_id, activity.name)
+        requests.post(url, files = {"file": BytesIO(activity.fit)}, auth = HTTPBasicAuth('API_KEY', api_key))
+    except Exception as exc:
+        logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
 
 
 def zwift_upload(player_id, activity):
@@ -2007,12 +2021,8 @@ def api_profiles_activities_id(player_id, activity_id):
             save_ghost(quote(activity.name, safe=' '), player_id)
         except Exception as exc:
             logger.warning('save_ghost: %s' % repr(exc))
-    profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-    # For using with garmin/runalyze upload
-    with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
-        f.write(activity.fit)
     # For using with upload_activity
-    with open('%s/last_activity.bin' % profile_dir, 'wb') as f:
+    with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
     # Unconditionally *try* and upload to strava and garmin since profile may
     # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
@@ -2020,6 +2030,7 @@ def api_profiles_activities_id(player_id, activity_id):
     strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
     runalyze_upload(player_id, activity)
+    intervals_upload(player_id, activity)
     zwift_upload(player_id, activity)
     logout_player(player_id)
     return response, 200

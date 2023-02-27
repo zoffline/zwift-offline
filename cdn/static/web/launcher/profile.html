@@ -2,10 +2,18 @@
 {% block content %}
   <h1><div class="text-shadow">Download Zwift profile</div></h1>
   {% if username != "zoffline" %}
-    <h2 class="text-shadow">Logged in as {{ username }} </h2>
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
   {% endif %}
   <div class="row">
-    <div class="col-sm-6 col-md-5">
+    <div class="col-md-12">
+      <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+      {% if uname or passw %}
+        <a href="/delete/zwift_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-5 top-buffer">
       <form id="profile" action="{{ url_for('profile', username=username) }}" method="post">
         <div class="row">
           <div class="col-md-12">
@@ -30,17 +38,9 @@
         <div class="row">
           <div class="col-md-12 top-buffer">
             <input type="submit" value="Submit" class="btn btn-sm btn-light">
-            <a href="{{ url_for('user_home', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
           </div>
         </div>
       </form>
-      {% if uname or passw %}
-        <div class="row">
-          <div class="col-md-12">
-            <a href="/delete/zwift_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
-          </div>
-        </div>
-      {% endif %}
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="list-group top-buffer">
