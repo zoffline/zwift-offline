@@ -154,6 +154,7 @@ def upload_activity(session, access_token, activity):
                 "Accept-Language": "en-us",
             },
             data=activity.SerializeToString(),
+            params={"upload-to-strava": "true"}
         )
 
         return response.status_code
