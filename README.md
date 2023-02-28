@@ -239,7 +239,7 @@ gender). Your profile can be further customized and changed via the in game
 menu (e.g. name, nationality, weight change, etc).
 
 To obtain your current profile:
-* __NOTE:__ instead of performing the steps below you can instead use the "Get Zwift profile" button in the launcher window (Windows and macOS only).
+* __NOTE:__ instead of performing the steps below you can instead use the "Settings - Zwift" button in the launcher window (Windows and macOS only).
 * Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``get_profile.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
@@ -253,7 +253,7 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* __NOTE:__ instead of performing the steps below you can instead use the "Strava" button in the launcher window to authorize (Windows and macOS only).
+* __NOTE:__ instead of performing the steps below you can instead use the "Settings - Strava" button in the launcher window to authorize (Windows and macOS only).
 * [OPTIONAL] Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py``
@@ -270,7 +270,7 @@ To obtain your current profile:
 
 * If running from source, install garmin-uploader: ``pip install git+https://github.com/oldnapalm/garmin-uploader.git``
   * If the upload fails you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
-* __NOTE:__ instead of performing the step below you can instead use the "Garmin" button in the launcher window to enter your credentials (Windows and macOS only).
+* __NOTE:__ instead of performing the step below you can instead use the "Settings - Garmin" button in the launcher window to enter your credentials (Windows and macOS only).
 * Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
   ```
   <username>

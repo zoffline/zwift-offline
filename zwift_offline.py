@@ -704,19 +704,24 @@ def decrypt_credentials(file):
 def profile(username):
     profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
     file = os.path.join(profile_dir, 'zwift_credentials.bin')
+    cred = decrypt_credentials(file)
     if request.method == "POST":
         if request.form['username'] == "" or request.form['password'] == "":
             flash("Zwift credentials can't be empty.")
             return render_template("profile.html", username=current_user.username)
+        if not request.form.get("zwift_profile") and not request.form.get("achievements") and not request.form.get("save_zwift"):
+            flash("Select at least one option.")
+            return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
         username = request.form['username']
         password = request.form['password']
         session = requests.session()
         try:
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
-                profile = online_sync.query(session, access_token, "api/profiles/me")
-                with open('%s/profile.bin' % profile_dir, 'wb') as f:
-                    f.write(profile)
+                if request.form.get("zwift_profile"):
+                    profile = online_sync.query(session, access_token, "api/profiles/me")
+                    with open('%s/profile.bin' % profile_dir, 'wb') as f:
+                        f.write(profile)
                 if request.form.get("achievements"):
                     achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
                     with open('%s/achievements.bin' % profile_dir, 'wb') as f:
@@ -727,11 +732,12 @@ def profile(username):
             except Exception as exc:
                 logger.warning('Zwift profile: %s' % repr(exc))
                 flash("Error downloading profile.")
+                return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
         except Exception as exc:
             logger.warning('online_sync.login: %s' % repr(exc))
             flash("Invalid username or password.")
+            return render_template("profile.html", username=current_user.username)
         return redirect(url_for('settings', username=current_user.username))
-    cred = decrypt_credentials(file)
     return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
 
 
