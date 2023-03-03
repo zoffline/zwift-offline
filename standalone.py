@@ -11,9 +11,7 @@ import math
 import random
 import itertools
 import socketserver
-import dns.resolver
 from urllib3 import PoolManager
-from urllib3.util import connection
 from http.server import SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from collections import deque
@@ -43,6 +41,29 @@ else:
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
 CDN_PROXY = os.path.isfile('%s/cdn-proxy.txt' % STORAGE_DIR)
+if not CDN_PROXY:
+    # If CDN proxy is disabled, try to resolve zwift.com using Google public DNS
+    try:
+        import dns.resolver
+        resolver = dns.resolver.Resolver(configure=False)
+        resolver.nameservers = ['8.8.8.8', '8.8.4.4']
+        resolver.cache = dns.resolver.Cache()
+        resolver.resolve('zwift.com')
+        # If succeeded, patch create_connection to use resolver
+        from urllib3.util import connection
+        orig_create_connection = connection.create_connection
+        def patched_create_connection(address, *args, **kwargs):
+            try:
+                host, port = address
+                answer = resolver.resolve(host)[0].to_text()
+                address = (answer, port)
+            except Exception as exc:
+                print('dns.resolver: %s' % repr(exc))
+            return orig_create_connection(address, *args, **kwargs)
+        connection.create_connection = patched_create_connection
+        CDN_PROXY = True
+    except:
+        pass
 
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
@@ -85,23 +106,6 @@ def sigint_handler(num, frame):
     os._exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
-
-if not CDN_PROXY:
-    # If CDN proxy is disabled, try to use Google public DNS
-    try:
-        resolver = dns.resolver.Resolver()
-        resolver.nameservers = ['8.8.8.8', '8.8.4.4']
-        resolver.cache = dns.resolver.Cache()
-        resolver.resolve('google.com')
-        _orig_create_connection = connection.create_connection
-        def patched_create_connection(address, *args, **kwargs):
-            host, port = address
-            answer = resolver.resolve(host)[0].to_text()
-            return _orig_create_connection((answer, port), *args, **kwargs)
-        connection.create_connection = patched_create_connection
-        CDN_PROXY = True
-    except:
-        pass
 
 class CDNHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
