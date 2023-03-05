@@ -458,7 +458,6 @@ def load_ghosts(player_id, state, ghosts):
     folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))
     if not zo.is_forward(state): folder += '/reverse'
     if not os.path.isdir(folder): return
-    s = list()
     for f in os.listdir(folder):
         if f.endswith('.bin'):
             with open(os.path.join(folder, f), 'rb') as fd:
@@ -466,9 +465,8 @@ def load_ghosts(player_id, state, ghosts):
                 g.ParseFromString(fd.read())
                 g.position = 0
                 ghosts.play.append(g)
-                s.append(g.states[0].roadTime)
     ghosts.start_road = zo.road_id(state)
-    ghosts.start_rt = 0
+    ghosts.start_rt = state.roadTime
     if os.path.isfile(START_LINES_FILE):
         with open(START_LINES_FILE, 'r') as fd:
             sl = [tuple(line) for line in csv.reader(fd)]
@@ -476,10 +474,6 @@ def load_ghosts(player_id, state, ghosts):
             if rt:
                 ghosts.start_road = int(rt[0][3])
                 ghosts.start_rt = int(rt[0][4])
-    if not ghosts.start_rt:
-        s.append(state.roadTime)
-        if zo.is_forward(state): ghosts.start_rt = max(s)
-        else: ghosts.start_rt = min(s)
     for g in ghosts.play:
         try:
             while zo.road_id(g.states[g.position]) != ghosts.start_road:
