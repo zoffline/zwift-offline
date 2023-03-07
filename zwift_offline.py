@@ -2406,7 +2406,7 @@ def relay_events_subgroups_id_late_join(meetup_id):
             state = online[leader]
             lj = events_pb2.LateJoinInformation()
             lj.road_id = road_id(state)
-            lj.road_time = state.roadTime / 1005000
+            lj.road_time = (state.roadTime - 5000) / 1000000
             lj.is_forward = is_forward(state)
             lj.organizerId = leader
             lj.lj_f5 = 0
@@ -2820,41 +2820,30 @@ def relay_worlds_attributes():
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
     player_update.timestamp = int(get_utc_time() * 1000000)
+    state = None
+    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
+        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
+        chat_message.ParseFromString(player_update.payload)
+        if chat_message.player_id in online:
+            state = online[chat_message.player_id]
+            if chat_message.message == '/regroup':
+                regroup_ghosts(chat_message.player_id, True)
+                return '', 201
+            if chat_message.message == '/startline':
+                logger.info('course %s road %s isForward %s roadTime %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime))
+                return '', 201
+        discord.send_message(chat_message.message, chat_message.player_id)
     for receiving_player_id in online.keys():
         should_receive = False
-        if player_update.wa_type in [udp_node_msgs_pb2.WA_TYPE.WAT_SPA, udp_node_msgs_pb2.WA_TYPE.WAT_SR]:
-            receiving_player = online[receiving_player_id]
-            # Chat message
-            if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
-                chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
-                chat_message.ParseFromString(player_update.payload)
-                if chat_message.message == '/regroup':
-                    regroup_ghosts(chat_message.player_id)
-                    return '', 201
-                sending_player_id = chat_message.player_id
-                if sending_player_id in online:
-                    sending_player = online[sending_player_id]
-                    if is_nearby(sending_player, receiving_player):
-                        should_receive = True
-            # Segment complete
-            else:
-                segment_complete = segment_result_pb2.SegmentResult()
-                segment_complete.ParseFromString(player_update.payload)
-                sending_player_id = segment_complete.player_id
-                if sending_player_id in online and receiving_player_id != sending_player_id:
-                    sending_player = online[sending_player_id]
-                    if get_course(sending_player) == get_course(receiving_player) or receiving_player.watchingRiderId == sending_player_id:
-                        should_receive = True
+        # Chat message
+        if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
+            if is_nearby(state, online[receiving_player_id]):
+                should_receive = True
         # Other PlayerUpdate, send to all
         else:
             should_receive = True
         if should_receive:
             enqueue_player_update(receiving_player_id, player_update.SerializeToString())
-    # If it's a chat message, send to Discord
-    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
-        chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
-        chat_message.ParseFromString(player_update.payload)
-        discord.send_message(chat_message.message, chat_message.player_id)
     return '', 201
 
 

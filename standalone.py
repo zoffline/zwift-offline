@@ -463,7 +463,6 @@ def load_ghosts(player_id, state, ghosts):
             with open(os.path.join(folder, f), 'rb') as fd:
                 g = udp_node_msgs_pb2.Ghost()
                 g.ParseFromString(fd.read())
-                g.position = 0
                 ghosts.play.append(g)
     ghosts.start_road = zo.road_id(state)
     ghosts.start_rt = state.roadTime
@@ -474,22 +473,12 @@ def load_ghosts(player_id, state, ghosts):
             if rt:
                 ghosts.start_road = int(rt[0][3])
                 ghosts.start_rt = int(rt[0][4])
-    for g in ghosts.play:
-        try:
-            while zo.road_id(g.states[g.position]) != ghosts.start_road:
-                g.position += 1
-            if zo.is_forward(g.states[g.position]):
-                while g.states[g.position].roadTime < ghosts.start_rt or abs(g.states[g.position].roadTime - ghosts.start_rt) > 500000:
-                    g.position += 1
-            else:
-                while g.states[g.position].roadTime > ghosts.start_rt or abs(g.states[g.position].roadTime - ghosts.start_rt) > 500000:
-                    g.position += 1
-        except IndexError:
-            pass
 
-def regroup_ghosts(player_id):
+def regroup_ghosts(player_id, ahead=False):
     p = online[player_id]
     ghosts = global_ghosts[player_id]
+    if not ghosts.started and ghosts.play:
+        ghosts.started = True
     for g in ghosts.play:
         states = []
         for s in g.states:
@@ -500,9 +489,8 @@ def regroup_ghosts(player_id):
             g.position = 0
             while g.states[g.position].roadTime != c[0] or g.states[g.position].distance != c[1]:
                 g.position += 1
-            g.position += 1
-    if not ghosts.started and ghosts.play:
-        ghosts.started = True
+            if ahead:
+                g.position += 1
 
 class PacePartnerVariables:
     profile = None
@@ -690,12 +678,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if not ghosts.started and ghosts.play and zo.road_id(state) == ghosts.start_road:
                     if zo.is_forward(state):
                         if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
-                            ghosts.started = True
+                            regroup_ghosts(player_id)
                     else:
                         if state.roadTime < ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
-                            ghosts.started = True
-            #Uncomment to print player state when stopped (to find new start lines)
-            #else: print('course', zo.get_course(state), 'road', zo.road_id(state), 'isForward', zo.is_forward(state), 'roadTime', state.roadTime)
+                            regroup_ghosts(player_id)
             ghosts.last_rt = state.roadTime
 
         #Set state of player being watched

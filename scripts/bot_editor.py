@@ -1,9 +1,8 @@
 # Script to manipulate zoffline bot files
 #
-# Route ID can be found in Zwift\assets\Worlds\worldX\data_1.wad\Worlds\worldX\routes\routesX.xml (nameHash)
+# Route ID can be found in http://cdn.zwift.com/gameassets/GameDictionary.xml (signature)
 #
-# To find new start line values, uncomment this line (the values will be printed when you are stopped)
-# https://github.com/zoffline/zwift-offline/blob/d84e82c72086a8994b8b43042b76f70dc1f1e059/standalone.py#L509
+# To find new start line values type /startline in chat, the values will be printed in console
 
 import os
 import sys
