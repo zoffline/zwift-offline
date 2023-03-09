@@ -243,9 +243,9 @@ To obtain your current profile:
 * Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``get_profile.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
-* Move the resulting ``profile.bin`` (saved in whatever directory you ran get_profile.py in) into the ``storage`` directory.
-  * If using zoffline.exe on Windows, create a ``storage`` directory within the same folder as zoffline.exe if it does not already exist.
-  * If using Docker, move ``profile.bin`` into the path you passed to ``-v``
+* Move the resulting ``profile.bin`` and ``achievements.bin`` (saved in whatever directory you ran get_profile.py in) into the ``storage/1`` directory.
+  * If using zoffline.exe on Windows, create a ``storage/1`` directory within the same folder as zoffline.exe if it does not already exist.
+  * If using Docker, the directory ``1`` should be in the path you passed to ``-v``
 
 </details>
 
@@ -259,7 +259,7 @@ To obtain your current profile:
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py``
   * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
-* Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/<player_id>`` directory.
+* Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/1`` directory.
 * If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
@@ -271,7 +271,7 @@ To obtain your current profile:
 * If running from source, install garmin-uploader: ``pip install git+https://github.com/oldnapalm/garmin-uploader.git``
   * If the upload fails you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
 * __NOTE:__ instead of performing the step below you can instead use the "Settings - Garmin" button in the launcher window to enter your credentials (Windows and macOS only).
-* Create a file ``garmin_credentials.txt`` in the ``storage/<player_id>`` directory containing your login credentials
+* Create a file ``garmin_credentials.txt`` in the ``storage/1`` directory containing your login credentials
   ```
   <username>
   <password>
