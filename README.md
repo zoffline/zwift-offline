@@ -284,12 +284,12 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-To enable support for multiple users perform the steps below. zoffline's previous multi-profile support has been superceded by full multiplayer support. If you were previously using multiple profiles with zoffline you will need to enable multiplayer to continue supporting multiple users.
+To enable support for multiple users perform the steps below:
 
 * Create a ``multiplayer.txt`` file in the ``storage`` directory.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
   * TCP ports 80, 443, 3025 and UDP port 3024 will need to be open on the PC running zoffline if its running remotely.
-* Start Zwift and create an account in the new Zwift launcher (desktop solution only, for Android go to `https://<zoffline ip>/signup/`, in-app registration does not work yet) and upload your ``profile.bin``, ``strava_token.txt``, and/or ``garmin_credentials.txt`` if you have them.
+* Start Zwift and create an account in the new Zwift launcher (desktop solution only, for Android go to `https://<zoffline ip>/signup/`).
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
 </details>
@@ -323,7 +323,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
 * To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to access https://security.google.com/settings/security/apppasswords and create an app password to allow the login from the server.
-* To enable the Discord bridge bot: ``pip3 install discord`` and create a ``discord.cfg`` file in the ``storage`` directory containing
+* To enable the Discord bridge bot: ``pip3 install discord.py`` and create a ``discord.cfg`` file in the ``storage`` directory containing
   ```
   [discord]
   token = 
