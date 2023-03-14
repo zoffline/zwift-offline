@@ -1022,6 +1022,17 @@ def api_activity_feed():
         ret = []
     return jsonify(ret)
 
+@app.route('/api/activities/<int:activity_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_activities(activity_id):
+    row = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE id = :i"), {"i": activity_id}).first()
+    if row:
+        activity = activity_pb2.Activity()
+        row_to_protobuf(row._mapping, activity, exclude_fields=['fit'])
+        return jsonify(activity_protobuf_to_json(activity))
+    return '', 404
+
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
     return {"realm": "zwift","launcher": "https://launcher.zwift.com/launcher","url": "https://secure.zwift.com/auth/"}
@@ -2001,6 +2012,8 @@ def zwift_upload(player_id, activity):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_activities_id(player_id, activity_id):
+    if request.headers['Source'] == "zwift-companion":
+        return '', 400 # edit from ZCA is not supported yet
     if not request.stream:
         return '', 400
     if current_user.player_id != player_id:
@@ -2911,6 +2924,77 @@ def api_personal_records_my_records():
         row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
 
     return results.SerializeToString(), 200
+
+
+@app.route('/api/personal-records/results/summary/profiles/me/<sport>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_personal_records_results_summary(sport):
+    segment_ids = request.args.getlist('segmentIds')
+    query = {"name": "AllTimeBestResultsForSegments", "labelsAre": "SEGMENT_ID", "sport": sport, "segmentIds": segment_ids}
+    results = []
+    for segment_id in segment_ids:
+        where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp"
+        args = {"s": int(segment_id), "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport)}
+        row = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s ORDER BY elapsed_ms LIMIT 1" % where_stmt), args).first()
+        if row:
+            count = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
+            result = {"label": segment_id, "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
+                "lastName": row.last_name, "endTime": int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000),
+                "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
+            results.append(result)
+    return jsonify({"query": query, "results": results})
+
+
+def limits(q, y):
+    if q == 1: return ('%s-01-01T00:00:00Z' % y, '%s-03-31T23:59:59Z' % y)
+    if q == 2: return ('%s-04-01T00:00:00Z' % y, '%s-06-30T23:59:59Z' % y)
+    if q == 3: return ('%s-07-01T00:00:00Z' % y, '%s-09-30T23:59:59Z' % y)
+    if q == 4: return ('%s-10-01T00:00:00Z' % y, '%s-12-31T23:59:59Z' % y)
+
+@app.route('/api/personal-records/results/summary/profiles/me/<sport>/segments/<segment_id>/by-quarter', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_personal_records_results_summary_by_quarter(sport, segment_id):
+    query = {"name": "QuarterlyRecordsForSegment", "labelsAre": "YEAR-QUARTER", "sport": sport, "segmentId": segment_id}
+    where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp"
+    args = {"s": int(segment_id), "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport)}
+    row = db.session.execute(sqlalchemy.text("SELECT finish_time_str FROM segment_result %s ORDER BY world_time LIMIT 1" % where_stmt), args).first()
+    oldest = time.strptime(row[0], "%Y-%m-%dT%H:%M:%SZ").tm_year
+    row = db.session.execute(sqlalchemy.text("SELECT finish_time_str FROM segment_result %s ORDER BY world_time DESC LIMIT 1" % where_stmt), args).first()
+    newest = time.strptime(row[0], "%Y-%m-%dT%H:%M:%SZ").tm_year
+    results = []
+    for y in range(oldest, newest + 1):
+        for q in range(1, 5):
+            from_date, to_date = limits(q, y)
+            where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp AND strftime('%s', finish_time_str) >= strftime('%s', :f) AND strftime('%s', finish_time_str) <= strftime('%s', :t)"
+            args = {"s": int(segment_id), "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport), "f": from_date, "t": to_date}
+            row = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s ORDER BY elapsed_ms LIMIT 1" % where_stmt), args).first()
+            if row:
+                count = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
+                result = {"label": '%s-Q%s' % (y, q), "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
+                    "lastName": row.last_name, "endTime": int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000),
+                    "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
+                results.append(result)
+    return jsonify({"query": query, "results": results})
+
+
+@app.route('/api/personal-records/results/summary/profiles/me/<sport>/segments/<segment_id>/date/<year>/<quarter>/all', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
+    query = {"name": "AllResultsInQuarterForSegment", "labelsAre": "END_TIME", "sport": sport, "segmentId": segment_id, "year": year, "quarter": quarter}
+    from_date, to_date = limits(int(quarter[1]), year)
+    where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp AND strftime('%s', finish_time_str) >= strftime('%s', :f) AND strftime('%s', finish_time_str) <= strftime('%s', :t)"
+    args = {"s": int(segment_id), "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport), "f": from_date, "t": to_date}
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args)
+    results = []
+    for row in rows:
+        end_time = int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000)
+        result = {"label": str(end_time), "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
+            "lastName": row.last_name, "endTime": end_time, "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": 1}}
+        results.append(result)
+    return jsonify({"query": query, "results": results})
 
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
