@@ -184,8 +184,8 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
     username = "zoffline"
     first_name = "z"
     last_name = "offline"
-    enable_ghosts = True
-    new_home = False
+    enable_ghosts = os.path.isfile(ENABLEGHOSTS_FILE)
+    new_home = os.path.isfile(NEWHOME_FILE)
 
     def is_authenticated(self):
         return True
@@ -1144,12 +1144,7 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit, sport):
-    events_list = [('City and the Sgurr', 4107749591, 17),
-                   ('Glasgow Crit Circuit', 3765339356, 17),
-                   ('Loch Loop', 742057576, 17),
-                   ('Rolling Highlands', 46799750, 17),
-                   ('The Muckle Yin', 3662705581, 17),
-                   ('2022 Bambino Fondo', 3368626651, 6),
+    events_list = [('2022 Bambino Fondo', 3368626651, 6),
                    ('2022 Medio Fondo', 2900074211, 6),
                    ('2022 Gran Fondo', 1327147942, 6),
                    ('Alpe du Zwift Downhill', 1480439148, 6),
@@ -3370,15 +3365,14 @@ def auth_realms_zwift_protocol_openid_connect_token():
             # cookie is not set in request since we just logged in so create it.
             return jsonify(fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id'])))), 200
     else:
-        AnonUser.enable_ghosts = os.path.exists(ENABLEGHOSTS_FILE)
-        AnonUser.new_home = os.path.exists(NEWHOME_FILE)
+        ghosts_enabled[AnonUser.player_id] = AnonUser.enable_ghosts # to work also on Android
         r = make_response(FAKE_JWT)
         r.mimetype = 'application/json'
         return r
 
 @app.route('/auth/realms/zwift/protocol/openid-connect/logout', methods=['POST'])
 def auth_realms_zwift_protocol_openid_connect_logout():
-    # This is called on ZCA logout, we don't want the game client to logout (anyway jwt.decode would fail)
+    # This is called on ZCA logout, we don't want ZA to logout
     session.clear()
     return '', 204
 
@@ -3393,13 +3387,16 @@ def save_option(option, file):
 @app.route("/start-zwift" , methods=['POST'])
 @login_required
 def start_zwift():
-    current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-    ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
-    current_user.new_home = 'newhome' in request.form.keys()
-    if not MULTIPLAYER:
-        save_option(current_user.enable_ghosts, ENABLEGHOSTS_FILE)
-        save_option(current_user.new_home, NEWHOME_FILE)
-    db.session.commit()
+    if MULTIPLAYER:
+        current_user.enable_ghosts = 'enableghosts' in request.form.keys()
+        current_user.new_home = 'newhome' in request.form.keys()
+        db.session.commit()
+        ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
+    else:
+        AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
+        AnonUser.new_home = 'newhome' in request.form.keys()
+        save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
+        save_option(AnonUser.new_home, NEWHOME_FILE)
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)

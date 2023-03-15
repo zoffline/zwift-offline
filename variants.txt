@@ -139,6 +139,10 @@
       "values": {}
     },
     {
+      "name": "game_1_33_5_events_rubberbanding_v2",
+      "values": {}
+    },
+    {
       "name": "game_1_33_server_driven_completed_campaigns",
       "values": {}
     },
@@ -158,6 +162,19 @@
         "fields": {
           "slope": {
             "numberValue": 0.04
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_33_extended_sleep_for_robopacers",
+      "values": {
+        "fields": {
+          "delete_enabled": {
+            "boolValue": false
+          },
+          "sleep_threshold": {
+            "numberValue": 60.0
           }
         }
       }
@@ -705,6 +722,19 @@
           },
           "query_interval": {
             "numberValue": 10.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_34_hw_restrictions_forbidden_hw",
+      "values": {
+        "fields": {
+          "forbidden_manufacturers_name_list": {
+            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
+          },
+          "forbidden_device_name_list": {
+            "stringValue": "HR2VP"
           }
         }
       }
