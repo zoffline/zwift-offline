@@ -168,6 +168,7 @@
     },
     {
       "name": "game_1_33_extended_sleep_for_robopacers",
+      "value": true,
       "values": {
         "fields": {
           "delete_enabled": {
@@ -351,7 +352,7 @@
             "boolValue": false
           },
           "world_scotland_spawn_disabled": {
-            "boolValue": true
+            "boolValue": false
           },
           "recording_enabled": {
             "boolValue": true
@@ -372,7 +373,7 @@
             "boolValue": true
           },
           "world_scotland_record_disabled": {
-            "boolValue": true
+            "boolValue": false
           }
         }
       }
@@ -606,6 +607,9 @@
           },
           "minSpeedLimitShallowDown": {
             "numberValue": 40.0
+          },
+          "uphillSlopeLimitCdaPenalty": {
+            "numberValue": 0.02
           },
           "aeroDragDiffLow": {
             "numberValue": 10.0
