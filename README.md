@@ -360,6 +360,7 @@ Docker
 * gevent (http://www.gevent.org/)
 * pycryptodome (https://pypi.org/project/pycryptodome/)
 * dnspython (https://www.dnspython.org/)
+* fitdecode (https://pypi.org/project/fitdecode/)
 * stravalib (https://github.com/hozn/stravalib)
 * OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
 * OPTIONAL: discord.py (https://discordpy.readthedocs.io/)

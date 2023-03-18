@@ -296,6 +296,11 @@ class Notification(db.Model):
     player_id = db.Column(db.Integer, nullable=False)
     json = db.Column(db.Text, nullable=False)
 
+class ActivityFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    activity_id = db.Column(db.Integer, nullable=False)
+    full = db.Column(db.Integer, nullable=False)
+
 class Version(db.Model):
     version = db.Column(db.Integer, primary_key=True)
 
@@ -980,34 +985,38 @@ def activity_moving_time(activity):
     except:
         return 0
 
-def activity_protobuf_to_json(activity):
+def activity_row_to_json(activity, details=False):
     profile = get_partial_profile(activity.player_id)
-    return {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":profile.first_name,"lastName":profile.last_name, \
-    "imageSrc":profile.imageSrc,"approvalRequired":None}, \
-    "worldId":activity.course_id,"name":activity.name,"sport":str_sport(activity.sport),"startDate":activity.start_date, \
-    "endDate":activity.end_date,"distanceInMeters":activity.distanceInMeters, \
-    "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"", \
-    "feedImageThumbnailUrl":"", \
-    "lastSaveDate":activity.date,"movingTimeInMs":activity_moving_time(activity), \
-    "avgSpeedInMetersPerSecond":activity.avg_speed,"activityRideOnCount":0,"activityCommentCount":0,"privacy":"PUBLIC", \
-    "eventId":None,"rideOnGiven":False,"id_str":str(activity.id)}
+    data = {"id":activity.id,"profile":{"id":str(activity.player_id),"firstName":profile.first_name,"lastName":profile.last_name,
+        "imageSrc":profile.imageSrc,"approvalRequired":None},"worldId":activity.course_id,"name":activity.name,"sport":str_sport(activity.sport),
+        "startDate":activity.start_date,"endDate":activity.end_date,"distanceInMeters":activity.distanceInMeters,
+        "totalElevation":activity.total_elevation,"calories":activity.calories,"primaryImageUrl":"","feedImageThumbnailUrl":"",
+        "lastSaveDate":activity.date,"movingTimeInMs":activity_moving_time(activity),"avgSpeedInMetersPerSecond":activity.avg_speed,
+        "activityRideOnCount":0,"activityCommentCount":0,"privacy":"PUBLIC","eventId":None,"rideOnGiven":False,"id_str":str(activity.id)}
+    if details:
+        extra_data = {"avgWatts":activity.avg_watts,"maxWatts":activity.max_watts,"avgHeartRate":activity.avg_heart_rate,
+            "maxHeartRate":activity.max_heart_rate,"avgCadenceInRotationsPerMinute":activity.avg_cadence,
+            "maxCadenceInRotationsPerMinute":activity.max_cadence,"maxSpeedInMetersPerSecond":activity.max_speed}
+        data.update(extra_data)
+    return data
 
-def select_activities_json(player_id, limit):
+def select_activities_json(player_id, limit, start_after=None):
     ret = []
     if limit > 0:
-        activities = activity_pb2.ActivityList()
-        stmt = sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p ORDER BY date DESC LIMIT :l")
-        rows = db.session.execute(stmt, {"p": player_id, "l": limit}).mappings()
+        where_stmt = "WHERE player_id = :p"
+        args = {"p": player_id, "l": limit}
+        if start_after:
+            where_stmt += " AND id < :s"
+            args.update({"s": int(start_after)})
+        rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity %s ORDER BY date DESC LIMIT :l" % where_stmt), args)
         allow_empty_end_date = True
         for row in rows:
-            activity = activities.activities.add()
-            row_to_protobuf(row, activity, exclude_fields=['fit'])
-            if activity.end_date == "":
+            if row.end_date == "":
                 if allow_empty_end_date:
                     allow_empty_end_date = False
                 else:
                     continue
-            ret.append(activity_protobuf_to_json(activity))
+            ret.append(activity_row_to_json(row))
     return ret
 
 @app.route('/api/activity-feed/feed/', methods=['GET'])
@@ -1016,22 +1025,94 @@ def select_activities_json(player_id, limit):
 def api_activity_feed():
     limit = int(request.args.get('limit'))
     feed_type = request.args.get('feedType')
+    start_after = request.args.get('start_after_activity_id')
     if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
-        ret = select_activities_json(current_user.player_id, limit)
+        ret = select_activities_json(current_user.player_id, limit, start_after)
     else: # todo: FAVORITES, FOLLOWEES
         ret = []
     return jsonify(ret)
+
+def create_activity_file(fit_file, activity_file, full=False):
+    start_time = 0
+    powerInWatts = []
+    cadencePerMin = []
+    heartRate = []
+    distanceInCm = []
+    speedInCmPerSec = []
+    timeInSec = []
+    altitudeInCm = []
+    latlng = []
+    import fitdecode
+    with fitdecode.FitReader(fit_file) as fit:
+        for frame in fit:
+            if frame.frame_type == fitdecode.FIT_FRAME_DATA and frame.name == 'record':
+                power = cadence = heart_rate = distance = speed = time = altitude = position_lat = position_long = None
+                for f in frame.fields:
+                    if f.name == "power" and f.value is not None: power = int(f.value)
+                    elif f.name == "cadence" and f.value is not None: cadence = int(f.value)
+                    elif f.name == "heart_rate" and f.value is not None: heart_rate = int(f.value)
+                    elif f.name == "distance" and f.value is not None: distance = int(f.value * 100)
+                    elif f.name == "speed" and f.value is not None: speed = int(f.value * 100)
+                    elif f.name == "timestamp" and f.value is not None:
+                        timestamp = int(f.value.timestamp())
+                        if start_time == 0: start_time = timestamp
+                        time = timestamp - start_time
+                    elif f.name == "altitude" and f.value is not None: altitude = int(f.value * 100)
+                    elif f.name == "position_lat" and f.value is not None: position_lat = round(f.value / 11930465, 6)
+                    elif f.name == "position_long" and f.value is not None: position_long = round(f.value / 11930465, 6)
+                if None not in {power, cadence, heart_rate, distance, speed, time, altitude, position_lat, position_long}:
+                    powerInWatts.append(power)
+                    cadencePerMin.append(cadence)
+                    heartRate.append(heart_rate)
+                    distanceInCm.append(distance)
+                    speedInCmPerSec.append(speed)
+                    timeInSec.append(time)
+                    altitudeInCm.append(altitude)
+                    latlng.append([position_lat, position_long])
+    if all(l for l in [powerInWatts, cadencePerMin, heartRate, distanceInCm, speedInCmPerSec, timeInSec, altitudeInCm, latlng]):
+        step = len(powerInWatts) // 1000
+        if step == 0 or full: step = 1
+        data = {"powerInWatts": powerInWatts[::step], "cadencePerMin": cadencePerMin[::step], "heartRate": heartRate[::step],
+            "distanceInCm": distanceInCm[::step], "speedInCmPerSec": speedInCmPerSec[::step], "timeInSec": timeInSec[::step],
+            "altitudeInCm": altitudeInCm[::step], "latlng": latlng[::step]}
+        with open(activity_file, 'w') as f:
+            json.dump(data, f)
 
 @app.route('/api/activities/<int:activity_id>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_activities(activity_id):
-    row = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE id = :i"), {"i": activity_id}).first()
+    row = Activity.query.filter_by(id=activity_id).first()
     if row:
-        activity = activity_pb2.Activity()
-        row_to_protobuf(row._mapping, activity, exclude_fields=['fit'])
-        return jsonify(activity_protobuf_to_json(activity))
+        activity = activity_row_to_json(row, True)
+        activities_dir = '%s/activities' % STORAGE_DIR
+        try:
+            if not os.path.isdir(activities_dir):
+                os.makedirs(activities_dir)
+        except IOError as e:
+            logger.error("failed to create activities dir (%s):  %s", activities_dir, str(e))
+            return '', 400
+        fit_file = '%s/%s/fit/%s - %s' % (STORAGE_DIR, row.player_id, row.id, row.fit_filename)
+        # fullDataUrl is never fetched, creating only downsampled file
+        file = ActivityFile.query.filter_by(activity_id=row.id, full=0).first()
+        if not file and os.path.isfile(fit_file):
+            file = ActivityFile(activity_id=row.id, full=0)
+            db.session.add(file)
+            db.session.commit()
+        if file:
+            activity_file = '%s/%s' % (activities_dir, file.id)
+            if not os.path.isfile(activity_file) and os.path.isfile(fit_file):
+                create_activity_file(fit_file, activity_file)
+            if os.path.isfile(activity_file):
+                url = 'https://us-or-rly101.zwift.com/api/activities/%s/file/%s' % (row.id, file.id)
+                data = {"fitnessData": {"status": "AVAILABLE", "fullDataUrl": url, "smallDataUrl": url}}
+                activity.update(data)
+        return jsonify(activity)
     return '', 404
+
+@app.route('/api/activities/<int:activity_id>/file/<file>')
+def api_activities_file(activity_id, file):
+    return send_from_directory('%s/activities' % STORAGE_DIR, file)
 
 @app.route('/api/auth', methods=['GET'])
 def api_auth():
@@ -1411,7 +1492,7 @@ def age(dob):
     return years
 
 def jsf(obj, field, deflt = None):
-    if(obj.HasField(field)):
+    if obj.HasField(field):
         return getattr(obj, field)
     return deflt
 
@@ -1439,7 +1520,7 @@ def copyAttributes(jprofile, jprofileFull, src):
     jprofile[src] = dest
 
 def powerSourceModelToStr(val):
-    if (val == 1):
+    if val == 1:
         return "Power Meter"
     else:
         return "zPower"
@@ -1478,19 +1559,19 @@ def do_api_profiles(profile_id, is_json):
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
         jprofileFull = MessageToDict(profile)
         jprofile = {"id": profile.id, "firstName": jsf(profile, 'first_name'), "lastName": jsf(profile, 'last_name'), "preferredLanguage": jsf(profile, 'preferred_language'), "bodyType":jsv0(profile, 'body_type'), "male": jsb1(profile, 'is_male'), 
-"imageSrc": imageSrc(profile.id), "imageSrcLarge": imageSrc(profile.id), "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
-"emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), 
-"ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'), 
-"connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
-"totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'server_realm'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
-"achievementLevel": jsv0(profile, 'achievement_level'), "totalWattHours": jsv0(profile, 'total_watt_hours'), "runTime1miInSeconds": jsv0(profile, 'run_time_1mi_in_seconds'), "runTime5kmInSeconds": jsv0(profile, 'run_time_5km_in_seconds'), "runTime10kmInSeconds": jsv0(profile, 'run_time_10km_in_seconds'), 
-"runTimeHalfMarathonInSeconds": jsv0(profile, 'run_time_half_marathon_in_seconds'), "runTimeFullMarathonInSeconds": jsv0(profile, 'run_time_full_marathon_in_seconds'), "totalInKomJersey": jsv0(profile, 'total_in_kom_jersey'), "totalInSprintersJersey": jsv0(profile, 'total_in_sprinters_jersey'), 
-"totalInOrangeJersey": jsv0(profile, 'total_in_orange_jersey'), "currentActivityId": jsf(profile, 'current_activity_id'), "enrolledZwiftAcademy": jsv0(profile, 'enrolled_program') == profile.EnrolledProgram.ZWIFT_ACADEMY, "runAchievementLevel": jsv0(profile, 'run_achievement_level'), 
-"totalRunDistance": jsv0(profile, 'total_run_distance'), "totalRunTimeInMinutes": jsv0(profile, 'total_run_time_in_minutes'), "totalRunExperiencePoints": jsv0(profile, 'total_run_experience_points'), "totalRunCalories": jsv0(profile, 'total_run_calories'), "totalGold": jsv0(profile, 'total_gold_drops'), 
-"profilePropertyChanges": jprofileFull.get('propertyChanges'), "cyclingOrganization": jsf(profile, 'cycling_organization'), "userAgent": "CNL/3.13.0 (Android 11) zwift/1.0.85684 curl/7.78.0-DEV", "stravaPremium": jsb0(profile, 'strava_premium'), "profileChanges": False, "launchedGameClient": "09/19/2021 13:24:19 +0000", 
-"createdOn":"2021-09-19T13:24:17.783+0000", "likelyInGame": False, "address": None, "bt":"f97803d3-efac-4510-a17a-ef44e65d3071", "numberOfFolloweesInCommon": 0, "fundraiserId": None, "source": "Android", "origin": None, "licenseNumber": None, "bigCommerceId": None, "marketingConsent": None, "affiliate": None, 
-"avantlinkId": None, "virtualBikeModel": bikeFrameToStr(profile.bike_frame), "connectedToWithings": jsb0(profile, 'connected_to_withings'), "connectedToRuntastic": jsb0(profile, 'connected_to_runtastic'), "connectedToZwiftPower": False, "powerSourceType": "Power Source", 
-"powerSourceModel": powerSourceModelToStr(profile.power_source_model), "riding": False, "location": "", "publicId": "5a72e9b1-239f-435e-8757-af9467336b40", "mixpanelDistinctId": "21304417-af2d-4c9b-8543-8ba7c0500e84"}
+            "imageSrc": imageSrc(profile.id), "imageSrcLarge": imageSrc(profile.id), "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
+            "emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), 
+            "ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'), 
+            "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
+            "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'server_realm'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
+            "achievementLevel": jsv0(profile, 'achievement_level'), "totalWattHours": jsv0(profile, 'total_watt_hours'), "runTime1miInSeconds": jsv0(profile, 'run_time_1mi_in_seconds'), "runTime5kmInSeconds": jsv0(profile, 'run_time_5km_in_seconds'), "runTime10kmInSeconds": jsv0(profile, 'run_time_10km_in_seconds'), 
+            "runTimeHalfMarathonInSeconds": jsv0(profile, 'run_time_half_marathon_in_seconds'), "runTimeFullMarathonInSeconds": jsv0(profile, 'run_time_full_marathon_in_seconds'), "totalInKomJersey": jsv0(profile, 'total_in_kom_jersey'), "totalInSprintersJersey": jsv0(profile, 'total_in_sprinters_jersey'), 
+            "totalInOrangeJersey": jsv0(profile, 'total_in_orange_jersey'), "currentActivityId": jsf(profile, 'current_activity_id'), "enrolledZwiftAcademy": jsv0(profile, 'enrolled_program') == profile.EnrolledProgram.ZWIFT_ACADEMY, "runAchievementLevel": jsv0(profile, 'run_achievement_level'), 
+            "totalRunDistance": jsv0(profile, 'total_run_distance'), "totalRunTimeInMinutes": jsv0(profile, 'total_run_time_in_minutes'), "totalRunExperiencePoints": jsv0(profile, 'total_run_experience_points'), "totalRunCalories": jsv0(profile, 'total_run_calories'), "totalGold": jsv0(profile, 'total_gold_drops'), 
+            "profilePropertyChanges": jprofileFull.get('propertyChanges'), "cyclingOrganization": jsf(profile, 'cycling_organization'), "userAgent": "CNL/3.13.0 (Android 11) zwift/1.0.85684 curl/7.78.0-DEV", "stravaPremium": jsb0(profile, 'strava_premium'), "profileChanges": False, "launchedGameClient": "09/19/2021 13:24:19 +0000", 
+            "createdOn":"2021-09-19T13:24:17.783+0000", "likelyInGame": False, "address": None, "bt":"f97803d3-efac-4510-a17a-ef44e65d3071", "numberOfFolloweesInCommon": 0, "fundraiserId": None, "source": "Android", "origin": None, "licenseNumber": None, "bigCommerceId": None, "marketingConsent": None, "affiliate": None, 
+            "avantlinkId": None, "virtualBikeModel": bikeFrameToStr(profile.bike_frame), "connectedToWithings": jsb0(profile, 'connected_to_withings'), "connectedToRuntastic": jsb0(profile, 'connected_to_runtastic'), "connectedToZwiftPower": False, "powerSourceType": "Power Source", 
+            "powerSourceModel": powerSourceModelToStr(profile.power_source_model), "riding": False, "location": "", "publicId": "5a72e9b1-239f-435e-8757-af9467336b40", "mixpanelDistinctId": "21304417-af2d-4c9b-8543-8ba7c0500e84"}
         copyAttributes(jprofile, jprofileFull, 'publicAttributes')
         copyAttributes(jprofile, jprofileFull, 'privateAttributes')
         return jsonify(jprofile)
@@ -1501,7 +1582,7 @@ def do_api_profiles(profile_id, is_json):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me():
-    if(request.headers['Source'] == "zwift-companion"):
+    if request.headers['Source'] == "zwift-companion":
         return do_api_profiles(current_user.player_id, True)
     else:
         return do_api_profiles(current_user.player_id, False)
@@ -1538,25 +1619,25 @@ def api_profiles_id_privacy(player_id):
     with open(profile_file, 'rb') as fd:
         profile.ParseFromString(fd.read())
     profile.privacy_bits = 0
-    if (jp["approvalRequired"]):
+    if jp["approvalRequired"]:
         profile.privacy_bits += 1
-    if ("displayWeight" in jp and jp["displayWeight"]):
+    if "displayWeight" in jp and jp["displayWeight"]:
         profile.privacy_bits += 4
-    if ("minor" in jp and jp["minor"]):
+    if "minor" in jp and jp["minor"]:
         profile.privacy_bits += 2
-    if (jp["privateMessaging"]):
+    if jp["privateMessaging"]:
         profile.privacy_bits += 8
-    if (jp["defaultFitnessDataPrivacy"]):
+    if jp["defaultFitnessDataPrivacy"]:
         profile.privacy_bits += 16
-    if ("suppressFollowerNotification" in jp and jp["suppressFollowerNotification"]):
+    if "suppressFollowerNotification" in jp and jp["suppressFollowerNotification"]:
         profile.privacy_bits += 32
-    if (not jp["displayAge"]):
+    if not jp["displayAge"]:
         profile.privacy_bits += 64
     defaultActivityPrivacy = jp["defaultActivityPrivacy"]
     profile.default_activity_privacy = 0 #PUBLIC
-    if(defaultActivityPrivacy == "PRIVATE"):
+    if defaultActivityPrivacy == "PRIVATE":
         profile.default_activity_privacy = 1
-    if(defaultActivityPrivacy == "FRIENDS"):
+    if defaultActivityPrivacy == "FRIENDS":
         profile.default_activity_privacy = 2
     with open(profile_file, 'wb') as fd:
         fd.write(profile.SerializeToString())
@@ -1715,8 +1796,9 @@ def api_profiles_activities(player_id):
     for row in rows:
         activity = activities.activities.add()
         row_to_protobuf(row, activity, exclude_fields=['fit'])
-        #Remove activities with less than 100m distance
-        if activity.distanceInMeters < 100:
+        #Remove activities with less than 100m distance or without end time and older than a week
+        start_date = time.mktime(time.strptime(activity.start_date, "%Y-%m-%dT%H:%M:%SZ"))
+        if activity.distanceInMeters < 100 or (not activity.end_date and get_time() - start_date > 604800):
             should_remove.append(activity)
     for a in should_remove:
         db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": a.id})
@@ -2348,7 +2430,7 @@ def api_private_event_feed():
     ret = []
     for pe in ActualPrivateEvents().values():
         ret.append(clone_and_append_social(current_user.player_id, pe))
-    if(request.headers['Accept'] == 'application/json'):
+    if request.headers['Accept'] == 'application/json':
         return jsonify(ret)
     return jsonPrivateEventFeedToProtobuf(ret).SerializeToString(), 200
 
@@ -2387,7 +2469,7 @@ def jsonPrivateEventToProtobuf(je):
 @login_required
 def api_private_event_id(event_id):
     ret = clone_and_append_social(current_user.player_id, ActualPrivateEvents()[event_id])
-    if(request.headers['Accept'] == 'application/json'):
+    if request.headers['Accept'] == 'application/json':
         return jsonify(ret)
     return jsonPrivateEventToProtobuf(ret).SerializeToString(), 200
 
@@ -2574,7 +2656,7 @@ def api_profiles_goals(player_id):
     if request.method == 'POST':
         if not request.stream:
             return '', 400
-        if(request.headers['Content-Type'] == 'application/x-protobuf-lite'):
+        if request.headers['Content-Type'] == 'application/x-protobuf-lite':
             goal = goal_pb2.Goal()
             goal.ParseFromString(request.stream.read())
         else:
