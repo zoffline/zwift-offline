@@ -1001,21 +1001,15 @@ def activity_row_to_json(activity, details=False):
     return data
 
 def select_activities_json(player_id, limit, start_after=None):
+    filters = []
+    if player_id:
+        filters.append(Activity.player_id == player_id)
+    if start_after:
+        filters.append(Activity.id < int(start_after))
+    rows = Activity.query.filter(*filters).order_by(Activity.date.desc()).limit(limit)
     ret = []
-    if limit > 0:
-        where_stmt = "WHERE player_id = :p"
-        args = {"p": player_id, "l": limit}
-        if start_after:
-            where_stmt += " AND id < :s"
-            args.update({"s": int(start_after)})
-        rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity %s ORDER BY date DESC LIMIT :l" % where_stmt), args)
-        allow_empty_end_date = True
-        for row in rows:
-            if row.end_date == "":
-                if allow_empty_end_date:
-                    allow_empty_end_date = False
-                else:
-                    continue
+    for row in rows:
+        if row.end_date:
             ret.append(activity_row_to_json(row))
     return ret
 
@@ -1028,8 +1022,8 @@ def api_activity_feed():
     start_after = request.args.get('start_after_activity_id')
     if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
         ret = select_activities_json(current_user.player_id, limit, start_after)
-    else: # todo: FAVORITES, FOLLOWEES
-        ret = []
+    else: # todo: FAVORITES, FOLLOWEES (showing all for now)
+        ret = select_activities_json(None, limit, start_after)
     return jsonify(ret)
 
 def create_activity_file(fit_file, activity_file, full=False):
@@ -1102,7 +1096,10 @@ def api_activities(activity_id):
         if file:
             activity_file = '%s/%s' % (activities_dir, file.id)
             if not os.path.isfile(activity_file) and os.path.isfile(fit_file):
-                create_activity_file(fit_file, activity_file)
+                try:
+                    create_activity_file(fit_file, activity_file)
+                except Exception as exc:
+                    logger.warning('create_activity_file: %s' % repr(exc))
             if os.path.isfile(activity_file):
                 url = 'https://us-or-rly101.zwift.com/api/activities/%s/file/%s' % (row.id, file.id)
                 data = {"fitnessData": {"status": "AVAILABLE", "fullDataUrl": url, "smallDataUrl": url}}
