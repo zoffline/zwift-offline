@@ -20,6 +20,7 @@ import base64
 import uuid
 import jwt
 import sqlalchemy
+import fitdecode
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from functools import wraps
@@ -37,6 +38,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+from collections import deque
+from itertools import islice
 
 sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
 import udp_node_msgs_pb2
@@ -301,6 +304,14 @@ class ActivityFile(db.Model):
     activity_id = db.Column(db.Integer, nullable=False)
     full = db.Column(db.Integer, nullable=False)
 
+class PowerCurve(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    time = db.Column(db.Text, nullable=False)
+    power = db.Column(db.Integer, nullable=False)
+    power_wkg = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.Integer, nullable=False)
+
 class Version(db.Model):
     version = db.Column(db.Integer, primary_key=True)
 
@@ -323,6 +334,7 @@ class PartialProfile:
     route = 0
     player_type = 'NORMAL'
     male = True
+    weight_in_grams = 0
     imageSrc = ''
     def to_json(self):
         return {"countryCode": self.country_code,
@@ -446,6 +458,7 @@ def get_partial_profile(player_id):
         partial_profile.country_code = profile.country_code
         partial_profile.player_type = profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1))
         partial_profile.male = profile.is_male
+        partial_profile.weight_in_grams = profile.weight_in_grams
         for f in profile.public_attributes:
             #0x69520F20=1766985504 - crc32 of "PACE PARTNER - ROUTE"
             #TODO: -1021012238: figure out
@@ -916,6 +929,24 @@ def delete(filename):
         flash("Credentials removed.")
     return redirect(url_for('settings', username=current_user.username))
 
+@app.route("/power_curves/<username>", methods=["GET", "POST"])
+@login_required
+def power_curves(username):
+    if request.method == "POST":
+        player_id = current_user.player_id
+        PowerCurve.query.filter_by(player_id=player_id).delete()
+        db.session.commit()
+        if request.form.get('create'):
+            fit_dir = os.path.join(STORAGE_DIR, str(player_id), 'fit')
+            if os.path.isdir(fit_dir):
+                for fit_file in os.listdir(fit_dir):
+                    create_power_curve(player_id, os.path.join(fit_dir, fit_file))
+            flash("Power curves created.")
+        else:
+            flash("Power curves deleted.")
+        return redirect(url_for('settings', username=current_user.username))
+    return render_template("power_curves.html", username=current_user.username)
+
 @app.route("/logout/<username>")
 @login_required
 def logout(username):
@@ -1039,7 +1070,6 @@ def create_activity_file(fit_file, activity_file, full=False):
     timeInSec = []
     altitudeInCm = []
     latlng = []
-    import fitdecode
     with fitdecode.FitReader(fit_file) as fit:
         for frame in fit:
             if frame.frame_type == fitdecode.FIT_FRAME_DATA and frame.name == 'record':
@@ -2085,6 +2115,42 @@ def zwift_upload(player_id, activity):
         logger.warning("Zwift upload failed. No internet? %s" % repr(exc))
 
 
+def moving_average(iterable, n):
+    it = iter(iterable)
+    d = deque(islice(it, n))
+    s = sum(d)
+    for elem in it:
+        s += elem - d.popleft()
+        d.append(elem)
+        yield s // n
+
+def create_power_curve(player_id, fit_file):
+    try:
+        power_values = []
+        timestamp = int(get_utc_time())
+        with fitdecode.FitReader(fit_file) as fit:
+            for frame in fit:
+                if frame.frame_type == fitdecode.FIT_FRAME_DATA:
+                    if frame.name == 'record':
+                        p = frame.get_value('power')
+                        if p is not None: power_values.append(int(p))
+                    elif frame.name == 'activity':
+                        t = frame.get_value('timestamp')
+                        if t is not None: timestamp = int(t.timestamp())
+        if power_values:
+            for time in [5, 60, 300, 1200]:
+                averages = list(moving_average(power_values, time))
+                if averages:
+                    power = max(averages)
+                    profile = get_partial_profile(player_id)
+                    power_wkg = round(power / (profile.weight_in_grams / 1000), 2)
+                    power_curve = PowerCurve(player_id=player_id, time=str(time), power=power, power_wkg=power_wkg, timestamp=timestamp)
+                    db.session.add(power_curve)
+            db.session.commit()
+    except Exception as exc:
+        logger.warning('create_power_curve: %s' % repr(exc))
+
+
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
 @login_required
@@ -2104,6 +2170,7 @@ def api_profiles_activities_id(player_id, activity_id):
     activity = activity_pb2.Activity()
     activity.ParseFromString(stream)
     update_protobuf_in_db(Activity, activity, activity_id, ['fit'])
+    create_power_curve(player_id, BytesIO(activity.fit))
     fit_filename = '%s - %s' % (activity_id, activity.fit_filename)
     save_fit(player_id, fit_filename, activity.fit)
 
@@ -3194,6 +3261,18 @@ def achievement_unlock():
 @app.route('/api/achievement/category/<category_id>', methods=['GET'])
 def api_achievement_category(category_id):
     return '', 404 # returning error for now, since some steps can't be completed
+
+
+@app.route('/api/power-curve/best/all-time', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_power_curve_best_all_time():
+    power_curves = profile_pb2.PowerCurveAggregationMsg()
+    for time in ['5', '60', '300', '1200']:
+        row = PowerCurve.query.filter_by(player_id=current_user.player_id, time=time).order_by(PowerCurve.power.desc()).first()
+        if row:
+            power_curves.watts[time].power = row.power
+    return power_curves.SerializeToString(), 200
 
 
 @app.teardown_request

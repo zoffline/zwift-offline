@@ -1,0 +1,40 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">Power curves</div></h1>
+  {% if username != "zoffline" %}
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-12">
+      <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-5 top-buffer">
+      <form id="power_curves" action="{{ url_for('power_curves', username=username) }}" method="post">
+        <div class="row">
+          <div class="col-md-12">
+            <h5 class="text-shadow">Personal best power numbers</h5>
+          </div>
+          <div id="content" class="col-md-12">
+            <input type="submit" value="Calculate from FIT files" name="create" class="btn btn-sm btn-light" onclick="working();">
+            <input type="submit" value="Reset" name="reset" class="btn btn-sm btn-danger">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="working"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script type="text/javascript">
+    function working() {
+      document.getElementById("working").style.display = "block";
+      document.getElementById("content").style.display = "none";
+    }
+  </script>
+{% endblock %}

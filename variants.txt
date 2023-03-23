@@ -36,10 +36,11 @@
     },
     {
       "name": "game_1_32_server_power_curves",
+      "value": true,
       "values": {
         "fields": {
           "view_enabled": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }

@@ -329,3 +329,13 @@ message AchievementEntry {
 message Achievements {
 	repeated AchievementEntry achievements = 1;
 }
+
+message BestEffortPointMsg {
+	required double power = 1;
+	optional uint64 timestamp = 2;
+}
+
+message PowerCurveAggregationMsg {
+	map<string, BestEffortPointMsg> watts = 1;
+	map<string, BestEffortPointMsg> watts_per_kg = 2;
+}
