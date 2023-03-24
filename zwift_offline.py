@@ -376,8 +376,35 @@ courses_lookup = {
     17: 'Scotland'
 }
 
-tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
-GD = tree.getroot()
+def load_game_dictionary():
+    tree = ET.parse('%s/cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
+    root = tree.getroot()
+    gd = {}
+    gd['headgears'] = [int(x.get('signature')) for x in root.findall("./HEADGEARS/HEADGEAR")]
+    gd['glasses'] = [int(x.get('signature')) for x in root.findall("./GLASSES/GLASS")]
+    gd['bikeshoes'] = [int(x.get('signature')) for x in root.findall("./BIKESHOES/BIKESHOE")]
+    gd['socks'] = [int(x.get('signature')) for x in root.findall("./SOCKS/SOCK")]
+    gd['jerseys'] = [int(x.get('signature')) for x in root.findall("./JERSEYS/JERSEY")]
+    gd['bikefrontwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")]
+    gd['bikerearwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEREARWHEELS/BIKEREARWHEEL")]
+    gd['runshirts'] = [int(x.get('signature')) for x in root.findall("./RUNSHIRTS/RUNSHIRT")]
+    gd['runshorts'] = [int(x.get('signature')) for x in root.findall("./RUNSHORTS/RUNSHORT")]
+    gd['runshoes'] = [int(x.get('signature')) for x in root.findall("./RUNSHOES/RUNSHOE")]
+    bikeframes = {}
+    for x in root.findall("./BIKEFRAMES/BIKEFRAME"):
+        bikeframes[int(x.get('signature'))] = x.get('name')
+    gd['bikeframes'] = bikeframes
+    routes = {}
+    for x in root.findall("./ACHIEVEMENTS/ACHIEVEMENT"):
+        if x.get('imageName') == "RouteComplete": routes[x.get('name')] = int(x.get('signature'))
+    achievements = {}
+    for x in root.findall("./ROUTES/ROUTE"):
+        name = x.get('name').upper()
+        if name in routes: achievements[routes[name]] = int(x.get('signature'))
+    gd['achievements'] = achievements
+    return gd
+
+GD = load_game_dictionary()
 
 
 def get_utc_time():
@@ -1561,9 +1588,8 @@ def privacy(profile):
         "suppressFollowerNotification": bool(privacy_bits & 32), "displayAge": not bool(privacy_bits & 64), "defaultActivityPrivacy": profile_pb2.ActivityPrivacyType.Name(jsv0(profile, 'default_activity_privacy'))}
 
 def bikeFrameToStr(val):
-    item = GD.find("./BIKEFRAMES/BIKEFRAME[@signature='%s']" % val)
-    if item is not None:
-        return item.get('name')
+    if val in GD['bikeframes']:
+        return GD['bikeframes'][val]
     return "---"
 
 def do_api_profiles(profile_id, is_json):
@@ -1860,17 +1886,17 @@ def time_since(state):
     return '%s %s ago' % (interval, interval_type)
 
 def random_profile(p):
-    p.ride_helmet_type = int(random.choice(GD.findall("./HEADGEARS/HEADGEAR")).get('signature'))
-    p.glasses_type = int(random.choice(GD.findall("./GLASSES/GLASS")).get('signature'))
-    p.ride_shoes_type = int(random.choice(GD.findall("./BIKESHOES/BIKESHOE")).get('signature'))
-    p.ride_socks_type = int(random.choice(GD.findall("./SOCKS/SOCK")).get('signature'))
-    p.ride_jersey = int(random.choice(GD.findall("./JERSEYS/JERSEY")).get('signature'))
-    p.bike_wheel_front = int(random.choice(GD.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")).get('signature'))
-    p.bike_wheel_rear = int(random.choice(GD.findall("./BIKEREARWHEELS/BIKEREARWHEEL")).get('signature'))
-    p.bike_frame = int(random.choice(GD.findall("./BIKEFRAMES/BIKEFRAME")).get('signature'))
-    p.run_shirt_type = int(random.choice(GD.findall("./RUNSHIRTS/RUNSHIRT")).get('signature'))
-    p.run_shorts_type = int(random.choice(GD.findall("./RUNSHORTS/RUNSHORT")).get('signature'))
-    p.run_shoes_type = int(random.choice(GD.findall("./RUNSHOES/RUNSHOE")).get('signature'))
+    p.ride_helmet_type = random.choice(GD['headgears'])
+    p.glasses_type = random.choice(GD['glasses'])
+    p.ride_shoes_type = random.choice(GD['bikeshoes'])
+    p.ride_socks_type = random.choice(GD['socks'])
+    p.ride_jersey = random.choice(GD['jerseys'])
+    p.bike_wheel_front = random.choice(GD['bikefrontwheels'])
+    p.bike_wheel_rear = random.choice(GD['bikerearwheels'])
+    p.bike_frame = random.choice(list(GD['bikeframes'].keys()))
+    p.run_shirt_type = random.choice(GD['runshirts'])
+    p.run_shorts_type = random.choice(GD['runshorts'])
+    p.run_shoes_type = random.choice(GD['runshoes'])
     return p
 
 @app.route('/api/profiles', methods=['GET'])
@@ -3146,6 +3172,28 @@ def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
             "lastName": row.last_name, "endTime": end_time, "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": 1}}
         results.append(result)
     return jsonify({"query": query, "results": results})
+
+
+@app.route('/api/route-results/completion-stats/all', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_route_results_completion_stats_all():
+    page = int(request.args.get('page'))
+    page_size = int(request.args.get('pageSize'))
+    achievements_proto = profile_pb2.Achievements()
+    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
+    if os.path.isfile(achievements_file):
+        with open(achievements_file, 'rb') as f:
+            achievements_proto.ParseFromString(f.read())
+    achievements = [x.id for x in achievements_proto.achievements]
+    stats = []
+    for achievement in achievements:
+        if achievement in GD['achievements']:
+            stats.append({"routeHash": GD['achievements'][achievement], "firstCompletedAt": "", "lastCompletedAt": ""})
+    current_page = stats[page * page_size:page * page_size + page_size]
+    page_count = math.ceil(len(stats) / page_size)
+    response = {"response": {"stats": current_page}, "hasPreviousPage": page > 0, "hasNextPage": page < page_count - 1, "pageCount": page_count}
+    return jsonify(response)
 
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
