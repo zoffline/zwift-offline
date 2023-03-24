@@ -1,37 +1,13 @@
-<!doctype html5>
+<!doctype html>
 <html>
 <head>
   <title>Zwift Launcher</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=10">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   <link rel="stylesheet" href="/style/site.css"/>
-  <!--[if lte IE 9]>
-    <style>
-      .text-shadow {
-        color: black !important;
-        position: relative;
-        left: 0px;
-        top: 0px;
-        filter:progid:DXImageTransform.Microsoft.Blur(pixelradius=2.25);
-      }
-      .text-shadow:before {
-        color: white;
-        width: 100%;
-        position: absolute;
-        content: attr(data-innertext);
-
-        top: 2px;
-        left: 1px;
-      }
-      a .text-shadow {
-        text-decoration: none !important;
-      }
-    </style>
-  <![endif]-->
 </head>
 <body>
   <div class="container-fluid">
-      {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
   </div>
   <script>
     if(document.getElementsByClassName) {

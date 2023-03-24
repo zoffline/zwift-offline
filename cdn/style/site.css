@@ -6,7 +6,7 @@ body {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
-.text-shadow, .text-shadow-not-ie {
+.text-shadow {
     text-shadow: 1px 1px 2px black;
 }
 .list-group-item, form, h1 {
@@ -55,7 +55,7 @@ div#working {
     border-radius: 50%;
     width: 30px;
     height: 30px;
-	display: none;
+    display: none;
     animation: spin 2s linear infinite;
 }
 @keyframes spin {
