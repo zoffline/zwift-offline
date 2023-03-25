@@ -2290,7 +2290,8 @@ def create_zca_notification(player_id, private_event, organizer):
 def api_notifications():
     ret_notifications = []
     for row in Notification.query.filter_by(player_id=current_user.player_id):
-        ret_notifications.append(row.json)
+        if json.loads(json.loads(row.json)["argString0"])["eventStartDate"] > get_time():
+            ret_notifications.append(row.json)
     return jsonify(ret_notifications)
 
 @app.route('/api/notifications/<int:notif_id>', methods=['PUT'])
@@ -2933,6 +2934,8 @@ def transformPrivateEvents(player_id, max_count, status):
     ret = []
     if max_count > 0:
         for e in ActualPrivateEvents().values():
+            if time.mktime(time.strptime(e['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) < get_utc_time():
+                continue
             for i in e['eventInvites']:
                 if i['invitedProfile']['id'] == player_id:
                     if i['status'] == status:
@@ -3180,16 +3183,15 @@ def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
 def api_route_results_completion_stats_all():
     page = int(request.args.get('page'))
     page_size = int(request.args.get('pageSize'))
-    achievements_proto = profile_pb2.Achievements()
+    achievements = profile_pb2.Achievements()
     achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
     if os.path.isfile(achievements_file):
         with open(achievements_file, 'rb') as f:
-            achievements_proto.ParseFromString(f.read())
-    achievements = [x.id for x in achievements_proto.achievements]
+            achievements.ParseFromString(f.read())
     stats = []
-    for achievement in achievements:
-        if achievement in GD['achievements']:
-            stats.append({"routeHash": GD['achievements'][achievement], "firstCompletedAt": "", "lastCompletedAt": ""})
+    for achievement in achievements.achievements:
+        if achievement.id in GD['achievements']:
+            stats.append({"routeHash": GD['achievements'][achievement.id], "firstCompletedAt": "", "lastCompletedAt": ""})
     current_page = stats[page * page_size:page * page_size + page_size]
     page_count = math.ceil(len(stats) / page_size)
     response = {"response": {"stats": current_page}, "hasPreviousPage": page > 0, "hasNextPage": page < page_count - 1, "pageCount": page_count}
