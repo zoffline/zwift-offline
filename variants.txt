@@ -1,6 +1,26 @@
 {
   "variants": [
     {
+      "name": "zwift_launcher_win_rollout",
+      "values": {
+        "fields": {
+          "ver_cur": {
+            "stringValue": "Zwift_ver_cur.xml"
+          }
+        }
+      }
+    },
+    {
+      "name": "zwift_launcher_osx_rollout",
+      "values": {
+        "fields": {
+          "ver_cur": {
+            "stringValue": "ZwiftMac_ver_cur.xml"
+          }
+        }
+      }
+    },
+    {
       "name": "zwift_launcher_osx_metal",
       "value": true,
       "values": {}

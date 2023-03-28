@@ -1520,8 +1520,6 @@ def api_zfiles_delete(file_id):
 def custom_style(filename):
     return send_from_directory('%s/cdn/style' % SCRIPT_DIR, filename)
 
-
-# Launcher files are requested over https on macOS
 @app.route('/static/web/launcher/<path:filename>')
 def static_web_launcher(filename):
     return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
@@ -3238,10 +3236,7 @@ def relay_worlds_leave(server_realm):
     return '{"worldtime":%ld}' % world_time()
 
 
-@app.route('/experimentation/v1/variant', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def experimentation_v1_variant():
+def do_experimentation_v1_variant():
     stream = variants_pb2.FeatureResponse()
     stream.ParseFromString(request.stream.read())
     variants = {}
@@ -3250,7 +3245,8 @@ def experimentation_v1_variant():
         Parse(f.read(), vs)
         for v in vs.variants:
             variants[v.name] = v
-    variants['game_1_20_home_screen'].value = current_user.new_home
+    if hasattr(current_user, 'new_home'):
+        variants['game_1_20_home_screen'].value = current_user.new_home
     response = variants_pb2.FeatureResponse()
     for req in stream.variants:
         if req.name in variants:
@@ -3258,6 +3254,16 @@ def experimentation_v1_variant():
         else:
             logger.info("Unknown feature: " + req.name)
     return response.SerializeToString(), 200
+
+@app.route('/experimentation/v1/variant', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def experimentation_v1_variant():
+    return do_experimentation_v1_variant()
+
+@app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
+def experimentation_v1_machine_id_variant():
+    return do_experimentation_v1_variant()
 
 def get_profile_saved_game_achiev2_40_bytes():
     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
