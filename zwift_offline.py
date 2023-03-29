@@ -1289,6 +1289,7 @@ def get_events(limit, sport):
                    ('Bologna TT', 2843604888, 10),
                    ('Crit City', 947394567, 12),
                    ('Crit City Reverse', 2875658892, 12),
+                   ('France Classic Fondo', 2136907048, 14),
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),

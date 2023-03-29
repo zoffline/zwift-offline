@@ -178,6 +178,11 @@
       "values": {}
     },
     {
+      "name": "game_1_33_6_powerup_priority_for_archpowerup_tag",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_33_riders_nearby_watts",
       "values": {
         "fields": {
@@ -556,6 +561,7 @@
     },
     {
       "name": "game_1_30_position_accuracy_over_network_global",
+      "value": true,
       "values": {}
     },
     {
@@ -630,7 +636,7 @@
             "numberValue": 40.0
           },
           "uphillSlopeLimitCdaPenalty": {
-            "numberValue": 0.02
+            "numberValue": 0.04
           },
           "aeroDragDiffLow": {
             "numberValue": 10.0
@@ -793,7 +799,7 @@
             "boolValue": false
           },
           "makuri": {
-            "boolValue": false
+            "boolValue": true
           },
           "watopia": {
             "boolValue": false
@@ -805,7 +811,7 @@
             "boolValue": false
           },
           "draftScale": {
-            "numberValue": 2.0
+            "numberValue": 1.5
           },
           "disable_draft_supertuck": {
             "boolValue": true
@@ -845,7 +851,13 @@
     },
     {
       "name": "game_VideoCapture",
-      "values": {}
+      "values": {
+        "fields": {
+          "CloseClips": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_VideoCaptureNotableMoments",
