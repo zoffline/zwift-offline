@@ -2289,7 +2289,7 @@ def create_zca_notification(player_id, private_event, organizer):
 def api_notifications():
     ret_notifications = []
     for row in Notification.query.filter_by(player_id=current_user.player_id):
-        if json.loads(json.loads(row.json)["argString0"])["eventStartDate"] > get_time():
+        if json.loads(json.loads(row.json)["argString0"])["eventStartDate"] > get_time() - 1800:
             ret_notifications.append(row.json)
     return jsonify(ret_notifications)
 
@@ -2521,7 +2521,8 @@ def jsonPrivateEventFeedToProtobuf(jfeed):
 def api_private_event_feed():
     ret = []
     for pe in ActualPrivateEvents().values():
-        ret.append(clone_and_append_social(current_user.player_id, pe))
+        if time.mktime(time.strptime(pe['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) > get_utc_time() - 1800:
+            ret.append(clone_and_append_social(current_user.player_id, pe))
     if request.headers['Accept'] == 'application/json':
         return jsonify(ret)
     return jsonPrivateEventFeedToProtobuf(ret).SerializeToString(), 200
@@ -2933,16 +2934,15 @@ def transformPrivateEvents(player_id, max_count, status):
     ret = []
     if max_count > 0:
         for e in ActualPrivateEvents().values():
-            if time.mktime(time.strptime(e['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) < get_utc_time():
-                continue
-            for i in e['eventInvites']:
-                if i['invitedProfile']['id'] == player_id:
-                    if i['status'] == status:
-                        e_clone = deepcopy(e)
-                        e_clone['inviteStatus'] = status
-                        ret.append(e_clone)
-                        if len(ret) >= max_count:
-                            return ret
+            if time.mktime(time.strptime(e['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) > get_utc_time() - 1800:
+                for i in e['eventInvites']:
+                    if i['invitedProfile']['id'] == player_id:
+                        if i['status'] == status:
+                            e_clone = deepcopy(e)
+                            e_clone['inviteStatus'] = status
+                            ret.append(e_clone)
+                            if len(ret) >= max_count:
+                                return ret
     return ret
 
 #todo: followingCount=3&playerSport=all&eventSport=CYCLING&fetchCampaign=true
