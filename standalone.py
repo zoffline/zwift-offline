@@ -527,6 +527,9 @@ def play_pace_partners():
         ppthreadevent.wait(timeout=pacer_update_freq)
 
 def load_bots():
+    import json
+    with open('%s/bot.txt' % SCRIPT_DIR) as f:
+        data = json.load(f)
     i = 1
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
@@ -543,10 +546,17 @@ def load_bots():
                         with open(os.path.join(root, f), 'rb') as fd:
                             bot.route.ParseFromString(fd.read())
                         bot.position = random.randrange(len(bot.route.states))
-                        p.first_name = ''
-                        p.last_name = zo.time_since(bot.route.states[0]) + ' [bot]'
+                        p.last_name = random.choice(data['last_names'])
+                        p.body_type = random.choice(data['body_types'])
+                        p.hair_type = random.choice(data['hair_types'])
                         p.is_male = bool(random.getrandbits(1))
-                        p.country_code = 0
+                        if p.is_male:
+                            p.first_name = random.choice(data['first_names_male'])
+                            p.facial_hair_type = random.choice(data['facial_hair_types'])
+                        else:
+                            p.first_name = random.choice(data['first_names_female'])
+                            p.body_type += 1
+                        p.country_code = random.choice(data['country_codes'])
                         bot.profile = p
                         i += 1
 
