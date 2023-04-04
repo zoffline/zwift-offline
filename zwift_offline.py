@@ -1849,16 +1849,16 @@ def api_profiles_activities(player_id):
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id}).mappings()
     should_remove = list()
     for row in rows:
-        activity = activities.activities.add()
-        row_to_protobuf(row, activity, exclude_fields=['fit'])
         #Remove activities with less than 100m distance or without end time and older than a week
-        start_date = time.mktime(time.strptime(activity.start_date, "%Y-%m-%dT%H:%M:%SZ"))
-        if activity.distanceInMeters < 100 or (not activity.end_date and get_time() - start_date > 604800):
-            should_remove.append(activity)
-    for a in should_remove:
-        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": a.id})
+        start_date = time.mktime(time.strptime(row.start_date, "%Y-%m-%dT%H:%M:%SZ"))
+        if row.distanceInMeters < 100 or (not row.end_date and get_time() - start_date > 604800):
+            should_remove.append(row.id)
+        elif start_date > get_time() - 2592000: #Add activities from last 30 days
+            activity = activities.activities.add()
+            row_to_protobuf(row, activity, exclude_fields=['fit'])
+    if should_remove:
+        Activity.query.filter(Activity.id.in_(should_remove)).delete()
         db.session.commit()
-        activities.activities.remove(a)
     return activities.SerializeToString(), 200
 
 def time_since(state):
@@ -2519,9 +2519,12 @@ def jsonPrivateEventFeedToProtobuf(jfeed):
 @jwt_to_session_cookie
 @login_required
 def api_private_event_feed():
+    start_date = int(request.args.get('start_date')) / 1000
+    if start_date == -1800: start_date += get_time() # first ZA request has start_date=-1800000
+    past_events = request.args.get('organizer_only_past_events') == 'true'
     ret = []
     for pe in ActualPrivateEvents().values():
-        if time.mktime(time.strptime(pe['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) > get_utc_time() - 1800:
+        if stime_to_timestamp(pe['eventStart']) > start_date or (past_events and int(pe['organizerProfileId']) == current_user.player_id):
             ret.append(clone_and_append_social(current_user.player_id, pe))
     if request.headers['Accept'] == 'application/json':
         return jsonify(ret)
