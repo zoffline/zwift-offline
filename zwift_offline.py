@@ -1849,11 +1849,9 @@ def api_profiles_activities(player_id):
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id}).mappings()
     should_remove = list()
     for row in rows:
-        #Remove activities with less than 100m distance or without end time and older than a week
-        start_date = time.mktime(time.strptime(row.start_date, "%Y-%m-%dT%H:%M:%SZ"))
-        if row.distanceInMeters < 100 or (not row.end_date and get_time() - start_date > 604800):
+        if row.distanceInMeters < 100: # Remove activities with less than 100m distance
             should_remove.append(row.id)
-        elif start_date > get_time() - 2592000: #Add activities from last 30 days
+        elif stime_to_timestamp(row.date) > get_time() - 2592000: # Add activities from last 30 days
             activity = activities.activities.add()
             row_to_protobuf(row, activity, exclude_fields=['fit'])
     if should_remove:
@@ -2254,7 +2252,10 @@ def api_profiles_activities_rideon(receiving_player_id):
 
 def stime_to_timestamp(stime):
     utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
-    return int((datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp())
+    try:
+        return int((datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp())
+    except:
+        return 0
 
 def create_zca_notification(player_id, private_event, organizer):
     orm_not = Notification(event_id=private_event['id'], player_id=player_id, json='')
@@ -2937,7 +2938,7 @@ def transformPrivateEvents(player_id, max_count, status):
     ret = []
     if max_count > 0:
         for e in ActualPrivateEvents().values():
-            if time.mktime(time.strptime(e['eventStart'], "%Y-%m-%dT%H:%M:%SZ")) > get_utc_time() - 1800:
+            if stime_to_timestamp(e['eventStart']) > get_time() - 1800:
                 for i in e['eventInvites']:
                     if i['invitedProfile']['id'] == player_id:
                         if i['status'] == status:
@@ -3122,8 +3123,8 @@ def api_personal_records_results_summary(sport):
         if row:
             count = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
             result = {"label": segment_id, "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
-                "lastName": row.last_name, "endTime": int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000),
-                "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
+                "lastName": row.last_name, "endTime": stime_to_timestamp(row.finish_time_str) * 1000, "durationInMilliseconds": row.elapsed_ms,
+                "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
             results.append(result)
     return jsonify({"query": query, "results": results})
 
@@ -3155,8 +3156,8 @@ def api_personal_records_results_summary_by_quarter(sport, segment_id):
             if row:
                 count = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
                 result = {"label": '%s-Q%s' % (y, q), "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
-                    "lastName": row.last_name, "endTime": int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000),
-                    "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
+                    "lastName": row.last_name, "endTime": stime_to_timestamp(row.finish_time_str) * 1000, "durationInMilliseconds": row.elapsed_ms,
+                    "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": count}}
                 results.append(result)
     return jsonify({"query": query, "results": results})
 
@@ -3172,7 +3173,7 @@ def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args)
     results = []
     for row in rows:
-        end_time = int(time.mktime(time.strptime(row.finish_time_str, "%Y-%m-%dT%H:%M:%SZ")) * 1000)
+        end_time = stime_to_timestamp(row.finish_time_str) * 1000
         result = {"label": str(end_time), "result": {"segmentId": int(segment_id), "profileId": row.player_id, "firstInitial": row.first_name[0],
             "lastName": row.last_name, "endTime": end_time, "durationInMilliseconds": row.elapsed_ms, "playerType": "NORMAL", "activityId": row.activity_id, "numberOfResults": 1}}
         results.append(result)
