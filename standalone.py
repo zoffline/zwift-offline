@@ -549,7 +549,7 @@ def load_bots():
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
                         rider = random.choice(list(data['riders']))
-                        p.is_male = eval(rider['is_male'])
+                        p.is_male = rider['is_male']
                         if p.is_male:
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
