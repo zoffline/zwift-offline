@@ -548,12 +548,11 @@ def load_bots():
                         bot.position = random.randrange(len(bot.route.states))
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
-                        p.is_male = bool(random.getrandbits(1))
+                        rider = random.choice(list(data['riders']))
+                        p.is_male = eval(rider['is_male'])
                         if p.is_male:
-                            rider = random.choice(list(data['male_riders']))
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
-                            rider = random.choice(list(data['female_riders']))
                             p.body_type += 1
                         p.last_name = rider['last_name']
                         p.first_name = rider['first_name']
