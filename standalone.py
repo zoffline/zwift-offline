@@ -530,6 +530,8 @@ def load_bots():
     import json
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
+    with open('%s/pro_bots.json' % SCRIPT_DIR) as f:
+        pro_data = json.load(f)
     i = 1
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
@@ -546,17 +548,21 @@ def load_bots():
                         with open(os.path.join(root, f), 'rb') as fd:
                             bot.route.ParseFromString(fd.read())
                         bot.position = random.randrange(len(bot.route.states))
-                        p.last_name = random.choice(data['last_names'])
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
                         p.is_male = bool(random.getrandbits(1))
                         if p.is_male:
-                            p.first_name = random.choice(data['first_names_male'])
+                            i = random.randint(0, len(pro_data['male_riders']) - 1)
+                            p.last_name = pro_data['male_riders'][i]['last_name']
+                            p.first_name = pro_data['male_riders'][i]['first_name']
+                            p.country_code = pro_data['male_riders'][i]['country_code']
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
-                            p.first_name = random.choice(data['first_names_female'])
+                            i = random.randint(0, len(pro_data['female_riders']) - 1)
+                            p.last_name = pro_data['female_riders'][i]['last_name']
+                            p.first_name = pro_data['female_riders'][i]['first_name']
+                            p.country_code = pro_data['female_riders'][i]['country_code']
                             p.body_type += 1
-                        p.country_code = random.choice(data['country_codes'])
                         bot.profile = p
                         i += 1
 
