@@ -530,8 +530,6 @@ def load_bots():
     import json
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
-    with open('%s/pro_bots.json' % SCRIPT_DIR) as f:
-        pro_data = json.load(f)
     i = 1
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
@@ -552,17 +550,14 @@ def load_bots():
                         p.hair_type = random.choice(data['hair_types'])
                         p.is_male = bool(random.getrandbits(1))
                         if p.is_male:
-                            i = random.randint(0, len(pro_data['male_riders']) - 1)
-                            p.last_name = pro_data['male_riders'][i]['last_name']
-                            p.first_name = pro_data['male_riders'][i]['first_name']
-                            p.country_code = pro_data['male_riders'][i]['country_code']
+                            rider = random.choice(list(data['male_riders']))
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
-                            i = random.randint(0, len(pro_data['female_riders']) - 1)
-                            p.last_name = pro_data['female_riders'][i]['last_name']
-                            p.first_name = pro_data['female_riders'][i]['first_name']
-                            p.country_code = pro_data['female_riders'][i]['country_code']
+                            rider = random.choice(list(data['female_riders']))
                             p.body_type += 1
+                        p.last_name = rider['last_name']
+                        p.first_name = rider['first_name']
+                        p.country_code = rider['country_code']
                         bot.profile = p
                         i += 1
 
