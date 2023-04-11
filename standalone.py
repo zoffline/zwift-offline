@@ -546,17 +546,17 @@ def load_bots():
                         with open(os.path.join(root, f), 'rb') as fd:
                             bot.route.ParseFromString(fd.read())
                         bot.position = random.randrange(len(bot.route.states))
-                        p.last_name = random.choice(data['last_names'])
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
-                        p.is_male = bool(random.getrandbits(1))
+                        rider = random.choice(list(data['riders']))
+                        p.is_male = rider['is_male']
                         if p.is_male:
-                            p.first_name = random.choice(data['first_names_male'])
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
-                            p.first_name = random.choice(data['first_names_female'])
                             p.body_type += 1
-                        p.country_code = random.choice(data['country_codes'])
+                        p.first_name = rider['first_name']
+                        p.last_name = rider['last_name']
+                        p.country_code = rider['country_code']
                         bot.profile = p
                         i += 1
 
