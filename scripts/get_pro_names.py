@@ -2,11 +2,13 @@
 
 from bs4 import BeautifulSoup
 import urllib.request
-from phonenumbers.phonenumberutil import country_code_for_region
 import json
+import country_converter as coco
 
 male_url = "https://www.procyclingstats.com/rankings/me/individual"
 female_url = "https://www.procyclingstats.com/rankings/we/individual"
+
+cc = coco.CountryConverter()
 
 def get_pros(url):
     data = []
@@ -22,7 +24,7 @@ def get_pros(url):
             if "flag" in repr(td.contents[0]):
                 tmp = {}
                 code = td.span.get_attribute_list("class")[1]
-                tmp['country_code'] = (country_code_for_region(code.upper()))
+                tmp['country_code'] = cc.convert(names=code, to='ISOnumeric')
                 if td.a:
                     tmp['first_name'] = (td.a.contents[1].strip())
                     tmp['last_name'] = (td.a.span.contents[0])
