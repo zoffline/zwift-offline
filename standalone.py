@@ -554,8 +554,8 @@ def load_bots():
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
                         else:
                             p.body_type += 1
-                        p.last_name = rider['last_name']
                         p.first_name = rider['first_name']
+                        p.last_name = rider['last_name']
                         p.country_code = rider['country_code']
                         bot.profile = p
                         i += 1
