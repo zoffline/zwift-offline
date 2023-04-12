@@ -1058,7 +1058,7 @@ def activity_row_to_json(activity, details=False):
     return data
 
 def select_activities_json(player_id, limit, start_after=None):
-    filters = []
+    filters = [Activity.distanceInMeters > 100]
     if player_id:
         filters.append(Activity.player_id == player_id)
     if start_after:
@@ -2192,20 +2192,17 @@ def api_profiles_activities_id(player_id, activity_id):
     activity = activity_pb2.Activity()
     activity.ParseFromString(stream)
     update_protobuf_in_db(Activity, activity, activity_id, ['fit'])
-    create_power_curve(player_id, BytesIO(activity.fit))
-    fit_filename = '%s - %s' % (activity_id, activity.fit_filename)
-    save_fit(player_id, fit_filename, activity.fit)
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     if activity.distanceInMeters < 300:
         return response, 200
+
+    create_power_curve(player_id, BytesIO(activity.fit))
+    save_fit(player_id, '%s - %s' % (activity_id, activity.fit_filename), activity.fit)
     if current_user.enable_ghosts:
-        try:
-            save_ghost(quote(activity.name, safe=' '), player_id)
-        except Exception as exc:
-            logger.warning('save_ghost: %s' % repr(exc))
+        save_ghost(quote(activity.name, safe=' '), player_id)
     # For using with upload_activity
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
