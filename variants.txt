@@ -157,10 +157,12 @@
     },
     {
       "name": "game_1_32_meetups_rubberbanding_v2",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_33_5_events_rubberbanding_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -804,11 +806,8 @@
           "watopia": {
             "boolValue": false
           },
-          "double_draft_global": {
-            "boolValue": false
-          },
           "global": {
-            "boolValue": false
+            "boolValue": true
           },
           "draftScale": {
             "numberValue": 1.5
@@ -829,7 +828,7 @@
       "values": {
         "fields": {
           "RenderDevice": {
-            "varintValue": "0"
+            "varintValue": "1"
           }
         }
       }
