@@ -1845,17 +1845,10 @@ def api_profiles_activities(player_id):
 
     # request.method == 'GET'
     activities = activity_pb2.ActivityList()
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p"), {"p": player_id}).mappings()
-    should_remove = list()
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p AND date > date('now', '-1 month')"), {"p": player_id}).mappings()
     for row in rows:
-        if row.distanceInMeters < 100: # Remove activities with less than 100m distance
-            should_remove.append(row.id)
-        elif stime_to_timestamp(row.date) > get_time() - 2592000: # Add activities from last 30 days
-            activity = activities.activities.add()
-            row_to_protobuf(row, activity, exclude_fields=['fit'])
-    if should_remove:
-        Activity.query.filter(Activity.id.in_(should_remove)).delete()
-        db.session.commit()
+        activity = activities.activities.add()
+        row_to_protobuf(row, activity, exclude_fields=['fit'])
     return activities.SerializeToString(), 200
 
 def time_since(state):
@@ -2184,7 +2177,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if current_user.player_id != player_id:
         return '', 401
     if request.method == 'DELETE':
-        db.session.execute(sqlalchemy.text("DELETE FROM activity WHERE id = :i"), {"i": activity_id})
+        Activity.query.filter_by(id=activity_id).delete()
         db.session.commit()
         logout_player(player_id)
         return 'true', 200
@@ -2197,6 +2190,9 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
     if activity.distanceInMeters < 300:
+        Activity.query.filter_by(id=activity_id).delete()
+        db.session.commit()
+        logout_player(player_id)
         return response, 200
 
     create_power_curve(player_id, BytesIO(activity.fit))
