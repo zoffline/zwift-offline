@@ -40,6 +40,7 @@ def main(argv):
     parser.add_argument('-f', '--female', help='Female riders only', default=False, action='store_true')
     parser.add_argument('-m', '--male', help='Male riders only', default=False, action='store_true')
     parser.add_argument('-a', '--alltime', help='Use all time ranking', default=False, action='store_true')
+    parser.add_argument('-p', '--pages', help='Number of pages to process', default=1)
     args = parser.parse_args()
     url_additions = ""
     url_list = []
@@ -53,6 +54,13 @@ def main(argv):
         url_list = [ { "url": base_url + url_additions + "&p=me", "is_male": True } ]
     else:
         url_list = [ { "url": base_url + url_additions + "&p=me", "is_male": True }, { "url": base_url + url_additions + "&p=we", "is_male": False } ]
+    if args.pages:
+        new_url_list = url_list.copy()
+        for x in range(1,int(args.pages)):
+            offset = str(x*100)
+            for url in url_list:
+                new_url_list += [ { "url": url['url'] + "&offset=" + offset, "is_male": url['is_male'] }]
+        url_list = new_url_list.copy()
 
     total_data = {}
     total_data['riders'] = []
