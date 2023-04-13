@@ -5,7 +5,7 @@
       "values": {
         "fields": {
           "ver_cur": {
-            "stringValue": "Zwift_ver_cur.xml"
+            "stringValue": "Zwift_ver_cur.109673.xml"
           }
         }
       }
@@ -15,7 +15,7 @@
       "values": {
         "fields": {
           "ver_cur": {
-            "stringValue": "ZwiftMac_ver_cur.xml"
+            "stringValue": "ZwiftMac_ver_cur.109673.xml"
           }
         }
       }
@@ -52,6 +52,14 @@
     {
       "name": "game_1_33_0_refactor_calls_to_drawbike_and_drawrider",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_0_refactor_bikemanager_allbikes_vectors",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_use_a_memory_pool_for_network_bikes",
       "values": {}
     },
     {
@@ -114,6 +122,56 @@
       "values": {}
     },
     {
+      "name": "game_1_34_fix_return_ride_on_bug",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_allow_toggling_ui_with_noesis_keys",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_prevent_scrolling_parent_ui_when_focusing_child",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_use_bike_length_in_trigger_volume_collision_check",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_enable_fit_tech_nav_on_ui_achievement_list",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_adjust_ui_action_keys_layout_for_fit_tech_icons",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_stabilize_scrolling_on_ui_achievement_list",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_display_selected_club_on_quit_activity_share_ui_screen",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_disable_nav_graph_on_ui_zwift_shop",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_34_enable_ui_trainingplan_fit_tech_improvements",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_34_fix_player_spawn_location_when_returning_from_event",
       "value": true,
       "values": {}
@@ -130,6 +188,10 @@
     {
       "name": "game_1_31_enable_join_zwifter",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "rc1_onboarding_tutorial",
       "values": {}
     },
     {
@@ -166,6 +228,17 @@
       "values": {}
     },
     {
+      "name": "game_1_34_tt_bike_switch_dlg",
+      "value": true,
+      "values": {
+        "fields": {
+          "timeout": {
+            "varintValue": "30"
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_33_server_driven_completed_campaigns",
       "values": {}
     },
@@ -195,6 +268,34 @@
       }
     },
     {
+      "name": "game_1_34_bluetooth_device_persistence",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_cached_ble_service_filter",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_save_device_profiles_on_all_platforms",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_do_not_duplicate_connection_requests",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_monitor_zc_ble_bridge_scanning",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_ct_auto_pair_check",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_ble_unpair_on_disconnect",
+      "values": {}
+    },
+    {
       "name": "game_1_33_extended_sleep_for_robopacers",
       "value": true,
       "values": {
@@ -204,6 +305,16 @@
           },
           "sleep_threshold": {
             "numberValue": 60.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_33_custom_workouts",
+      "values": {
+        "fields": {
+          "game_1_33_custom_workouts": {
+            "boolValue": false
           }
         }
       }
@@ -219,6 +330,10 @@
     },
     {
       "name": "xplatform_partner_connection_vitality",
+      "values": {}
+    },
+    {
+      "name": "game_garage_gearing",
       "values": {}
     },
     {
@@ -266,6 +381,14 @@
           }
         }
       }
+    },
+    {
+      "name": "game_use_lighting_settings_tab",
+      "values": {}
+    },
+    {
+      "name": "game_use_control_settings_tab",
+      "values": {}
     },
     {
       "name": "game_1_20_hw_experiment_1",
@@ -819,6 +942,10 @@
       }
     },
     {
+      "name": "game_1_36_steering_camera",
+      "values": {}
+    },
+    {
       "name": "game_1_29_player_hightlight",
       "values": {}
     },
@@ -862,6 +989,34 @@
       "name": "game_VideoCaptureNotableMoments",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_34_coffee_stop",
+      "values": {
+        "fields": {
+          "end_event_distance_meters": {
+            "numberValue": 5000.0
+          },
+          "end_event_duration_milliseconds": {
+            "varintValue": "900000"
+          },
+          "middle_delay": {
+            "numberValue": 1800.0
+          },
+          "initial_expiry": {
+            "numberValue": 300.0
+          },
+          "initial_duration": {
+            "numberValue": 30.0
+          },
+          "middle_duration": {
+            "numberValue": 180.0
+          },
+          "initial_delay": {
+            "numberValue": 0.0
+          }
+        }
+      }
     },
     {
       "name": "game_1_23_workout_auto_pause",
