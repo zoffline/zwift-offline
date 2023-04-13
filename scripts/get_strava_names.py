@@ -41,7 +41,7 @@ def get_names(response, defcode):
         name = HumanName(div.div['title'])
         tmp['first_name']=name.first
         tmp['last_name']=name.last
-        resp = urllib.request.urlopen("https://api.genderize.io?name="+name.first).read()
+        resp = urllib.request.urlopen("https://api.genderize.io?name="+name.first.encode("ascii",errors="ignore").decode()).read()
         sex = json.loads(resp)
         tmp['is_male']=(sex['gender']=="male")
         country = geograpy.get_geoPlace_context(text=div.contents[5].text)
