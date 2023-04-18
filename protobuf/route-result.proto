@@ -1,0 +1,35 @@
+syntax = "proto2";
+import "profile.proto";
+
+message RouteResultSaveRequest {
+    optional string f1 = 1;
+    optional uint64 server_realm = 2;
+    optional uint64 map_id = 3;
+    required uint64 route_hash = 4;
+    optional uint64 f5 = 5; // 0
+    optional uint64 world_time = 6;
+    optional uint64 elapsed_ms = 7;
+    optional PowerType power_type = 8;
+    optional uint32 weight_in_grams = 9;
+    optional uint32 height_in_centimeters = 10;
+    optional uint32 ftp = 11;
+    optional uint32 avg_power = 12;
+    optional uint32 max_power = 13;
+    optional uint32 avg_hr = 14;
+    optional uint32 max_hr = 15;
+    optional uint32 calories = 16;
+    optional Gender gender = 18;
+    optional PlayerType player_type = 19;
+    optional Sport sport = 20;
+    optional uint64 activity_id = 21;
+    optional bool f22 = 22; // 0
+    optional string hr_monitor = 23;
+    optional string power_meter = 24;
+    optional string controllable = 25;
+    optional string cadence_sensor = 26;
+}
+
+enum Gender {
+    MALE = 1;
+    FEMALE = 2;
+}

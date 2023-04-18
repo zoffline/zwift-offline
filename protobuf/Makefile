@@ -13,6 +13,7 @@ all:
 	protoc --python_out=. events.proto
 	protoc --python_out=. variants.proto
 	protoc --python_out=. playback.proto
+	protoc --python_out=. route-result.proto
 
 clean:
 	rm -f *_pb2.py *_pb2.pyc

@@ -50,6 +50,7 @@ import login_pb2
 import per_session_info_pb2
 import profile_pb2
 import segment_result_pb2
+import route_result_pb2
 import world_pb2
 import zfiles_pb2
 import hash_seeds_pb2
@@ -256,6 +257,32 @@ class SegmentResult(db.Model):
     activity_id = db.Column(db.Integer)
     f22 = db.Column(db.Integer)
     f23 = db.Column(db.Text)
+
+class RouteResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
+    server_realm = db.Column(db.Integer)
+    map_id = db.Column(db.Integer)
+    route_hash = db.Column(db.Integer)
+    world_time = db.Column(db.Integer)
+    elapsed_ms = db.Column(db.Integer)
+    power_type = db.Column(db.Integer)
+    weight_in_grams = db.Column(db.Integer)
+    height_in_centimeters = db.Column(db.Integer)
+    ftp = db.Column(db.Integer)
+    avg_power = db.Column(db.Integer)
+    max_power = db.Column(db.Integer)
+    avg_hr = db.Column(db.Integer)
+    max_hr = db.Column(db.Integer)
+    calories = db.Column(db.Integer)
+    gender = db.Column(db.Integer)
+    player_type = db.Column(db.Integer)
+    sport = db.Column(db.Integer)
+    activity_id = db.Column(db.Integer)
+    hr_monitor = db.Column(db.Text)
+    power_meter = db.Column(db.Text)
+    controllable = db.Column(db.Text)
+    cadence_sensor = db.Column(db.Text)
 
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -985,7 +1012,8 @@ def logout(username):
 def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
     msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
-        del msg_dict[key]
+        if key in msg_dict:
+            del msg_dict[key]
     if 'id' in msg_dict:
         del msg_dict['id']
     row = table_name(**msg_dict)
@@ -997,7 +1025,8 @@ def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
 def update_protobuf_in_db(table_name, msg, id, exclude_fields=[]):
     msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
-        del msg_dict[key]
+        if key in msg_dict:
+            del msg_dict[key]
     table_name.query.filter_by(id=id).update(msg_dict)
     db.session.commit()
 
@@ -1979,12 +2008,6 @@ def player_playbacks_player_me_playbacks(segment_id, option):
 @app.route('/player-playback/playbacks/<path:filename>')
 def player_playback_playbacks(filename):
     return send_from_directory('%s/playbacks' % STORAGE_DIR, filename)
-
-@app.route('/route-results', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def route_results():
-    return '', 200
 
 def strava_upload(player_id, activity):
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
@@ -3167,21 +3190,44 @@ def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
     return jsonify({"query": query, "results": results})
 
 
+@app.route('/api/route-results', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def route_results():
+    rr = route_result_pb2.RouteResultSaveRequest()
+    rr.ParseFromString(request.stream.read())
+    rr_id = insert_protobuf_into_db(RouteResult, rr, ['f1', 'f5', 'f22'])
+    row = RouteResult.query.filter_by(id=rr_id).first()
+    row.player_id = current_user.player_id
+    db.session.commit()
+    return '', 202
+
+def wtime_to_stime(wtime):
+    if wtime:
+        return datetime.datetime.fromtimestamp(wtime / 1000 + 1414016075).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'
+    return ''
+
 @app.route('/api/route-results/completion-stats/all', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_route_results_completion_stats_all():
     page = int(request.args.get('page'))
     page_size = int(request.args.get('pageSize'))
-    achievements = profile_pb2.Achievements()
-    achievements_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'achievements.bin')
-    if os.path.isfile(achievements_file):
-        with open(achievements_file, 'rb') as f:
-            achievements.ParseFromString(f.read())
+    player_id = current_user.player_id
+    if db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM route_result WHERE player_id = :p"), {"p": player_id}).scalar() == 0:
+        achievements_file = os.path.join(STORAGE_DIR, str(player_id), 'achievements.bin')
+        if os.path.isfile(achievements_file):
+            achievements = profile_pb2.Achievements()
+            with open(achievements_file, 'rb') as f:
+                achievements.ParseFromString(f.read())
+            for achievement in achievements.achievements:
+                if achievement.id in GD['achievements']:
+                    db.session.add(RouteResult(player_id=player_id, route_hash=GD['achievements'][achievement.id]))
+            db.session.commit()
     stats = []
-    for achievement in achievements.achievements:
-        if achievement.id in GD['achievements']:
-            stats.append({"routeHash": GD['achievements'][achievement.id], "firstCompletedAt": "", "lastCompletedAt": ""})
+    rows = db.session.execute(sqlalchemy.text("SELECT route_hash, min(world_time) AS first, max(world_time) AS last FROM route_result WHERE player_id = :p GROUP BY route_hash"), {"p": player_id})
+    for row in rows:
+        stats.append({"routeHash": row.route_hash, "firstCompletedAt": wtime_to_stime(row.first), "lastCompletedAt": wtime_to_stime(row.last)})
     current_page = stats[page * page_size:page * page_size + page_size]
     page_count = math.ceil(len(stats) / page_size)
     response = {"response": {"stats": current_page}, "hasPreviousPage": page > 0, "hasNextPage": page < page_count - 1, "pageCount": page_count}
