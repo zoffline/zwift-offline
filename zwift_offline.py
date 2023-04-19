@@ -3214,16 +3214,19 @@ def api_route_results_completion_stats_all():
     page = int(request.args.get('page'))
     page_size = int(request.args.get('pageSize'))
     player_id = current_user.player_id
-    if db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM route_result WHERE player_id = :p"), {"p": player_id}).scalar() == 0:
-        achievements_file = os.path.join(STORAGE_DIR, str(player_id), 'achievements.bin')
-        if os.path.isfile(achievements_file):
-            achievements = profile_pb2.Achievements()
-            with open(achievements_file, 'rb') as f:
-                achievements.ParseFromString(f.read())
-            for achievement in achievements.achievements:
-                if achievement.id in GD['achievements']:
-                    db.session.add(RouteResult(player_id=player_id, route_hash=GD['achievements'][achievement.id]))
-            db.session.commit()
+    badges = []
+    achievements_file = os.path.join(STORAGE_DIR, str(player_id), 'achievements.bin')
+    if os.path.isfile(achievements_file):
+        achievements = profile_pb2.Achievements()
+        with open(achievements_file, 'rb') as f:
+            achievements.ParseFromString(f.read())
+        for achievement in achievements.achievements:
+            if achievement.id in GD['achievements']:
+                badges.append(GD['achievements'][achievement.id])
+    if db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM route_result WHERE player_id = :p"), {"p": player_id}).scalar() < len(badges):
+        for badge in badges:
+            db.session.add(RouteResult(player_id=player_id, route_hash=badge))
+        db.session.commit()
     stats = []
     rows = db.session.execute(sqlalchemy.text("SELECT route_hash, min(world_time) AS first, max(world_time) AS last FROM route_result WHERE player_id = :p GROUP BY route_hash"), {"p": player_id})
     for row in rows:
