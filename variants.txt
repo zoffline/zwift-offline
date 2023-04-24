@@ -5,7 +5,7 @@
       "values": {
         "fields": {
           "ver_cur": {
-            "stringValue": "Zwift_ver_cur.109673.xml"
+            "stringValue": "Zwift_ver_cur.xml"
           }
         }
       }
@@ -15,7 +15,7 @@
       "values": {
         "fields": {
           "ver_cur": {
-            "stringValue": "ZwiftMac_ver_cur.109673.xml"
+            "stringValue": "ZwiftMac_ver_cur.xml"
           }
         }
       }
@@ -203,7 +203,7 @@
       "values": {
         "fields": {
           "ZED_idleSeconds": {
-            "varintValue": "180"
+            "varintValue": "5"
           },
           "NUIT_filename": {
             "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
@@ -374,6 +374,7 @@
     },
     {
       "name": "game_1_19_use_tabbed_settings",
+      "value": true,
       "values": {
         "fields": {
           "game_1_19_use_tabbed_settings": {
@@ -784,7 +785,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest03"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest1"
           }
         }
       }
