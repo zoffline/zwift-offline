@@ -3278,8 +3278,8 @@ def relay_worlds_leave(server_realm):
 
 
 def do_experimentation_v1_variant():
-    stream = variants_pb2.FeatureResponse()
-    stream.ParseFromString(request.stream.read())
+    req = variants_pb2.FeatureRequest()
+    req.ParseFromString(request.stream.read())
     variants = {}
     with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
         vs = variants_pb2.FeatureResponse()
@@ -3289,11 +3289,12 @@ def do_experimentation_v1_variant():
     if hasattr(current_user, 'new_home'):
         variants['game_1_20_home_screen'].value = current_user.new_home
     response = variants_pb2.FeatureResponse()
-    for req in stream.variants:
-        if req.name in variants:
-            response.variants.append(variants[req.name])
-        else:
-            logger.info("Unknown feature: " + req.name)
+    for params in req.params:
+        for param in params.param:
+            if param in variants:
+                response.variants.append(variants[param])
+            else:
+                logger.info("Unknown feature: " + param)
     return response.SerializeToString(), 200
 
 @app.route('/experimentation/v1/variant', methods=['POST'])

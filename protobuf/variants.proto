@@ -64,3 +64,13 @@ message FeatureResponse_Params {
 message FeatureResponse {
 	repeated FeatureResponse_Params variants = 1;
 }
+
+message FeatureRequest_Params {
+	repeated string param = 1;
+}
+
+message FeatureRequest {
+	repeated FeatureRequest_Params params = 1;
+	optional string str_player_id = 2;
+	map<string, string> user_attrs = 3;
+}
