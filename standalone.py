@@ -531,6 +531,7 @@ def load_bots():
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
     i = 1
+    loop_riders = data['riders'].copy()
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
         if os.path.isdir(path):
@@ -548,7 +549,9 @@ def load_bots():
                         bot.position = random.randrange(len(bot.route.states))
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
-                        rider = random.choice(list(data['riders']))
+                        if not loop_riders:
+                          loop_riders = data['riders'].copy()
+                        rider = loop_riders.pop()
                         p.is_male = rider['is_male']
                         if p.is_male:
                             p.facial_hair_type = random.choice(data['facial_hair_types'])
