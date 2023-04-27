@@ -23,6 +23,7 @@ import zwift_offline as zo
 import udp_node_msgs_pb2
 import tcp_node_msgs_pb2
 import profile_pb2
+import numpy as np
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -531,7 +532,7 @@ def load_bots():
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
     i = 1
-    loop_riders = data['riders'].copy()
+    loop_riders = np.random.permutation(data['riders'])
     for name in os.listdir(STORAGE_DIR):
         path = '%s/%s/ghosts' % (STORAGE_DIR, name)
         if os.path.isdir(path):
@@ -550,7 +551,7 @@ def load_bots():
                         p.body_type = random.choice(data['body_types'])
                         p.hair_type = random.choice(data['hair_types'])
                         if not loop_riders:
-                          loop_riders = data['riders'].copy()
+                          loop_riders = np.random.permutation(data['riders'])
                         rider = loop_riders.pop()
                         p.is_male = rider['is_male']
                         if p.is_male:
