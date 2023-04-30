@@ -526,7 +526,7 @@ def play_pace_partners():
             state.worldTime = zo.world_time()
         ppthreadevent.wait(timeout=pacer_update_freq)
 
-def load_bots():
+def load_bots(multiplier):
     import json
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
@@ -538,30 +538,34 @@ def load_bots():
             for (root, dirs, files) in os.walk(path):
                 for f in files:
                     if f.endswith('.bin'):
-                        p = profile_pb2.PlayerProfile()
-                        p.CopyFrom(zo.random_profile(p))
-                        p.id = i + 1000000
-                        global_bots[p.id] = PacePartnerVariables()
-                        bot = global_bots[p.id]
-                        bot.route = udp_node_msgs_pb2.Ghost()
-                        with open(os.path.join(root, f), 'rb') as fd:
-                            bot.route.ParseFromString(fd.read())
-                        bot.position = random.randrange(len(bot.route.states))
-                        p.body_type = random.choice(data['body_types'])
-                        p.hair_type = random.choice(data['hair_types'])
-                        if not loop_riders:
-                            loop_riders = data['riders'].copy()
-                            random.shuffle(loop_riders)
-                        rider = loop_riders.pop()
-                        p.is_male = rider['is_male']
-                        if p.is_male:
-                            p.facial_hair_type = random.choice(data['facial_hair_types'])
-                        else:
-                            p.body_type += 1
-                        p.first_name = rider['first_name']
-                        p.last_name = rider['last_name']
-                        p.country_code = rider['country_code']
-                        bot.profile = p
+                        for n in range(0, multiplier):
+                            p = profile_pb2.PlayerProfile()
+                            p.CopyFrom(zo.random_profile(p))
+                            p.id = i + 1000000 + n * 10000
+                            global_bots[p.id] = PacePartnerVariables()
+                            bot = global_bots[p.id]
+                            if n == 0:
+                                bot.route = udp_node_msgs_pb2.Ghost()
+                                with open(os.path.join(root, f), 'rb') as fd:
+                                    bot.route.ParseFromString(fd.read())
+                            else:
+                                bot.route = global_bots[i + 1000000].route
+                            bot.position = random.randrange(len(bot.route.states))
+                            if not loop_riders:
+                                loop_riders = data['riders'].copy()
+                                random.shuffle(loop_riders)
+                            rider = loop_riders.pop()
+                            p.first_name = rider['first_name']
+                            p.last_name = rider['last_name']
+                            p.is_male = rider['is_male']
+                            p.body_type = random.choice(data['body_types'])
+                            p.hair_type = random.choice(data['hair_types'])
+                            if p.is_male:
+                                p.facial_hair_type = random.choice(data['facial_hair_types'])
+                            else:
+                                p.body_type += 1
+                            p.country_code = rider['country_code']
+                            bot.profile = p
                         i += 1
 
 def play_bots():
@@ -801,8 +805,14 @@ if os.path.isdir(PACE_PARTNERS_DIR):
     pp = threading.Thread(target=play_pace_partners)
     pp.start()
 
-if os.path.isfile('%s/enable_bots.txt' % STORAGE_DIR):
-    load_bots()
+ENABLE_BOTS_FILE = '%s/enable_bots.txt' % STORAGE_DIR
+if os.path.isfile(ENABLE_BOTS_FILE):
+    with open(ENABLE_BOTS_FILE, 'r') as f:
+        try:
+            multiplier = int(f.readline().rstrip('\r\n'))
+        except ValueError:
+            multiplier = 1
+    load_bots(multiplier)
     botthreadevent = threading.Event()
     bot = threading.Thread(target=play_bots)
     bot.start()
