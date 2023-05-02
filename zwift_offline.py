@@ -583,7 +583,7 @@ def signup():
             flash("Passwords did not match.")
             return redirect(url_for('signup'))
 
-        hashed_pwd = generate_password_hash(password, 'sha256')
+        hashed_pwd = generate_password_hash(password, 'scrypt')
 
         new_user = User(username=username, pass_hash=hashed_pwd, first_name=first_name, last_name=last_name)
         db.session.add(new_user)
@@ -688,7 +688,7 @@ def api_users_password_reset():
     confirm_password = request.form.get("password-confirm")
     if password != confirm_password:
         return 'passwords not match', 500
-    hashed_pwd = generate_password_hash(password, 'sha256')
+    hashed_pwd = generate_password_hash(password, 'scrypt')
     current_user.pass_hash = hashed_pwd
     db.session.commit()
     return '', 200
@@ -707,7 +707,7 @@ def reset(username):
             flash("Passwords did not match.")
             return redirect(url_for('reset', username=current_user.username))
 
-        hashed_pwd = generate_password_hash(password, 'sha256')
+        hashed_pwd = generate_password_hash(password, 'scrypt')
         current_user.pass_hash = hashed_pwd
         db.session.commit()
         flash("Password changed.")
