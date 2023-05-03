@@ -1829,6 +1829,8 @@ def api_profiles_me_id(player_id):
 def api_profiles_id(player_id):
     if not request.stream:
         return '', 400
+    if player_id == 0:
+        return '', 400 # can't return 401 to /api/profiles/0/in-game-fields (causes issues in following requests)
     if current_user.player_id != player_id:
         return '', 401
     stream = request.stream.read()
