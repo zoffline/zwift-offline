@@ -36,21 +36,7 @@
       "values": {}
     },
     {
-      "name": "game_1_29_training_partners_survey",
-      "values": {}
-    },
-    {
       "name": "game_1_31_fquery",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_33_0_remove_lighting_code_from_bike_level_reset",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_33_0_refactor_calls_to_drawbike_and_drawrider",
       "value": true,
       "values": {}
     },
@@ -60,6 +46,14 @@
     },
     {
       "name": "game_1_34_use_a_memory_pool_for_network_bikes",
+      "values": {}
+    },
+    {
+      "name": "game_1_34_cache_distance_to_camera",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_0_optimize_createbikematrix",
       "values": {}
     },
     {
@@ -182,8 +176,48 @@
       "values": {}
     },
     {
-      "name": "game_1_31_workout_network_service",
+      "name": "game_1_36_fix_wrong_club_selected_when_quitting_activity_bug",
+      "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_39_adjust_workout_list_hud_for_new_fittech_icons",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_enable_generic_fittech_hud_icons",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_enable_rr2_game_mode",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_enable_braking_hardware",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_enable_rc1_settings_screen",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_show_for_you_try_rc1_cards",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_abort_teleport_when_drop_in_target_teleports_away",
+      "value": true,
+      "values": {
+        "fields": {
+          "teleportTargetMovedTooFarAwayDistance": {
+            "numberValue": 3000.0
+          }
+        }
+      }
     },
     {
       "name": "game_1_31_enable_join_zwifter",
@@ -223,6 +257,10 @@
       "values": {}
     },
     {
+      "name": "game_1_39_movement_recorder",
+      "values": {}
+    },
+    {
       "name": "game_1_33_5_events_rubberbanding_v2",
       "value": true,
       "values": {}
@@ -243,8 +281,17 @@
       "values": {}
     },
     {
+      "name": "game_1_39_zui",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_33_run_level_30_cap_raise",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_repack_rampage_steering_route_list",
       "values": {}
     },
     {
@@ -256,16 +303,6 @@
       "name": "game_1_33_6_powerup_priority_for_archpowerup_tag",
       "value": true,
       "values": {}
-    },
-    {
-      "name": "game_1_33_riders_nearby_watts",
-      "values": {
-        "fields": {
-          "slope": {
-            "numberValue": 0.04
-          }
-        }
-      }
     },
     {
       "name": "game_1_34_bluetooth_device_persistence",
@@ -296,15 +333,55 @@
       "values": {}
     },
     {
-      "name": "game_1_33_extended_sleep_for_robopacers",
+      "name": "game_1_39_0_blewin10lib_connection_fix",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_detect_specific_trainer_by_model_number",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_tts",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_asset_patching",
       "values": {
         "fields": {
-          "delete_enabled": {
-            "boolValue": false
+          "manifest_retry_count": {
+            "varintValue": "3"
           },
-          "sleep_threshold": {
-            "numberValue": 60.0
+          "manifest_backoff": {
+            "varintValue": "100"
+          },
+          "asset_retry_count": {
+            "varintValue": "3"
+          },
+          "asset_backoff": {
+            "varintValue": "100"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_39_workouts_patching",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_portal_road_patching",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_delete_robopacer_entities",
+      "values": {}
+    },
+    {
+      "name": "game_1_33_riders_nearby_watts",
+      "values": {
+        "fields": {
+          "slope": {
+            "numberValue": 0.04
           }
         }
       }
@@ -320,6 +397,51 @@
       }
     },
     {
+      "name": "segment_portal",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_new_race_results_saving",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_new_race_results_fetching",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_noesis_race_results",
+      "values": {
+        "fields": {
+          "polling_interval_seconds": {
+            "numberValue": 3.0
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_39_multi_input_widget_pairing_ui",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_atv_connection_limit_check",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_39_robopacer_colorized_models",
+      "values": {}
+    },
+    {
+      "name": "custom_workout_folders",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_steering_enabled_in_events",
+      "values": {}
+    },
+    {
       "name": "game_1_26_ninety_day_prs",
       "value": true,
       "values": {}
@@ -330,10 +452,6 @@
     },
     {
       "name": "xplatform_partner_connection_vitality",
-      "values": {}
-    },
-    {
-      "name": "game_garage_gearing",
       "values": {}
     },
     {
@@ -415,11 +533,6 @@
       "values": {}
     },
     {
-      "name": "game_1_21_add_device_jet_black_swb",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_20_clickable_telemetry_box",
       "value": true,
       "values": {}
@@ -472,12 +585,26 @@
       "values": {}
     },
     {
-      "name": "game_1_24_workout_blocks_extendable",
-      "values": {}
+      "name": "game_1_23_workout_auto_pause",
+      "values": {
+        "fields": {
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
+          },
+          "minERGModeDisableTime": {
+            "numberValue": 5.0
+          },
+          "reenableERGPowerThreshold": {
+            "numberValue": 10.0
+          }
+        }
+      }
     },
     {
-      "name": "game_1_23_universal_start_line_for_time_based_event",
-      "value": true,
+      "name": "game_1_24_workout_blocks_extendable",
       "values": {}
     },
     {
@@ -496,41 +623,6 @@
       "values": {}
     },
     {
-      "name": "game_training_partners",
-      "value": true,
-      "values": {
-        "fields": {
-          "SOLO_WORKOUT_recording_disabled": {
-            "boolValue": false
-          },
-          "world_scotland_spawn_disabled": {
-            "boolValue": false
-          },
-          "recording_enabled": {
-            "boolValue": true
-          },
-          "route_spawning_enabled": {
-            "boolValue": true
-          },
-          "leaderboard_replay_disabled": {
-            "boolValue": true
-          },
-          "screenshots_enabled": {
-            "boolValue": true
-          },
-          "spawn_enabled": {
-            "boolValue": true
-          },
-          "route_recording_enabled": {
-            "boolValue": true
-          },
-          "world_scotland_record_disabled": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
       "name": "game_upload_route_results_v2",
       "value": true,
       "values": {}
@@ -541,20 +633,7 @@
     },
     {
       "name": "game_1_25_extended_pedal_asssit",
-      "value": true,
-      "values": {
-        "fields": {
-          "initialDropInFrames": {
-            "numberValue": 1000.0
-          },
-          "initialDropInTime": {
-            "numberValue": 10000.0
-          },
-          "extendedDropInTime": {
-            "numberValue": 60000.0
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_25_flat_grade_while_in_ui",
@@ -603,11 +682,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_27_hardware_restriction",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_27_goal_notable_moment",
@@ -734,11 +808,11 @@
           "minSpeedLimitFlat": {
             "numberValue": 35.0
           },
-          "minDraftLimitDown": {
-            "varintValue": "85"
-          },
           "aeroDragDiffHigh": {
             "numberValue": 100.0
+          },
+          "minDraftLimitDown": {
+            "varintValue": "85"
           },
           "minDraftLimitShallowDown": {
             "varintValue": "45"
@@ -755,17 +829,17 @@
           "minDraftLimitFlat": {
             "varintValue": "38"
           },
-          "powerComparisonConfigLowDraft": {
-            "varintValue": "3"
-          },
-          "minSpeedLimitShallowDown": {
-            "numberValue": 40.0
-          },
           "uphillSlopeLimitCdaPenalty": {
             "numberValue": 0.04
           },
           "aeroDragDiffLow": {
             "numberValue": 10.0
+          },
+          "minSpeedLimitShallowDown": {
+            "numberValue": 40.0
+          },
+          "powerComparisonConfigLowDraft": {
+            "varintValue": "3"
           },
           "cdaPenaltyInGroup": {
             "numberValue": 3.0
@@ -785,7 +859,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest1"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2"
           }
         }
       }
@@ -817,11 +891,11 @@
       "name": "game_1_31_rlog",
       "values": {
         "fields": {
-          "DISABLED_TYPES": {
-            "stringValue": ""
-          },
           "DISABLED_LEVELS": {
             "stringValue": "DEBUG,INFO,WARNING"
+          },
+          "DISABLED_TYPES": {
+            "stringValue": ""
           }
         }
       }
@@ -842,6 +916,18 @@
       }
     },
     {
+      "name": "game_1_39_event_settings",
+      "values": {}
+    },
+    {
+      "name": "game_1_35_action_bar_v2",
+      "values": {}
+    },
+    {
+      "name": "game_1_39_teleport_on_action_bar",
+      "values": {}
+    },
+    {
       "name": "game_1_29_set_thread_names",
       "values": {}
     },
@@ -855,14 +941,27 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_34_hw_restrictions_forbidden_hw",
+      "values": {
+        "fields": {
+          "forbidden_manufacturers_name_list": {
+            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
+          },
+          "forbidden_device_name_list": {
+            "stringValue": "HR2VP"
           }
         }
       }
@@ -884,19 +983,6 @@
       }
     },
     {
-      "name": "game_1_34_hw_restrictions_forbidden_hw",
-      "values": {
-        "fields": {
-          "forbidden_manufacturers_name_list": {
-            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
-          },
-          "forbidden_device_name_list": {
-            "stringValue": "HR2VP"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_31_pp_data",
       "value": true,
       "values": {}
@@ -904,6 +990,40 @@
     {
       "name": "game_1_18_holiday_mode",
       "values": {}
+    },
+    {
+      "name": "game_1_39_powerups_rebalancing",
+      "values": {
+        "fields": {
+          "truck_duration": {
+            "numberValue": 30.0
+          },
+          "ghost_cuttoff_distance_meters": {
+            "numberValue": 200.0
+          },
+          "anvil_weight_bias_const": {
+            "numberValue": 20.0
+          },
+          "burrito_distance_cm": {
+            "numberValue": 750.0
+          },
+          "draft_boost_max_draft": {
+            "numberValue": 1.5
+          },
+          "feather_duration": {
+            "numberValue": 15.0
+          },
+          "burrito_duration": {
+            "numberValue": 15.0
+          },
+          "anvil_duration": {
+            "numberValue": 30.0
+          },
+          "ghost_duration": {
+            "numberValue": 10.0
+          }
+        }
+      }
     },
     {
       "name": "game_1_29_hand_cycle",
@@ -930,11 +1050,11 @@
           "watopia": {
             "boolValue": false
           },
-          "global": {
-            "boolValue": true
-          },
           "draftScale": {
             "numberValue": 1.5
+          },
+          "global": {
+            "boolValue": true
           },
           "disable_draft_supertuck": {
             "boolValue": true
@@ -972,14 +1092,25 @@
       "values": {}
     },
     {
+      "name": "game_garage_gearing",
+      "values": {}
+    },
+    {
       "name": "workout_training_v2_release",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_VideoCaptureRestrictTransferZC",
       "values": {}
     },
     {
       "name": "game_VideoCapture",
       "values": {
         "fields": {
+          "EnableWindowsAudio": {
+            "boolValue": true
+          },
           "CloseClips": {
             "boolValue": true
           }
@@ -987,8 +1118,81 @@
       }
     },
     {
+      "name": "game_VideoCaptureLowPerf",
+      "values": {
+        "fields": {
+          "MaxHeight": {
+            "varintValue": "360"
+          },
+          "MaxWidth": {
+            "varintValue": "640"
+          }
+        }
+      }
+    },
+    {
       "name": "game_VideoCaptureNotableMoments",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_VideoCaptureKeyboard",
+      "values": {}
+    },
+    {
+      "name": "game_ProcessHealth",
+      "value": true,
+      "values": {
+        "fields": {
+          "MonitorFiles": {
+            "boolValue": true
+          },
+          "MonitorPerf": {
+            "boolValue": true
+          },
+          "MonitorMemory": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_training_partners",
+      "value": true,
+      "values": {
+        "fields": {
+          "SOLO_WORKOUT_recording_disabled": {
+            "boolValue": false
+          },
+          "world_scotland_spawn_disabled": {
+            "boolValue": false
+          },
+          "route_spawning_enabled": {
+            "boolValue": true
+          },
+          "recording_enabled": {
+            "boolValue": true
+          },
+          "leaderboard_replay_disabled": {
+            "boolValue": true
+          },
+          "screenshots_enabled": {
+            "boolValue": true
+          },
+          "spawn_enabled": {
+            "boolValue": true
+          },
+          "route_recording_enabled": {
+            "boolValue": true
+          },
+          "world_scotland_record_disabled": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_29_training_partners_survey",
       "values": {}
     },
     {
@@ -1015,25 +1219,6 @@
           },
           "initial_delay": {
             "numberValue": 0.0
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_23_workout_auto_pause",
-      "values": {
-        "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
-          "minERGModeDisableTime": {
-            "numberValue": 5.0
-          },
-          "reenableERGPowerThreshold": {
-            "numberValue": 10.0
           }
         }
       }
