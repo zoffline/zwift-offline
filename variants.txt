@@ -921,10 +921,12 @@
     },
     {
       "name": "game_1_35_action_bar_v2",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_39_teleport_on_action_bar",
+      "value": true,
       "values": {}
     },
     {
@@ -1197,6 +1199,7 @@
     },
     {
       "name": "game_1_34_coffee_stop",
+      "value": true,
       "values": {
         "fields": {
           "end_event_distance_meters": {
