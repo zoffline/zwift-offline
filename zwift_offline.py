@@ -98,7 +98,6 @@ else:
     server_ip = '127.0.0.1'
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
-NEWHOME_FILE = "%s/new_home.txt" % STORAGE_DIR
 MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
 if MULTIPLAYER:
     try:
@@ -159,7 +158,6 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     pass_hash = db.Column(db.String(100), nullable=False)
     enable_ghosts = db.Column(db.Integer, nullable=False, default=1)
-    new_home = db.Column(db.Integer, nullable=False, default=0)
     is_admin = db.Column(db.Integer, nullable=False, default=0)
     remember = db.Column(db.Integer, nullable=False, default=0)
 
@@ -189,7 +187,6 @@ class AnonUser(User, AnonymousUserMixin, db.Model):
     first_name = "z"
     last_name = "offline"
     enable_ghosts = os.path.isfile(ENABLEGHOSTS_FILE)
-    new_home = os.path.isfile(NEWHOME_FILE)
 
     def is_authenticated(self):
         return True
@@ -624,12 +621,12 @@ def login():
             except IOError as e:
                 logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
                 return '', 500
-            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), new_home=bool(user.new_home), online=get_online()))
+            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
             flash("Invalid username or password.")
 
     if current_user.is_authenticated and current_user.remember:
-        return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), new_home=bool(current_user.new_home), online=get_online()))
+        return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
 
     user = User.verify_token(request.args.get('token'))
     if user:
@@ -843,7 +840,7 @@ def intervals(username):
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
-    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), new_home=bool(current_user.new_home),
+    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
 def enqueue_player_update(player_id, wa_bytes):
@@ -3281,7 +3278,9 @@ def relay_worlds_leave(server_realm):
     return '{"worldtime":%ld}' % world_time()
 
 
-def do_experimentation_v1_variant():
+@app.route('/experimentation/v1/variant', methods=['POST'])
+@app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
+def experimentation_v1_variant():
     req = variants_pb2.FeatureRequest()
     req.ParseFromString(request.stream.read())
     variants = {}
@@ -3290,8 +3289,6 @@ def do_experimentation_v1_variant():
         Parse(f.read(), vs)
         for v in vs.variants:
             variants[v.name] = v
-    if hasattr(current_user, 'new_home'):
-        variants['game_1_20_home_screen'].value = current_user.new_home
     response = variants_pb2.FeatureResponse()
     for params in req.params:
         for param in params.param:
@@ -3300,16 +3297,6 @@ def do_experimentation_v1_variant():
             else:
                 logger.info("Unknown feature: " + param)
     return response.SerializeToString(), 200
-
-@app.route('/experimentation/v1/variant', methods=['POST'])
-@jwt_to_session_cookie
-@login_required
-def experimentation_v1_variant():
-    return do_experimentation_v1_variant()
-
-@app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
-def experimentation_v1_machine_id_variant():
-    return do_experimentation_v1_variant()
 
 def get_profile_saved_game_achiev2_40_bytes():
     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
@@ -3574,7 +3561,7 @@ def launch_zwift():
         if MULTIPLAYER:
             return redirect(url_for('login'))
         else:
-            return render_template("user_home.html", username=current_user.username, enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), new_home=os.path.exists(NEWHOME_FILE), online=get_online(),
+            return render_template("user_home.html", username=current_user.username, enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
                 is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
@@ -3630,7 +3617,6 @@ def auth_realms_zwift_protocol_openid_connect_token():
         else:  # android login
             current_user.enable_ghosts = user.enable_ghosts
             ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
-            current_user.new_home = user.new_home
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
             return jsonify(fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id'])))), 200
@@ -3659,14 +3645,11 @@ def save_option(option, file):
 def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
-        current_user.new_home = 'newhome' in request.form.keys()
         db.session.commit()
         ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
-        AnonUser.new_home = 'newhome' in request.form.keys()
         save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
-        save_option(AnonUser.new_home, NEWHOME_FILE)
     selected_map = request.form['map']
     if selected_map == 'CALENDAR':
         return redirect("/ride", 302)
