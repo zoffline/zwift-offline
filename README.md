@@ -169,7 +169,7 @@ to generate your own certificates and do the same.
 
 * Install required apps:
   * Download and install ``ZofflineObb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/releases/latest)
-  * Download "#1 HOST CHANGER - BEST FOR GAMING" from Google Play ([link](https://play.google.com/store/apps/details?id=best.see.world.company))
+  * Download "Gaming VPN" from Google Play ([link](https://play.google.com/store/apps/details?id=com.gamingvpn))
   * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
   ```
   <zoffline ip> us-or-rly101.zwift.com
@@ -306,7 +306,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 * Open Command Prompt, cd to that location and run
   * ``apk-mitm --certificate cert-zwift-com.pem zca.apk``
 * Copy ``zca-patched.apk`` to your phone and install it
-* Download "#1 HOST CHANGER - BEST FOR GAMING" from Google Play ([link](https://play.google.com/store/apps/details?id=best.see.world.company))
+* Download "Gaming VPN" from Google Play ([link](https://play.google.com/store/apps/details?id=com.gamingvpn))
 * Create a ``hosts.txt`` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
 ```
 <zoffline ip> us-or-rly101.zwift.com
