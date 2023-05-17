@@ -746,7 +746,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, bot)
                 if is_nearby:
                     nearby[p_id] = distance
-        if ghosts.started and t >= ghosts.last_play + ghost_update_freq:
+        elif ghosts.started and t >= ghosts.last_play + ghost_update_freq:
             ghosts.last_play = t
             ghost_id = 1
             for g in ghosts.play:
