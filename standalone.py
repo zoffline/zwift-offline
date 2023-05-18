@@ -5,8 +5,8 @@ import signal
 import struct
 import sys
 import threading
-import time
 import csv
+import json
 import math
 import random
 import itertools
@@ -67,6 +67,7 @@ if not CDN_PROXY:
 
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
+ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
@@ -94,7 +95,6 @@ global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
-start_time = time.time()
 
 def sigint_handler(num, frame):
     httpd.shutdown()
@@ -529,8 +529,13 @@ def play_pace_partners():
             state.worldTime = zo.world_time()
         ppthreadevent.wait(timeout=pacer_update_freq)
 
-def load_bots(multiplier):
-    import json
+def load_bots():
+    multiplier = 1
+    with open(ENABLE_BOTS_FILE) as f:
+        try:
+            multiplier = int(f.readline().rstrip('\r\n'))
+        except ValueError:
+            pass
     with open('%s/bot.txt' % SCRIPT_DIR) as f:
         data = json.load(f)
     i = 1
@@ -575,8 +580,9 @@ def play_bots():
     while True:
         if zo.reload_pacer_bots:
             zo.reload_pacer_bots = False
-            global_bots.clear()
-            load_bots()
+            if os.path.isfile(ENABLE_BOTS_FILE):
+                global_bots.clear()
+                load_bots()
         for bot_id in global_bots.keys():
             bot = global_bots[bot_id]
             if bot.position < len(bot.route.states) - 1: bot.position += 1
@@ -674,7 +680,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             if player_id in online.keys():
                 if online[player_id].worldTime > state.worldTime:
                     return #udp is unordered -> drop old state
-            elif time.time() > start_time + 10:
+            else:
                 discord.change_presence(len(online) + 1)
             online[player_id] = state
 
@@ -748,14 +754,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     nearby[p_id] = distance
         elif ghosts.started and t >= ghosts.last_play + ghost_update_freq:
             ghosts.last_play = t
-            ghost_id = 1
-            for g in ghosts.play:
+            for i, g in enumerate(ghosts.play):
                 if len(g.states) > g.position:
                     is_nearby, distance = nearby_distance(watching_state, g.states[g.position])
                     if is_nearby:
-                        nearby[player_id + ghost_id * 10000000] = distance
+                        nearby[player_id + (i + 1) * 10000000] = distance
                     g.position += 1
-                ghost_id += 1
 
         #Send nearby riders states or empty message
         message = get_empty_message(player_id)
@@ -775,9 +779,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     bot_variables = global_bots[p_id]
                     player = bot_variables.route.states[bot_variables.position]
                 elif p_id > 10000000:
-                    player = udp_node_msgs_pb2.PlayerState()
                     ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
-                    player.CopyFrom(ghost.states[ghost.position - 1])
+                    player = ghost.states[ghost.position - 1]
                     player.id = p_id
                     player.worldTime = zo.world_time()
                 if player != None:
@@ -808,14 +811,8 @@ if os.path.isdir(PACE_PARTNERS_DIR):
     pp = threading.Thread(target=play_pace_partners)
     pp.start()
 
-ENABLE_BOTS_FILE = '%s/enable_bots.txt' % STORAGE_DIR
 if os.path.isfile(ENABLE_BOTS_FILE):
-    with open(ENABLE_BOTS_FILE, 'r') as f:
-        try:
-            multiplier = int(f.readline().rstrip('\r\n'))
-        except ValueError:
-            multiplier = 1
-    load_bots(multiplier)
+    load_bots()
     botthreadevent = threading.Event()
     bot = threading.Thread(target=play_bots)
     bot.start()
