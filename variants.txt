@@ -42,10 +42,12 @@
     },
     {
       "name": "game_1_34_0_refactor_bikemanager_allbikes_vectors",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_34_use_a_memory_pool_for_network_bikes",
+      "value": true,
       "values": {}
     },
     {
@@ -374,6 +376,7 @@
     },
     {
       "name": "game_1_39_delete_robopacer_entities",
+      "value": true,
       "values": {}
     },
     {
@@ -451,6 +454,7 @@
     },
     {
       "name": "game_1_39_robopacer_colorized_models",
+      "value": true,
       "values": {}
     },
     {
