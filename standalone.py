@@ -780,7 +780,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     player = bot_variables.route.states[bot_variables.position]
                 elif p_id > 10000000:
                     ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
-                    player = ghost.states[ghost.position - 1]
+                    player = udp_node_msgs_pb2.PlayerState()
+                    player.CopyFrom(ghost.states[ghost.position - 1]) #worldTime is used in name
                     player.id = p_id
                     player.worldTime = zo.world_time()
                 if player != None:
