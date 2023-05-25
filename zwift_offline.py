@@ -261,6 +261,7 @@ class RouteResult(db.Model):
     server_realm = db.Column(db.Integer)
     map_id = db.Column(db.Integer)
     route_hash = db.Column(db.Integer)
+    event_id = db.Column(db.Integer)
     world_time = db.Column(db.Integer)
     elapsed_ms = db.Column(db.Integer)
     power_type = db.Column(db.Integer)
@@ -276,6 +277,7 @@ class RouteResult(db.Model):
     player_type = db.Column(db.Integer)
     sport = db.Column(db.Integer)
     activity_id = db.Column(db.Integer)
+    steering = db.Column(db.Integer)
     hr_monitor = db.Column(db.Text)
     power_meter = db.Column(db.Text)
     controllable = db.Column(db.Text)
@@ -1315,6 +1317,7 @@ def get_events(limit, sport):
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
+                   ('Repack Rush', 762747962, 6),
                    ('The Magnificent 8', 2207442179, 6),
                    ('Ventop Downhill', 2891361683, 14),
                    ('WBR Climbing Series', 2218409282, 6),
@@ -3197,7 +3200,7 @@ def api_personal_records_results_summary_all(sport, segment_id, year, quarter):
 def route_results():
     rr = route_result_pb2.RouteResultSaveRequest()
     rr.ParseFromString(request.stream.read())
-    rr_id = insert_protobuf_into_db(RouteResult, rr, ['f1', 'f5', 'f22'])
+    rr_id = insert_protobuf_into_db(RouteResult, rr, ['f1'])
     row = RouteResult.query.filter_by(id=rr_id).first()
     row.player_id = current_user.player_id
     db.session.commit()
@@ -3530,6 +3533,7 @@ with app.app_context():
     check_columns(User, 'user')
     if check_columns(Playback, 'playback'):
         update_playback()
+    check_columns(RouteResult, 'route_result')
     migrate_database()
     db.session.close()
 
