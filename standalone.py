@@ -86,6 +86,7 @@ MAP_OVERRIDE = deque(maxlen=16)
 bot_update_freq = 3
 pacer_update_freq = 1
 simulated_latency = 300 #makes bots animation smoother than using current time
+margin = 0.1 #avoids bots donuting in "just watch" (now player updates only once per second)
 last_pp_updates = {}
 last_bot_updates = {}
 global_ghosts = {}
@@ -699,7 +700,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghosts.loaded = True
                     load_ghosts(player_id, state, ghosts)
                 #Save player state as ghost
-                if t >= ghosts.last_rec + bot_update_freq:
+                if t >= ghosts.last_rec + bot_update_freq - margin:
                     ghosts.rec.states.append(state)
                     ghosts.last_rec = t
                 #Start loaded ghosts
@@ -737,7 +738,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, player)
                 if is_nearby and is_state_new_for(player, player_id):
                     nearby[p_id] = distance
-        if t >= last_pp_updates[player_id] + pacer_update_freq:
+        if t >= last_pp_updates[player_id] + pacer_update_freq - margin:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
                 pp = global_pace_partners[p_id]
@@ -745,7 +746,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, pace_partner)
                 if is_nearby:
                     nearby[p_id] = distance
-        if t >= last_bot_updates[player_id] + bot_update_freq:
+        if t >= last_bot_updates[player_id] + bot_update_freq - margin:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
                 b = global_bots[p_id]
@@ -753,7 +754,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, bot)
                 if is_nearby:
                     nearby[p_id] = distance
-        if ghosts.started and t >= ghosts.last_play + bot_update_freq:
+        if ghosts.started and t >= ghosts.last_play + bot_update_freq - margin:
             ghosts.last_play = t
             for i, g in enumerate(ghosts.play):
                 if len(g.route.states) > g.position:
