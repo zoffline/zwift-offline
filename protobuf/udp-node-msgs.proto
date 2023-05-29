@@ -293,7 +293,6 @@ message ServerToClient {
 message Ghost { //not from the Zwift game, zoffline-specific!
 	required int32 player_id = 1;
 	repeated PlayerState states = 2;
-	optional int32 position = 3;
 }
 
 message RideOn {

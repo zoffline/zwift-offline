@@ -491,7 +491,7 @@ def get_partial_profile(player_id):
             g_id = math.floor(player_id / 10000000)
             p_id = player_id - g_id * 10000000
             partial_profile.first_name = ''
-            partial_profile.last_name = time_since(global_ghosts[p_id].play[g_id-1].states[0])
+            partial_profile.last_name = time_since(global_ghosts[p_id].play[g_id-1].date)
             return partial_profile
         else:
             #Read from disk
@@ -1879,8 +1879,8 @@ def api_profiles_activities(player_id):
         row_to_protobuf(row, activity, exclude_fields=['fit'])
     return activities.SerializeToString(), 200
 
-def time_since(state):
-    seconds = (world_time() - state.worldTime) // 1000
+def time_since(date):
+    seconds = (world_time() - date) // 1000
     interval = seconds // 31536000
     if interval > 0: interval_type = 'year'
     else:
@@ -1934,7 +1934,7 @@ def api_profiles():
                     p.CopyFrom(random_profile(profile))
                     p.id = p_id
                     p.first_name = ''
-                    p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].states[0])
+                    p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
                     p.country_code = 0
         else:
             if p_id in global_pace_partners.keys():
