@@ -36,6 +36,16 @@
       "values": {}
     },
     {
+      "name": "game_1_41_0_bc1_release",
+      "values": {
+        "fields": {
+          "game_1_41_0_bc1_release": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_31_fquery",
       "value": true,
       "values": {}
@@ -57,17 +67,6 @@
     {
       "name": "game_1_39_0_optimize_createbikematrix",
       "values": {}
-    },
-    {
-      "name": "game_1_32_server_power_curves",
-      "value": true,
-      "values": {
-        "fields": {
-          "view_enabled": {
-            "boolValue": true
-          }
-        }
-      }
     },
     {
       "name": "game_1_28_enable_workout_hud_hiding",
@@ -222,6 +221,11 @@
       }
     },
     {
+      "name": "game_1_41_allow_custom_user_action_zc_success_timing",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_31_enable_join_zwifter",
       "value": true,
       "values": {}
@@ -268,18 +272,8 @@
       "values": {}
     },
     {
-      "name": "game_1_34_tt_bike_switch_dlg",
-      "value": true,
-      "values": {
-        "fields": {
-          "timeout": {
-            "varintValue": "30"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_33_server_driven_completed_campaigns",
+      "value": true,
       "values": {}
     },
     {
@@ -380,6 +374,10 @@
       "values": {}
     },
     {
+      "name": "game_1_41_leader_replay_dynamic_bias",
+      "values": {}
+    },
+    {
       "name": "game_1_33_riders_nearby_watts",
       "values": {
         "fields": {
@@ -391,7 +389,6 @@
     },
     {
       "name": "game_1_33_custom_workouts",
-      "value": true,
       "values": {
         "fields": {
           "game_1_33_custom_workouts": {
@@ -399,6 +396,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_41_haptics",
+      "values": {}
     },
     {
       "name": "game_1_40_steering_params",
@@ -421,15 +422,23 @@
     },
     {
       "name": "segment_portal",
-      "values": {}
+      "values": {
+        "fields": {
+          "MustHaveDefaultRoad": {
+            "boolValue": false
+          },
+          "UseTdFAssets": {
+            "varintValue": "0"
+          },
+          "CompletePctBasedOnRoadTime": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
-      "name": "game_1_39_new_race_results_saving",
+      "name": "game_1_39_steering_enabled_in_events",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_new_race_results_fetching",
       "values": {}
     },
     {
@@ -459,12 +468,6 @@
     },
     {
       "name": "custom_workout_folders",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_steering_enabled_in_events",
-      "value": true,
       "values": {}
     },
     {
@@ -614,11 +617,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
           "rampUpTime": {
             "numberValue": 10.0
+          },
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -680,11 +683,11 @@
       "value": true,
       "values": {
         "fields": {
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
-          },
           "ATVPopDelay": {
             "numberValue": 0.15
+          },
+          "ATVFriction": {
+            "numberValue": 0.9
           },
           "ATVMoveSensitivity": {
             "varintValue": "5"
@@ -692,8 +695,8 @@
           "ATVPopInitDist": {
             "numberValue": 250.0
           },
-          "ATVFriction": {
-            "numberValue": 0.9
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
           },
           "ATVPopDist": {
             "numberValue": 175.0
@@ -788,86 +791,6 @@
       "values": {}
     },
     {
-      "name": "game_1_30_pack_dynamics_v4",
-      "value": true,
-      "values": {
-        "fields": {
-          "maxWattsCeiling": {
-            "varintValue": "400"
-          },
-          "speedDifferenceHigh": {
-            "numberValue": 3.0
-          },
-          "aeroDragCdaPenaltyLimit": {
-            "numberValue": 80.0
-          },
-          "reducedPowerPercentage": {
-            "numberValue": 55.0
-          },
-          "downhillSlopeLimit": {
-            "numberValue": -0.02
-          },
-          "minSpeedLimitDown": {
-            "numberValue": 45.0
-          },
-          "slowdownPwrPercentageCdaPenalty": {
-            "numberValue": 90.0
-          },
-          "slowdownPwrPercentageHighDraft": {
-            "numberValue": 30.0
-          },
-          "uphillSlopeLimit": {
-            "numberValue": 0.001
-          },
-          "minSpeedLimitFlat": {
-            "numberValue": 35.0
-          },
-          "minDraftLimitDown": {
-            "varintValue": "85"
-          },
-          "aeroDragDiffHigh": {
-            "numberValue": 100.0
-          },
-          "minDraftLimitShallowDown": {
-            "varintValue": "45"
-          },
-          "slowdownPwrPercentageLowDraft": {
-            "numberValue": 90.0
-          },
-          "brakingAmount": {
-            "numberValue": 0.4
-          },
-          "cdaPenaltyMultiplier": {
-            "numberValue": 1.0
-          },
-          "minDraftLimitFlat": {
-            "varintValue": "38"
-          },
-          "uphillSlopeLimitCdaPenalty": {
-            "numberValue": 0.04
-          },
-          "powerComparisonConfigLowDraft": {
-            "varintValue": "3"
-          },
-          "minSpeedLimitShallowDown": {
-            "numberValue": 40.0
-          },
-          "frontRiderSpeedDiff": {
-            "numberValue": 0.0
-          },
-          "cdaPenaltyInGroup": {
-            "numberValue": 3.0
-          },
-          "aeroDragDiffLow": {
-            "numberValue": 10.0
-          },
-          "powerCeilingPercentage": {
-            "numberValue": 110.0
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_30_campaign_fullscreen_modal",
       "value": true,
       "values": {
@@ -905,11 +828,11 @@
       "name": "game_1_31_rlog",
       "values": {
         "fields": {
-          "DISABLED_TYPES": {
-            "stringValue": ""
-          },
           "DISABLED_LEVELS": {
             "stringValue": "DEBUG,INFO,WARNING"
+          },
+          "DISABLED_TYPES": {
+            "stringValue": ""
           }
         }
       }
@@ -924,7 +847,7 @@
       "values": {
         "fields": {
           "GROUP_EVENT_QUERY_RATE_SECONDS": {
-            "numberValue": 120.0
+            "numberValue": 15.0
           }
         }
       }
@@ -957,13 +880,13 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           }
         }
@@ -986,14 +909,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
+          "udp_loss_threshold": {
+            "numberValue": 0.25
+          },
           "query_interval": {
             "numberValue": 10.0
           },
           "udp_history_length": {
             "varintValue": "6"
-          },
-          "udp_loss_threshold": {
-            "numberValue": 0.25
           }
         }
       }
@@ -1018,11 +941,11 @@
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "burrito_distance_cm": {
-            "numberValue": 750.0
-          },
           "anvil_weight_bias_const": {
             "numberValue": 20.0
+          },
+          "burrito_distance_cm": {
+            "numberValue": 750.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
@@ -1048,67 +971,39 @@
       "values": {}
     },
     {
-      "name": "game_1_32_pack_dynamics_v4_global",
-      "value": true,
-      "values": {
-        "fields": {
-          "auto_braking_visuals_events": {
-            "boolValue": true
-          },
-          "auto_braking_visuals": {
-            "boolValue": false
-          },
-          "cda_penalty_enabled_globally": {
-            "boolValue": false
-          },
-          "makuri": {
-            "boolValue": true
-          },
-          "watopia": {
-            "boolValue": false
-          },
-          "global": {
-            "boolValue": true
-          },
-          "draftScale": {
-            "numberValue": 1.5
-          },
-          "disable_draft_supertuck": {
-            "boolValue": true
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_40_pack_dynamics_4_race_physics",
+      "value": true,
       "values": {
         "fields": {
           "cdaMultAeroPosition": {
             "numberValue": 0.95
           },
-          "maxDraft": {
-            "numberValue": 1.8
-          },
-          "preventEasyOvertakeNearFront": {
-            "boolValue": true
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "cdaDynamicChanges": {
             "boolValue": true
           },
-          "draftFalloffCurve": {
-            "numberValue": 0.0
-          },
           "cdaPenaltyMultDrafting": {
-            "numberValue": 1.2
+            "numberValue": 1.1
           },
           "cdaPenaltyMultGeneral": {
             "numberValue": 1.0
           },
+          "preventEasyOvertakeNearFront": {
+            "boolValue": false
+          },
+          "draftFalloffCurve": {
+            "numberValue": 0.2
+          },
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.15
+          },
           "draftScale": {
             "numberValue": 1.5
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.1
+          "maxDraft": {
+            "numberValue": 1.85
           }
         }
       }
@@ -1149,6 +1044,10 @@
     {
       "name": "workout_training_v2_release",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_41_show_racing_score",
       "values": {}
     },
     {
@@ -1218,10 +1117,10 @@
           "world_scotland_spawn_disabled": {
             "boolValue": false
           },
-          "recording_enabled": {
+          "route_spawning_enabled": {
             "boolValue": true
           },
-          "route_spawning_enabled": {
+          "recording_enabled": {
             "boolValue": true
           },
           "leaderboard_replay_disabled": {
