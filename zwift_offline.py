@@ -1976,16 +1976,18 @@ def player_playbacks_player_playback():
         f.write(stream)
     return new_uuid, 201
 
-@app.route('/api/player-playbacks/player/me/playbacks/<segment_id>/<option>', methods=['GET'])
+@app.route('/api/player-playbacks/player/<player_id>/playbacks/<segment_id>/<option>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
-def player_playbacks_player_me_playbacks(segment_id, option):
+def player_playbacks_player_playbacks(player_id, segment_id, option):
+    if player_id == 'me':
+        player_id = current_user.player_id
     segment_id = int(segment_id)
     after = request.args.get('after')
     before = request.args.get('before')
     pb_type = playback_pb2.PlaybackType.Value(request.args.get('type'))
     query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s AND type = :t"
-    args = {"p": current_user.player_id, "s": segment_id, "t": pb_type}
+    args = {"p": player_id, "s": segment_id, "t": pb_type}
     if after != '18446744065933551616':
         query += " AND world_time > :a"
         args.update({"a": after})
@@ -3355,13 +3357,16 @@ def api_achievement_category(category_id):
     return '', 404 # returning error for now, since some steps can't be completed
 
 
-@app.route('/api/power-curve/best/all-time', methods=['GET'])
+@app.route('/api/power-curve/best/<option>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
-def api_power_curve_best_all_time():
+def api_power_curve_best(option):
     power_curves = profile_pb2.PowerCurveAggregationMsg()
     for time in ['5', '60', '300', '1200']:
-        row = PowerCurve.query.filter_by(player_id=current_user.player_id, time=time).order_by(PowerCurve.power.desc()).first()
+        filters = [PowerCurve.player_id == current_user.player_id, PowerCurve.time == time]
+        if option == 'last': #default is "all-time"
+            filters.append(PowerCurve.timestamp > int(get_time()) - int(request.args.get('days')) * 86400)
+        row = PowerCurve.query.filter(*filters).order_by(PowerCurve.power.desc()).first()
         if row:
             power_curves.watts[time].power = row.power
     return power_curves.SerializeToString(), 200

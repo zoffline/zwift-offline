@@ -1124,7 +1124,7 @@
             "boolValue": true
           },
           "leaderboard_replay_disabled": {
-            "boolValue": true
+            "boolValue": false
           },
           "screenshots_enabled": {
             "boolValue": true
