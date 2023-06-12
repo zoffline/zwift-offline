@@ -41,3 +41,8 @@ message DropInPlayer {
 	optional uint32 ride_power = 18;
 	optional uint32 speed = 19;
 }
+
+message TeleportTargets {
+	repeated DropInPlayer pacer_groups = 1;
+	repeated DropInPlayer friends = 2;
+}
