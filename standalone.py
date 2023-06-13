@@ -17,7 +17,6 @@ from http.server import SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from collections import deque
 from datetime import datetime, timedelta
-from shutil import copyfile
 from Crypto.Cipher import AES
 
 import zwift_offline as zo
@@ -31,14 +30,10 @@ if getattr(sys, 'frozen', False):
     EXE_DIR = os.path.dirname(sys.executable)
     STORAGE_DIR = "%s/storage" % EXE_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % EXE_DIR
-    START_LINES_FILE = '%s/start_lines.csv' % STORAGE_DIR
-    if not os.path.isfile(START_LINES_FILE):
-        copyfile('%s/start_lines.csv' % SCRIPT_DIR, START_LINES_FILE)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
-    START_LINES_FILE = '%s/start_lines.csv' % SCRIPT_DIR
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
 CDN_PROXY = os.path.isfile('%s/cdn-proxy.txt' % STORAGE_DIR)
@@ -441,17 +436,16 @@ class GhostsVariables:
     start_road = 0
     start_rt = 0
 
-def boolean(s):
-    if s.lower() in ['true', 'yes', '1']: return True
-    if s.lower() in ['false', 'no', '0']: return False
-    return None
-
 def save_ghost(name, player_id):
     if not player_id in global_ghosts.keys(): return
     ghosts = global_ghosts[player_id]
     if len(ghosts.rec.states) > 0:
-        folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(ghosts.rec.states[0]), zo.road_id(ghosts.rec.states[0]))
-        if not zo.is_forward(ghosts.rec.states[0]): folder += '/reverse'
+        state = ghosts.rec.states[0]
+        folder = '%s/%s/ghosts/%s/' % (STORAGE_DIR, player_id, zo.get_course(state))
+        if state.route: folder += str(state.route)
+        else:
+            folder += str(zo.road_id(state))
+            if not zo.is_forward(state): folder += '/reverse'
         try:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
@@ -463,27 +457,32 @@ def save_ghost(name, player_id):
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
+def load_ghosts_folder(folder, ghosts):
+    if os.path.isdir(folder):
+        for f in os.listdir(folder):
+            if f.endswith('.bin'):
+                with open(os.path.join(folder, f), 'rb') as fd:
+                    g = BotVariables()
+                    g.route = udp_node_msgs_pb2.Ghost()
+                    g.route.ParseFromString(fd.read())
+                    g.date = g.route.states[0].worldTime
+                    ghosts.play.append(g)
+
 def load_ghosts(player_id, state, ghosts):
-    folder = '%s/%s/ghosts/%s/%s' % (STORAGE_DIR, player_id, zo.get_course(state), zo.road_id(state))
-    if not zo.is_forward(state): folder += '/reverse'
-    if not os.path.isdir(folder): return
-    for f in os.listdir(folder):
-        if f.endswith('.bin'):
-            with open(os.path.join(folder, f), 'rb') as fd:
-                g = BotVariables()
-                g.route = udp_node_msgs_pb2.Ghost()
-                g.route.ParseFromString(fd.read())
-                g.date = g.route.states[0].worldTime
-                ghosts.play.append(g)
+    folder = '%s/%s/ghosts/%s' % (STORAGE_DIR, player_id, zo.get_course(state))
+    road_folder = '%s/%s' % (folder, zo.road_id(state))
+    if not zo.is_forward(state): road_folder += '/reverse'
+    load_ghosts_folder(road_folder, ghosts)
+    if state.route:
+        load_ghosts_folder('%s/%s' % (folder, state.route), ghosts)
     ghosts.start_road = zo.road_id(state)
     ghosts.start_rt = state.roadTime
-    if os.path.isfile(START_LINES_FILE):
-        with open(START_LINES_FILE, 'r') as fd:
-            sl = [tuple(line) for line in csv.reader(fd)]
-            rt = [t for t in sl if t[0] == str(zo.get_course(state)) and t[1] == str(zo.road_id(state)) and (boolean(t[2]) == zo.is_forward(state) or not t[2])]
-            if rt:
-                ghosts.start_road = int(rt[0][3])
-                ghosts.start_rt = int(rt[0][4])
+    with open('%s/start_lines.csv' % SCRIPT_DIR) as fd:
+        sl = [tuple(line) for line in csv.reader(fd)]
+        rt = [t for t in sl if t[0] == str(state.route)]
+        if rt:
+            ghosts.start_road = int(rt[0][1])
+            ghosts.start_rt = int(rt[0][2])
 
 def regroup_ghosts(player_id, ahead=False):
     p = online[player_id]

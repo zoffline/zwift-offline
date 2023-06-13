@@ -3087,7 +3087,7 @@ def relay_worlds_attributes():
                 regroup_ghosts(chat_message.player_id, True)
                 return '', 201
             if chat_message.message == '/startline':
-                logger.info('course %s road %s isForward %s roadTime %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime))
+                logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 return '', 201
         discord.send_message(chat_message.message, chat_message.player_id)
     for receiving_player_id in online.keys():
