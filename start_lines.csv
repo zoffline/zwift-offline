@@ -1,25 +1,200 @@
-course,spawnRoad,isForward,startRoad,roadTime,name
-2,0,,0,996941,Richmond
-6,0,,0,987711,Downtown
-6,22,,23,788778,Volcano Circuit
-6,36,,36,770795,Jungle start pens
-6,36,,35,546940,Jungle Circuit (move up to replace start pens)
-6,36,,43,23170,Road to Sky (move up to replace start pens)
-6,81,True,81,30426,Desert Flats
-6,81,False,81,913245,Titans Grove
-7,0,,0,532687,London 1
-7,7,,7,809519,London 2
-8,4,,4,173378,New York
-9,7,,7,157428,Innsbruck
-10,9,,0,38105,Bologna cat A
-10,6,,0,38105,Bologna cat B
-10,8,,0,38105,Bologna cat C
-10,7,,0,38105,Bologna cat D
-11,0,,0,5068,Yorkshire
-12,20,,17,348149,Crit City cat A
-12,18,,17,348149,Crit City cat B
-12,21,,17,348149,Crit City cat C
-12,22,,17,348149,Crit City cat D
-14,26,,26,513383,France
-14,26,True,26,536700,Ven-Top (move up to replace Roule Ma Poule and Tire-Bouchon)
-15,0,,0,485917,Paris
+nameHash,startRoad,startTime,world,route
+-1451362408,0,38183,Bologna,Bologna Time Trial
+947394567,0,614865,Crit City,Downtown Dolphin
+-1419308404,0,614865,Crit City,The Bell Lap
+-375055007,26,486852,France,Casse-Pattes
+-1373878237,26,344976,France,Climb Portal - France
+986252325,0,23330,France,Douce France
+2136907048,26,486930,France,France Classic Fondo
+1433431343,26,518316,France,La Reine
+-1442814000,26,487037,France,Petit Boucle
+1776635757,26,486885,France,R.G.V.
+872351836,0,975682,France,Roule Ma Poule
+-1881526724,0,975682,France,Tire-Bouchon
+-1721499149,26,519342,France,Ven-Top
+-1403605613,26,993611,France,Ven-Top Downhill
+-607816610,0,652593,Gravel Mountain,Gravel Mountain
+-1338434275,0,548908,Gravel Mountain,Gravel Mountain Reverse
+-1180363988,7,157428,Innsbruck,2018 UCI Worlds Short Lap
+-285732192,7,157428,Innsbruck,Achterbahn
+-645620046,7,157428,Innsbruck,Innsbruck KOM After Party
+-1193274130,7,117884,Innsbruck,InnsbruckConti
+-1702939696,7,157428,Innsbruck,Innsbruckring
+156457316,7,573873,Innsbruck,Lutscher
+-493725582,7,573780,Innsbruck,Lutscher CCW
+-1600800906,0,532687,London,Classique
+-694994027,0,532687,London,Classique Reverse
+87055383,7,809519,London,Greater London 8
+928793662,0,532687,London,Greater London Flat
+-1018563692,7,809519,London,Greater London Loop
+474781994,7,809519,London,Greater London Loop Reverse
+1880443431,0,532687,London,Greatest London Flat
+-441312475,7,809519,London,Greatest London Loop
+-318564470,7,809519,London,Greatest London Loop Reverse
+-725292771,7,809519,London,Keith Hill After Party
+1230300449,7,809519,London,Leith Hill After Party
+-282320817,7,809519,London,London 8
+-2129086892,7,809519,London,London 8 Reverse
+913172163,7,809519,London,London Loop
+1788889233,7,809519,London,London Loop Reverse
+-587176267,7,146860,London,Surrey Hills
+163688809,7,809519,London,The London Pretzel
+-2090505677,7,809519,London,The PRL Full
+764532081,7,809519,London,The PRL Half
+-84918359,7,809519,London,Triple Loops
+1760877317,134,173138,Makuri Islands,Bridges and Boardwalks
+-552779580,6,696976,Makuri Islands,Castle to Castle
+-603048413,0,499969,Makuri Islands,Chain Chomper
+-1428486734,4,875952,Makuri Islands,Chasing the Sun
+576953930,0,903592,Makuri Islands,Country to Coastal
+525689100,0,878936,Makuri Islands,Countryside Tour
+910684583,4,875625,Makuri Islands,Electric Loop
+-1314347541,0,878991,Makuri Islands,Farmland Loop
+468624015,129,251229,Makuri Islands,Fine and Sandy
+-1012355859,0,877006,Makuri Islands,Flatland Loop
+2140131142,129,113581,Makuri Islands,Island Hopper
+211138252,129,113581,Makuri Islands,Island Outskirts
+1562187590,41,482406,Makuri Islands,Kappa Quest
+1454553567,41,480989,Makuri Islands,Kappa Quest Reverse
+890800649,0,903592,Makuri Islands,Makuri 40
+1366943680,129,255640,Makuri Islands,Mech Isle Loop
+1453570384,4,36383,Makuri Islands,Neokyo All-Nighter
+1127056801,4,793392,Makuri Islands,Neokyo Crit Course
+-887604976,4,35833,Makuri Islands,Neon Flats
+246712730,19,766245,Makuri Islands,Railways and Rooftops
+-729536506,70,124959,Makuri Islands,Rooftop Rendezvous
+-691331742,0,247026,Makuri Islands,Sea to Tree
+-992013557,4,76517,Makuri Islands,Sleepless City
+-771160870,41,480780,Makuri Islands,Spirit Forest
+-938089035,4,36116,Makuri Islands,Sprinter's Playground
+-927780947,0,879890,Makuri Islands,Suki's Playground
+-1398808254,6,551899,Makuri Islands,Temples and Towers
+-915188049,0,500004,Makuri Islands,Three Village Loop
+-36023909,4,873021,Makuri Islands,Turf N Surf
+1457923570,4,936443,Makuri Islands,Twilight Harbor
+-1641108600,0,878989,Makuri Islands,Two Village Loop
+1941800093,0,299965,Makuri Islands,Valley to Mountaintop
+-380438255,0,292119,Makuri Islands,Wandering Flats
+-1858871695,4,173378,New York,2022 Cycling Esports World Championships Route
+1509089537,4,173378,New York,Astoria Line 8
+1790569309,3,633941,New York,Couch To Sky K
+1327665278,4,173378,New York,Everything Bagel
+711818913,3,880661,New York,Flat Irons
+480315274,4,173378,New York,Gotham Grind
+352245150,4,173378,New York,Gotham Grind Reverse
+-1349154056,4,914829,New York,Grand Central Circuit
+-607715522,4,914829,New York,Grand Central Circuit Reverse
+-629007892,3,684316,New York,Hudson Roll
+-1340600634,4,173378,New York,Knickerbocker
+2001106885,4,173378,New York,Knickerbocker Reverse
+-1872187942,4,914829,New York,LaGuardia Loop
+-520963945,4,914829,New York,LaGuardia Loop Reverse
+5103974,4,173378,New York,Lady Liberty
+-421989162,4,173378,New York,Mighty Metropolitan
+-1922084092,4,173378,New York,NYC KOM After Party
+1919980508,4,173378,New York,Park Perimeter Loop
+-2092357466,4,173378,New York,Park Perimeter Reverse
+1378559127,3,632077,New York,Park To Peak
+-1216301327,4,173378,New York,Rising Empire
+-1704397990,3,643043,New York,Shuman Trail Loop
+274775181,3,675557,New York,Shuman Trail Reverse
+-697027596,4,173378,New York,The 6 Train
+274639515,4,173378,New York,The 6 Train Reverse
+1732356505,24,556294,New York,The Highline
+1763213625,24,551875,New York,The Highline Reverse
+-930393161,0,485917,Paris,Champs-Élysées
+1236439870,0,485917,Paris,Lutece Express
+-2098947784,0,996941,Richmond,2015 UCI Worlds Course
+1545087483,0,996941,Richmond,Cobbled Climbs
+-100615025,0,996941,Richmond,Cobbled Climbs Reverse
+54700404,0,996941,Richmond,Libby Hill After Party
+948831673,0,209369,Richmond,Richmond Rollercoaster
+1039983620,0,996941,Richmond,Richmond UCI Reverse
+1638640398,0,209509,Richmond,The Fan Flats
+-187217705,3,361414,Scotland,City and the Sgurr
+-529627940,9,1002106,Scotland,Glasgow Crit Circuit
+742057576,2,905327,Scotland,Loch Loop
+46799750,2,237004,Scotland,Rolling Highlands
+-632261715,9,1002374,Scotland,The Muckle Yin
+-54639337,47,350274,Watopia,11.1 Ocean Blvd
+-475871543,47,349578,Watopia,5K Loop
+1480439148,43,970534,Watopia,Alpe du Zwift Downhill
+-1820739709,0,987711,Watopia,Beach Island Loop
+-373554961,81,30426,Watopia,Big Foot Hills
+-1347856247,0,987711,Watopia,Big Loop
+-187122806,0,987711,Watopia,Big Loop Reverse
+2139708890,0,987711,Watopia,Bigger Loop
+1373909093,47,362617,Watopia,Chili Pepper
+-600015192,47,347020,Watopia,Chili Pepper Reverse
+-1392764540,23,488947,Watopia,Climb Portal - Watopia
+-1271607938,0,987711,Watopia,Climber's Gambit
+5745690,0,987711,Watopia,Downtown Titans
+-1619903700,81,913245,Watopia,Dust In The Wind
+-1548491836,81,30426,Watopia,Eastern Eight
+-912947484,0,987711,Watopia,Figure 8
+553661379,0,987711,Watopia,Figure 8 Reverse
+-899269028,0,987711,Watopia,Flat Route
+-483398031,0,987711,Watopia,Flat Route Reverse
+-1416786329,0,987711,Watopia,Four Horsemen
+1993374659,35,316602,Watopia,Handful Of Gravel
+-1586440278,35,316602,Watopia,Handful of Gravel Run
+-1557483915,0,987711,Watopia,Hilly Route
+107363867,0,987711,Watopia,Hilly Route Reverse
+-721879714,117,641396,Watopia,Italian Villas Circuit
+136957568,47,350580,Watopia,Jon's Route
+743730361,35,546940,Watopia,Jungle Circuit
+-1455910170,35,546940,Watopia,Jungle Circuit Reverse
+-430109420,81,913245,Watopia,Legends and Lava
+-1282378735,99,185302,Watopia,May Field
+1082034232,36,770795,Watopia,Mayan Bridge Loop
+-1075893284,0,987711,Watopia,Mountain 8
+-1328149290,0,987711,Watopia,Mountain Route
+2139465450,81,913245,Watopia,Muir And The Mountain
+1386460176,0,987711,Watopia,Ocean Lava Cliffside Loop
+-1546309583,81,30426,Watopia,Out And Back Again
+-1325015219,81,913245,Watopia,Quatch Quest
+762747962,135,975720,Watopia,Repack Rush
+-1327354915,0,987711,Watopia,Road To Ruins Reverse
+-593398481,0,987711,Watopia,Road to Ruins
+-1631058747,36,770795,Watopia,Road to Sky
+772562418,47,430386,Watopia,Run Path Reverse
+604330868,81,30426,Watopia,Sand And Sequoias
+-840629157,0,609902,Watopia,Seaside Sprint
+-1465337769,35,546940,Watopia,Serpentine 8
+1988847319,99,195242,Watopia,Splash and Dash
+-62240442,36,770795,Watopia,Surfin' Safari
+2128890027,81,30426,Watopia,Tempus Fugit
+263936293,47,365699,Watopia,That's Amore
+1586193601,47,354429,Watopia,That's Amore Reverse
+-2087525117,0,987711,Watopia,The Magnificent 8
+-446475279,33,770102,Watopia,The Mega Pretzel
+-1799991412,0,987711,Watopia,The Pretzel
+1475638265,0,987711,Watopia,The Uber Pretzel
+-1667361048,0,987711,Watopia,Three Little Sisters
+-152194466,0,987711,Watopia,Three Sisters
+-31795178,0,987711,Watopia,Three Sisters Reverse
+-928742216,81,30426,Watopia,Tick Tock
+1766405776,23,788778,Watopia,Tour of Fire and Ice
+-841773096,81,30426,Watopia,Triple Flat Loops
+-982929680,0,987711,Watopia,Two Bridges Loop
+686828068,23,788778,Watopia,Volcano Circuit
+-428725966,23,788778,Watopia,Volcano Circuit CCW
+849508252,0,987711,Watopia,Volcano Climb
+387309391,0,987711,Watopia,Volcano Climb After Party
+-300032622,0,987711,Watopia,Volcano Flat
+1397026382,0,987711,Watopia,Volcano Flat Reverse
+-2076558014,0,987711,Watopia,WBR Climbing Series
+1064303857,81,30426,Watopia,Watopia's Waistband
+982239385,23,788778,Watopia,Whole Lotta Lava
+-673805084,0,987711,Watopia,Zwift Bambino Fondo
+-926340645,0,987711,Watopia,Zwift Bambino Fondo 2022
+242381847,0,987711,Watopia,Zwift Gran Fondo
+1327147942,0,987711,Watopia,Zwift Gran Fondo 2022
+-546187135,0,987711,Watopia,Zwift Medio Fondo
+-1394893085,0,987711,Watopia,Zwift Medio Fondo 2022
+2007026433,0,5068,Yorkshire,2019 UCI Worlds Harrogate Circuit
+1233527301,0,718743,Yorkshire,Duchy Estate
+620436060,0,5068,Yorkshire,Harrogate Circuit Reverse
+-1287700625,0,718743,Yorkshire,Queen's Highway
+-1389586229,0,5068,Yorkshire,Royal Pump Room 8
+1086718516,0,5068,Yorkshire,Tour Of Tewit Well

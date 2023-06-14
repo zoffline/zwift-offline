@@ -51,8 +51,7 @@
       "values": {}
     },
     {
-      "name": "game_1_34_0_refactor_bikemanager_allbikes_vectors",
-      "value": true,
+      "name": "game_1_41_asset_manager_xml",
       "values": {}
     },
     {
@@ -192,10 +191,6 @@
       "values": {}
     },
     {
-      "name": "game_1_39_enable_rr2_game_mode",
-      "values": {}
-    },
-    {
       "name": "game_1_39_enable_braking_hardware",
       "value": true,
       "values": {}
@@ -226,12 +221,23 @@
       "values": {}
     },
     {
+      "name": "game_1_42_fix_return_to_world_bug_when_leaving_events",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_42_clear_pedal_assist_when_ending_sessions",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_31_enable_join_zwifter",
       "value": true,
       "values": {}
     },
     {
       "name": "rc1_onboarding_tutorial",
+      "value": true,
       "values": {}
     },
     {
@@ -272,6 +278,34 @@
       "values": {}
     },
     {
+      "name": "game_1_42_teleport_bikeentity_validation",
+      "value": true,
+      "values": {
+        "fields": {
+          "maxReconTime": {
+            "numberValue": 5.0
+          },
+          "maxPacketTimeMS": {
+            "varintValue": "5000"
+          },
+          "paddingDistance": {
+            "numberValue": 1.0
+          },
+          "maxProjectedDistance": {
+            "numberValue": 30.0
+          },
+          "reconAttempts": {
+            "varintValue": "5"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_42_teleport_deprecate_pedalassist_state",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_33_server_driven_completed_campaigns",
       "value": true,
       "values": {}
@@ -288,6 +322,7 @@
     },
     {
       "name": "game_1_39_repack_rampage_steering_route_list",
+      "value": true,
       "values": {}
     },
     {
@@ -318,6 +353,7 @@
     },
     {
       "name": "game_1_34_monitor_zc_ble_bridge_scanning",
+      "value": true,
       "values": {}
     },
     {
@@ -339,17 +375,29 @@
     },
     {
       "name": "game_1_39_tts",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_st3_swap",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_39_asset_patching",
       "values": {
         "fields": {
+          "validate_asset_hash_on_manifest_loading": {
+            "boolValue": false
+          },
           "manifest_retry_count": {
             "varintValue": "3"
           },
           "manifest_backoff": {
             "varintValue": "100"
+          },
+          "validate_asset_hash_after_downloading": {
+            "boolValue": false
           },
           "asset_retry_count": {
             "varintValue": "3"
@@ -389,6 +437,7 @@
     },
     {
       "name": "game_1_33_custom_workouts",
+      "value": true,
       "values": {
         "fields": {
           "game_1_33_custom_workouts": {
@@ -398,11 +447,12 @@
       }
     },
     {
-      "name": "game_1_41_haptics",
+      "name": "game_1_42_haptics_rc1",
       "values": {}
     },
     {
       "name": "game_1_40_steering_params",
+      "value": true,
       "values": {
         "fields": {
           "lightPress": {
@@ -421,25 +471,33 @@
       }
     },
     {
+      "name": "visual_lean_v2",
+      "values": {}
+    },
+    {
+      "name": "game_1_42_repack_rush",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "segment_portal",
-      "values": {
-        "fields": {
-          "MustHaveDefaultRoad": {
-            "boolValue": false
-          },
-          "UseTdFAssets": {
-            "varintValue": "0"
-          },
-          "CompletePctBasedOnRoadTime": {
-            "boolValue": false
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_39_steering_enabled_in_events",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_42_filter_workouts_from_recommendations",
+      "value": true,
+      "values": {
+        "fields": {
+          "excluded_collections": {
+            "stringValue": "\"Baby On Board\""
+          }
+        }
+      }
     },
     {
       "name": "game_1_39_noesis_race_results",
@@ -468,7 +526,18 @@
     },
     {
       "name": "custom_workout_folders",
+      "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_42_onboarding_quest",
+      "values": {
+        "fields": {
+          "test_str": {
+            "stringValue": "alpha"
+          }
+        }
+      }
     },
     {
       "name": "game_1_26_ninety_day_prs",
@@ -617,11 +686,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -796,7 +865,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci"
           }
         }
       }
@@ -828,11 +897,11 @@
       "name": "game_1_31_rlog",
       "values": {
         "fields": {
-          "DISABLED_LEVELS": {
-            "stringValue": "DEBUG,INFO,WARNING"
-          },
           "DISABLED_TYPES": {
             "stringValue": ""
+          },
+          "DISABLED_LEVELS": {
+            "stringValue": "DEBUG,INFO,WARNING"
           }
         }
       }
@@ -847,7 +916,7 @@
       "values": {
         "fields": {
           "GROUP_EVENT_QUERY_RATE_SECONDS": {
-            "numberValue": 15.0
+            "numberValue": 120.0
           }
         }
       }
@@ -909,14 +978,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
+          "udp_history_length": {
+            "varintValue": "6"
+          },
           "udp_loss_threshold": {
             "numberValue": 0.25
           },
           "query_interval": {
             "numberValue": 10.0
-          },
-          "udp_history_length": {
-            "varintValue": "6"
           }
         }
       }
@@ -941,20 +1010,20 @@
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "anvil_weight_bias_const": {
-            "numberValue": 20.0
-          },
           "burrito_distance_cm": {
             "numberValue": 750.0
+          },
+          "anvil_weight_bias_const": {
+            "numberValue": 20.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "feather_duration": {
-            "numberValue": 30.0
-          },
           "burrito_duration": {
             "numberValue": 20.0
+          },
+          "feather_duration": {
+            "numberValue": 30.0
           },
           "anvil_duration": {
             "numberValue": 15.0
@@ -981,8 +1050,8 @@
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
-          "cdaDynamicChanges": {
-            "boolValue": true
+          "preventEasyOvertakeNearFront": {
+            "boolValue": false
           },
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.1
@@ -990,14 +1059,14 @@
           "cdaPenaltyMultGeneral": {
             "numberValue": 1.0
           },
-          "preventEasyOvertakeNearFront": {
-            "boolValue": false
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.15
+          },
+          "cdaDynamicChanges": {
+            "boolValue": true
           },
           "draftFalloffCurve": {
             "numberValue": 0.2
-          },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.15
           },
           "draftScale": {
             "numberValue": 1.5
@@ -1010,6 +1079,7 @@
     },
     {
       "name": "game_1_36_steering_camera",
+      "value": true,
       "values": {}
     },
     {
@@ -1058,6 +1128,9 @@
       "name": "game_VideoCapture",
       "values": {
         "fields": {
+          "UploadTimeout": {
+            "varintValue": "20"
+          },
           "EnableWindowsAudio": {
             "boolValue": true
           },

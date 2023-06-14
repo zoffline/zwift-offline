@@ -1061,6 +1061,7 @@ def api_eventfeed():
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/recommendation/profile', methods=['GET'])
+@app.route('/api/recommendations/recommendation', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
@@ -2910,6 +2911,50 @@ def relay_worlds_generic(server_realm=None):
 def relay_worlds():
     return relay_worlds_generic()
 
+
+def add_teleport_target(player, targets, is_pace_partner=True):
+    partial_profile = get_partial_profile(player.id)
+    if is_pace_partner:
+        target = targets.pacer_groups.add()
+        target.route = partial_profile.route
+        if player.sport == profile_pb2.Sport.CYCLING:
+            target.ride_power = player.power
+        else:
+            target.speed = player.speed
+    else:
+        target = targets.friends.add()
+        target.route = player.route
+    target.id = player.id
+    target.firstName = partial_profile.first_name
+    target.lastName = partial_profile.last_name
+    target.distance = player.distance
+    target.time = player.time
+    target.country_code = partial_profile.country_code
+    target.sport = player.sport
+    target.power = player.power
+    target.x = player.x
+    target.y_altitude = player.y_altitude
+    target.z = player.z
+
+@app.route('/relay/teleport-targets', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def relay_teleport_targets():
+    course = int(request.args.get('mapRevisionId'))
+    targets = world_pb2.TeleportTargets()
+    for p_id in global_pace_partners.keys():
+        pp = global_pace_partners[p_id]
+        pace_partner = pp.route.states[pp.position]
+        if get_course(pace_partner) == course:
+            add_teleport_target(pace_partner, targets)
+    for p_id in online.keys():
+        if p_id != current_user.player_id:
+            player = online[p_id]
+            if get_course(player) == course:
+                add_teleport_target(player, targets, False)
+    return targets.SerializeToString()
+
+
 def iterableToJson(it):
     if it == None:
         return None
@@ -3042,7 +3087,7 @@ def relay_worlds_attributes():
                 regroup_ghosts(chat_message.player_id, True)
                 return '', 201
             if chat_message.message == '/startline':
-                logger.info('course %s road %s isForward %s roadTime %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime))
+                logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 return '', 201
         discord.send_message(chat_message.message, chat_message.player_id)
     for receiving_player_id in online.keys():
