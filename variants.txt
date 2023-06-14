@@ -26,6 +26,10 @@
       "values": {}
     },
     {
+      "name": "zwift_launcher_osx_silicon",
+      "values": {}
+    },
+    {
       "name": "game_1_26_2_data_encryption",
       "value": true,
       "values": {}
@@ -1217,10 +1221,6 @@
     {
       "name": "game_1_29_training_partners_survey",
       "values": {}
-    },
-    {
-      "name": "zwift_launcher_osx_silicon",
-      "values": []
     },
     {
       "name": "game_1_34_coffee_stop",
