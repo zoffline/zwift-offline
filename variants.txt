@@ -26,6 +26,10 @@
       "values": {}
     },
     {
+      "name": "zwift_launcher_osx_silicon",
+      "values": {}
+    },
+    {
       "name": "game_1_26_2_data_encryption",
       "value": true,
       "values": {}
