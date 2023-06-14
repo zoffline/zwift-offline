@@ -1146,6 +1146,10 @@
       "values": {}
     },
     {
+      "name": "zwift_launcher_osx_silicon",
+      "values": []
+    },
+    {
       "name": "game_1_34_coffee_stop",
       "value": true,
       "values": {
