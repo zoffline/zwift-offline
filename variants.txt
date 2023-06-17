@@ -45,6 +45,9 @@
         "fields": {
           "game_1_41_0_bc1_release": {
             "boolValue": false
+          },
+          "min_firmware_version_st3": {
+            "stringValue": "5.0"
           }
         }
       }
@@ -384,33 +387,11 @@
     },
     {
       "name": "game_st3_swap",
-      "value": true,
       "values": {}
     },
     {
       "name": "game_1_39_asset_patching",
-      "values": {
-        "fields": {
-          "validate_asset_hash_on_manifest_loading": {
-            "boolValue": false
-          },
-          "manifest_retry_count": {
-            "varintValue": "3"
-          },
-          "manifest_backoff": {
-            "varintValue": "100"
-          },
-          "validate_asset_hash_after_downloading": {
-            "boolValue": false
-          },
-          "asset_retry_count": {
-            "varintValue": "3"
-          },
-          "asset_backoff": {
-            "varintValue": "100"
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_39_workouts_patching",
@@ -762,11 +743,11 @@
           "ATVFriction": {
             "numberValue": 0.9
           },
-          "ATVMoveSensitivity": {
-            "varintValue": "5"
-          },
           "ATVPopInitDist": {
             "numberValue": 250.0
+          },
+          "ATVMoveSensitivity": {
+            "varintValue": "5"
           },
           "ATVPopInitDelay": {
             "numberValue": 0.22
@@ -901,11 +882,11 @@
       "name": "game_1_31_rlog",
       "values": {
         "fields": {
-          "DISABLED_TYPES": {
-            "stringValue": ""
-          },
           "DISABLED_LEVELS": {
             "stringValue": "DEBUG,INFO,WARNING"
+          },
+          "DISABLED_TYPES": {
+            "stringValue": ""
           }
         }
       }
@@ -953,13 +934,13 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
           }
         }
@@ -967,29 +948,20 @@
     },
     {
       "name": "game_1_34_hw_restrictions_forbidden_hw",
-      "values": {
-        "fields": {
-          "forbidden_manufacturers_name_list": {
-            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
-          },
-          "forbidden_device_name_list": {
-            "stringValue": "HR2VP"
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
+          "query_interval": {
+            "numberValue": 10.0
+          },
           "udp_history_length": {
             "varintValue": "6"
           },
           "udp_loss_threshold": {
             "numberValue": 0.25
-          },
-          "query_interval": {
-            "numberValue": 10.0
           }
         }
       }
@@ -1008,29 +980,29 @@
       "value": true,
       "values": {
         "fields": {
-          "truck_duration": {
-            "numberValue": 40.0
+          "anvil_duration": {
+            "numberValue": 15.0
           },
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "burrito_distance_cm": {
-            "numberValue": 750.0
-          },
           "anvil_weight_bias_const": {
             "numberValue": 20.0
+          },
+          "burrito_distance_cm": {
+            "numberValue": 750.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "burrito_duration": {
-            "numberValue": 20.0
-          },
           "feather_duration": {
             "numberValue": 30.0
           },
-          "anvil_duration": {
-            "numberValue": 15.0
+          "burrito_duration": {
+            "numberValue": 20.0
+          },
+          "truck_duration": {
+            "numberValue": 40.0
           },
           "ghost_duration": {
             "numberValue": 15.0
@@ -1054,17 +1026,8 @@
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
-          "preventEasyOvertakeNearFront": {
-            "boolValue": false
-          },
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.1
-          },
-          "cdaPenaltyMultGeneral": {
-            "numberValue": 1.0
-          },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.15
           },
           "cdaDynamicChanges": {
             "boolValue": true
@@ -1072,11 +1035,20 @@
           "draftFalloffCurve": {
             "numberValue": 0.2
           },
-          "draftScale": {
-            "numberValue": 1.5
+          "preventEasyOvertakeNearFront": {
+            "boolValue": true
+          },
+          "cdaPenaltyMultGeneral": {
+            "numberValue": 1.0
           },
           "maxDraft": {
-            "numberValue": 1.85
+            "numberValue": 1.75
+          },
+          "draftScale": {
+            "numberValue": 1.4
+          },
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.15
           }
         }
       }
