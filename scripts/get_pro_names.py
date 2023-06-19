@@ -33,56 +33,20 @@ def get_pros(url, male):
                     tmp['last_name'] = (td.a.span.contents[0])
         if td.a and td.contents[0]:
             if "cu600" in repr(td) and td.a.contents:
-                best_match = process.extractOne(td.a.contents[0], GD['jersey_name'], scorer=fuzz.token_set_ratio)
+                best_match = process.extractOne(td.a.contents[0], jerseys.keys(), scorer=fuzz.token_set_ratio)
                 if 'first_name' in tmp:
                     print ("%s %s : %s - %s" % (tmp['first_name'],tmp['last_name'],td.a.contents[0], best_match))
-                    for index, item in enumerate(GD['jersey_name']):
-                        if item.startswith(best_match[0]):
-                            tmp['jersey'] = (GD['jerseys'][index])
+                    if best_match[0] in jerseys:
+                        tmp['jersey'] = jerseys[best_match[0]]
                     data.append(tmp)
 
     return data
 
-if getattr(sys, 'frozen', False):
-    # If we're running as a pyinstaller bundle
-    SCRIPT_DIR = sys._MEIPASS
-    STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
-    LOGS_DIR = "%s/logs" % os.path.dirname(sys.executable)
-else:
-    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-    STORAGE_DIR = "%s/storage" % SCRIPT_DIR
-    LOGS_DIR = "%s/logs" % SCRIPT_DIR
-
-def load_game_dictionary():
-    tree = ET.parse('%s/../cdn/gameassets/GameDictionary.xml' % SCRIPT_DIR)
-    root = tree.getroot()
-    gd = {}
-    gd['headgears'] = [int(x.get('signature')) for x in root.findall("./HEADGEARS/HEADGEAR")]
-    gd['glasses'] = [int(x.get('signature')) for x in root.findall("./GLASSES/GLASS")]
-    gd['bikeshoes'] = [int(x.get('signature')) for x in root.findall("./BIKESHOES/BIKESHOE")]
-    gd['socks'] = [int(x.get('signature')) for x in root.findall("./SOCKS/SOCK")]
-    gd['jerseys'] = [int(x.get('signature')) for x in root.findall("./JERSEYS/JERSEY")]
-    gd['jersey_name'] = [(x.get('name')) for x in root.findall("./JERSEYS/JERSEY")]
-    gd['bikefrontwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")]
-    gd['bikerearwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEREARWHEELS/BIKEREARWHEEL")]
-    gd['runshirts'] = [int(x.get('signature')) for x in root.findall("./RUNSHIRTS/RUNSHIRT")]
-    gd['runshorts'] = [int(x.get('signature')) for x in root.findall("./RUNSHORTS/RUNSHORT")]
-    gd['runshoes'] = [int(x.get('signature')) for x in root.findall("./RUNSHOES/RUNSHOE")]
-    bikeframes = {}
-    for x in root.findall("./BIKEFRAMES/BIKEFRAME"):
-        bikeframes[int(x.get('signature'))] = x.get('name')
-    gd['bikeframes'] = bikeframes
-    routes = {}
-    for x in root.findall("./ACHIEVEMENTS/ACHIEVEMENT"):
-        if x.get('imageName') == "RouteComplete": routes[x.get('name')] = int(x.get('signature'))
-    achievements = {}
-    for x in root.findall("./ROUTES/ROUTE"):
-        name = x.get('name').upper()
-        if name in routes: achievements[routes[name]] = int(x.get('signature'))
-    gd['achievements'] = achievements
-    return gd
-
-GD = load_game_dictionary()
+tree = ET.parse('../cdn/gameassets/GameDictionary.xml')
+root = tree.getroot()
+jerseys = {}
+for x in root.findall("./JERSEYS/JERSEY"):
+    jerseys[x.get('name')] = int(x.get('signature'))
 
 def main(argv):
     global args
