@@ -22,20 +22,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Wout",
-      "last_name": "van Aert",
-      "jersey": 958696823
-    },
-    {
-      "country_code": 208,
-      "is_male": true,
-      "first_name": "Jonas",
-      "last_name": "Vingegaard",
-      "jersey": 958696823
-    },
-    {
       "country_code": 208,
       "is_male": true,
       "first_name": "Jonas",
@@ -48,13 +34,6 @@
       "first_name": "Jasper",
       "last_name": "Philipsen",
       "jersey": 930946828
-    },
-    {
-      "country_code": 705,
-      "is_male": true,
-      "first_name": "Primo\u017e",
-      "last_name": "Rogli\u010d",
-      "jersey": 958696823
     },
     {
       "country_code": 705,
@@ -92,13 +71,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Christophe",
-      "last_name": "Laporte",
-      "jersey": 958696823
-    },
-    {
       "country_code": 724,
       "is_male": true,
       "first_name": "Enric",
@@ -118,20 +90,6 @@
       "first_name": "Mathieu",
       "last_name": "van der Poel",
       "jersey": 930946828
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Arnaud",
-      "last_name": "De Lie",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Arnaud",
-      "last_name": "De Lie",
-      "jersey": 4130579852
     },
     {
       "country_code": 56,
@@ -164,30 +122,9 @@
     {
       "country_code": 250,
       "is_male": true,
-      "first_name": "Thibaut",
-      "last_name": "Pinot",
-      "jersey": 3020536025
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
       "first_name": "David",
       "last_name": "Gaudu",
       "jersey": 3020536025
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "David",
-      "last_name": "Gaudu",
-      "jersey": 3020536025
-    },
-    {
-      "country_code": 528,
-      "is_male": true,
-      "first_name": "Olav",
-      "last_name": "Kooij",
-      "jersey": 958696823
     },
     {
       "country_code": 528,
@@ -218,13 +155,6 @@
       "jersey": 2768366528
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Romain",
-      "last_name": "Bardet",
-      "jersey": 2768366528
-    },
-    {
       "country_code": 36,
       "is_male": true,
       "first_name": "Michael",
@@ -239,25 +169,11 @@
       "jersey": 3020536025
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Arnaud",
-      "last_name": "D\u00e9mare",
-      "jersey": 3020536025
-    },
-    {
       "country_code": 528,
       "is_male": true,
       "first_name": "Dylan",
       "last_name": "Groenewegen",
       "jersey": 631173451
-    },
-    {
-      "country_code": 756,
-      "is_male": true,
-      "first_name": "Stefan",
-      "last_name": "K\u00fcng",
-      "jersey": 3020536025
     },
     {
       "country_code": 756,
@@ -288,13 +204,6 @@
       "jersey": 3020536025
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Valentin",
-      "last_name": "Madouas",
-      "jersey": 3020536025
-    },
-    {
       "country_code": 840,
       "is_male": true,
       "first_name": "Matteo",
@@ -307,13 +216,6 @@
       "first_name": "Alexander",
       "last_name": "Kristoff",
       "jersey": 3612223524
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Axel",
-      "last_name": "Zingle",
-      "jersey": 4191972189
     },
     {
       "country_code": 250,
@@ -349,13 +251,6 @@
       "first_name": "Simon",
       "last_name": "Yates",
       "jersey": 631173451
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Guillaume",
-      "last_name": "Martin",
-      "jersey": 4191972189
     },
     {
       "country_code": 250,
@@ -447,20 +342,6 @@
       "first_name": "Jordi",
       "last_name": "Meeus",
       "jersey": 321508751
-    },
-    {
-      "country_code": 36,
-      "is_male": true,
-      "first_name": "Caleb",
-      "last_name": "Ewan",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 36,
-      "is_male": true,
-      "first_name": "Caleb",
-      "last_name": "Ewan",
-      "jersey": 4130579852
     },
     {
       "country_code": 36,
@@ -612,30 +493,9 @@
     {
       "country_code": 250,
       "is_male": true,
-      "first_name": "Bryan",
-      "last_name": "Coquard",
-      "jersey": 4191972189
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
       "first_name": "Beno\u00eet",
       "last_name": "Cosnefroy",
       "jersey": 851470392
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Milan",
-      "last_name": "Menten",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Milan",
-      "last_name": "Menten",
-      "jersey": 4130579852
     },
     {
       "country_code": 56,
@@ -666,25 +526,11 @@
       "jersey": 4191972189
     },
     {
-      "country_code": 724,
-      "is_male": true,
-      "first_name": "Jes\u00fas",
-      "last_name": "Herrada",
-      "jersey": 4191972189
-    },
-    {
       "country_code": 380,
       "is_male": true,
       "first_name": "Jonathan",
       "last_name": "Milan",
       "jersey": 2155858980
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Tiesj",
-      "last_name": "Benoot",
-      "jersey": 958696823
     },
     {
       "country_code": 56,
@@ -722,25 +568,11 @@
       "jersey": 2768366528
     },
     {
-      "country_code": 578,
-      "is_male": true,
-      "first_name": "Andreas",
-      "last_name": "Leknessund",
-      "jersey": 2768366528
-    },
-    {
       "country_code": 620,
       "is_male": true,
       "first_name": "Rui",
       "last_name": "Costa",
       "jersey": 1456211971
-    },
-    {
-      "country_code": 36,
-      "is_male": true,
-      "first_name": "Sam",
-      "last_name": "Welsford",
-      "jersey": 2768366528
     },
     {
       "country_code": 36,
@@ -848,13 +680,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 840,
-      "is_male": true,
-      "first_name": "Sepp",
-      "last_name": "Kuss",
-      "jersey": 958696823
-    },
-    {
       "country_code": 554,
       "is_male": true,
       "first_name": "Corbin",
@@ -867,13 +692,6 @@
       "first_name": "Danny",
       "last_name": "van Poppel",
       "jersey": 321508751
-    },
-    {
-      "country_code": 724,
-      "is_male": true,
-      "first_name": "Ion",
-      "last_name": "Izagirre",
-      "jersey": 4191972189
     },
     {
       "country_code": 724,
@@ -974,13 +792,6 @@
       "jersey": 2768366528
     },
     {
-      "country_code": 826,
-      "is_male": false,
-      "first_name": "Pfeiffer",
-      "last_name": "Georgi",
-      "jersey": 2768366528
-    },
-    {
       "country_code": 36,
       "is_male": false,
       "first_name": "Amanda",
@@ -1016,25 +827,11 @@
       "jersey": 958696823
     },
     {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Marianne",
-      "last_name": "Vos",
-      "jersey": 958696823
-    },
-    {
       "country_code": 724,
       "is_male": false,
       "first_name": "Mavi",
       "last_name": "Garc\u00eda",
       "jersey": 1277618322
-    },
-    {
-      "country_code": 250,
-      "is_male": false,
-      "first_name": "Juliette",
-      "last_name": "Labous",
-      "jersey": 2768366528
     },
     {
       "country_code": 250,
@@ -1084,20 +881,6 @@
       "first_name": "Charlotte",
       "last_name": "Kool",
       "jersey": 2768366528
-    },
-    {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Charlotte",
-      "last_name": "Kool",
-      "jersey": 2768366528
-    },
-    {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Riejanne",
-      "last_name": "Markus",
-      "jersey": 958696823
     },
     {
       "country_code": 528,
@@ -1182,13 +965,6 @@
       "first_name": "Ellen",
       "last_name": "van Dijk",
       "jersey": 2140478849
-    },
-    {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Karlijn",
-      "last_name": "Swinkels",
-      "jersey": 958696823
     },
     {
       "country_code": 528,
@@ -1317,13 +1093,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 826,
-      "is_male": false,
-      "first_name": "Anna",
-      "last_name": "Henderson",
-      "jersey": 958696823
-    },
-    {
       "country_code": 528,
       "is_male": false,
       "first_name": "Maike",
@@ -1371,13 +1140,6 @@
       "first_name": "Sofia",
       "last_name": "Bertizzolo",
       "jersey": 2411042224
-    },
-    {
-      "country_code": 840,
-      "is_male": false,
-      "first_name": "Megan",
-      "last_name": "Jastrab",
-      "jersey": 2768366528
     },
     {
       "country_code": 840,
@@ -1478,13 +1240,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Amber",
-      "last_name": "Kraak",
-      "jersey": 958696823
-    },
-    {
       "country_code": 442,
       "is_male": false,
       "first_name": "Christine",
@@ -1546,13 +1301,6 @@
       "first_name": "Danielle",
       "last_name": "de Francesco",
       "jersey": 3612223524
-    },
-    {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Esm\u00e9e",
-      "last_name": "Peperkamp",
-      "jersey": 2768366528
     },
     {
       "country_code": 528,
@@ -1688,32 +1436,11 @@
       "jersey": 4130579852
     },
     {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Maxim",
-      "last_name": "Van Gils",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Maxim",
-      "last_name": "Van Gils",
-      "jersey": 4130579852
-    },
-    {
       "country_code": 208,
       "is_male": true,
       "first_name": "S\u00f8ren",
       "last_name": "Kragh Andersen",
       "jersey": 930946828
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Romain",
-      "last_name": "Gr\u00e9goire",
-      "jersey": 3020536025
     },
     {
       "country_code": 250,
@@ -1758,13 +1485,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 578,
-      "is_male": true,
-      "first_name": "Tobias",
-      "last_name": "Foss",
-      "jersey": 958696823
-    },
-    {
       "country_code": 56,
       "is_male": true,
       "first_name": "Cian",
@@ -1777,20 +1497,6 @@
       "first_name": "Julian",
       "last_name": "Alaphilippe",
       "jersey": 3875378752
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Florian",
-      "last_name": "Vermeersch",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Florian",
-      "last_name": "Vermeersch",
-      "jersey": 4130579852
     },
     {
       "country_code": 56,
@@ -1877,20 +1583,6 @@
       "jersey": 4130579852
     },
     {
-      "country_code": 208,
-      "is_male": true,
-      "first_name": "Andreas",
-      "last_name": "Kron",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 208,
-      "is_male": true,
-      "first_name": "Andreas",
-      "last_name": "Kron",
-      "jersey": 4130579852
-    },
-    {
       "country_code": 578,
       "is_male": true,
       "first_name": "Rasmus",
@@ -1938,13 +1630,6 @@
       "first_name": "Marijn",
       "last_name": "van den Berg",
       "jersey": 2349035663
-    },
-    {
-      "country_code": 826,
-      "is_male": true,
-      "first_name": "Max",
-      "last_name": "Poole",
-      "jersey": 2768366528
     },
     {
       "country_code": 826,
@@ -2010,25 +1695,11 @@
       "jersey": 3020536025
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Rudy",
-      "last_name": "Molard",
-      "jersey": 3020536025
-    },
-    {
       "country_code": 380,
       "is_male": true,
       "first_name": "Matteo",
       "last_name": "Sobrero",
       "jersey": 631173451
-    },
-    {
-      "country_code": 528,
-      "is_male": true,
-      "first_name": "Wilco",
-      "last_name": "Kelderman",
-      "jersey": 958696823
     },
     {
       "country_code": 528,
@@ -2050,13 +1721,6 @@
       "first_name": "Luis Le\u00f3n",
       "last_name": "S\u00e1nchez",
       "jersey": 1969335676
-    },
-    {
-      "country_code": 348,
-      "is_male": true,
-      "first_name": "Attila",
-      "last_name": "Valter",
-      "jersey": 958696823
     },
     {
       "country_code": 348,
@@ -2108,25 +1772,11 @@
       "jersey": 3020536025
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Lenny",
-      "last_name": "Martinez",
-      "jersey": 3020536025
-    },
-    {
       "country_code": 826,
       "is_male": true,
       "first_name": "Mark",
       "last_name": "Cavendish",
       "jersey": 1969335676
-    },
-    {
-      "country_code": 528,
-      "is_male": true,
-      "first_name": "Dylan",
-      "last_name": "van Baarle",
-      "jersey": 958696823
     },
     {
       "country_code": 528,
@@ -2164,13 +1814,6 @@
       "jersey": 4191972189
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Victor",
-      "last_name": "Lafay",
-      "jersey": 4191972189
-    },
-    {
       "country_code": 56,
       "is_male": true,
       "first_name": "Jasper",
@@ -2183,20 +1826,6 @@
       "first_name": "Simone",
       "last_name": "Consonni",
       "jersey": 4191972189
-    },
-    {
-      "country_code": 380,
-      "is_male": true,
-      "first_name": "Simone",
-      "last_name": "Consonni",
-      "jersey": 4191972189
-    },
-    {
-      "country_code": 380,
-      "is_male": true,
-      "first_name": "Alberto",
-      "last_name": "Dainese",
-      "jersey": 2768366528
     },
     {
       "country_code": 380,
@@ -2246,13 +1875,6 @@
       "first_name": "Vincenzo",
       "last_name": "Albanese",
       "jersey": 2422819298
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Benjamin",
-      "last_name": "Thomas",
-      "jersey": 4191972189
     },
     {
       "country_code": 250,
@@ -2332,13 +1954,6 @@
       "jersey": 3020536025
     },
     {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Paul",
-      "last_name": "Penho\u00ebt",
-      "jersey": 3020536025
-    },
-    {
       "country_code": 528,
       "is_male": true,
       "first_name": "Sjoerd",
@@ -2351,13 +1966,6 @@
       "first_name": "Davide",
       "last_name": "Formolo",
       "jersey": 3795276190
-    },
-    {
-      "country_code": 276,
-      "is_male": true,
-      "first_name": "Max",
-      "last_name": "Walscheid",
-      "jersey": 4191972189
     },
     {
       "country_code": 276,
@@ -2400,27 +2008,6 @@
       "first_name": "Sylvain",
       "last_name": "Moniquet",
       "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Sylvain",
-      "last_name": "Moniquet",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Sylvain",
-      "last_name": "Moniquet",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 276,
-      "is_male": true,
-      "first_name": "Marius",
-      "last_name": "Mayrhofer",
-      "jersey": 2768366528
     },
     {
       "country_code": 276,
@@ -2472,20 +2059,6 @@
       "jersey": 4130579852
     },
     {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Jasper",
-      "last_name": "De Buyst",
-      "jersey": 4130579852
-    },
-    {
-      "country_code": 56,
-      "is_male": true,
-      "first_name": "Jasper",
-      "last_name": "De Buyst",
-      "jersey": 4130579852
-    },
-    {
       "country_code": 276,
       "is_male": true,
       "first_name": "Nils",
@@ -2505,13 +2078,6 @@
       "first_name": "Samuele",
       "last_name": "Battistella",
       "jersey": 1969335676
-    },
-    {
-      "country_code": 250,
-      "is_male": true,
-      "first_name": "Anthony",
-      "last_name": "Perez",
-      "jersey": 4191972189
     },
     {
       "country_code": 250,
@@ -2626,13 +2192,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Eva",
-      "last_name": "van Agt",
-      "jersey": 958696823
-    },
-    {
       "country_code": 40,
       "is_male": false,
       "first_name": "Kathrin",
@@ -2680,13 +2239,6 @@
       "first_name": "Georgia",
       "last_name": "Baker",
       "jersey": 631173451
-    },
-    {
-      "country_code": 756,
-      "is_male": false,
-      "first_name": "Noemi",
-      "last_name": "R\u00fcegg",
-      "jersey": 958696823
     },
     {
       "country_code": 756,
@@ -2822,13 +2374,6 @@
       "jersey": 958696823
     },
     {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Teuntje",
-      "last_name": "Beekhuis",
-      "jersey": 958696823
-    },
-    {
       "country_code": 704,
       "is_male": false,
       "first_name": "Th\u1ecb Th\u1eadt",
@@ -2897,13 +2442,6 @@
       "first_name": "Paula Andrea",
       "last_name": "Pati\u00f1o",
       "jersey": 1842355135
-    },
-    {
-      "country_code": 276,
-      "is_male": false,
-      "first_name": "Franziska",
-      "last_name": "Koch",
-      "jersey": 2768366528
     },
     {
       "country_code": 276,
@@ -2995,13 +2533,6 @@
       "first_name": "Dilyxine",
       "last_name": "Miermont",
       "jersey": 3305515323
-    },
-    {
-      "country_code": 528,
-      "is_male": false,
-      "first_name": "Elise",
-      "last_name": "Uijen",
-      "jersey": 2768366528
     },
     {
       "country_code": 528,

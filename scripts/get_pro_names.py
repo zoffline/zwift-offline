@@ -34,11 +34,12 @@ def get_pros(url, male):
         if td.a and td.contents[0]:
             if "cu600" in repr(td) and td.a.contents:
                 best_match = process.extractOne(td.a.contents[0], GD['jersey_name'], scorer=fuzz.token_sort_ratio)
-                print ("%s %s : %s - %s" % (tmp['first_name'],tmp['last_name'],td.a.contents[0], best_match))
-                for index, item in enumerate(GD['jersey_name']):
-                    if item.startswith(best_match[0]):
-                        tmp['jersey'] = (GD['jerseys'][index])
-                        data.append(tmp)
+                if 'first_name' in tmp:
+                    print ("%s %s : %s - %s" % (tmp['first_name'],tmp['last_name'],td.a.contents[0], best_match))
+                    for index, item in enumerate(GD['jersey_name']):
+                        if item.startswith(best_match[0]):
+                            tmp['jersey'] = (GD['jerseys'][index])
+                    data.append(tmp)
 
     return data
 
