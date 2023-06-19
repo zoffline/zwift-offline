@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 
+# Use this script to populate bot.txt with names from https://www.procyclingstats.com
+# pip install beautifulsoup4 country-converter fuzzywuzzy
+# scripts/get_pro_names.py -h
+
+
 from bs4 import BeautifulSoup
 import urllib.request
 import json
@@ -15,7 +20,7 @@ from fuzzywuzzy import fuzz
 base_url = "https://www.procyclingstats.com/rankings.php?filter=Filter"
 cc = coco.CountryConverter()
 
-def get_pros(url, male):
+def get_pros(url, male, get_jersey):
     data = []
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     site = urllib.request.urlopen(req).read()
@@ -36,8 +41,10 @@ def get_pros(url, male):
                 best_match = process.extractOne(td.a.contents[0], jerseys.keys(), scorer=fuzz.token_set_ratio)
                 if 'first_name' in tmp:
                     print ("%s %s : %s - %s" % (tmp['first_name'],tmp['last_name'],td.a.contents[0], best_match))
-                    if best_match[0] in jerseys:
-                        tmp['jersey'] = jerseys[best_match[0]]
+                    if get_jersey:
+                        if best_match[0] in jerseys:
+                            tmp['jersey'] = jerseys[best_match[0]]
+
                     data.append(tmp)
 
     return data
@@ -57,6 +64,7 @@ def main(argv):
     parser.add_argument('-m', '--male', help='Male riders only', default=False, action='store_true')
     parser.add_argument('-a', '--alltime', help='Use all time ranking', default=False, action='store_true')
     parser.add_argument('-p', '--pages', help='Number of pages to process', default=1)
+    parser.add_argument('-j', '--jersey', help='Get team jerseys', default=False, action='store_true')
     args = parser.parse_args()
     url_additions = ""
     url_list = []
@@ -81,7 +89,7 @@ def main(argv):
     total_data = {}
     total_data['riders'] = []
     for item in url_list:
-        total_data['riders'] = total_data['riders'] + get_pros(item['url'], item['is_male'])
+        total_data['riders'] = total_data['riders'] + get_pros(item['url'], item['is_male'], args.jersey)
     total_data['body_types'] = [16, 48, 80, 272, 304, 336, 528, 560, 592]
     total_data['hair_types'] = [25953412, 175379869, 398510584, 659452569, 838618949, 924073005, 1022111028, 1262230565, 1305767757, 1569595897, 1626212425, 1985754517, 2234835005, 2507058825, 3092564365, 3200039653, 3296520581, 3351295312, 3536770137, 4021222889, 4179410997, 4294226781]
     total_data['facial_hair_types'] = [248681634, 398510584, 867351826, 1947387842, 2173853954, 3169994930, 4131541011, 4216468066]
