@@ -576,6 +576,8 @@ def load_bots():
                             else:
                                 p.body_type += 1
                             p.country_code = rider['country_code']
+                            if 'jersey' in rider:
+                                p.ride_jersey = rider['jersey']
                             bot.profile = p
                         i += 1
 

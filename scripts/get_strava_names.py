@@ -1,5 +1,9 @@
 #! /usr/bin/env python
-# Please be patient
+
+# Use this script to update bot.txt with your accounts you follow on Strava
+# pip install requests_toolbelt nameparser geograpy3 country3
+# get_strava_names.py us
+
 import os
 import json
 import re
