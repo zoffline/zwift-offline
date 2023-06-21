@@ -22,6 +22,26 @@ cc = coco.CountryConverter()
 
 def get_pros(url, male, get_jersey):
     data = []
+    bikes = {}
+    bikes['AG2R Citroën Team'] = { 'Bike': 'BMC BMCTeammachine', 'Wheels': 'Campagnolo Bora WTO' }
+    bikes['Alpecin-Deceuninck'] = { 'Bike': 'Canyon Aeroad CFR', 'Wheels': 'Shimano' }
+    bikes['Astana Qazaqstan Team'] = { 'Bike': 'Wilier Triestina Filante', 'Wheels': 'Corima' }
+    bikes['Bahrain - Victorious'] = { 'Bike': 'Merida Scultura', 'Wheels': 'Vision Metron 45SL' }
+    bikes['BORA - hansgrohe'] = { 'Bike': 'Specialized Tarmac SL7', 'Wheels': 'Roval' }
+    bikes['Cofidis'] = { 'Bike': 'Look', 'Wheels': 'Corima' }
+    bikes['EF Education-EasyPost'] = { 'Bike': 'Cannondale SystemSix', 'Wheels': 'Vision Metron' }
+    bikes['Groupama - FDJ'] = { 'Bike': 'Lapierre Xelius SL3', 'Wheels': 'Shimano' }
+    bikes['INEOS Grenadiers'] = { 'Bike': 'Pinarello Dogma F', 'Wheels': 'Princeton Carbonworks' }
+    bikes['Intermarché - Circus - Wanty'] = { 'Bike': 'Cube Litening Aero C:68X Pro', 'Wheels': 'Newmen Advanced SL' }
+    bikes['Jumbo-Visma'] = { 'Bike': 'Cervélo R5 Disc', 'Wheels': 'Reserve 52' }
+    bikes['Movistar Team'] = { 'Bike': 'Canyon Aeroad CFR', 'Wheels': 'Zipp' }
+    bikes['Soudal - Quick Step'] = { 'Bike': 'Specialized S-Works Tarmac SL7', 'Wheels': 'Roval' }
+    bikes['Team Arkéa Samsic'] = { 'Bike': 'Bianchi Oltre RC', 'Wheels': 'Vision' }
+    bikes['Team DSM'] = { 'Bike': 'Scott Foil RC', 'Wheels': 'Shimano' }
+    bikes['Team Jayco AlUla'] = { 'Bike': 'Giant Propel', 'Wheels': 'Cadex 42' }
+    bikes['Trek - Segafredo'] = { 'Bike': 'Trek Madone SLR', 'Wheels': 'Bontrager Aeolus' }
+    bikes['UAE Team Emirates'] = { 'Bike': 'Colnago V4Rs', 'Wheels': 'Enve' }
+
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     site = urllib.request.urlopen(req).read()
     soup = BeautifulSoup(site)
@@ -44,6 +64,17 @@ def get_pros(url, male, get_jersey):
                     if get_jersey:
                         if best_match[0] in jerseys:
                             tmp['jersey'] = jerseys[best_match[0]]
+                    if td.a.contents[0] in bikes:
+                        bike_match = process.extractOne(bikes[td.a.contents[0]]['Bike'], bikeframes.keys(), scorer=fuzz.token_sort_ratio)
+                        fwheel_match = process.extractOne(bikes[td.a.contents[0]]['Wheels'], bikefrontwheels.keys(), scorer=fuzz.token_set_ratio)
+                        rwheel_match = process.extractOne(bikes[td.a.contents[0]]['Wheels'], bikerearwheels.keys(), scorer=fuzz.token_set_ratio)
+                        print ("%s : %s - %s" %(bike_match, fwheel_match, rwheel_match))
+                        if bike_match[0] in bikeframes:
+                            tmp['bike_frame'] = bikeframes[bike_match[0]]
+                        if fwheel_match[0] in bikefrontwheels:
+                            tmp['bike_wheel_front'] = bikefrontwheels[fwheel_match[0]]
+                        if rwheel_match[0] in bikerearwheels:
+                            tmp['bike_wheel_rear'] = bikerearwheels[rwheel_match[0]]
 
                     data.append(tmp)
 
@@ -54,6 +85,15 @@ root = tree.getroot()
 jerseys = {}
 for x in root.findall("./JERSEYS/JERSEY"):
     jerseys[x.get('name')] = int(x.get('signature'))
+bikeframes = {}
+for x in root.findall("./BIKEFRAMES/BIKEFRAME"):
+    bikeframes[x.get('name')] = int(x.get('signature'))
+bikefrontwheels = {}
+for x in root.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL"):
+    bikefrontwheels[x.get('name')] = int(x.get('signature'))
+bikerearwheels = {}
+for x in root.findall("./BIKEREARWHEELS/BIKEREARWHEEL"):
+    bikerearwheels[x.get('name')] = int(x.get('signature'))
 
 def main(argv):
     global args
