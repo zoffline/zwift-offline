@@ -578,6 +578,12 @@ def load_bots():
                             p.country_code = rider['country_code']
                             if 'jersey' in rider:
                                 p.ride_jersey = rider['jersey']
+                            if 'bike_frame' in rider:
+                                p.bike_frame = rider['bike_frame']
+                            if 'bike_wheel_front' in rider:
+                                p.bike_wheel_front = rider['bike_wheel_front']
+                            if 'bike_wheel_rear' in rider:
+                                p.bike_wheel_front = rider['bike_wheel_rear']
                             bot.profile = p
                         i += 1
 
