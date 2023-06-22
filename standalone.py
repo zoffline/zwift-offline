@@ -583,7 +583,7 @@ def load_bots():
                             if 'bike_wheel_front' in rider:
                                 p.bike_wheel_front = rider['bike_wheel_front']
                             if 'bike_wheel_rear' in rider:
-                                p.bike_wheel_front = rider['bike_wheel_rear']
+                                p.bike_wheel_rear = rider['bike_wheel_rear']
                             bot.profile = p
                         i += 1
 
