@@ -95,13 +95,13 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                             tmp['last_name'] += " ("+teams[td.a.contents[0]]['abv']+")"
                     if get_jersey:
                         if not male and td.a.contents[0] in teams and 'womens_jersey_signature' in teams[td.a.contents[0]]:
-                            tmp['jersey'] = teams[td.a.contents[0]]['womens_jersey_signature']
+                            tmp['ride_jersey'] = teams[td.a.contents[0]]['womens_jersey_signature']
                         elif td.a.contents[0] in teams:
-                            tmp['jersey'] = teams[td.a.contents[0]]['jersey_signature']
+                            tmp['ride_jersey'] = teams[td.a.contents[0]]['jersey_signature']
                         else:
                             best_match = process.extractOne(td.a.contents[0], jerseys.keys(), scorer=fuzz.token_set_ratio)
                             print ("%s %s : %s - %s" % (tmp['first_name'],tmp['last_name'],td.a.contents[0], best_match))
-                            tmp['jersey'] = jerseys[best_match[0]]
+                            tmp['ride_jersey'] = jerseys[best_match[0]]
                     if get_equipment:
                         if td.a.contents[0] in teams:
                             team = teams[td.a.contents[0]]
@@ -112,7 +112,7 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                             if 'rear_wheel_signature' in team:
                                 tmp['bike_wheel_rear'] = team['rear_wheel_signature']
                             if 'helmet_signature' in team:
-                                tmp['helmet'] = team['helmet_signature']
+                                tmp['ride_helmet_type'] = team['helmet_signature']
 
                     data.append(tmp)
 
