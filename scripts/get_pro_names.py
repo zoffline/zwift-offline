@@ -63,7 +63,7 @@ teams = {
     'Arkéa Pro Cycling Team': {'jersey_name': 'Arkea', 'jersey_signature': 1128201030},
     'MAT Atom Deweloper Wrocław': {'jersey_name': 'Atom Racing Team', 'jersey_signature': 851470392},
     'Top Girls Fassa Bortolo': {'jersey_name': 'Clash Of Clubs Blue', 'jersey_signature': 520081294},
-    'EOLO-Kometa': {'jersey_name': 'Eolo Kometa', 'jersey_signature': 2422819298, 'bike_name': 'Aurum', 'bike_signature': 4209581234, 'front_wheel_name': 'Enve SES 3.4', 'front_wheel_signature': 2223270801, 'rear_wheel_name': 'Enve SES 3.4', 'rear_wheel_signature': 3835575171},
+    'EOLO-Kometa': {'jersey_name': 'Eolo Kometa', 'jersey_signature': 2422819298, 'front_wheel_name': 'Enve SES 3.4', 'front_wheel_signature': 2223270801, 'rear_wheel_name': 'Enve SES 3.4', 'rear_wheel_signature': 3835575171},
     'Green Project-Bardiani CSF-Faizanè': {'jersey_name': 'Bardiani 2019', 'jersey_signature': 3503002798, 'front_wheel_name': 'Campagnolo Bora Ultra 35', 'front_wheel_signature': 1053884173, 'rear_wheel_name': 'Campagnolo Bora Ultra 35', 'rear_wheel_signature': 1614586487},
     'L39ION of Los Angeles': {'jersey_name':'L39ION of LA 2022', 'jersey_signature': 2330819669},
     'Lotto Dstny Ladies': {'jersey_name': 'Lotto Soudal Ladies', 'jersey_signature': 1423767803},
