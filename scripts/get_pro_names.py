@@ -70,7 +70,7 @@ teams = {
     'Parkhotel Valkenburg': {'abv': 'PHV', 'jersey_name': 'Parkhotel Valkenburg', 'jersey_signature': 4102459937}
 }
 
-def get_pros(url, male, get_jersey, get_equipment):
+def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
     data = []
 
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -90,6 +90,9 @@ def get_pros(url, male, get_jersey, get_equipment):
         if td.a and td.contents[0]:
             if "cu600" in repr(td) and td.a.contents:
                 if 'first_name' in tmp:
+                    if team_abbrv:
+                        if td.a.contents[0] in teams and 'abv' in teams[td.a.contents[0]]:
+                            tmp['last_name'] += " ("+teams[td.a.contents[0]]['abv']+")"
                     if get_jersey:
                         if not male and td.a.contents[0] in teams and 'womens_jersey_signature' in teams[td.a.contents[0]]:
                             tmp['jersey'] = teams[td.a.contents[0]]['womens_jersey_signature']
@@ -132,6 +135,7 @@ def main(argv):
     parser.add_argument('-p', '--pages', help='Number of pages to process', default=1)
     parser.add_argument('-j', '--jersey', help='Get team jerseys', default=False, action='store_true')
     parser.add_argument('-e', '--equipment', help='Get team bike and wheels', default=False, action='store_true')
+    parser.add_argument('-t', '--teamabbrv', help='Add team abbreviation to last name', default=False, action='store_true')
     args = parser.parse_args()
     url_additions = ""
     url_list = []
@@ -156,7 +160,7 @@ def main(argv):
     total_data = {}
     total_data['riders'] = []
     for item in url_list:
-        total_data['riders'] = total_data['riders'] + get_pros(item['url'], item['is_male'], args.jersey, args.equipment)
+        total_data['riders'] = total_data['riders'] + get_pros(item['url'], item['is_male'], args.jersey, args.equipment, args.teamabbrv)
     total_data['body_types'] = [16, 48, 80, 272, 304, 336, 528, 560, 592]
     total_data['hair_types'] = [25953412, 175379869, 398510584, 659452569, 838618949, 924073005, 1022111028, 1262230565, 1305767757, 1569595897, 1626212425, 1985754517, 2234835005, 2507058825, 3092564365, 3200039653, 3296520581, 3351295312, 3536770137, 4021222889, 4179410997, 4294226781]
     total_data['facial_hair_types'] = [248681634, 398510584, 867351826, 1947387842, 2173853954, 3169994930, 4131541011, 4216468066]
