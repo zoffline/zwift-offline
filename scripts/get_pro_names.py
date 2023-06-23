@@ -25,7 +25,7 @@ teams = {
     'Soudal - Quick Step': {'jersey_name': 'Deceuninck-Quick-Step', 'jersey_signature': 2906189156, 'bike_name': 'Specialized Tarmac SL7', 'bike_signature': 935373427, 'front_wheel_name': 'Roval Rapide CLX', 'front_wheel_signature': 2181416413, 'rear_wheel_name': 'Roval Rapide CLX', 'rear_wheel_signature': 3548735686},
     'Jumbo-Visma': {'jersey_name': 'Team Jumbo-Visma Men 2023', 'jersey_signature': 88214615, 'bike_name': 'Cervelo R5', 'bike_signature': 106535518, 'front_wheel_name': 'Reserve Reserve 25 GR', 'front_wheel_signature': 635220876, 'rear_wheel_name': 'Reserve Reserve 25 GR', 'rear_wheel_signature': 1842698274},
     'Alpecin-Deceuninck': {'jersey_name': 'Alpecin-Fenix Pro Team', 'jersey_signature': 930946828, 'bike_name': 'Canyon Aeroad 2015', 'bike_signature': 1520594784, 'front_wheel_name': 'Shimano C50', 'front_wheel_signature': 1742598126, 'rear_wheel_name': 'Shimano C50', 'rear_wheel_signature': 3725678091},
-    'Trek - Segafredo': {'jersey_name': 'Trek-Segafredo Men', 'jersey_signature': 2140478849, 'bike_name': 'Trek Madone', 'bike_signature': 4129467727, 'front_wheel_name': 'Bontrager Aeolus5', 'front_wheel_signature': 702195190, 'rear_wheel_name': 'Bontrager Aeolus5', 'rear_wheel_signature': 3594144634},
+    'Trek - Segafredo': {'jersey_name': 'Trek-Segafredo Men', 'jersey_signature': 2140478849, 'womens_jersey_signature': 1154847422, 'bike_name': 'Trek Madone', 'bike_signature': 4129467727, 'front_wheel_name': 'Bontrager Aeolus5', 'front_wheel_signature': 702195190, 'rear_wheel_name': 'Bontrager Aeolus5', 'rear_wheel_signature': 3594144634},
     'Movistar Team': {'jersey_name': 'Movistar Team', 'jersey_signature': 1842355135, 'bike_name': 'Canyon Aeroad 2015', 'bike_signature': 1520594784, 'front_wheel_name': 'Zipp 404', 'front_wheel_signature': 613983807, 'rear_wheel_name': 'Zipp 404', 'rear_wheel_signature': 4183014640},
     'Lotto Dstny': {'jersey_name': 'Lotto', 'jersey_signature': 4130579852, 'bike_name': 'Ridley Noah Fast 2019', 'bike_signature': 4288910569, 'front_wheel_name': 'DTSwiss ARC 1100 DICUT 62', 'front_wheel_signature': 346409677, 'rear_wheel_name': 'DTSwiss ARC 1100 DICUT 62', 'rear_wheel_signature': 2049111692},
     'EF Education-EasyPost': {'jersey_name': 'EF Education First', 'jersey_signature': 2349035663, 'bike_name': 'Cannondale System Six', 'bike_signature': 2005280203, 'front_wheel_name': 'HED HED Vanquish RC6 Pro', 'front_wheel_signature': 1791179228, 'rear_wheel_name': 'HED HED Vanquish RC6 Pro', 'rear_wheel_signature': 2913819265},
@@ -91,7 +91,9 @@ def get_pros(url, male, get_jersey, get_equipment):
             if "cu600" in repr(td) and td.a.contents:
                 if 'first_name' in tmp:
                     if get_jersey:
-                        if td.a.contents[0] in teams:
+                        if not male and td.a.contents[0] in teams and 'womens_jersey_signature' in teams[td.a.contents[0]]:
+                            tmp['jersey'] = teams[td.a.contents[0]]['womens_jersey_signature']
+                        elif td.a.contents[0] in teams:
                             tmp['jersey'] = teams[td.a.contents[0]]['jersey_signature']
                         else:
                             best_match = process.extractOne(td.a.contents[0], jerseys.keys(), scorer=fuzz.token_set_ratio)
