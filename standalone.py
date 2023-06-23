@@ -566,32 +566,17 @@ def load_bots():
                                 loop_riders = data['riders'].copy()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
-                            p.first_name = rider['first_name']
-                            p.last_name = rider['last_name']
-                            p.is_male = rider['is_male']
+                            for item in ['first_name', 'last_name', 'is_male', 'country_code']:
+                                setattr(p, item, rider[item])
                             p.body_type = random.choice(data['body_types'])
                             p.hair_type = random.choice(data['hair_types'])
                             if p.is_male:
                                 p.facial_hair_type = random.choice(data['facial_hair_types'])
                             else:
                                 p.body_type += 1
-                            p.country_code = rider['country_code']
-                            if 'jersey' in rider:
-                                p.ride_jersey = rider['jersey']
-                            if 'bike_frame' in rider:
-                                p.bike_frame = rider['bike_frame']
-                            if 'bike_wheel_front' in rider:
-                                p.bike_wheel_front = rider['bike_wheel_front']
-                            if 'bike_wheel_rear' in rider:
-                                p.bike_wheel_rear = rider['bike_wheel_rear']
-                            if 'helmet' in rider:
-                                p.ride_helmet_type = rider['helmet']
-                            if 'glasses' in rider:
-                                p.glasses_type = rider['glasses']
-                            if 'shoes' in rider:
-                                p.ride_shoes_type = rider['shoes']
-                            if 'socks' in rider:
-                                p.ride_socks_type = rider['socks']
+                            for item in ['ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                                if item in rider:
+                                    setattr(p, item, rider[item])
                             bot.profile = p
                         i += 1
 
