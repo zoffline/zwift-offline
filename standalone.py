@@ -584,6 +584,14 @@ def load_bots():
                                 p.bike_wheel_front = rider['bike_wheel_front']
                             if 'bike_wheel_rear' in rider:
                                 p.bike_wheel_rear = rider['bike_wheel_rear']
+                            if 'helmet' in rider:
+                                p.ride_helmet_type = rider['helmet']
+                            if 'glasses' in rider:
+                                p.glasses_type = rider['glasses']
+                            if 'shoes' in rider:
+                                p.ride_shoes_type = rider['shoes']
+                            if 'socks' in rider:
+                                p.ride_socks_type = rider['socks']
                             bot.profile = p
                         i += 1
 
