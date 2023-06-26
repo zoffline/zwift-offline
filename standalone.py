@@ -566,18 +566,17 @@ def load_bots():
                                 loop_riders = data['riders'].copy()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
-                            p.first_name = rider['first_name']
-                            p.last_name = rider['last_name']
-                            p.is_male = rider['is_male']
+                            for item in ['first_name', 'last_name', 'is_male', 'country_code']:
+                                setattr(p, item, rider[item])
                             p.body_type = random.choice(data['body_types'])
                             p.hair_type = random.choice(data['hair_types'])
                             if p.is_male:
                                 p.facial_hair_type = random.choice(data['facial_hair_types'])
                             else:
                                 p.body_type += 1
-                            p.country_code = rider['country_code']
-                            if 'jersey' in rider:
-                                p.ride_jersey = rider['jersey']
+                            for item in ['ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                                if item in rider:
+                                    setattr(p, item, rider[item])
                             bot.profile = p
                         i += 1
 
