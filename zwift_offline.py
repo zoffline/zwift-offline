@@ -1221,6 +1221,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/campaign/proto/campaigns', methods=['GET'])
 @app.route('/api/campaign/public/proto/campaigns/active', methods=['GET'])
 @app.route('/api/player-playbacks/player/settings', methods=['GET', 'POST']) # TODO: private = \x08\x01 (1: 1)
+@app.route('/api/scoring/current', methods=['GET'])
 def api_proto_empty():
     return '', 200
 
@@ -1318,7 +1319,6 @@ def get_events(limit, sport):
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
-                   ('Repack Rush', 762747962, 6),
                    ('The Magnificent 8', 2207442179, 6),
                    ('Ventop Downhill', 2891361683, 14),
                    ('WBR Climbing Series', 2218409282, 6),
@@ -3705,11 +3705,15 @@ def start_zwift():
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
     selected_map = request.form['map']
-    if selected_map == 'CALENDAR':
+    selected_climb = request.form['climb']
+    if selected_map == 'CALENDAR' and selected_climb == 'CALENDAR':
         return redirect("/ride", 302)
     else:
         response = make_response(redirect("http://cdn.zwift.com/map_override", 302))
-        response.set_cookie('selected_map', selected_map, domain=".zwift.com")
+        if selected_map != 'CALENDAR':
+            response.set_cookie('selected_map', selected_map, domain=".zwift.com")
+        if selected_climb != 'CALENDAR':
+            response.set_cookie('selected_climb', selected_climb, domain=".zwift.com")
         if MULTIPLAYER:
             response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
         return response

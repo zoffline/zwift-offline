@@ -77,6 +77,7 @@ else:
     discord = DummyDiscord()
 
 MAP_OVERRIDE = deque(maxlen=16)
+CLIMB_OVERRIDE = deque(maxlen=16)
 
 bot_update_freq = 3
 pacer_update_freq = 1
@@ -119,7 +120,10 @@ class CDNHandler(SimpleHTTPRequestHandler):
             cookies = SimpleCookie()
             cookies.load(cookies_string)
             # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
-            MAP_OVERRIDE.append((self.client_address[0], cookies['selected_map'].value))
+            if 'selected_map' in cookies:
+                MAP_OVERRIDE.append((self.client_address[0], cookies['selected_map'].value))
+            if 'selected_climb' in cookies:
+                CLIMB_OVERRIDE.append((self.client_address[0], cookies['selected_climb'].value))
             self.send_response(302)
             self.send_header('Cookie', cookies_string)
             self.send_header('Location', 'https://secure.zwift.com/ride')
@@ -136,6 +140,17 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
                     self.wfile.write(output.encode())
                     MAP_OVERRIDE.remove(override)
+                    return
+        if self.path == '/gameassets/PortalRoadSchedule_v1.xml':
+            for override in CLIMB_OVERRIDE:
+                if override[0] == self.client_address[0]:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/xml')
+                    self.end_headers()
+                    start = datetime.today() - timedelta(days=1)
+                    output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
+                    self.wfile.write(output.encode())
+                    CLIMB_OVERRIDE.remove(override)
                     return
         exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
                       'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
