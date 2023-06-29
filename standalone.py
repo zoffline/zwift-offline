@@ -444,7 +444,7 @@ class GhostsVariables:
     loaded = False
     started = False
     rec = None
-    play = []
+    play = None
     last_rec = 0
     last_play = 0
     last_rt = 0
@@ -705,6 +705,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if not player_id in global_ghosts.keys():
             global_ghosts[player_id] = GhostsVariables()
             global_ghosts[player_id].rec = udp_node_msgs_pb2.Ghost()
+            global_ghosts[player_id].play = []
 
         ghosts = global_ghosts[player_id]
 
