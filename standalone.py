@@ -83,6 +83,8 @@ bot_update_freq = 3
 pacer_update_freq = 1
 simulated_latency = 300 #makes bots animation smoother than using current time
 margin = 0.1 #avoids bots donuting in "just watch" (now player updates only once per second)
+last_pp_update = 0
+last_bot_update = 0
 last_pp_updates = {}
 last_bot_updates = {}
 global_ghosts = {}
@@ -538,14 +540,15 @@ def load_pace_partners():
                     pp.position = 0
 
 def play_pace_partners():
+    global last_pp_update
     while True:
-        start = time.time()
         for pp_id in global_pace_partners.keys():
             pp = global_pace_partners[pp_id]
             if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
             pp.route.states[pp.position].id = pp_id
-        time.sleep(pacer_update_freq - (time.time() - start))
+        last_pp_update = time.monotonic()
+        time.sleep(pacer_update_freq)
 
 def load_bots():
     multiplier = 1
@@ -596,8 +599,8 @@ def load_bots():
                         i += 1
 
 def play_bots():
+    global last_bot_update
     while True:
-        start = time.time()
         if zo.reload_pacer_bots:
             zo.reload_pacer_bots = False
             if os.path.isfile(ENABLE_BOTS_FILE):
@@ -608,7 +611,8 @@ def play_bots():
             if bot.position < len(bot.route.states) - 1: bot.position += 1
             else: bot.position = 0
             bot.route.states[bot.position].id = bot_id
-        time.sleep(bot_update_freq - (time.time() - start))
+        last_bot_update = time.monotonic()
+        time.sleep(bot_update_freq)
 
 def remove_inactive():
     while True:
@@ -690,7 +694,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         if not player_id in last_bot_updates.keys():
             last_bot_updates[player_id] = 0
 
-        t = time.time()
+        t = time.monotonic()
 
         #Update player online state
         if state.roadTime:
@@ -716,7 +720,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghosts.loaded = True
                     load_ghosts(player_id, state, ghosts)
                 #Save player state as ghost
-                if t >= ghosts.last_rec + bot_update_freq - margin:
+                if t > ghosts.last_rec + bot_update_freq - margin:
                     ghosts.rec.states.append(state)
                     ghosts.last_rec = t
                 #Start loaded ghosts
@@ -754,7 +758,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, player)
                 if is_nearby and is_state_new_for(player, player_id):
                     nearby[p_id] = distance
-        if t >= last_pp_updates[player_id] + pacer_update_freq - margin:
+        if t > last_pp_updates[player_id] + pacer_update_freq - margin and last_pp_update > last_pp_updates[player_id]:
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
                 pp = global_pace_partners[p_id]
@@ -762,7 +766,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, pace_partner)
                 if is_nearby:
                     nearby[p_id] = distance
-        if t >= last_bot_updates[player_id] + bot_update_freq - margin:
+        if t > last_bot_updates[player_id] + bot_update_freq - margin and last_bot_update > last_bot_updates[player_id]:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
                 b = global_bots[p_id]
@@ -770,7 +774,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 is_nearby, distance = nearby_distance(watching_state, bot)
                 if is_nearby:
                     nearby[p_id] = distance
-        if ghosts.started and t >= ghosts.last_play + bot_update_freq - margin:
+        if ghosts.started and t > ghosts.last_play + bot_update_freq - margin:
             ghosts.last_play = t
             for i, g in enumerate(ghosts.play):
                 if len(g.route.states) > g.position:
