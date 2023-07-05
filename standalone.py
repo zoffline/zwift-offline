@@ -551,13 +551,19 @@ def play_pace_partners():
         time.sleep(pacer_update_freq)
 
 def load_bots():
+    body_types = [16, 48, 80, 272, 304, 336, 528, 560, 592]
+    hair_types = [25953412, 175379869, 398510584, 659452569, 838618949, 924073005, 1022111028, 1262230565, 1305767757, 1569595897, 1626212425, 1985754517, 2234835005, 2507058825, 3092564365, 3200039653, 3296520581, 3351295312, 3536770137, 4021222889, 4179410997, 4294226781]
+    facial_hair_types = [248681634, 398510584, 867351826, 1947387842, 2173853954, 3169994930, 4131541011, 4216468066]
     multiplier = 1
     with open(ENABLE_BOTS_FILE) as f:
         try:
             multiplier = int(f.readline().rstrip('\r\n'))
         except ValueError:
             pass
-    with open('%s/bot.txt' % SCRIPT_DIR) as f:
+    bots_file = '%s/bot.txt' % STORAGE_DIR
+    if not os.path.isfile(bots_file):
+        bots_file = '%s/bot.txt' % SCRIPT_DIR
+    with open(bots_file) as f:
         data = json.load(f)
     i = 1
     loop_riders = []
@@ -584,17 +590,15 @@ def load_bots():
                                 loop_riders = data['riders'].copy()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
-                            for item in ['first_name', 'last_name', 'is_male', 'country_code']:
-                                setattr(p, item, rider[item])
-                            p.body_type = random.choice(data['body_types'])
-                            p.hair_type = random.choice(data['hair_types'])
-                            if p.is_male:
-                                p.facial_hair_type = random.choice(data['facial_hair_types'])
-                            else:
-                                p.body_type += 1
-                            for item in ['ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                            for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
                                 if item in rider:
                                     setattr(p, item, rider[item])
+                            p.body_type = random.choice(body_types)
+                            p.hair_type = random.choice(hair_types)
+                            if p.is_male:
+                                p.facial_hair_type = random.choice(facial_hair_types)
+                            else:
+                                p.body_type += 1
                             bot.profile = p
                         i += 1
 
