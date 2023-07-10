@@ -64,11 +64,11 @@
           "manifest_retry_count": {
             "varintValue": "3"
           },
-          "validate_asset_hash_after_downloading": {
-            "boolValue": false
-          },
           "asset_retry_count": {
             "varintValue": "3"
+          },
+          "validate_asset_hash_after_downloading": {
+            "boolValue": false
           },
           "validate_asset_hash_on_manifest_loading": {
             "boolValue": false
@@ -419,6 +419,11 @@
       "values": {}
     },
     {
+      "name": "game_1_44_ble_queue",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_39_delete_robopacer_entities",
       "value": true,
       "values": {}
@@ -498,11 +503,14 @@
           "MustHaveDefaultRoad": {
             "boolValue": false
           },
-          "UseTdFAssets": {
-            "varintValue": "1"
+          "AllowPortalRoadDifficultySeletion": {
+            "boolValue": true
           },
           "CompletePctBasedOnRoadTime": {
             "boolValue": false
+          },
+          "UseTdFAssets": {
+            "varintValue": "1"
           }
         }
       }
@@ -689,8 +697,7 @@
       "values": {}
     },
     {
-      "name": "game_1_27_ble_dll_v2",
-      "value": true,
+      "name": "game_1_43_3_ble_dll_v2",
       "values": {}
     },
     {
@@ -781,11 +788,11 @@
       "value": true,
       "values": {
         "fields": {
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
-          },
           "ATVPopDelay": {
             "numberValue": 0.15
+          },
+          "ATVFriction": {
+            "numberValue": 0.9
           },
           "ATVPopInitDist": {
             "numberValue": 250.0
@@ -793,8 +800,8 @@
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
-          "ATVFriction": {
-            "numberValue": 0.9
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
           },
           "ATVPopDist": {
             "numberValue": 175.0
@@ -926,11 +933,11 @@
       "name": "game_1_31_rlog",
       "values": {
         "fields": {
-          "DISABLED_TYPES": {
-            "stringValue": ""
-          },
           "DISABLED_LEVELS": {
             "stringValue": "DEBUG,INFO,WARNING"
+          },
+          "DISABLED_TYPES": {
+            "stringValue": ""
           }
         }
       }
@@ -978,13 +985,13 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           }
         }
@@ -998,14 +1005,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
+          "query_interval": {
+            "numberValue": 10.0
+          },
           "udp_history_length": {
             "varintValue": "6"
           },
           "udp_loss_threshold": {
             "numberValue": 0.25
-          },
-          "query_interval": {
-            "numberValue": 10.0
           }
         }
       }
@@ -1030,20 +1037,20 @@
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "burrito_distance_cm": {
-            "numberValue": 750.0
-          },
           "anvil_weight_bias_const": {
             "numberValue": 20.0
+          },
+          "burrito_distance_cm": {
+            "numberValue": 750.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "feather_duration": {
-            "numberValue": 30.0
-          },
           "burrito_duration": {
             "numberValue": 20.0
+          },
+          "feather_duration": {
+            "numberValue": 30.0
           },
           "anvil_duration": {
             "numberValue": 15.0
@@ -1065,37 +1072,37 @@
       "values": {
         "fields": {
           "cdaMultAeroPosition": {
-            "numberValue": 0.95
+            "numberValue": 0.97
           },
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
-          "cdaPenaltyMultDrafting": {
-            "numberValue": 1.1
+          "cdaDynamicChanges": {
+            "boolValue": true
           },
           "cdaPenaltyMultSteering": {
-            "numberValue": 2.0
+            "numberValue": 1.75
           },
           "cdaPenaltyMultGeneral": {
             "numberValue": 1.0
           },
-          "draftFalloffCurve": {
-            "numberValue": 0.2
+          "cdaPenaltyMultDrafting": {
+            "numberValue": 1.05
           },
           "preventEasyOvertakeNearFront": {
             "boolValue": true
           },
-          "cdaDynamicChanges": {
-            "boolValue": true
+          "draftFalloffCurve": {
+            "numberValue": 0.2
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.15
+          "maxDraft": {
+            "numberValue": 1.75
           },
           "draftScale": {
             "numberValue": 1.4
           },
-          "maxDraft": {
-            "numberValue": 1.75
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.15
           }
         }
       }
