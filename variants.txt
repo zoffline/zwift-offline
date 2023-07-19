@@ -337,11 +337,6 @@
       "values": {}
     },
     {
-      "name": "game_1_33_server_driven_completed_campaigns",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_39_zui",
       "value": true,
       "values": {}
@@ -503,14 +498,14 @@
           "MustHaveDefaultRoad": {
             "boolValue": false
           },
-          "AllowPortalRoadDifficultySeletion": {
-            "boolValue": true
+          "UseTdFAssets": {
+            "varintValue": "1"
           },
           "CompletePctBasedOnRoadTime": {
             "boolValue": false
           },
-          "UseTdFAssets": {
-            "varintValue": "1"
+          "AllowPortalRoadDifficultySeletion": {
+            "boolValue": false
           }
         }
       }
@@ -534,6 +529,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_44_workouts_2_library",
+      "values": {}
     },
     {
       "name": "game_1_39_noesis_race_results",
@@ -566,6 +565,14 @@
       "values": {}
     },
     {
+      "name": "gn_deferred_lighting",
+      "values": {}
+    },
+    {
+      "name": "gn_lights",
+      "values": {}
+    },
+    {
       "name": "game_1_42_onboarding_quest",
       "values": {
         "fields": {
@@ -574,6 +581,18 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_43_android_road_height_fixup",
+      "values": {}
+    },
+    {
+      "name": "game_1_44_virtual_shifting",
+      "values": {}
+    },
+    {
+      "name": "game_1_44_workout_start_delay",
+      "values": {}
     },
     {
       "name": "game_1_26_ninety_day_prs",
@@ -698,6 +717,7 @@
     },
     {
       "name": "game_1_43_3_ble_dll_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -722,11 +742,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
           "rampUpTime": {
             "numberValue": 10.0
+          },
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -788,11 +808,11 @@
       "value": true,
       "values": {
         "fields": {
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
+          },
           "ATVPopDelay": {
             "numberValue": 0.15
-          },
-          "ATVFriction": {
-            "numberValue": 0.9
           },
           "ATVPopInitDist": {
             "numberValue": 250.0
@@ -800,8 +820,8 @@
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
+          "ATVFriction": {
+            "numberValue": 0.9
           },
           "ATVPopDist": {
             "numberValue": 175.0
@@ -1046,11 +1066,11 @@
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "burrito_duration": {
-            "numberValue": 20.0
-          },
           "feather_duration": {
             "numberValue": 30.0
+          },
+          "burrito_duration": {
+            "numberValue": 20.0
           },
           "anvil_duration": {
             "numberValue": 15.0
@@ -1077,7 +1097,7 @@
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
-          "cdaDynamicChanges": {
+          "preventEasyOvertakeNearFront": {
             "boolValue": true
           },
           "cdaPenaltyMultSteering": {
@@ -1089,28 +1109,23 @@
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.05
           },
-          "preventEasyOvertakeNearFront": {
+          "cdaDynamicChanges": {
             "boolValue": true
           },
           "draftFalloffCurve": {
             "numberValue": 0.2
           },
-          "maxDraft": {
-            "numberValue": 1.75
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.15
           },
           "draftScale": {
             "numberValue": 1.4
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.15
+          "maxDraft": {
+            "numberValue": 1.75
           }
         }
       }
-    },
-    {
-      "name": "game_1_36_steering_camera",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_29_player_hightlight",
@@ -1220,10 +1235,10 @@
           "world_scotland_spawn_disabled": {
             "boolValue": false
           },
-          "route_spawning_enabled": {
+          "recording_enabled": {
             "boolValue": true
           },
-          "recording_enabled": {
+          "route_spawning_enabled": {
             "boolValue": true
           },
           "leaderboard_replay_disabled": {

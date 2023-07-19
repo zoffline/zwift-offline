@@ -766,16 +766,14 @@ class UDPHandler(socketserver.BaseRequestHandler):
             last_pp_updates[player_id] = t
             for p_id in global_pace_partners.keys():
                 pp = global_pace_partners[p_id]
-                pace_partner = pp.route.states[pp.position]
-                is_nearby, distance = nearby_distance(watching_state, pace_partner)
+                is_nearby, distance = nearby_distance(watching_state, pp.route.states[pp.position])
                 if is_nearby:
                     nearby[p_id] = distance
         if t > last_bot_updates[player_id] + bot_update_freq - margin and last_bot_update > last_bot_updates[player_id]:
             last_bot_updates[player_id] = t
             for p_id in global_bots.keys():
-                b = global_bots[p_id]
-                bot = b.route.states[b.position]
-                is_nearby, distance = nearby_distance(watching_state, bot)
+                bot = global_bots[p_id]
+                is_nearby, distance = nearby_distance(watching_state, bot.route.states[bot.position])
                 if is_nearby:
                     nearby[p_id] = distance
         if ghosts.started and t > ghosts.last_play + bot_update_freq - margin:

@@ -2917,10 +2917,6 @@ def add_teleport_target(player, targets, is_pace_partner=True):
     if is_pace_partner:
         target = targets.pacer_groups.add()
         target.route = partial_profile.route
-        if player.sport == profile_pb2.Sport.CYCLING:
-            target.ride_power = player.power
-        else:
-            target.speed = player.speed
     else:
         target = targets.friends.add()
         target.route = player.route
@@ -2935,6 +2931,8 @@ def add_teleport_target(player, targets, is_pace_partner=True):
     target.x = player.x
     target.y_altitude = player.y_altitude
     target.z = player.z
+    target.ride_power = player.power
+    target.speed = player.speed
 
 @app.route('/relay/teleport-targets', methods=['GET'])
 @jwt_to_session_cookie
