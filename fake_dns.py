@@ -57,6 +57,7 @@ class DNSServer:
 
 def fake_dns(server_ip):
     dns = DNSServer()
+    dns.addname('cdn.zwift.com.', server_ip)
     dns.addname('secure.zwift.com.', server_ip)
     dns.addname('us-or-rly101.zwift.com.', server_ip)
     dns.start()
