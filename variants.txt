@@ -499,7 +499,7 @@
             "boolValue": false
           },
           "UseTdFAssets": {
-            "varintValue": "1"
+            "varintValue": "2"
           },
           "CompletePctBasedOnRoadTime": {
             "boolValue": false
@@ -517,7 +517,13 @@
     {
       "name": "game_1_39_steering_enabled_in_events",
       "value": true,
-      "values": {}
+      "values": {
+        "fields": {
+          "steering_disabled_race_events": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_1_42_filter_workouts_from_recommendations",
@@ -540,6 +546,9 @@
         "fields": {
           "polling_interval_seconds": {
             "varintValue": "3"
+          },
+          "see_all_finishers_enabled": {
+            "boolValue": false
           }
         }
       }
@@ -742,11 +751,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -1025,14 +1034,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
-          "query_interval": {
-            "numberValue": 10.0
-          },
           "udp_history_length": {
             "varintValue": "6"
           },
           "udp_loss_threshold": {
             "numberValue": 0.25
+          },
+          "query_interval": {
+            "numberValue": 10.0
           }
         }
       }
@@ -1051,8 +1060,8 @@
       "value": true,
       "values": {
         "fields": {
-          "truck_duration": {
-            "numberValue": 40.0
+          "anvil_duration": {
+            "numberValue": 15.0
           },
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
@@ -1066,14 +1075,14 @@
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "feather_duration": {
-            "numberValue": 30.0
-          },
           "burrito_duration": {
             "numberValue": 20.0
           },
-          "anvil_duration": {
-            "numberValue": 15.0
+          "feather_duration": {
+            "numberValue": 30.0
+          },
+          "truck_duration": {
+            "numberValue": 40.0
           },
           "ghost_duration": {
             "numberValue": 15.0
@@ -1097,23 +1106,23 @@
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
-          "preventEasyOvertakeNearFront": {
+          "cdaDynamicChanges": {
             "boolValue": true
           },
           "cdaPenaltyMultSteering": {
             "numberValue": 1.75
           },
+          "draftFalloffCurve": {
+            "numberValue": 0.2
+          },
           "cdaPenaltyMultGeneral": {
             "numberValue": 1.0
           },
           "cdaPenaltyMultDrafting": {
-            "numberValue": 1.05
+            "numberValue": 1.02
           },
-          "cdaDynamicChanges": {
+          "preventEasyOvertakeNearFront": {
             "boolValue": true
-          },
-          "draftFalloffCurve": {
-            "numberValue": 0.2
           },
           "cdaMultAeroPositionPercOfPower": {
             "numberValue": 1.15
@@ -1122,7 +1131,7 @@
             "numberValue": 1.4
           },
           "maxDraft": {
-            "numberValue": 1.75
+            "numberValue": 1.5
           }
         }
       }
