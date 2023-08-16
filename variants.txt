@@ -64,11 +64,11 @@
           "manifest_retry_count": {
             "varintValue": "3"
           },
-          "validate_asset_hash_after_downloading": {
-            "boolValue": false
-          },
           "asset_retry_count": {
             "varintValue": "3"
+          },
+          "validate_asset_hash_after_downloading": {
+            "boolValue": false
           },
           "validate_asset_hash_on_manifest_loading": {
             "boolValue": false
@@ -99,6 +99,10 @@
       "values": {}
     },
     {
+      "name": "game_1_46_0_sandbagger_expiration",
+      "values": {}
+    },
+    {
       "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
       "values": {}
     },
@@ -107,7 +111,17 @@
       "values": {}
     },
     {
+      "name": "game_1_46_fix_pairing_on_homescreen_trainingplan",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_39_show_for_you_try_rc1_cards",
+      "values": {}
+    },
+    {
+      "name": "game_1_46_save_end_ride_no_club_pref",
+      "value": true,
       "values": {}
     },
     {
@@ -131,11 +145,11 @@
           "ZED_idleSeconds": {
             "varintValue": "30"
           },
-          "NUIT_filename": {
-            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
-          },
           "ZED_filename": {
             "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
+          },
+          "NUIT_filename": {
+            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
           },
           "serverURL": {
             "stringValue": "https://cdn.zwift.com/gameassets/Videos/"
@@ -292,6 +306,45 @@
       "values": {}
     },
     {
+      "name": "game_1_46_necod_6",
+      "values": {
+        "fields": {
+          "necod_6_max": {
+            "stringValue": "5.2.0"
+          },
+          "necod_6_min": {
+            "stringValue": "5.1.6"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_46_necod_9",
+      "values": {
+        "fields": {
+          "necod_9_max": {
+            "stringValue": "9.9.9"
+          },
+          "necod_9_min": {
+            "stringValue": "9.9.9"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_46_necod_23",
+      "values": {
+        "fields": {
+          "necod_23_max": {
+            "stringValue": "1.2.1"
+          },
+          "necod_23_min": {
+            "stringValue": "1.2.0"
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_39_delete_robopacer_entities",
       "value": true,
       "values": {}
@@ -347,6 +400,10 @@
       }
     },
     {
+      "name": "disable_yaw_adjustment",
+      "values": {}
+    },
+    {
       "name": "visual_lean_v2",
       "values": {}
     },
@@ -381,14 +438,14 @@
           "MustHaveDefaultRoad": {
             "boolValue": false
           },
-          "AllowPortalRoadDifficultySeletion": {
-            "boolValue": false
+          "UseTdFAssets": {
+            "varintValue": "0"
           },
           "CompletePctBasedOnRoadTime": {
             "boolValue": false
           },
-          "UseTdFAssets": {
-            "varintValue": "0"
+          "AllowPortalRoadDifficultySeletion": {
+            "boolValue": false
           }
         }
       }
@@ -425,13 +482,14 @@
     },
     {
       "name": "game_1_39_noesis_race_results",
+      "value": true,
       "values": {
         "fields": {
           "polling_interval_seconds": {
             "varintValue": "3"
           },
           "see_all_finishers_enabled": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -444,6 +502,10 @@
     {
       "name": "game_1_39_atv_connection_limit_check",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_46_virtual_shifting_leak_prevention",
       "values": {}
     },
     {
@@ -705,23 +767,23 @@
       "value": true,
       "values": {
         "fields": {
+          "ATVPopDelay": {
+            "numberValue": 0.15
+          },
+          "ATVFriction": {
+            "numberValue": 0.9
+          },
+          "ATVMoveSensitivity": {
+            "varintValue": "5"
+          },
+          "ATVPopInitDist": {
+            "numberValue": 250.0
+          },
           "ATVPopInitDelay": {
             "numberValue": 0.22
           },
           "ATVPopDist": {
             "numberValue": 175.0
-          },
-          "ATVPopInitDist": {
-            "numberValue": 250.0
-          },
-          "ATVMoveSensitivity": {
-            "varintValue": "5"
-          },
-          "ATVFriction": {
-            "numberValue": 0.9
-          },
-          "ATVPopDelay": {
-            "numberValue": 0.15
           }
         }
       }
@@ -897,6 +959,9 @@
           "XPPerKilometerCycling": {
             "varintValue": "20"
           },
+          "DropsPerLevel": {
+            "varintValue": "0"
+          },
           "ReEarnMaxLevel": {
             "boolValue": false
           },
@@ -913,16 +978,6 @@
       }
     },
     {
-      "name": "game_1_35_action_bar_v2",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_teleport_on_action_bar",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_29_set_thread_names",
       "values": {}
     },
@@ -936,13 +991,13 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           }
         }
@@ -960,14 +1015,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
-          "udp_loss_threshold": {
-            "numberValue": 0.25
-          },
           "query_interval": {
             "numberValue": 10.0
           },
           "udp_history_length": {
             "varintValue": "6"
+          },
+          "udp_loss_threshold": {
+            "numberValue": 0.25
           }
         }
       }
@@ -986,29 +1041,29 @@
       "value": true,
       "values": {
         "fields": {
-          "anvil_duration": {
-            "numberValue": 15.0
+          "truck_duration": {
+            "numberValue": 40.0
           },
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "anvil_weight_bias_const": {
-            "numberValue": 20.0
-          },
           "burrito_distance_cm": {
             "numberValue": 750.0
+          },
+          "anvil_weight_bias_const": {
+            "numberValue": 20.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "feather_duration": {
-            "numberValue": 30.0
-          },
           "burrito_duration": {
             "numberValue": 20.0
           },
-          "truck_duration": {
-            "numberValue": 40.0
+          "feather_duration": {
+            "numberValue": 30.0
+          },
+          "anvil_duration": {
+            "numberValue": 15.0
           },
           "ghost_duration": {
             "numberValue": 15.0
@@ -1026,20 +1081,35 @@
       "value": true,
       "values": {
         "fields": {
-          "cdaMultAeroPosition": {
-            "numberValue": 0.97
+          "enabledWatopia": {
+            "boolValue": false
           },
           "draftDeltaAngle": {
             "numberValue": 0.96
           },
           "cdaPenaltyMultDrafting": {
-            "numberValue": 1.02
+            "numberValue": 1.03
           },
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "cdaPenaltyMultGeneral": {
-            "numberValue": 1.0
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.2
+          },
+          "enabledFrance": {
+            "boolValue": false
+          },
+          "enabledGlobally": {
+            "boolValue": false
+          },
+          "enabledScotland": {
+            "boolValue": false
+          },
+          "enabledMakuri": {
+            "boolValue": true
+          },
+          "cdaMultAeroPosition": {
+            "numberValue": 0.97
           },
           "preventEasyOvertakeNearFront": {
             "boolValue": true
@@ -1047,17 +1117,17 @@
           "cdaDynamicChanges": {
             "boolValue": true
           },
+          "cdaPenaltyMultGeneral": {
+            "numberValue": 1.0
+          },
           "draftFalloffCurve": {
             "numberValue": 0.15
-          },
-          "maxDraft": {
-            "numberValue": 1.5
           },
           "draftScale": {
             "numberValue": 1.4
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
+          "maxDraft": {
+            "numberValue": 1.7
           }
         }
       }
@@ -1127,10 +1197,10 @@
           "world_scotland_spawn_disabled": {
             "boolValue": false
           },
-          "route_spawning_enabled": {
+          "recording_enabled": {
             "boolValue": true
           },
-          "recording_enabled": {
+          "route_spawning_enabled": {
             "boolValue": true
           },
           "leaderboard_replay_disabled": {
