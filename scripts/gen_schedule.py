@@ -31,7 +31,7 @@ with open('MapSchedule_v2.xml', 'w') as f:
     f.write(dom.toprettyxml())
 
 
-CLIMBS = [str(x) for x in range(10000, 10013)]
+CLIMBS = [str(x) for x in range(10000, 10019)]
 
 dom = minidom.parseString('<PortalRoads><PortalRoadSchedule><appointments></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>')
 appts = dom.getElementsByTagName('appointments')[0]

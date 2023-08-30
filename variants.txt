@@ -64,11 +64,11 @@
           "manifest_retry_count": {
             "varintValue": "3"
           },
-          "asset_retry_count": {
-            "varintValue": "3"
-          },
           "validate_asset_hash_after_downloading": {
             "boolValue": false
+          },
+          "asset_retry_count": {
+            "varintValue": "3"
           },
           "validate_asset_hash_on_manifest_loading": {
             "boolValue": false
@@ -145,11 +145,11 @@
           "ZED_idleSeconds": {
             "varintValue": "30"
           },
-          "ZED_filename": {
-            "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
-          },
           "NUIT_filename": {
             "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
+          },
+          "ZED_filename": {
+            "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
           },
           "serverURL": {
             "stringValue": "https://cdn.zwift.com/gameassets/Videos/"
@@ -435,17 +435,23 @@
       "value": true,
       "values": {
         "fields": {
-          "MustHaveDefaultRoad": {
+          "EnableHeroicDifficulty": {
             "boolValue": false
           },
-          "UseTdFAssets": {
-            "varintValue": "0"
-          },
-          "CompletePctBasedOnRoadTime": {
+          "MustHaveDefaultRoad": {
             "boolValue": false
           },
           "AllowPortalRoadDifficultySeletion": {
             "boolValue": false
+          },
+          "CompletePctBasedOnRoadTime": {
+            "boolValue": false
+          },
+          "AllowMultiRoadsScheduling": {
+            "boolValue": false
+          },
+          "UseTdFAssets": {
+            "varintValue": "0"
           }
         }
       }
@@ -568,10 +574,6 @@
     },
     {
       "name": "xplatform_partner_connection_vitality",
-      "values": {}
-    },
-    {
-      "name": "game_1_30_for_you_carousel",
       "values": {}
     },
     {
@@ -880,7 +882,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3"
           }
         }
       }
@@ -1012,17 +1014,25 @@
       "values": {}
     },
     {
+      "name": "gfx_useemptyshadowmaps",
+      "values": {}
+    },
+    {
+      "name": "gfx_framebuffer_srgb",
+      "values": {}
+    },
+    {
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
-          "query_interval": {
-            "numberValue": 10.0
-          },
           "udp_history_length": {
             "varintValue": "6"
           },
           "udp_loss_threshold": {
             "numberValue": 0.25
+          },
+          "query_interval": {
+            "numberValue": 10.0
           }
         }
       }
@@ -1082,10 +1092,10 @@
       "values": {
         "fields": {
           "enabledWatopia": {
-            "boolValue": false
+            "boolValue": true
           },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
+          "enabledScotland": {
+            "boolValue": true
           },
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.03
@@ -1093,17 +1103,17 @@
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
-          },
-          "enabledFrance": {
-            "boolValue": false
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "enabledGlobally": {
-            "boolValue": false
+            "boolValue": true
           },
-          "enabledScotland": {
-            "boolValue": false
+          "enabledFrance": {
+            "boolValue": true
+          },
+          "maxDraft": {
+            "numberValue": 1.7
           },
           "enabledMakuri": {
             "boolValue": true
@@ -1111,10 +1121,10 @@
           "cdaMultAeroPosition": {
             "numberValue": 0.97
           },
-          "preventEasyOvertakeNearFront": {
+          "cdaDynamicChanges": {
             "boolValue": true
           },
-          "cdaDynamicChanges": {
+          "preventEasyOvertakeNearFront": {
             "boolValue": true
           },
           "cdaPenaltyMultGeneral": {
@@ -1126,14 +1136,14 @@
           "draftScale": {
             "numberValue": 1.4
           },
-          "maxDraft": {
-            "numberValue": 1.7
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.2
           }
         }
       }
     },
     {
-      "name": "game_1_29_player_hightlight",
+      "name": "game_1_29_player_highlight",
       "values": {}
     },
     {
