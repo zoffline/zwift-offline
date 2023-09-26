@@ -570,6 +570,7 @@ def load_bots():
             for (root, dirs, files) in os.walk(path):
                 for f in files:
                     if f.endswith('.bin'):
+                        positions = []
                         for n in range(0, multiplier):
                             p = profile_pb2.PlayerProfile()
                             p.CopyFrom(zo.random_profile(p))
@@ -580,9 +581,11 @@ def load_bots():
                                 bot.route = udp_node_msgs_pb2.Ghost()
                                 with open(os.path.join(root, f), 'rb') as fd:
                                     bot.route.ParseFromString(fd.read())
+                                positions = list(range(len(bot.route.states)))
+                                random.shuffle(positions)
                             else:
                                 bot.route = global_bots[i + 1000000].route
-                            bot.position = random.randrange(len(bot.route.states))
+                            bot.position = positions.pop()
                             if not loop_riders:
                                 loop_riders = data['riders'].copy()
                                 random.shuffle(loop_riders)
