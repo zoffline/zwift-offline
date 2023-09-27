@@ -125,6 +125,127 @@
       "values": {}
     },
     {
+      "name": "game_1_48_tow_double_xp_routes_enabled",
+      "values": {
+        "fields": {
+          "tow2023_cycling_route_8": {
+            "varintValue": "3395698268"
+          },
+          "tow2023_running_route_3": {
+            "varintValue": "3454338139"
+          },
+          "tow2023_end_month": {
+            "varintValue": "11"
+          },
+          "tow2023_cycling_route_13": {
+            "varintValue": "2947111049"
+          },
+          "tow2023_cycling_route_19": {
+            "varintValue": "1635842477"
+          },
+          "tow2023_cycling_route_3": {
+            "varintValue": "1386460176"
+          },
+          "tow2023_running_route_9": {
+            "varintValue": "2328501978"
+          },
+          "tow2023_cycling_route_7": {
+            "varintValue": "3366225080"
+          },
+          "tow2023_cycling_route_5": {
+            "varintValue": "2746475460"
+          },
+          "tow2023_end_day": {
+            "varintValue": "13"
+          },
+          "tow2023_cycling_route_18": {
+            "varintValue": "1656629976"
+          },
+          "tow2023_cycling_route_4": {
+            "varintValue": "2474227587"
+          },
+          "tow2023_running_route_4": {
+            "varintValue": "3819095753"
+          },
+          "tow2023_running_route_5": {
+            "varintValue": "2737483381"
+          },
+          "tow2023_running_route_8": {
+            "varintValue": "263936293"
+          },
+          "tow2023_running_route_11": {
+            "varintValue": "0"
+          },
+          "tow2023_cycling_route_12": {
+            "varintValue": "3312037616"
+          },
+          "tow2023_start_month": {
+            "varintValue": "9"
+          },
+          "tow2023_running_route_2": {
+            "varintValue": "3573087582"
+          },
+          "tow2023_cycling_route_9": {
+            "varintValue": "1766405776"
+          },
+          "tow2023_cycling_route_11": {
+            "varintValue": "849508252"
+          },
+          "tow2023_cycling_route_20": {
+            "varintValue": "2595459121"
+          },
+          "tow2023_cycling_route_16": {
+            "varintValue": "3866241330"
+          },
+          "tow2023_running_route_6": {
+            "varintValue": "1988847319"
+          },
+          "tow2023_campaign_id": {
+            "varintValue": "3"
+          },
+          "tow2023_running_route_7": {
+            "varintValue": "1082034232"
+          },
+          "tow2023_start_year": {
+            "varintValue": "2023"
+          },
+          "tow2023_cycling_route_1": {
+            "varintValue": "2627606248"
+          },
+          "tow2023_cycling_route_2": {
+            "varintValue": "3382019812"
+          },
+          "tow2023_cycling_route_14": {
+            "varintValue": "3701568815"
+          },
+          "tow2023_start_day": {
+            "varintValue": "20"
+          },
+          "tow2023_cycling_route_15": {
+            "varintValue": "743730361"
+          },
+          "tow2023_running_route_1": {
+            "varintValue": "686828068"
+          },
+          "tow2023_running_route_10": {
+            "varintValue": "3312037616"
+          },
+          "tow2023_end_year": {
+            "varintValue": "2023"
+          },
+          "tow2023_cycling_route_17": {
+            "varintValue": "2569385980"
+          },
+          "tow2023_cycling_route_10": {
+            "varintValue": "3023359358"
+          },
+          "tow2023_cycling_route_6": {
+            "varintValue": "3453194200"
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_31_enable_join_zwifter",
       "value": true,
       "values": {}
@@ -145,11 +266,11 @@
           "ZED_idleSeconds": {
             "varintValue": "30"
           },
-          "NUIT_filename": {
-            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
-          },
           "ZED_filename": {
             "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
+          },
+          "NUIT_filename": {
+            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
           },
           "serverURL": {
             "stringValue": "https://cdn.zwift.com/gameassets/Videos/"
@@ -345,7 +466,7 @@
       }
     },
     {
-      "name": "game_1_47_0_track_rssi",
+      "name": "game_1_49_0_track_rssi",
       "values": {}
     },
     {
@@ -354,6 +475,15 @@
     },
     {
       "name": "game_1_48_show_rssi",
+      "values": {}
+    },
+    {
+      "name": "game_1_49_ble_adv_fix_pc_android",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_49_pvs",
       "values": {}
     },
     {
@@ -420,11 +550,6 @@
       "values": {}
     },
     {
-      "name": "game_1_42_repack_rush",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "dist_from_road_v2",
       "values": {}
     },
@@ -444,7 +569,18 @@
     },
     {
       "name": "game_1_47_new_powerup",
+      "value": true,
       "values": {}
+    },
+    {
+      "name": "gamified_event_survey",
+      "values": {
+        "fields": {
+          "surveyChance": {
+            "varintValue": "10"
+          }
+        }
+      }
     },
     {
       "name": "game_1_43_segment_portal",
@@ -457,8 +593,8 @@
           "MustHaveDefaultRoad": {
             "boolValue": false
           },
-          "AllowPortalRoadDifficultySeletion": {
-            "boolValue": false
+          "UseTdFAssets": {
+            "varintValue": "0"
           },
           "CompletePctBasedOnRoadTime": {
             "boolValue": false
@@ -466,14 +602,19 @@
           "AllowMultiRoadsScheduling": {
             "boolValue": false
           },
-          "UseTdFAssets": {
-            "varintValue": "0"
+          "AllowPortalRoadDifficultySeletion": {
+            "boolValue": false
           }
         }
       }
     },
     {
       "name": "game_1_43_ride_data_leak_prevention",
+      "values": {}
+    },
+    {
+      "name": "game_1_48_2_road_access_lock",
+      "value": true,
       "values": {}
     },
     {
@@ -503,15 +644,14 @@
       "values": {}
     },
     {
-      "name": "game_1_39_noesis_race_results",
-      "value": true,
+      "name": "game_1_49_onboarding_ftp_estimation",
       "values": {
         "fields": {
-          "polling_interval_seconds": {
-            "varintValue": "3"
+          "highZoneFTPRelation": {
+            "numberValue": 0.8
           },
-          "see_all_finishers_enabled": {
-            "boolValue": true
+          "midZone2FTPRelation": {
+            "numberValue": 0.75
           }
         }
       }
@@ -566,8 +706,8 @@
       "name": "game_1_42_onboarding_quest",
       "values": {
         "fields": {
-          "test_str": {
-            "stringValue": "alpha"
+          "show_to_zwift_staff": {
+            "boolValue": true
           }
         }
       }
@@ -586,6 +726,10 @@
     },
     {
       "name": "game_1_45_0_shifting_hvc_analytic",
+      "values": {}
+    },
+    {
+      "name": "game_1_49_0_disable_pairing_to_tutorial",
       "values": {}
     },
     {
@@ -728,11 +872,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
           "rampUpTime": {
             "numberValue": 10.0
+          },
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -970,6 +1114,7 @@
     },
     {
       "name": "game_Economy2023",
+      "value": true,
       "values": {
         "fields": {
           "XPPerKilometerRowing": {
@@ -987,20 +1132,23 @@
           "XPPerKilometerCycling": {
             "varintValue": "20"
           },
-          "ReEarnMaxLevel": {
-            "boolValue": false
-          },
           "DropsPerLevel": {
             "varintValue": "0"
           },
+          "ShowRideStreaksScreen": {
+            "boolValue": false
+          },
           "XPPerMileCycling": {
-            "varintValue": "30"
+            "varintValue": "32"
           },
           "XPPerMileRowing": {
             "varintValue": "15"
           },
           "XPPerKilometerRunning": {
             "varintValue": "10"
+          },
+          "ReEarnMaxLevel": {
+            "boolValue": false
           }
         }
       }
@@ -1081,29 +1229,29 @@
       "value": true,
       "values": {
         "fields": {
-          "truck_duration": {
-            "numberValue": 40.0
+          "anvil_duration": {
+            "numberValue": 15.0
           },
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "anvil_weight_bias_const": {
-            "numberValue": 20.0
-          },
           "burrito_distance_cm": {
             "numberValue": 750.0
+          },
+          "anvil_weight_bias_const": {
+            "numberValue": 20.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.8
           },
-          "burrito_duration": {
-            "numberValue": 20.0
-          },
           "feather_duration": {
             "numberValue": 30.0
           },
-          "anvil_duration": {
-            "numberValue": 15.0
+          "burrito_duration": {
+            "numberValue": 20.0
+          },
+          "truck_duration": {
+            "numberValue": 40.0
           },
           "ghost_duration": {
             "numberValue": 15.0
@@ -1124,17 +1272,17 @@
           "enabledWatopia": {
             "boolValue": true
           },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
+          "enabledScotland": {
+            "boolValue": true
           },
           "cdaPenaltyMultDrafting": {
-            "numberValue": 1.03
+            "numberValue": 1.01
           },
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "enabledScotland": {
-            "boolValue": true
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "enabledFrance": {
             "boolValue": true
@@ -1142,8 +1290,8 @@
           "enabledGlobally": {
             "boolValue": true
           },
-          "maxDraft": {
-            "numberValue": 1.7
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.2
           },
           "enabledMakuri": {
             "boolValue": true
@@ -1157,17 +1305,20 @@
           "preventEasyOvertakeNearFront": {
             "boolValue": true
           },
-          "draftFalloffCurve": {
-            "numberValue": 0.15
-          },
           "cdaPenaltyMultGeneral": {
             "numberValue": 1.0
           },
-          "draftScale": {
-            "numberValue": 1.4
+          "overtakePenaltyDraftLimit": {
+            "numberValue": 5000.0
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
+          "draftFalloffCurve": {
+            "numberValue": 0.15
+          },
+          "draftScale": {
+            "numberValue": 1.5
+          },
+          "maxDraft": {
+            "numberValue": 1.7
           }
         }
       }
@@ -1241,10 +1392,10 @@
           "world_scotland_spawn_disabled": {
             "boolValue": false
           },
-          "route_spawning_enabled": {
+          "recording_enabled": {
             "boolValue": true
           },
-          "recording_enabled": {
+          "route_spawning_enabled": {
             "boolValue": true
           },
           "leaderboard_replay_disabled": {

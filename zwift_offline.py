@@ -1222,6 +1222,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/campaign/public/proto/campaigns/active', methods=['GET'])
 @app.route('/api/player-playbacks/player/settings', methods=['GET', 'POST']) # TODO: private = \x08\x01 (1: 1)
 @app.route('/api/scoring/current', methods=['GET'])
+@app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
 def api_proto_empty():
     return '', 200
 
