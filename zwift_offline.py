@@ -2057,9 +2057,9 @@ def strava_upload(player_id, activity):
 
 def garmin_upload(player_id, activity):
     try:
-        from garmin_uploader.workflow import Workflow
+        import garth
     except ImportError as exc:
-        logger.warning("garmin_uploader is not installed. Skipping Garmin upload attempt: %s" % repr(exc))
+        logger.warning("garth is not installed. Skipping Garmin upload attempt: %s" % repr(exc))
         return
     profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
     garmin_credentials = '%s/garmin_credentials' % profile_dir
@@ -2082,11 +2082,10 @@ def garmin_upload(player_id, activity):
     except Exception as exc:
         logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
         return
-    with open('%s/last_activity.fit' % profile_dir, 'wb') as f:
-        f.write(activity.fit)
     try:
-        w = Workflow(['%s/last_activity.fit' % profile_dir], activity_name=activity.name, username=username, password=password)
-        w.run()
+        garth.login(username, password)
+        requests.post('https://connect.garmin.com/upload-service/upload/.fit', files={'file': BytesIO(activity.fit)},
+            headers={'NK': 'NT', 'authorization': garth.client.oauth2_token.__str__(), 'di-backend': 'connectapi.garmin.com'})
     except Exception as exc:
         logger.warning("Garmin upload failed. No internet? %s" % repr(exc))
 

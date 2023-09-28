@@ -24,7 +24,7 @@ jobs:
         pathInArchive: "upx-4.0.2-win64/upx.exe"
 
     - run: pip install -r requirements.txt
-    - run: pip install pyinstaller git+https://github.com/oldnapalm/garmin-uploader.git
+    - run: pip install pyinstaller garth
     - run: pyinstaller standalone.spec
 
     - uses: vimtor/action-zip@v1

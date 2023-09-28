@@ -269,8 +269,7 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* If running from source, install garmin-uploader: ``pip install git+https://github.com/oldnapalm/garmin-uploader.git``
-  * If the upload fails you can try the selenium method: ``pip uninstall -y garmin-uploader ; pip install git+https://github.com/ursoft/garmin-uploader.git@cloudscraper selenium webdriver_manager``
+* If running from source, install garth: ``pip install garth``
 * __NOTE:__ instead of performing the step below you can instead use the "Settings - Garmin" button in the launcher window to enter your credentials (Windows and macOS only).
 * Create a file ``garmin_credentials.txt`` in the ``storage/1`` directory containing your login credentials
   ```
@@ -362,7 +361,7 @@ Docker
 * dnspython (https://www.dnspython.org/)
 * fitdecode (https://pypi.org/project/fitdecode/)
 * stravalib (https://github.com/hozn/stravalib)
-* OPTIONAL: garmin-uploader (https://github.com/La0/garmin-uploader)
+* OPTIONAL: garth (https://pypi.org/project/garth/)
 * OPTIONAL: discord.py (https://discordpy.readthedocs.io/)
 
 

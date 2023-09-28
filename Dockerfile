@@ -8,7 +8,7 @@ RUN git clone --depth 1 https://github.com/zoffline/zwift-offline
 
 COPY requirements.txt requirements.txt
 RUN pip install --user --requirement requirements.txt
-RUN pip install --user git+https://github.com/oldnapalm/garmin-uploader.git
+RUN pip install --user garth
 
 FROM python:3.11-alpine
 MAINTAINER zoffline <zoffline@tutanota.com>
