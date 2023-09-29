@@ -2082,8 +2082,18 @@ def garmin_upload(player_id, activity):
     except Exception as exc:
         logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
         return
+    tokens_dir = '%s/garth' % profile_dir
     try:
-        garth.login(username, password)
+        garth.resume(tokens_dir)
+        garth.client.username
+    except:
+        try:
+            garth.login(username, password)
+            garth.save(tokens_dir)
+        except Exception as exc:
+            logger.warning("Garmin login failed: %s" % repr(exc))
+            return
+    try:
         requests.post('https://connect.garmin.com/upload-service/upload/.fit', files={'file': BytesIO(activity.fit)},
             headers={'NK': 'NT', 'authorization': garth.client.oauth2_token.__str__(), 'di-backend': 'connectapi.garmin.com'})
     except Exception as exc:
