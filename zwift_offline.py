@@ -2094,8 +2094,7 @@ def garmin_upload(player_id, activity):
             logger.warning("Garmin login failed: %s" % repr(exc))
             return
     try:
-        requests.post('https://connect.garmin.com/upload-service/upload/.fit', files={'file': BytesIO(activity.fit)},
-            headers={'NK': 'NT', 'authorization': garth.client.oauth2_token.__str__(), 'di-backend': 'connectapi.garmin.com'})
+        garth.client.post("connectapi", "/upload-service/upload", api=True, files={"file": (activity.fit_filename, BytesIO(activity.fit))})
     except Exception as exc:
         logger.warning("Garmin upload failed. No internet? %s" % repr(exc))
 
