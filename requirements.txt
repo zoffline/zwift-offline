@@ -8,3 +8,4 @@ pyjwt==2.6.0
 stravalib==1.1.0
 dnspython==2.3.0
 fitdecode==0.10.0
+werkzeug==2.3.7
