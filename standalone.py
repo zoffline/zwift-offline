@@ -151,10 +151,7 @@ class CDNHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(output.encode())
                     CLIMB_OVERRIDE.remove(override)
                     return
-        exceptions = ['Launcher_ver_cur.xml', 'LauncherMac_ver_cur.xml',
-                      'Zwift_ver_cur.xml', 'ZwiftMac_ver_cur.xml',
-                      'ZwiftAndroid_ver_cur.xml', 'Zwift_StreamingFiles_ver_cur.xml']
-        if CDN_PROXY and self.path.startswith('/gameassets/') and not path_end in exceptions:
+        if CDN_PROXY and self.path.startswith('/gameassets/') and not path_end.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
             try:
                 self.send_response(200)
                 self.end_headers()
