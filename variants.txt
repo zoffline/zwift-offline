@@ -166,20 +166,20 @@
           "tow2023_running_route_3": {
             "varintValue": "3454338139"
           },
-          "tow2023_cycling_route_19": {
-            "varintValue": "1635842477"
+          "tow2023_end_month": {
+            "varintValue": "11"
           },
           "tow2023_cycling_route_13": {
             "varintValue": "2947111049"
           },
-          "tow2023_end_month": {
-            "varintValue": "11"
+          "tow2023_cycling_route_19": {
+            "varintValue": "1635842477"
           },
           "tow2023_cycling_route_3": {
             "varintValue": "1386460176"
           },
-          "tow2023_end_day": {
-            "varintValue": "13"
+          "tow2023_running_route_9": {
+            "varintValue": "2328501978"
           },
           "tow2023_cycling_route_7": {
             "varintValue": "3366225080"
@@ -187,14 +187,14 @@
           "tow2023_cycling_route_5": {
             "varintValue": "2746475460"
           },
-          "tow2023_running_route_9": {
-            "varintValue": "2328501978"
+          "tow2023_end_day": {
+            "varintValue": "13"
           },
           "tow2023_cycling_route_18": {
             "varintValue": "1656629976"
           },
-          "tow2023_running_route_5": {
-            "varintValue": "2737483381"
+          "tow2023_running_route_8": {
+            "varintValue": "263936293"
           },
           "tow2023_running_route_4": {
             "varintValue": "3819095753"
@@ -202,23 +202,23 @@
           "tow2023_cycling_route_4": {
             "varintValue": "2474227587"
           },
-          "tow2023_running_route_8": {
-            "varintValue": "263936293"
-          },
-          "tow2023_start_month": {
-            "varintValue": "9"
-          },
-          "tow2023_cycling_route_12": {
-            "varintValue": "3312037616"
+          "tow2023_running_route_5": {
+            "varintValue": "2737483381"
           },
           "tow2023_running_route_11": {
             "varintValue": "0"
           },
-          "tow2023_cycling_route_9": {
-            "varintValue": "1766405776"
+          "tow2023_cycling_route_12": {
+            "varintValue": "3312037616"
+          },
+          "tow2023_start_month": {
+            "varintValue": "9"
           },
           "tow2023_running_route_2": {
             "varintValue": "3573087582"
+          },
+          "tow2023_cycling_route_9": {
+            "varintValue": "1766405776"
           },
           "tow2023_cycling_route_11": {
             "varintValue": "849508252"
@@ -241,8 +241,8 @@
           "tow2023_start_year": {
             "varintValue": "2023"
           },
-          "tow2023_cycling_route_1": {
-            "varintValue": "2627606248"
+          "tow2023_cycling_route_15": {
+            "varintValue": "743730361"
           },
           "tow2023_cycling_route_2": {
             "varintValue": "3382019812"
@@ -253,8 +253,8 @@
           "tow2023_start_day": {
             "varintValue": "20"
           },
-          "tow2023_cycling_route_15": {
-            "varintValue": "743730361"
+          "tow2023_cycling_route_1": {
+            "varintValue": "2627606248"
           },
           "tow2023_running_route_1": {
             "varintValue": "686828068"
@@ -289,6 +289,7 @@
     },
     {
       "name": "game_workout_detail_screen",
+      "value": true,
       "values": {}
     },
     {
@@ -544,6 +545,10 @@
       }
     },
     {
+      "name": "game_1_51_scored_event_filter",
+      "values": {}
+    },
+    {
       "name": "game_1_33_custom_workouts",
       "value": true,
       "values": {
@@ -585,11 +590,16 @@
     },
     {
       "name": "visual_lean_v2",
-      "values": {}
-    },
-    {
-      "name": "dist_from_road_v2",
-      "values": {}
+      "values": {
+        "fields": {
+          "bHoloReplayLean": {
+            "boolValue": true
+          },
+          "leanScalar": {
+            "numberValue": 0.5
+          }
+        }
+      }
     },
     {
       "name": "gradient_min_speed",
@@ -716,6 +726,11 @@
       "values": {}
     },
     {
+      "name": "game_1_51_zc_workout_asset_patch_fix",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_39_robopacer_colorized_models",
       "value": true,
       "values": {}
@@ -744,10 +759,14 @@
     },
     {
       "name": "game_1_42_onboarding_quest",
+      "value": true,
       "values": {
         "fields": {
           "pin_get_started_quest": {
             "boolValue": false
+          },
+          "onboarding_quest_slug": {
+            "stringValue": "gettingstarted"
           }
         }
       }
@@ -928,11 +947,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "workoutAutoPauseTime": {
-            "numberValue": 3.0
-          },
           "rampUpTime": {
             "numberValue": 10.0
+          },
+          "workoutAutoPauseTime": {
+            "numberValue": 3.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -994,11 +1013,11 @@
       "value": true,
       "values": {
         "fields": {
-          "ATVPopDelay": {
-            "numberValue": 0.15
+          "ATVPopInitDelay": {
+            "numberValue": 0.22
           },
-          "ATVFriction": {
-            "numberValue": 0.9
+          "ATVPopDist": {
+            "numberValue": 175.0
           },
           "ATVPopInitDist": {
             "numberValue": 250.0
@@ -1006,11 +1025,11 @@
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
+          "ATVFriction": {
+            "numberValue": 0.9
           },
-          "ATVPopDist": {
-            "numberValue": 175.0
+          "ATVPopDelay": {
+            "numberValue": 0.15
           }
         }
       }
@@ -1188,14 +1207,17 @@
           "XPPerKilometerCycling": {
             "varintValue": "20"
           },
+          "ShowXPUntilNextLevel": {
+            "boolValue": false
+          },
           "XPPerMileCycling": {
             "varintValue": "32"
           },
           "ShowRideStreaksScreen": {
             "boolValue": false
           },
-          "DropsPerLevel": {
-            "varintValue": "0"
+          "ReEarnMaxLevel": {
+            "boolValue": false
           },
           "XPPerMileRowing": {
             "varintValue": "15"
@@ -1203,8 +1225,8 @@
           "XPPerKilometerRunning": {
             "varintValue": "10"
           },
-          "ReEarnMaxLevel": {
-            "boolValue": false
+          "DropsPerLevel": {
+            "varintValue": "0"
           }
         }
       }
@@ -1223,13 +1245,13 @@
           "loadingTimeoutInterval": {
             "numberValue": 60.0
           },
-          "reportTimeoutsOnLoad": {
+          "abortEnabled": {
             "boolValue": false
           },
           "renderTimeoutInterval": {
             "numberValue": 30.0
           },
-          "abortEnabled": {
+          "reportTimeoutsOnLoad": {
             "boolValue": false
           }
         }
@@ -1259,14 +1281,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
+          "udp_history_length": {
+            "varintValue": "6"
+          },
           "udp_loss_threshold": {
             "numberValue": 0.25
           },
           "query_interval": {
             "numberValue": 10.0
-          },
-          "udp_history_length": {
-            "varintValue": "6"
           }
         }
       }
@@ -1291,11 +1313,11 @@
           "ghost_cuttoff_distance_meters": {
             "numberValue": 400.0
           },
-          "burrito_distance_cm": {
-            "numberValue": 750.0
-          },
           "anvil_weight_bias_const": {
             "numberValue": 20.0
+          },
+          "burrito_distance_cm": {
+            "numberValue": 750.0
           },
           "draft_boost_max_draft": {
             "numberValue": 1.7
@@ -1337,8 +1359,8 @@
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "enabledGlobally": {
             "boolValue": true
@@ -1346,8 +1368,8 @@
           "enabledFrance": {
             "boolValue": true
           },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
+          "maxDraft": {
+            "numberValue": 1.5
           },
           "enabledMakuri": {
             "boolValue": true
@@ -1355,33 +1377,39 @@
           "cdaMultAeroPosition": {
             "numberValue": 0.95
           },
-          "preventEasyOvertakeNearFront": {
-            "boolValue": true
-          },
           "cdaDynamicChanges": {
             "boolValue": true
           },
-          "cdaPenaltyMultGeneral": {
-            "numberValue": 1.0
-          },
-          "overtakePenaltyDraftLimit": {
-            "numberValue": 85.0
+          "preventEasyOvertakeNearFront": {
+            "boolValue": true
           },
           "draftFalloffCurve": {
             "numberValue": 0.15
           },
+          "overtakePenaltyDraftLimit": {
+            "numberValue": 85.0
+          },
+          "cdaPenaltyMultGeneral": {
+            "numberValue": 1.0
+          },
           "draftScale": {
             "numberValue": 1.3
           },
-          "maxDraft": {
-            "numberValue": 1.5
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.2
           }
         }
       }
     },
     {
       "name": "game_1_29_player_highlight",
-      "values": {}
+      "values": {
+        "fields": {
+          "UseStencilForDeferred": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_1_48_conditional_entities",
