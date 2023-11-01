@@ -613,6 +613,8 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
+            if user.pass_hash.startswith('sha256'):
+                user.pass_hash = generate_password_hash(password, 'scrypt')
             login_user(user, remember=True)
             user.remember = remember
             db.session.commit()
@@ -627,7 +629,7 @@ def login():
         else:
             flash("Invalid username or password.")
 
-    if current_user.is_authenticated and current_user.remember:
+    if current_user.is_authenticated and current_user.remember and not current_user.pass_hash.startswith('sha256'):
         return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
 
     user = User.verify_token(request.args.get('token'))
@@ -3662,6 +3664,9 @@ def auth_realms_zwift_protocol_openid_connect_token():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.pass_hash, password):
+            if user.pass_hash.startswith('sha256'):
+                user.pass_hash = generate_password_hash(password, 'scrypt')
+                db.session.commit()
             login_user(user, remember=True)
         else:
             return '', 401
