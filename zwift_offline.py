@@ -599,6 +599,15 @@ def signup():
     return render_template("signup.html")
 
 
+def check_sha256_hash(pwhash, password):
+    import hmac
+    try:
+        method, salt, hashval = pwhash.split("$", 2)
+    except ValueError:
+        return False
+    return hmac.compare_digest(hmac.new(salt.encode("utf-8"), password.encode("utf-8"), method).hexdigest(), hashval)
+
+
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -612,9 +621,15 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.pass_hash, password):
-            if user.pass_hash.startswith('sha256'):
+        if user and user.pass_hash.startswith('sha256'): # sha256 is deprecated in werkzeug 3
+            if check_sha256_hash(user.pass_hash, password):
                 user.pass_hash = generate_password_hash(password, 'scrypt')
+                db.session.commit()
+            else:
+                flash("Invalid username or password.")
+                return redirect(url_for('login'))
+
+        if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
             user.remember = remember
             db.session.commit()
@@ -629,7 +644,7 @@ def login():
         else:
             flash("Invalid username or password.")
 
-    if current_user.is_authenticated and current_user.remember and not current_user.pass_hash.startswith('sha256'):
+    if current_user.is_authenticated and current_user.remember:
         return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
 
     user = User.verify_token(request.args.get('token'))
@@ -3663,10 +3678,14 @@ def auth_realms_zwift_protocol_openid_connect_token():
     if username and MULTIPLAYER:
         user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.pass_hash, password):
-            if user.pass_hash.startswith('sha256'):
+        if user and user.pass_hash.startswith('sha256'): # sha256 is deprecated in werkzeug 3
+            if check_sha256_hash(user.pass_hash, password):
                 user.pass_hash = generate_password_hash(password, 'scrypt')
                 db.session.commit()
+            else:
+                return '', 401
+
+        if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
         else:
             return '', 401
