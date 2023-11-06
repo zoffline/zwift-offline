@@ -27,6 +27,7 @@
     },
     {
       "name": "zwift_launcher_osx_silicon",
+      "value": true,
       "values": {}
     },
     {
