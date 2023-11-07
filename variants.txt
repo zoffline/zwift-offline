@@ -51,6 +51,10 @@
       }
     },
     {
+      "name": "game_zc_pairing_transfer",
+      "values": {}
+    },
+    {
       "name": "game_end_game_session",
       "values": {}
     },
@@ -83,11 +87,11 @@
           "manifest_retry_count": {
             "varintValue": "3"
           },
-          "validate_asset_hash_after_downloading": {
-            "boolValue": false
-          },
           "asset_retry_count": {
             "varintValue": "3"
+          },
+          "validate_asset_hash_after_downloading": {
+            "boolValue": false
           },
           "validate_asset_hash_on_manifest_loading": {
             "boolValue": false
@@ -179,8 +183,8 @@
           "tow2023_cycling_route_3": {
             "varintValue": "1386460176"
           },
-          "tow2023_running_route_9": {
-            "varintValue": "2328501978"
+          "tow2023_end_day": {
+            "varintValue": "13"
           },
           "tow2023_cycling_route_7": {
             "varintValue": "3366225080"
@@ -188,38 +192,38 @@
           "tow2023_cycling_route_5": {
             "varintValue": "2746475460"
           },
-          "tow2023_end_day": {
-            "varintValue": "13"
+          "tow2023_running_route_9": {
+            "varintValue": "2328501978"
           },
           "tow2023_cycling_route_18": {
             "varintValue": "1656629976"
           },
-          "tow2023_running_route_8": {
-            "varintValue": "263936293"
+          "tow2023_cycling_route_4": {
+            "varintValue": "2474227587"
           },
           "tow2023_running_route_4": {
             "varintValue": "3819095753"
           },
-          "tow2023_cycling_route_4": {
-            "varintValue": "2474227587"
-          },
           "tow2023_running_route_5": {
             "varintValue": "2737483381"
           },
-          "tow2023_running_route_11": {
-            "varintValue": "0"
-          },
-          "tow2023_cycling_route_12": {
-            "varintValue": "3312037616"
+          "tow2023_running_route_8": {
+            "varintValue": "263936293"
           },
           "tow2023_start_month": {
             "varintValue": "9"
           },
-          "tow2023_running_route_2": {
-            "varintValue": "3573087582"
+          "tow2023_cycling_route_12": {
+            "varintValue": "3312037616"
+          },
+          "tow2023_running_route_11": {
+            "varintValue": "0"
           },
           "tow2023_cycling_route_9": {
             "varintValue": "1766405776"
+          },
+          "tow2023_running_route_2": {
+            "varintValue": "3573087582"
           },
           "tow2023_cycling_route_11": {
             "varintValue": "849508252"
@@ -248,14 +252,14 @@
           "tow2023_cycling_route_2": {
             "varintValue": "3382019812"
           },
-          "tow2023_cycling_route_14": {
-            "varintValue": "3701568815"
-          },
           "tow2023_start_day": {
             "varintValue": "20"
           },
           "tow2023_cycling_route_1": {
             "varintValue": "2627606248"
+          },
+          "tow2023_cycling_route_14": {
+            "varintValue": "3701568815"
           },
           "tow2023_running_route_1": {
             "varintValue": "686828068"
@@ -520,10 +524,15 @@
     },
     {
       "name": "game_1_50_zc_rf1",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_50_zc_rf2",
+      "values": {}
+    },
+    {
+      "name": "game_1_52_ble_adv_sd",
       "values": {}
     },
     {
@@ -566,6 +575,17 @@
       "values": {}
     },
     {
+      "name": "game_3second_power_average_smoothing",
+      "value": true,
+      "values": {
+        "fields": {
+          "timeGapMS": {
+            "varintValue": "1000"
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_40_steering_params",
       "value": true,
       "values": {
@@ -590,24 +610,12 @@
       "values": {}
     },
     {
-      "name": "visual_lean_v2",
-      "values": {
-        "fields": {
-          "bHoloReplayLean": {
-            "boolValue": true
-          },
-          "leanScalar": {
-            "numberValue": 0.5
-          }
-        }
-      }
-    },
-    {
       "name": "gradient_min_speed",
       "values": {}
     },
     {
       "name": "game_1_44_steering_survey",
+      "value": true,
       "values": {
         "fields": {
           "surveyChance": {
@@ -759,6 +767,10 @@
       "values": {}
     },
     {
+      "name": "gfx_drawinstanced",
+      "values": {}
+    },
+    {
       "name": "game_1_42_onboarding_quest",
       "value": true,
       "values": {
@@ -795,7 +807,12 @@
       "values": {}
     },
     {
+      "name": "game_1_52_steering_only_event_filter",
+      "values": {}
+    },
+    {
       "name": "game_1_49_0_disable_pairing_to_tutorial",
+      "value": true,
       "values": {}
     },
     {
@@ -807,6 +824,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_52_onboarding_tutorial_progress_bar",
+      "values": {}
     },
     {
       "name": "game_1_26_ninety_day_prs",
@@ -1211,8 +1232,8 @@
           "ShowXPUntilNextLevel": {
             "boolValue": false
           },
-          "XPPerMileCycling": {
-            "varintValue": "32"
+          "DropsPerLevel": {
+            "varintValue": "0"
           },
           "ShowRideStreaksScreen": {
             "boolValue": false
@@ -1226,8 +1247,8 @@
           "XPPerKilometerRunning": {
             "varintValue": "10"
           },
-          "DropsPerLevel": {
-            "varintValue": "0"
+          "XPPerMileCycling": {
+            "varintValue": "32"
           }
         }
       }
@@ -1275,10 +1296,6 @@
       "values": {}
     },
     {
-      "name": "gfx_drawinstanced",
-      "values": {}
-    },
-    {
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
@@ -1301,42 +1318,8 @@
     },
     {
       "name": "game_1_18_holiday_mode",
-      "values": {}
-    },
-    {
-      "name": "game_1_39_powerups_rebalancing",
       "value": true,
-      "values": {
-        "fields": {
-          "truck_duration": {
-            "numberValue": 40.0
-          },
-          "ghost_cuttoff_distance_meters": {
-            "numberValue": 400.0
-          },
-          "anvil_weight_bias_const": {
-            "numberValue": 20.0
-          },
-          "burrito_distance_cm": {
-            "numberValue": 750.0
-          },
-          "draft_boost_max_draft": {
-            "numberValue": 1.7
-          },
-          "feather_duration": {
-            "numberValue": 30.0
-          },
-          "burrito_duration": {
-            "numberValue": 20.0
-          },
-          "anvil_duration": {
-            "numberValue": 15.0
-          },
-          "ghost_duration": {
-            "numberValue": 15.0
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_29_hand_cycle",
@@ -1351,8 +1334,8 @@
           "enabledWatopia": {
             "boolValue": true
           },
-          "enabledScotland": {
-            "boolValue": true
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.1
@@ -1360,10 +1343,7 @@
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
-          },
-          "enabledGlobally": {
+          "enabledScotland": {
             "boolValue": true
           },
           "enabledFrance": {
@@ -1372,16 +1352,19 @@
           "maxDraft": {
             "numberValue": 1.5
           },
+          "enabledGlobally": {
+            "boolValue": true
+          },
           "enabledMakuri": {
             "boolValue": true
           },
           "cdaMultAeroPosition": {
             "numberValue": 0.95
           },
-          "cdaDynamicChanges": {
+          "preventEasyOvertakeNearFront": {
             "boolValue": true
           },
-          "preventEasyOvertakeNearFront": {
+          "cdaDynamicChanges": {
             "boolValue": true
           },
           "draftFalloffCurve": {
@@ -1407,7 +1390,7 @@
       "values": {
         "fields": {
           "UseStencilForDeferred": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -1467,43 +1450,14 @@
       }
     },
     {
-      "name": "game_training_partners",
-      "value": true,
+      "name": "game_1_52_activity_break",
       "values": {
         "fields": {
-          "SOLO_WORKOUT_recording_disabled": {
-            "boolValue": false
-          },
-          "world_scotland_spawn_disabled": {
-            "boolValue": false
-          },
-          "recording_enabled": {
-            "boolValue": true
-          },
-          "route_spawning_enabled": {
-            "boolValue": true
-          },
-          "leaderboard_replay_disabled": {
-            "boolValue": false
-          },
-          "screenshots_enabled": {
-            "boolValue": true
-          },
-          "spawn_enabled": {
-            "boolValue": true
-          },
-          "route_recording_enabled": {
-            "boolValue": true
-          },
-          "world_scotland_record_disabled": {
-            "boolValue": false
+          "activityBreakIntervalSeconds": {
+            "varintValue": "30"
           }
         }
       }
-    },
-    {
-      "name": "game_1_29_training_partners_survey",
-      "values": {}
     },
     {
       "name": "game_1_34_coffee_stop",
@@ -1533,6 +1487,19 @@
           },
           "initial_delay": {
             "numberValue": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "visual_lean_v2",
+      "values": {
+        "fields": {
+          "bHoloReplayLean": {
+            "boolValue": true
+          },
+          "leanScalar": {
+            "numberValue": 0.5
           }
         }
       }
