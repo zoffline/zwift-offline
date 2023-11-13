@@ -1511,6 +1511,10 @@ def api_zfiles():
     except IOError as e:
         logger.error("failed to create zfiles dir (%s):  %s", zfiles_dir, str(e))
         return '', 400
+    try:
+        zfile.filename = zfile.filename.decode('utf-8', 'ignore')
+    except AttributeError:
+        pass
     with open(os.path.join(zfiles_dir, quote(zfile.filename, safe=' ')), 'wb') as fd:
         fd.write(zfile.file)
     row = Zfile.query.filter_by(folder=zfile.folder, filename=zfile.filename, player_id=current_user.player_id).first()
