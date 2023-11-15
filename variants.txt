@@ -87,11 +87,11 @@
           "manifest_retry_count": {
             "varintValue": "3"
           },
-          "asset_retry_count": {
-            "varintValue": "3"
-          },
           "validate_asset_hash_after_downloading": {
             "boolValue": false
+          },
+          "asset_retry_count": {
+            "varintValue": "3"
           },
           "validate_asset_hash_on_manifest_loading": {
             "boolValue": false
@@ -210,20 +210,20 @@
           "tow2023_running_route_8": {
             "varintValue": "263936293"
           },
-          "tow2023_start_month": {
-            "varintValue": "9"
+          "tow2023_running_route_11": {
+            "varintValue": "0"
           },
           "tow2023_cycling_route_12": {
             "varintValue": "3312037616"
           },
-          "tow2023_running_route_11": {
-            "varintValue": "0"
-          },
-          "tow2023_cycling_route_9": {
-            "varintValue": "1766405776"
+          "tow2023_start_month": {
+            "varintValue": "9"
           },
           "tow2023_running_route_2": {
             "varintValue": "3573087582"
+          },
+          "tow2023_cycling_route_9": {
+            "varintValue": "1766405776"
           },
           "tow2023_cycling_route_11": {
             "varintValue": "849508252"
@@ -246,8 +246,8 @@
           "tow2023_start_year": {
             "varintValue": "2023"
           },
-          "tow2023_cycling_route_15": {
-            "varintValue": "743730361"
+          "tow2023_cycling_route_1": {
+            "varintValue": "2627606248"
           },
           "tow2023_cycling_route_2": {
             "varintValue": "3382019812"
@@ -255,8 +255,8 @@
           "tow2023_start_day": {
             "varintValue": "20"
           },
-          "tow2023_cycling_route_1": {
-            "varintValue": "2627606248"
+          "tow2023_cycling_route_15": {
+            "varintValue": "743730361"
           },
           "tow2023_cycling_route_14": {
             "varintValue": "3701568815"
@@ -304,11 +304,11 @@
           "ZED_idleSeconds": {
             "varintValue": "30"
           },
-          "NUIT_filename": {
-            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
-          },
           "ZED_filename": {
             "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
+          },
+          "NUIT_filename": {
+            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
           },
           "serverURL": {
             "stringValue": "https://cdn.zwift.com/gameassets/Videos/"
@@ -466,7 +466,7 @@
       "values": {
         "fields": {
           "necod_6_max": {
-            "stringValue": "5.2.0"
+            "stringValue": "5.2.2"
           },
           "necod_6_min": {
             "stringValue": "5.1.6"
@@ -479,10 +479,10 @@
       "values": {
         "fields": {
           "necod_9_max": {
-            "stringValue": "9.9.9"
+            "stringValue": "1.1.0"
           },
           "necod_9_min": {
-            "stringValue": "9.9.9"
+            "stringValue": "1.1.0"
           }
         }
       }
@@ -706,6 +706,9 @@
       "name": "game_1_49_onboarding_ftp_estimation",
       "values": {
         "fields": {
+          "lowZone2FTPRelation": {
+            "numberValue": 0.7
+          },
           "highZoneFTPRelation": {
             "numberValue": 0.8
           },
@@ -808,6 +811,7 @@
     },
     {
       "name": "game_1_52_steering_only_event_filter",
+      "value": true,
       "values": {}
     },
     {
@@ -969,11 +973,11 @@
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
-          "rampUpTime": {
-            "numberValue": 10.0
-          },
           "workoutAutoPauseTime": {
             "numberValue": 3.0
+          },
+          "rampUpTime": {
+            "numberValue": 10.0
           },
           "minERGModeDisableTime": {
             "numberValue": 5.0
@@ -1038,20 +1042,20 @@
           "ATVPopInitDelay": {
             "numberValue": 0.22
           },
-          "ATVPopDist": {
-            "numberValue": 175.0
-          },
-          "ATVPopInitDist": {
-            "numberValue": 250.0
+          "ATVPopDelay": {
+            "numberValue": 0.15
           },
           "ATVMoveSensitivity": {
             "varintValue": "5"
           },
+          "ATVPopInitDist": {
+            "numberValue": 250.0
+          },
           "ATVFriction": {
             "numberValue": 0.9
           },
-          "ATVPopDelay": {
-            "numberValue": 0.15
+          "ATVPopDist": {
+            "numberValue": 175.0
           }
         }
       }
@@ -1299,14 +1303,14 @@
       "name": "game_1_33_unstable_connection_alert",
       "values": {
         "fields": {
-          "udp_history_length": {
-            "varintValue": "6"
-          },
           "udp_loss_threshold": {
             "numberValue": 0.25
           },
           "query_interval": {
             "numberValue": 10.0
+          },
+          "udp_history_length": {
+            "varintValue": "6"
           }
         }
       }
@@ -1334,8 +1338,8 @@
           "enabledWatopia": {
             "boolValue": true
           },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
+          "enabledScotland": {
+            "boolValue": true
           },
           "cdaPenaltyMultDrafting": {
             "numberValue": 1.1
@@ -1343,17 +1347,17 @@
           "cdaPenaltyMultSteering": {
             "numberValue": 1.8
           },
-          "enabledScotland": {
+          "cdaMultAeroPositionPercOfPower": {
+            "numberValue": 1.2
+          },
+          "enabledGlobally": {
             "boolValue": true
           },
           "enabledFrance": {
             "boolValue": true
           },
-          "maxDraft": {
-            "numberValue": 1.5
-          },
-          "enabledGlobally": {
-            "boolValue": true
+          "draftDeltaAngle": {
+            "numberValue": 0.96
           },
           "enabledMakuri": {
             "boolValue": true
@@ -1379,8 +1383,8 @@
           "draftScale": {
             "numberValue": 1.3
           },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
+          "maxDraft": {
+            "numberValue": 1.5
           }
         }
       }
@@ -1451,6 +1455,7 @@
     },
     {
       "name": "game_1_52_activity_break",
+      "value": true,
       "values": {
         "fields": {
           "activityBreakIntervalSeconds": {
@@ -1464,11 +1469,11 @@
       "value": true,
       "values": {
         "fields": {
-          "end_event_distance_meters": {
-            "numberValue": 5000.0
-          },
           "max_speed_adjustment_kph": {
             "numberValue": 60.0
+          },
+          "end_event_distance_meters": {
+            "numberValue": 5000.0
           },
           "end_event_duration_milliseconds": {
             "varintValue": "900000"
@@ -1495,8 +1500,8 @@
       "name": "visual_lean_v2",
       "values": {
         "fields": {
-          "bHoloReplayLean": {
-            "boolValue": true
+          "maxLeanDelta": {
+            "numberValue": 17.5
           },
           "leanScalar": {
             "numberValue": 0.5
