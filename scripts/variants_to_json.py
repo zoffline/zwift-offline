@@ -1,30 +1,21 @@
 import json
-import protobuf.variants_pb2 as variants_pb2
+import sys
+sys.path.insert(0, '../protobuf')
+import variants_pb2
 from google.protobuf.json_format import MessageToDict
 
-variants = variants_pb2.FeatureResponse()
-
 with open("variant", "rb") as f:
+    variants = variants_pb2.FeatureResponse()
     variants.ParseFromString(f.read())
 
-vs = []
+with open("../variants.txt") as f:
+    vs = json.load(f)['variants']
 
-with open("variants.txt") as f:
-    j = json.load(f)
-    vs = j['variants']
-
-for variant in variants.variants:
-    d = MessageToDict(variant)
-    v = {}
-    v['name'] = d['name']
-    if 'value' in d:
-        v['value'] = d['value']
-    d['values'] = dict(d['values'])
-    for f in d['values']:
-        d['values'][f] = dict(sorted(d['values'][f].items()))
-    v['values'] = d['values']
+for v in MessageToDict(variants)['variants']:
+    if 'fields' in v['values']:
+        v['values']['fields'] = dict(sorted(v['values']['fields'].items()))
     vs[:] = [d for d in vs if d.get('name') != v['name']]
     vs.append(v)
 
-with open("variants.txt", "w") as f:
+with open("../variants.txt", "w") as f:
     json.dump({'variants': sorted(vs, key=lambda x: x['name'])}, f, indent=2)

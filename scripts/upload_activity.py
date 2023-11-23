@@ -31,7 +31,7 @@ import json
 import os
 import requests
 import sys
-sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
+sys.path.insert(0, '../protobuf')
 import activity_pb2
 import profile_pb2
 

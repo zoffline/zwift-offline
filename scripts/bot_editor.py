@@ -7,7 +7,7 @@
 import os
 import sys
 import csv
-sys.path.append(os.path.join(sys.path[0], 'protobuf')) # otherwise import in .proto does not work
+sys.path.insert(0, '../protobuf')
 import profile_pb2
 import udp_node_msgs_pb2
 
