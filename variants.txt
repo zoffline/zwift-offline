@@ -1319,6 +1319,9 @@
           "ShowRideStreaksScreen": {
             "boolValue": false
           },
+          "ShowXPFastForward": {
+            "boolValue": true
+          },
           "ShowXPUntilNextLevel": {
             "boolValue": false
           },
