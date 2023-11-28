@@ -1,26 +1,12 @@
 {
   "variants": [
     {
-      "name": "bike_override_using_triggers",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "costume_overrides_using_workout_triggers",
       "value": true,
       "values": {}
     },
     {
-      "name": "custom_workout_folders",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "disable_yaw_adjustment",
-      "values": {}
-    },
-    {
-      "name": "game_1_14_draftlock_fix",
       "values": {}
     },
     {
@@ -30,20 +16,6 @@
     },
     {
       "name": "game_1_15_assert_disable_abort",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_16_2_ble_alternate_unpair_all_paired_devices",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_17_1_tdf_femmes_yellow_jersey",
-      "values": {}
-    },
-    {
-      "name": "game_1_17_ble_disable_component_sport_filter",
       "value": true,
       "values": {}
     },
@@ -59,62 +31,8 @@
       }
     },
     {
-      "name": "game_1_18_0_pack_dynamics_2_5_collision_push_back_removal",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_18_holiday_mode",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_19_0_default_rubberbanding",
-      "values": {}
-    },
-    {
-      "name": "game_1_19_paired_devices_alerts",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_19_real_time_unlocks",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_19_system_alerts",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_19_use_tabbed_settings",
-      "value": true,
-      "values": {
-        "fields": {
-          "game_1_19_use_tabbed_settings": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_20_0_enable_stages_steering",
-      "values": {
-        "fields": {
-          "game_1_20_0_enable_stages_steering": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_20_clickable_telemetry_box",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_20_disable_high_volume_send_mixpanel",
       "values": {}
     },
     {
@@ -128,39 +46,12 @@
       "values": {}
     },
     {
-      "name": "game_1_21_0_ftms_sport_filter",
-      "values": {}
-    },
-    {
-      "name": "game_1_21_0_gpu_deprecation_warning_message",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_21_0_hud_highlighter",
-      "values": {}
-    },
-    {
       "name": "game_1_21_ble_data_guard_v2",
-      "values": {}
-    },
-    {
-      "name": "game_1_21_ftms_bike_trainer_v3",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_21_ftms_set_rider_weight",
-      "value": true,
       "values": {}
     },
     {
       "name": "game_1_21_perf_analytics",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_22_allow_uturns_at_low_speed",
       "values": {}
     },
     {
@@ -186,49 +77,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_24_display_recommended_workout_cards",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_24_display_workout_of_the_week_card",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_24_workout_blocks_extendable",
-      "values": {}
-    },
-    {
-      "name": "game_1_25_wdc_error_dialogs",
-      "values": {}
-    },
-    {
-      "name": "game_1_26_2_data_encryption",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_26_club_attribution",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_26_memorable_screenshots",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_26_ninety_day_prs",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_27_0_disable_encryption_bypass",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_27_atv_remote_gestures",
@@ -262,21 +110,7 @@
       "values": {}
     },
     {
-      "name": "game_1_27_fix_training_plan_summary_no_stats",
-      "values": {}
-    },
-    {
-      "name": "game_1_27_goal_notable_moment",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_28_event_core_feed_service",
-      "values": {}
-    },
-    {
-      "name": "game_1_28_hub_firmware_update",
-      "value": true,
       "values": {}
     },
     {
@@ -322,42 +156,7 @@
       }
     },
     {
-      "name": "game_1_29_event_query_interval",
-      "value": true,
-      "values": {
-        "fields": {
-          "GROUP_EVENT_QUERY_RATE_SECONDS": {
-            "numberValue": 120.0
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_29_fix_stuck_zpower",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_29_get_started_workouts",
-      "values": {}
-    },
-    {
-      "name": "game_1_29_hand_cycle",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
-      "values": {}
-    },
-    {
-      "name": "game_1_29_level_60_cap_raise",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_29_logout_for_windows_and_mac",
-      "value": true,
       "values": {}
     },
     {
@@ -382,16 +181,6 @@
       "values": {}
     },
     {
-      "name": "game_1_30_ble_cycling_speed_pairing_exception",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_30_ble_cycling_speed_pairing_opt",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_30_campaign_fullscreen_modal",
       "value": true,
       "values": {
@@ -404,20 +193,6 @@
     },
     {
       "name": "game_1_30_enable_scale_setting_for_mobile",
-      "values": {}
-    },
-    {
-      "name": "game_1_30_position_accuracy_over_network_global",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_30_position_accuracy_over_network_london",
-      "values": {}
-    },
-    {
-      "name": "game_1_30_set_default_mobile_scale_to_small",
-      "value": true,
       "values": {}
     },
     {
@@ -453,17 +228,6 @@
       "name": "game_1_33_6_powerup_priority_for_archpowerup_tag",
       "value": true,
       "values": {}
-    },
-    {
-      "name": "game_1_33_custom_workouts",
-      "value": true,
-      "values": {
-        "fields": {
-          "game_1_33_custom_workouts": {
-            "boolValue": false
-          }
-        }
-      }
     },
     {
       "name": "game_1_33_riders_nearby_watts",
@@ -1386,11 +1150,6 @@
       "values": {}
     },
     {
-      "name": "game_ftms_spindown_fix",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_garage_gearing",
       "values": {}
     },
@@ -1404,26 +1163,8 @@
       "values": {}
     },
     {
-      "name": "game_upload_route_results_v2",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_use_control_settings_tab",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_use_lighting_settings_tab",
-      "values": {}
-    },
-    {
       "name": "game_workout_detail_screen",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_workout_partners",
       "values": {}
     },
     {
@@ -1508,10 +1249,6 @@
     {
       "name": "workout_training_v2_release",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "xplatform_partner_connection_vitality",
       "values": {}
     },
     {
