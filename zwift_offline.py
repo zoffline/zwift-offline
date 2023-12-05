@@ -3199,6 +3199,14 @@ def api_personal_records_my_records():
     return results.SerializeToString(), 200
 
 
+@app.route('/api/personal-records/my-segment-ride-stats/<sport>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_personal_records_my_segment_ride_stats(sport):
+    # TODO
+    return '', 200
+
+
 @app.route('/api/personal-records/results/summary/profiles/me/<sport>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required

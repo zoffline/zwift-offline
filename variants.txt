@@ -167,6 +167,9 @@
       "name": "game_1_29_player_highlight",
       "values": {
         "fields": {
+          "HighlightWorkoutFX": {
+            "boolValue": false
+          },
           "MaxHighlightedFriends": {
             "varintValue": "0"
           },
@@ -392,65 +395,6 @@
       "values": {}
     },
     {
-      "name": "game_1_40_pack_dynamics_4_race_physics",
-      "value": true,
-      "values": {
-        "fields": {
-          "cdaDynamicChanges": {
-            "boolValue": true
-          },
-          "cdaMultAeroPosition": {
-            "numberValue": 0.95
-          },
-          "cdaMultAeroPositionPercOfPower": {
-            "numberValue": 1.2
-          },
-          "cdaPenaltyMultDrafting": {
-            "numberValue": 1.1
-          },
-          "cdaPenaltyMultGeneral": {
-            "numberValue": 1.0
-          },
-          "cdaPenaltyMultSteering": {
-            "numberValue": 1.8
-          },
-          "draftDeltaAngle": {
-            "numberValue": 0.96
-          },
-          "draftFalloffCurve": {
-            "numberValue": 0.15
-          },
-          "draftScale": {
-            "numberValue": 1.3
-          },
-          "enabledFrance": {
-            "boolValue": true
-          },
-          "enabledGlobally": {
-            "boolValue": true
-          },
-          "enabledMakuri": {
-            "boolValue": true
-          },
-          "enabledScotland": {
-            "boolValue": true
-          },
-          "enabledWatopia": {
-            "boolValue": true
-          },
-          "maxDraft": {
-            "numberValue": 1.5
-          },
-          "overtakePenaltyDraftLimit": {
-            "numberValue": 85.0
-          },
-          "preventEasyOvertakeNearFront": {
-            "boolValue": true
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_40_steering_params",
       "value": true,
       "values": {
@@ -620,7 +564,7 @@
             "varintValue": "0"
           },
           "allowPortalRoadDifficultySelection": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -701,14 +645,13 @@
     },
     {
       "name": "game_1_45_rlog",
-      "value": true,
       "values": {
         "fields": {
           "ENABLED_LEVELS": {
-            "stringValue": "ERROR"
+            "stringValue": ""
           },
           "ENABLED_TYPES": {
-            "stringValue": "FILEIO,ASSET_PATCHING"
+            "stringValue": ""
           }
         }
       }
@@ -727,7 +670,7 @@
       "values": {
         "fields": {
           "necod_23_max": {
-            "stringValue": "1.2.1"
+            "stringValue": "1.2.2"
           },
           "necod_23_min": {
             "stringValue": "1.2.0"
@@ -969,19 +912,6 @@
       }
     },
     {
-      "name": "game_1_50_vs_latency",
-      "values": {
-        "fields": {
-          "HVC": {
-            "boolValue": false
-          },
-          "LOG": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_50_zc_rf1",
       "value": true,
       "values": {}
@@ -1026,6 +956,7 @@
     },
     {
       "name": "game_1_53_0_workout_detail_screen_tooltips",
+      "value": true,
       "values": {}
     },
     {
@@ -1044,6 +975,20 @@
         "fields": {
           "DelayInMs": {
             "varintValue": "800"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_54_battle_mode",
+      "values": {}
+    },
+    {
+      "name": "game_1_54_orcd",
+      "values": {
+        "fields": {
+          "Delay": {
+            "varintValue": "4000"
           }
         }
       }
@@ -1069,10 +1014,10 @@
       "values": {
         "fields": {
           "BonusXPForStreaks": {
-            "boolValue": false
+            "boolValue": true
           },
           "DropsPerLevel": {
-            "varintValue": "0"
+            "varintValue": "50000"
           },
           "ReEarnMaxLevel": {
             "boolValue": false
@@ -1081,13 +1026,13 @@
             "varintValue": "0"
           },
           "ShowRideStreaksScreen": {
-            "boolValue": false
+            "boolValue": true
           },
           "ShowXPFastForward": {
             "boolValue": true
           },
           "ShowXPUntilNextLevel": {
-            "boolValue": false
+            "boolValue": true
           },
           "XPPerKilometerCycling": {
             "varintValue": "20"
@@ -1125,6 +1070,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_allow_bc1_memfault_reporting",
+      "values": {}
     },
     {
       "name": "game_check_for_video_updates",
