@@ -1502,9 +1502,18 @@ def relay_race_event_starting_line_id(event_id):
 @jwt_to_session_cookie
 @login_required
 def api_zfiles():
-    zfile = zfiles_pb2.ZFileProto()
-    zfile.ParseFromString(request.stream.read())
-    zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile.folder)
+    if request.headers['Source'] == 'zwift-companion':
+        zfile = json.loads(request.stream.read())
+        zfile_folder = zfile['folder']
+        zfile_filename = zfile['name']
+        zfile_file = base64.b64decode(zfile['content'])
+    else:
+        zfile = zfiles_pb2.ZFileProto()
+        zfile.ParseFromString(request.stream.read())
+        zfile_folder = zfile.folder
+        zfile_filename = zfile.filename
+        zfile_file = zfile.file
+    zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile_folder)
     try:
         if not os.path.isdir(zfiles_dir):
             os.makedirs(zfiles_dir)
@@ -1512,22 +1521,31 @@ def api_zfiles():
         logger.error("failed to create zfiles dir (%s):  %s", zfiles_dir, str(e))
         return '', 400
     try:
-        zfile.filename = zfile.filename.decode('utf-8', 'ignore')
+        zfile_filename = zfile_filename.decode('utf-8', 'ignore')
     except AttributeError:
         pass
-    with open(os.path.join(zfiles_dir, quote(zfile.filename, safe=' ')), 'wb') as fd:
-        fd.write(zfile.file)
-    row = Zfile.query.filter_by(folder=zfile.folder, filename=zfile.filename, player_id=current_user.player_id).first()
+    with open(os.path.join(zfiles_dir, quote(zfile_filename, safe=' ')), 'wb') as fd:
+        fd.write(zfile_file)
+    row = Zfile.query.filter_by(folder=zfile_folder, filename=zfile_filename, player_id=current_user.player_id).first()
     if not row:
-        zfile.timestamp = int(get_utc_time())
-        new_zfile = Zfile(folder=zfile.folder, filename=zfile.filename, timestamp=zfile.timestamp, player_id=current_user.player_id)
+        zfile_timestamp = int(get_utc_time())
+        new_zfile = Zfile(folder=zfile_folder, filename=zfile_filename, timestamp=zfile_timestamp, player_id=current_user.player_id)
         db.session.add(new_zfile)
         db.session.commit()
-        zfile.id = new_zfile.id
+        zfile_id = new_zfile.id
     else:
-        zfile.id = row.id
-        zfile.timestamp = row.timestamp
-    return zfile.SerializeToString(), 200
+        zfile_id = row.id
+        zfile_timestamp = row.timestamp
+    if request.headers['Accept'] == 'application/json':
+        return jsonify({"id":zfile_id,"folder":zfile_folder,"name":zfile_filename,"content":None,"lastModified":str_timestamp(zfile_timestamp*1000)})
+    else:
+        response = zfiles_pb2.ZFileProto()
+        response.id = zfile_id
+        response.folder = zfile_folder
+        response.filename = zfile_filename
+        response.timestamp = zfile_timestamp
+        return response.SerializeToString(), 200
+
 
 @app.route('/api/zfiles/list', methods=['GET'])
 @jwt_to_session_cookie
