@@ -168,7 +168,7 @@ class User(UserMixin, db.Model):
         return self.player_id
 
     def get_token(self):
-        dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+        dt = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
         return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
@@ -434,7 +434,7 @@ GD = load_game_dictionary()
 
 
 def get_utc_time():
-    return datetime.datetime.utcnow().timestamp()
+    return datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 def get_time():
     return datetime.datetime.now().timestamp()
@@ -2317,7 +2317,7 @@ def api_profiles_activities_rideon(receiving_player_id):
     return '{}', 200
 
 def stime_to_timestamp(stime):
-    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
+    utc_offset = datetime.datetime.now().astimezone().utcoffset()
     try:
         return int((datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp())
     except:
@@ -2688,7 +2688,7 @@ def unix_time_millis(dt):
 
 def fill_in_goal_progress(goal, player_id):
     local_now = datetime.datetime.now()
-    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
+    utc_offset = datetime.datetime.now().astimezone().utcoffset()
     if goal.periodicity == 0:  # weekly
         first_dt, last_dt = get_week_range(local_now)
     else:  # monthly
@@ -2720,7 +2720,7 @@ def fill_in_goal_progress(goal, player_id):
 
 def set_goal_end_date_now(goal):
     local_now = datetime.datetime.now()
-    utc_offset = int((datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)).total_seconds())
+    utc_offset = int(datetime.datetime.now().astimezone().utcoffset().total_seconds())
     if goal.periodicity == 0:  # weekly
         goal.period_end_date = unix_time_millis(get_week_range(local_now)[1]) - utc_offset
     else:  # monthly
@@ -2742,7 +2742,7 @@ def str_timestamp(ts):
     else:
         sec = int(ts/1000)
         ms = ts % 1000
-        return datetime.datetime.utcfromtimestamp(sec).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
+        return datetime.datetime.fromtimestamp(sec, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
 
 def str_timestamp_json(ts):
     if ts == 0:
@@ -2794,8 +2794,8 @@ def select_protobuf_goals(player_id, limit):
         for row in rows:
             goal = goals.goals.add()
             row_to_protobuf(row, goal)
-            end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-            if end_dt < datetime.datetime.utcnow():
+            end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000, datetime.timezone.utc)
+            if end_dt < datetime.datetime.now(datetime.timezone.utc):
                 need_update.append(goal)
             fill_in_goal_progress(goal, player_id)
         for goal in need_update:
@@ -2826,7 +2826,7 @@ def api_profiles_goals(player_id):
             str_goal = request.stream.read()
             json_goal = json.loads(str_goal)
             goal = goalJsonToProtobuf(json_goal)
-        goal.created_on = unix_time_millis(datetime.datetime.utcnow())
+        goal.created_on = unix_time_millis(datetime.datetime.now(datetime.timezone.utc))
         set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
         goal.id = insert_protobuf_into_db(Goal, goal)
@@ -3163,7 +3163,7 @@ def api_segment_results():
     if result.segment_id == 1:
         return '', 400
     result.world_time = world_time()
-    result.finish_time_str = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    result.finish_time_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     result.sport = 0
     result.id = insert_protobuf_into_db(SegmentResult, result)
 

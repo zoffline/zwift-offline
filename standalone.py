@@ -16,7 +16,7 @@ from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from collections import deque
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from Crypto.Cipher import AES
 
 import zwift_offline as zo
@@ -464,7 +464,7 @@ def save_ghost(name, player_id):
             print('save_ghost: %s' % repr(exc))
             return
         ghosts.rec.player_id = player_id
-        f = '%s/%s-%s.bin' % (folder, datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"), name)
+        f = '%s/%s-%s.bin' % (folder, datetime.now(timezone.utc).strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
