@@ -3221,8 +3221,20 @@ def api_personal_records_my_records():
 @jwt_to_session_cookie
 @login_required
 def api_personal_records_my_segment_ride_stats(sport):
-    # TODO
-    return '', 200
+    if not request.args.get('segmentId'):
+        return '', 422
+    stats = segment_result_pb2.SegmentRideStats()
+    stats.segment_id = int(request.args.get('segmentId'))
+    where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp"
+    args = {"s": stats.segment_id, "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport)}
+    row = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s ORDER BY elapsed_ms LIMIT 1" % where_stmt), args).first()
+    if row:
+        stats.number_of_results = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
+        stats.latest_time = row.elapsed_ms # Zwift sends only best
+        stats.latest_percentile = 100
+        stats.best_time = row.elapsed_ms
+        stats.best_percentile = 100
+    return stats.SerializeToString(), 200
 
 
 @app.route('/api/personal-records/results/summary/profiles/me/<sport>', methods=['GET'])

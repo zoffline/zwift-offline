@@ -555,7 +555,7 @@
             "boolValue": false
           },
           "EnableHeroicDifficulty": {
-            "boolValue": false
+            "boolValue": true
           },
           "MustHaveDefaultRoad": {
             "boolValue": false
