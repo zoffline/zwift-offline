@@ -176,7 +176,7 @@ to generate your own certificates and do the same.
   <zoffline ip> secure.zwift.com
   <zoffline ip> cdn.zwift.com
   ```
-  * Run "Virtual Hosts" and select the created `hosts.txt` file
+  * Run "Virtual Hosts", select the created `hosts.txt` file, fully close (touch the "overview" button and swipe up) the app and run it again
   * Optionally, instead of using the "Virtual Hosts" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Virtual Hosts" app or changing your phone DNS.
 * Patch after every installation or update:
@@ -311,7 +311,7 @@ Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP a
 <zoffline ip> us-or-rly101.zwift.com
 <zoffline ip> secure.zwift.com
 ```
-* Run "Virtual Hosts" and select the created ``hosts.txt`` file
+* Run "Virtual Hosts", select the created ``hosts.txt`` file, fully close (touch the "overview" button and swipe up) the app and run it again
 * Optionally, instead of using the "Virtual Hosts" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
 * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Virtual Hosts" app or changing your phone DNS.
 
