@@ -139,12 +139,6 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 db = SQLAlchemy()
 db.init_app(app)
 
-online = {}
-global_pace_partners = {}
-global_bots = {}
-global_ghosts = {}
-ghosts_enabled = {}
-player_update_queue = {}
 zc_connect_queue = {}
 player_partial_profiles = {}
 restarting = False
@@ -3781,21 +3775,16 @@ def start_zwift():
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
     selected_map = request.form['map']
+    if selected_map != 'CALENDAR':
+        # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
+        map_override[request.remote_addr] = selected_map
     selected_climb = request.form['climb']
-    if selected_map == 'CALENDAR' and selected_climb == 'CALENDAR':
-        return redirect("/ride", 302)
-    else:
-        response = make_response(redirect("http://cdn.zwift.com/map_override", 302))
-        if selected_map != 'CALENDAR':
-            response.set_cookie('selected_map', selected_map, domain=".zwift.com")
-        if selected_climb != 'CALENDAR':
-            response.set_cookie('selected_climb', selected_climb, domain=".zwift.com")
-        if MULTIPLAYER:
-            response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
-        return response
+    if selected_climb != 'CALENDAR':
+        climb_override[request.remote_addr] = selected_climb
+    return redirect("/ride", 302)
 
 
-def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_regroup_ghosts, passed_player_update_queue, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_regroup_ghosts, passed_player_update_queue, passed_map_override, passed_climb_override, passed_discord):
     global online
     global global_relay
     global global_pace_partners
@@ -3805,6 +3794,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     global save_ghost
     global regroup_ghosts
     global player_update_queue
+    global map_override
+    global climb_override
     global discord
     global login_manager
     online = passed_online
@@ -3816,6 +3807,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     save_ghost = passed_save_ghost
     regroup_ghosts = passed_regroup_ghosts
     player_update_queue = passed_player_update_queue
+    map_override = passed_map_override
+    climb_override = passed_climb_override
     discord = passed_discord
     login_manager = LoginManager()
     login_manager.login_view = 'login'

@@ -14,8 +14,6 @@ import itertools
 import socketserver
 from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
-from http.cookies import SimpleCookie
-from collections import deque
 from datetime import datetime, timedelta, timezone
 from Crypto.Cipher import AES
 
@@ -76,9 +74,6 @@ else:
             pass
     discord = DummyDiscord()
 
-MAP_OVERRIDE = deque(maxlen=16)
-CLIMB_OVERRIDE = deque(maxlen=16)
-
 bot_update_freq = 3
 pacer_update_freq = 1
 simulated_latency = 300 #makes bots animation smoother than using current time
@@ -93,6 +88,8 @@ global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
+map_override = {}
+climb_override = {}
 
 def sigint_handler(num, frame):
     httpd.shutdown()
@@ -113,45 +110,26 @@ class CDNHandler(SimpleHTTPRequestHandler):
         return fullpath
 
     def do_GET(self):
-        path_end = self.path.split('/')[-1]
-        if path_end == 'map_override':
-            cookies_string = self.headers.get('Cookie')
-            cookies = SimpleCookie()
-            cookies.load(cookies_string)
-            # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
-            if 'selected_map' in cookies:
-                MAP_OVERRIDE.append((self.client_address[0], cookies['selected_map'].value))
-            if 'selected_climb' in cookies:
-                CLIMB_OVERRIDE.append((self.client_address[0], cookies['selected_climb'].value))
-            self.send_response(302)
-            self.send_header('Cookie', cookies_string)
-            self.send_header('Location', 'https://secure.zwift.com/ride')
+        # Check if client requested the map be overridden
+        if self.path == '/gameassets/MapSchedule_v2.xml' and self.client_address[0] in map_override:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/xml')
             self.end_headers()
+            start = datetime.today() - timedelta(days=1)
+            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (map_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            self.wfile.write(output.encode())
+            del map_override[self.client_address[0]]
             return
-        if self.path == '/gameassets/MapSchedule_v2.xml':
-            # Check if client requested the map be overridden
-            for override in MAP_OVERRIDE:
-                if override[0] == self.client_address[0]:
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/xml')
-                    self.end_headers()
-                    start = datetime.today() - timedelta(days=1)
-                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
-                    self.wfile.write(output.encode())
-                    MAP_OVERRIDE.remove(override)
-                    return
-        if self.path == '/gameassets/PortalRoadSchedule_v1.xml':
-            for override in CLIMB_OVERRIDE:
-                if override[0] == self.client_address[0]:
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/xml')
-                    self.end_headers()
-                    start = datetime.today() - timedelta(days=1)
-                    output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
-                    self.wfile.write(output.encode())
-                    CLIMB_OVERRIDE.remove(override)
-                    return
-        if CDN_PROXY and self.path.startswith('/gameassets/') and not path_end.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
+        if self.path == '/gameassets/PortalRoadSchedule_v1.xml' and self.client_address[0] in climb_override:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/xml')
+            self.end_headers()
+            start = datetime.today() - timedelta(days=1)
+            output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (climb_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            self.wfile.write(output.encode())
+            del climb_override[self.client_address[0]]
+            return
+        if CDN_PROXY and self.path.startswith('/gameassets/') and not self.path.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
             try:
                 self.send_response(200)
                 self.end_headers()
@@ -865,4 +843,4 @@ if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
         dns = threading.Thread(target=fake_dns, args=(server_ip,))
         dns.start()
 
-zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, map_override, climb_override, discord)
