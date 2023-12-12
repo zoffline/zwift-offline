@@ -3426,8 +3426,20 @@ def achievement_loadPlayerAchievements():
                 converted.achievements.add().id = ach_id
         with open(achievements_file, 'wb') as f:
             f.write(converted.SerializeToString())
+    achievements = profile_pb2.Achievements()
     with open(achievements_file, 'rb') as f:
-        return f.read(), 200
+        achievements.ParseFromString(f.read())
+    climbs = SegmentResult.query.filter(SegmentResult.player_id == current_user.player_id, SegmentResult.segment_id.between(10000, 11000)).count()
+    if climbs:
+        if not any(a.id == 211 for a in achievements.achievements):
+            achievements.achievements.add().id = 211 # Portal Climber
+        if climbs >= 10 and not any(a.id == 212 for a in achievements.achievements):
+            achievements.achievements.add().id = 212 # Climb Portal Pro
+        if climbs >= 25 and not any(a.id == 213 for a in achievements.achievements):
+            achievements.achievements.add().id = 213 # Legs of Steel
+        with open(achievements_file, 'wb') as f:
+            f.write(achievements.SerializeToString())
+    return achievements.SerializeToString(), 200
 
 @app.route('/api/achievement/unlock', methods=['POST'])
 @jwt_to_session_cookie
@@ -3443,7 +3455,8 @@ def achievement_unlock():
         with open(achievements_file, 'rb') as f:
             achievements.ParseFromString(f.read())
     for achievement in new.achievements:
-        achievements.achievements.add().id = achievement.id
+        if not any(a.id == achievement.id for a in achievements.achievements):
+            achievements.achievements.add().id = achievement.id
     with open(achievements_file, 'wb') as f:
         f.write(achievements.SerializeToString())
     return '', 202
