@@ -136,24 +136,6 @@ to generate your own certificates and do the same.
     * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
   * Append the contents of the SSL certificate ``ssl/cert-zwift-com.pem`` to cacert.pem (only the certificate and not the included private key)
-* Using a text editor (with admin privileges) open ``/Applications/Zwift.app/Contents/Info.plist``
-  * Insert in the main dict:
-    ```
-    <key>NSAppTransportSecurity</key>
-   	<dict>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>zwift.com</key>
-            <dict>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-            </dict>
-        </dict>
-   	</dict>
-    ```
-* Run ``sudo codesign --force --deep --sign - /Applications/Zwift.app`` in terminal. See https://github.com/zoffline/zwift-offline/issues/132 for extra details.
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
