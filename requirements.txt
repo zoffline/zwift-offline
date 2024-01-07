@@ -3,7 +3,7 @@ flask-login==0.6.3
 flask_sqlalchemy==3.0.3
 gevent==23.9.1
 protobuf==4.21.12
-pycryptodome==3.17
+pycryptodome==3.19.1
 pyjwt==2.6.0
 stravalib==1.1.0
 dnspython==2.3.0
