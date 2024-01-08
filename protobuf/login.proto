@@ -7,6 +7,7 @@ message LoginResponse {
 	required PerSessionInfo info = 2;
 	optional uint32 relay_session_id = 3;
 	optional uint32 expiration = 4; // minutes
+	optional EconomyConfig economy_config = 5;
 }
 
 message LoginRequest {
@@ -26,4 +27,23 @@ message AnalyticsEventProperties {
 message RelaySessionRefreshResponse {
 	required uint32 relay_session_id = 1;
 	required uint32 expiration = 2; // minutes
+}
+
+message EconomyConfig {
+	repeated Level cycling_levels = 1;
+	repeated Level running_levels = 2;
+	required uint32 f3 = 3;
+	required uint32 f4 = 4;
+	required uint32 f5 = 5;
+	optional uint32 transition_start = 6;
+	optional uint32 transition_end = 7;
+}
+
+message Level {
+	required uint32 level = 1;
+	required uint32 xp = 2;
+	required uint32 drops = 3;
+	optional uint32 f4 = 4;
+	optional string entitlement_1 = 5;
+	optional string entitlement_2 = 6;
 }

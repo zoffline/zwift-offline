@@ -1036,7 +1036,7 @@
             "boolValue": false
           },
           "ServerConfigXP": {
-            "varintValue": "0"
+            "varintValue": "2"
           },
           "ShowRideStreaksScreen": {
             "boolValue": true

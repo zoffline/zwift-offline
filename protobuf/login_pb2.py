@@ -14,21 +14,25 @@ _sym_db = _symbol_database.Default()
 import per_session_info_pb2 as per__session__info__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogin.proto\x1a\x16per-session-info.proto\"s\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x1d\n\x04info\x18\x02 \x02(\x0b\x32\x0f.PerSessionInfo\x12\x18\n\x10relay_session_id\x18\x03 \x01(\r\x12\x12\n\nexpiration\x18\x04 \x01(\r\"J\n\x0cLoginRequest\x12-\n\nproperties\x18\x01 \x02(\x0b\x32\x19.AnalyticsEventProperties\x12\x0b\n\x03key\x18\x02 \x02(\x0c\"0\n\x16\x41nalyticsEventProperty\x12\n\n\x02\x66\x31\x18\x01 \x02(\t\x12\n\n\x02\x66\x32\x18\x02 \x02(\t\"E\n\x18\x41nalyticsEventProperties\x12)\n\x08property\x18\x02 \x03(\x0b\x32\x17.AnalyticsEventProperty\"K\n\x1bRelaySessionRefreshResponse\x12\x18\n\x10relay_session_id\x18\x01 \x02(\r\x12\x12\n\nexpiration\x18\x02 \x02(\r')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogin.proto\x1a\x16per-session-info.proto\"\x9b\x01\n\rLoginResponse\x12\x15\n\rsession_state\x18\x01 \x02(\t\x12\x1d\n\x04info\x18\x02 \x02(\x0b\x32\x0f.PerSessionInfo\x12\x18\n\x10relay_session_id\x18\x03 \x01(\r\x12\x12\n\nexpiration\x18\x04 \x01(\r\x12&\n\x0e\x65\x63onomy_config\x18\x05 \x01(\x0b\x32\x0e.EconomyConfig\"J\n\x0cLoginRequest\x12-\n\nproperties\x18\x01 \x02(\x0b\x32\x19.AnalyticsEventProperties\x12\x0b\n\x03key\x18\x02 \x02(\x0c\"0\n\x16\x41nalyticsEventProperty\x12\n\n\x02\x66\x31\x18\x01 \x02(\t\x12\n\n\x02\x66\x32\x18\x02 \x02(\t\"E\n\x18\x41nalyticsEventProperties\x12)\n\x08property\x18\x02 \x03(\x0b\x32\x17.AnalyticsEventProperty\"K\n\x1bRelaySessionRefreshResponse\x12\x18\n\x10relay_session_id\x18\x01 \x02(\r\x12\x12\n\nexpiration\x18\x02 \x02(\r\"\xa5\x01\n\rEconomyConfig\x12\x1e\n\x0e\x63ycling_levels\x18\x01 \x03(\x0b\x32\x06.Level\x12\x1e\n\x0erunning_levels\x18\x02 \x03(\x0b\x32\x06.Level\x12\n\n\x02\x66\x33\x18\x03 \x02(\r\x12\n\n\x02\x66\x34\x18\x04 \x02(\r\x12\n\n\x02\x66\x35\x18\x05 \x02(\r\x12\x18\n\x10transition_start\x18\x06 \x01(\r\x12\x16\n\x0etransition_end\x18\x07 \x01(\r\"k\n\x05Level\x12\r\n\x05level\x18\x01 \x02(\r\x12\n\n\x02xp\x18\x02 \x02(\r\x12\r\n\x05\x64rops\x18\x03 \x02(\r\x12\n\n\x02\x66\x34\x18\x04 \x01(\r\x12\x15\n\rentitlement_1\x18\x05 \x01(\t\x12\x15\n\rentitlement_2\x18\x06 \x01(\t')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'login_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _LOGINRESPONSE._serialized_start=39
-  _LOGINRESPONSE._serialized_end=154
-  _LOGINREQUEST._serialized_start=156
-  _LOGINREQUEST._serialized_end=230
-  _ANALYTICSEVENTPROPERTY._serialized_start=232
-  _ANALYTICSEVENTPROPERTY._serialized_end=280
-  _ANALYTICSEVENTPROPERTIES._serialized_start=282
-  _ANALYTICSEVENTPROPERTIES._serialized_end=351
-  _RELAYSESSIONREFRESHRESPONSE._serialized_start=353
-  _RELAYSESSIONREFRESHRESPONSE._serialized_end=428
+  _LOGINRESPONSE._serialized_start=40
+  _LOGINRESPONSE._serialized_end=195
+  _LOGINREQUEST._serialized_start=197
+  _LOGINREQUEST._serialized_end=271
+  _ANALYTICSEVENTPROPERTY._serialized_start=273
+  _ANALYTICSEVENTPROPERTY._serialized_end=321
+  _ANALYTICSEVENTPROPERTIES._serialized_start=323
+  _ANALYTICSEVENTPROPERTIES._serialized_end=392
+  _RELAYSESSIONREFRESHRESPONSE._serialized_start=394
+  _RELAYSESSIONREFRESHRESPONSE._serialized_end=469
+  _ECONOMYCONFIG._serialized_start=472
+  _ECONOMYCONFIG._serialized_end=637
+  _LEVEL._serialized_start=639
+  _LEVEL._serialized_end=746
 # @@protoc_insertion_point(module_scope)
