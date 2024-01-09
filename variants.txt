@@ -180,10 +180,6 @@
       }
     },
     {
-      "name": "game_1_29_set_thread_names",
-      "values": {}
-    },
-    {
       "name": "game_1_30_campaign_fullscreen_modal",
       "value": true,
       "values": {
@@ -513,6 +509,7 @@
     },
     {
       "name": "game_1_43_asset_patching",
+      "value": true,
       "values": {
         "fields": {
           "asset_backoff": {
@@ -564,7 +561,7 @@
             "boolValue": false
           },
           "UseEventAssets": {
-            "varintValue": "0"
+            "varintValue": "3"
           },
           "allowPortalRoadDifficultySelection": {
             "boolValue": true
@@ -625,11 +622,6 @@
     },
     {
       "name": "game_1_44_workout_start_delay",
-      "values": {}
-    },
-    {
-      "name": "game_1_44_workouts_2_library",
-      "value": true,
       "values": {}
     },
     {
@@ -978,6 +970,10 @@
       }
     },
     {
+      "name": "game_1_54_emoji_feature",
+      "values": {}
+    },
+    {
       "name": "game_1_54_event_hud_time",
       "value": true,
       "values": {}
@@ -994,6 +990,7 @@
     },
     {
       "name": "game_1_54_tdz_confetti_pattern",
+      "value": true,
       "values": {}
     },
     {
@@ -1008,7 +1005,36 @@
     },
     {
       "name": "game_1_55_boost_vfx",
+      "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_56_0_trainer_max_grade_change_per_second",
+      "values": {
+        "fields": {
+          "maxRateOfChange": {
+            "numberValue": 0.05
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_56_draft_indicator",
+      "values": {}
+    },
+    {
+      "name": "game_1_56_home_screen_linear_scaling",
+      "values": {}
+    },
+    {
+      "name": "game_1_56_push_tutorial_on_home_screen",
+      "values": {
+        "fields": {
+          "max_num_activities": {
+            "varintValue": "4"
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1033,7 +1059,7 @@
             "varintValue": "50000"
           },
           "ReEarnMaxLevel": {
-            "boolValue": false
+            "boolValue": true
           },
           "ServerConfigXP": {
             "varintValue": "2"
@@ -1106,6 +1132,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_choose_any_avatar",
+      "values": {}
     },
     {
       "name": "game_end_game_session",
