@@ -3,7 +3,7 @@ nameHash,startRoad,startTime,world,route
 947394567,0,614865,Crit City,Downtown Dolphin
 -1419308404,0,614865,Crit City,The Bell Lap
 -375055007,26,486852,France,Casse-Pattes
--1373878237,26,344976,France,Climb Portal - France
+-145031253,26,344976,France,Climb Portal - Mont Saint-Michel
 986252325,0,23330,France,Douce France
 2136907048,26,486930,France,France Classic Fondo
 1433431343,26,518316,France,La Reine
@@ -12,7 +12,6 @@ nameHash,startRoad,startTime,world,route
 872351836,0,975682,France,Roule Ma Poule
 -1881526724,0,975682,France,Tire-Bouchon
 -1721499149,26,519342,France,Ven-Top
--1403605613,26,993611,France,Ven-Top Downhill
 -607816610,0,652593,Gravel Mountain,Gravel Mountain
 -1338434275,0,548908,Gravel Mountain,Gravel Mountain Reverse
 -1180363988,7,157428,Innsbruck,2018 UCI Worlds Short Lap
@@ -43,6 +42,7 @@ nameHash,startRoad,startTime,world,route
 764532081,7,809519,London,The PRL Half
 -84918359,7,809519,London,Triple Loops
 1760877317,134,173138,Makuri Islands,Bridges and Boardwalks
+-588439793,1,875012,Makuri Islands,Castle Crit
 -552779580,6,696976,Makuri Islands,Castle to Castle
 -603048413,0,499969,Makuri Islands,Chain Chomper
 -1428486734,4,875952,Makuri Islands,Chasing the Sun
@@ -119,8 +119,8 @@ nameHash,startRoad,startTime,world,route
 -54639337,47,350274,Watopia,11.1 Ocean Blvd
 -475871543,47,349578,Watopia,5K Loop
 1115260805,81,30426,Watopia,Accelerate to Elevate
-1480439148,43,970534,Watopia,Alpe du Zwift Downhill
 -1820739709,0,987711,Watopia,Beach Island Loop
+1917017591,81,30426,Watopia,Big Flat 8
 -373554961,81,30426,Watopia,Big Foot Hills
 -1347856247,0,987711,Watopia,Big Loop
 -187122806,0,987711,Watopia,Big Loop Reverse
@@ -128,7 +128,7 @@ nameHash,startRoad,startTime,world,route
 -1699508175,81,561265,Watopia,Canopies and Coastlines
 1373909093,47,362617,Watopia,Chili Pepper
 -600015192,47,347020,Watopia,Chili Pepper Reverse
--1392764540,23,488947,Watopia,Climb Portal - Watopia
+-1613077956,23,488947,Watopia,Climb Portal - Volcano
 -1271607938,0,987711,Watopia,Climber's Gambit
 -1725581316,149,129132,Watopia,Coast Crusher
 5745690,0,987711,Watopia,Downtown Titans
@@ -166,6 +166,7 @@ nameHash,startRoad,startTime,world,route
 -840629157,0,609902,Watopia,Seaside Sprint
 -1465337769,35,546940,Watopia,Serpentine 8
 -1966465318,35,316602,Watopia,Shorelines and Summits
+-1033799550,0,987711,Watopia,Spiral into the Volcano
 1988847319,99,195242,Watopia,Splash and Dash
 240388043,35,546940,Watopia,Sugar Cookie
 -62240442,36,770795,Watopia,Surfin' Safari
