@@ -3448,7 +3448,7 @@ def achievement_loadPlayerAchievements():
     achievements = profile_pb2.Achievements()
     with open(achievements_file, 'rb') as f:
         achievements.ParseFromString(f.read())
-    climbs = SegmentResult.query.filter(SegmentResult.player_id == current_user.player_id, SegmentResult.segment_id.between(10000, 11000)).count()
+    climbs = RouteResult.query.filter(RouteResult.player_id == current_user.player_id, RouteResult.route_hash.between(10000, 11000)).count()
     if climbs:
         if not any(a.id == 211 for a in achievements.achievements):
             achievements.achievements.add().id = 211 # Portal Climber
