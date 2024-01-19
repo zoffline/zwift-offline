@@ -59,7 +59,6 @@ if not CDN_PROXY:
     except:
         pass
 
-SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
@@ -270,22 +269,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
-        if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
-            udp_node_ip = "127.0.0.1"
-        elif os.path.exists(SERVER_IP_FILE):
-            with open(SERVER_IP_FILE, 'r') as f:
-                udp_node_ip = f.read().rstrip('\r\n')
-        else:
-            udp_node_ip = "127.0.0.1"
         details1 = msg.udp_config.relay_addresses.add()
         details1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         details1.lb_course = 6 # watopia crowd
-        details1.ip = udp_node_ip
+        details1.ip = zo.server_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
         details2.lb_realm = 0 #generic load balancing realm
         details2.lb_course = 0 #generic load balancing course
-        details2.ip = udp_node_ip
+        details2.ip = zo.server_ip
         details2.port = 3022
         msg.udp_config.uc_f2 = 10
         msg.udp_config.uc_f3 = 30
@@ -836,11 +828,9 @@ udpserver_thread.start()
 ri = threading.Thread(target=remove_inactive)
 ri.start()
 
-if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
+if os.path.exists(FAKE_DNS_FILE):
     from fake_dns import fake_dns
-    with open(SERVER_IP_FILE, 'r') as f:
-        server_ip = f.read().rstrip('\r\n')
-        dns = threading.Thread(target=fake_dns, args=(server_ip,))
-        dns.start()
+    dns = threading.Thread(target=fake_dns, args=(zo.server_ip,))
+    dns.start()
 
 zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, map_override, climb_override, discord)

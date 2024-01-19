@@ -278,8 +278,6 @@ To enable support for multiple users perform the steps below:
 
 ### Step 7 [OPTIONAL]: Install Zwift Companion App
 
-Create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
-
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
