@@ -1082,6 +1082,7 @@ def api_eventfeed():
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/recommendation/profile', methods=['GET'])
 @app.route('/api/recommendations/recommendation', methods=['GET'])
+@app.route('/api/subscription/plan', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
@@ -1365,6 +1366,7 @@ def get_events(limit, sport):
                    ('Spiral into the Volcano', 3261167746, 6),
                    ('The Magnificent 8', 2207442179, 6),
                    ('WBR Climbing Series', 2218409282, 6),
+                   ('Zwift Games 2024 - Epic', 762151244, 6),
                    ('Zwift Bambino Fondo', 3621162212, 6),
                    ('Zwift Medio Fondo', 3748780161, 6),
                    ('Zwift Gran Fondo', 242381847, 6)]
@@ -3143,10 +3145,10 @@ def relay_worlds_attributes():
         chat_message.ParseFromString(player_update.payload)
         if chat_message.player_id in online:
             state = online[chat_message.player_id]
-            if chat_message.message == '/regroup':
+            if chat_message.message == '.regroup':
                 regroup_ghosts(chat_message.player_id, True)
                 return '', 201
-            if chat_message.message == '/startline':
+            if chat_message.message == '.startline':
                 logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 return '', 201
         discord.send_message(chat_message.message, chat_message.player_id)
