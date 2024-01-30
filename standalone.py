@@ -14,9 +14,7 @@ import itertools
 import socketserver
 from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
-from http.cookies import SimpleCookie
-from collections import deque
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from Crypto.Cipher import AES
 
 import zwift_offline as zo
@@ -61,7 +59,6 @@ if not CDN_PROXY:
     except:
         pass
 
-SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
@@ -75,9 +72,6 @@ else:
         def change_presence(self, n):
             pass
     discord = DummyDiscord()
-
-MAP_OVERRIDE = deque(maxlen=16)
-CLIMB_OVERRIDE = deque(maxlen=16)
 
 bot_update_freq = 3
 pacer_update_freq = 1
@@ -93,6 +87,8 @@ global_bots = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
+map_override = {}
+climb_override = {}
 
 def sigint_handler(num, frame):
     httpd.shutdown()
@@ -113,45 +109,26 @@ class CDNHandler(SimpleHTTPRequestHandler):
         return fullpath
 
     def do_GET(self):
-        path_end = self.path.split('/')[-1]
-        if path_end == 'map_override':
-            cookies_string = self.headers.get('Cookie')
-            cookies = SimpleCookie()
-            cookies.load(cookies_string)
-            # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
-            if 'selected_map' in cookies:
-                MAP_OVERRIDE.append((self.client_address[0], cookies['selected_map'].value))
-            if 'selected_climb' in cookies:
-                CLIMB_OVERRIDE.append((self.client_address[0], cookies['selected_climb'].value))
-            self.send_response(302)
-            self.send_header('Cookie', cookies_string)
-            self.send_header('Location', 'https://secure.zwift.com/ride')
+        # Check if client requested the map be overridden
+        if self.path == '/gameassets/MapSchedule_v2.xml' and self.client_address[0] in map_override:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/xml')
             self.end_headers()
+            start = datetime.today() - timedelta(days=1)
+            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (map_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            self.wfile.write(output.encode())
+            del map_override[self.client_address[0]]
             return
-        if self.path == '/gameassets/MapSchedule_v2.xml':
-            # Check if client requested the map be overridden
-            for override in MAP_OVERRIDE:
-                if override[0] == self.client_address[0]:
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/xml')
-                    self.end_headers()
-                    start = datetime.today() - timedelta(days=1)
-                    output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
-                    self.wfile.write(output.encode())
-                    MAP_OVERRIDE.remove(override)
-                    return
-        if self.path == '/gameassets/PortalRoadSchedule_v1.xml':
-            for override in CLIMB_OVERRIDE:
-                if override[0] == self.client_address[0]:
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/xml')
-                    self.end_headers()
-                    start = datetime.today() - timedelta(days=1)
-                    output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (override[1], start.strftime("%Y-%m-%dT00:01-04"))
-                    self.wfile.write(output.encode())
-                    CLIMB_OVERRIDE.remove(override)
-                    return
-        if CDN_PROXY and self.path.startswith('/gameassets/') and not path_end.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
+        if self.path == '/gameassets/PortalRoadSchedule_v1.xml' and self.client_address[0] in climb_override:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/xml')
+            self.end_headers()
+            start = datetime.today() - timedelta(days=1)
+            output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (climb_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            self.wfile.write(output.encode())
+            del climb_override[self.client_address[0]]
+            return
+        if CDN_PROXY and self.path.startswith('/gameassets/') and not self.path.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
             try:
                 self.send_response(200)
                 self.end_headers()
@@ -292,22 +269,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
-        if self.request.getpeername()[0] == '127.0.0.1':  # to avoid needing hairpinning
-            udp_node_ip = "127.0.0.1"
-        elif os.path.exists(SERVER_IP_FILE):
-            with open(SERVER_IP_FILE, 'r') as f:
-                udp_node_ip = f.read().rstrip('\r\n')
-        else:
-            udp_node_ip = "127.0.0.1"
         details1 = msg.udp_config.relay_addresses.add()
         details1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         details1.lb_course = 6 # watopia crowd
-        details1.ip = udp_node_ip
+        details1.ip = zo.server_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
         details2.lb_realm = 0 #generic load balancing realm
         details2.lb_course = 0 #generic load balancing course
-        details2.ip = udp_node_ip
+        details2.ip = zo.server_ip
         details2.port = 3022
         msg.udp_config.uc_f2 = 10
         msg.udp_config.uc_f3 = 30
@@ -464,7 +434,7 @@ def save_ghost(name, player_id):
             print('save_ghost: %s' % repr(exc))
             return
         ghosts.rec.player_id = player_id
-        f = '%s/%s-%s.bin' % (folder, datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"), name)
+        f = '%s/%s-%s.bin' % (folder, datetime.now(timezone.utc).strftime("%Y-%m-%d-%H-%M-%S"), name)
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
@@ -858,11 +828,9 @@ udpserver_thread.start()
 ri = threading.Thread(target=remove_inactive)
 ri.start()
 
-if os.path.exists(FAKE_DNS_FILE) and os.path.exists(SERVER_IP_FILE):
+if os.path.exists(FAKE_DNS_FILE):
     from fake_dns import fake_dns
-    with open(SERVER_IP_FILE, 'r') as f:
-        server_ip = f.read().rstrip('\r\n')
-        dns = threading.Thread(target=fake_dns, args=(server_ip,))
-        dns.start()
+    dns = threading.Thread(target=fake_dns, args=(zo.server_ip,))
+    dns.start()
 
-zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, map_override, climb_override, discord)

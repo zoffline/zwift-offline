@@ -32,3 +32,13 @@ message SegmentResults {
     optional uint64 event_subgroup_id = 3;
     repeated SegmentResult segment_results = 4;
 }
+
+message SegmentRideStats {
+    required int64 segment_id = 1;
+    optional uint32 f2 = 2;
+    optional uint32 number_of_results = 3;
+    optional uint64 latest_time = 4;
+    optional float latest_percentile = 5;
+    optional uint64 best_time = 6;
+    optional float best_percentile = 7;
+}

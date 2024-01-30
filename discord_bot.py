@@ -1,5 +1,3 @@
-# Python 3 only (asyncio)
-
 import asyncio
 import json
 import os
@@ -39,7 +37,7 @@ class DiscordBot(discord.Client):
         elif message.content == '!ping':
             await message.channel.send('pong')
         elif message.channel == self.channel and not message.author.bot and not message.content.startswith('!'):
-            zwift_offline.send_message_to_all_online(message.content, message.author.name)
+            zwift_offline.send_message(message.content, message.author.name)
 
 
 class DiscordThread(threading.Thread):

@@ -86,8 +86,6 @@ SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 3
 
-PACE_PARTNERS_DIR = "%s/pace_partners" % SCRIPT_DIR
-
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -95,7 +93,16 @@ if os.path.exists(SERVER_IP_FILE):
     with open(SERVER_IP_FILE, 'r') as f:
         server_ip = f.read().rstrip('\r\n')
 else:
-    server_ip = '127.0.0.1'
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.254.254.254', 1))
+        server_ip = s.getsockname()[0]
+    except:
+        server_ip = '127.0.0.1'
+    finally:
+        s.close()
+    logger.info("server-ip.txt not found, using %s", server_ip)
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
@@ -140,11 +147,6 @@ db = SQLAlchemy()
 db.init_app(app)
 
 online = {}
-global_pace_partners = {}
-global_bots = {}
-global_ghosts = {}
-ghosts_enabled = {}
-player_update_queue = {}
 zc_connect_queue = {}
 player_partial_profiles = {}
 restarting = False
@@ -168,7 +170,7 @@ class User(UserMixin, db.Model):
         return self.player_id
 
     def get_token(self):
-        dt = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+        dt = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
         return jwt.encode({'user': self.player_id, 'exp': dt}, app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
@@ -411,8 +413,16 @@ def load_game_dictionary():
     gd['bikeshoes'] = [int(x.get('signature')) for x in root.findall("./BIKESHOES/BIKESHOE")]
     gd['socks'] = [int(x.get('signature')) for x in root.findall("./SOCKS/SOCK")]
     gd['jerseys'] = [int(x.get('signature')) for x in root.findall("./JERSEYS/JERSEY")]
-    gd['bikefrontwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL")]
-    gd['bikerearwheels'] = [int(x.get('signature')) for x in root.findall("./BIKEREARWHEELS/BIKEREARWHEEL")]
+    frontwheels = {}
+    for x in root.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL"):
+        frontwheels[x.get('name')] = int(x.get('signature'))
+    rearwheels = {}
+    for x in root.findall("./BIKEREARWHEELS/BIKEREARWHEEL"):
+        rearwheels[x.get('name')] = int(x.get('signature'))
+    gd['wheels'] = []
+    for wheel in rearwheels:
+        if wheel in frontwheels:
+            gd['wheels'].append((rearwheels[wheel], frontwheels[wheel]))
     gd['runshirts'] = [int(x.get('signature')) for x in root.findall("./RUNSHIRTS/RUNSHIRT")]
     gd['runshorts'] = [int(x.get('signature')) for x in root.findall("./RUNSHORTS/RUNSHORT")]
     gd['runshoes'] = [int(x.get('signature')) for x in root.findall("./RUNSHOES/RUNSHOE")]
@@ -431,13 +441,6 @@ def load_game_dictionary():
     return gd
 
 GD = load_game_dictionary()
-
-
-def get_utc_time():
-    return datetime.datetime.utcnow().timestamp()
-
-def get_time():
-    return datetime.datetime.now().timestamp()
 
 
 def get_online():
@@ -599,6 +602,15 @@ def signup():
     return render_template("signup.html")
 
 
+def check_sha256_hash(pwhash, password):
+    import hmac
+    try:
+        method, salt, hashval = pwhash.split("$", 2)
+    except ValueError:
+        return False
+    return hmac.compare_digest(hmac.new(salt.encode("utf-8"), password.encode("utf-8"), method).hexdigest(), hashval)
+
+
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -611,6 +623,14 @@ def login():
             return redirect(url_for('login'))
 
         user = User.query.filter_by(username=username).first()
+
+        if user and user.pass_hash.startswith('sha256'): # sha256 is deprecated in werkzeug 3
+            if check_sha256_hash(user.pass_hash, password):
+                user.pass_hash = generate_password_hash(password, 'scrypt')
+                db.session.commit()
+            else:
+                flash("Invalid username or password.")
+                return redirect(url_for('login'))
 
         if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
@@ -851,14 +871,14 @@ def enqueue_player_update(player_id, wa_bytes):
         player_update_queue[player_id] = list()
     player_update_queue[player_id].append(wa_bytes)
 
-def send_message_to_all_online(message, sender='Server'):
+def send_message(message, sender='Server', recipients=online.keys()):
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SPA
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.timestamp = int(get_utc_time()*1000000)
+    player_update.timestamp = int(time.time()*1000000)
 
     chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
     chat_message.player_id = 0
@@ -871,7 +891,7 @@ def send_message_to_all_online(message, sender='Server'):
 
     player_update.payload = chat_message.SerializeToString()
     player_update_s = player_update.SerializeToString()
-    for receiving_player_id in online.keys():
+    for receiving_player_id in recipients:
         enqueue_player_update(receiving_player_id, player_update_s)
 
 
@@ -879,12 +899,12 @@ def send_restarting_message():
     global restarting
     global restarting_in_minutes
     while restarting:
-        send_message_to_all_online('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
         time.sleep(60)
         restarting_in_minutes -= 1
         if restarting and restarting_in_minutes == 0:
             message = 'See you later! Look for the back online message.'
-            send_message_to_all_online(message)
+            send_message(message)
             discord.send_message(message)
             time.sleep(6)
             os.kill(os.getpid(), signal.SIGINT)
@@ -913,7 +933,7 @@ def cancel_restart_server():
         restarting = False
         restarting_in_minutes = 0
         message = 'Restart of the server has been cancelled. Ride on!'
-        send_message_to_all_online(message)
+        send_message(message)
         discord.send_message(message)
     return redirect(url_for('user_home', username=current_user.username))
 
@@ -1042,7 +1062,7 @@ def row_to_protobuf(row, msg, exclude_fields=[]):
 
 
 def world_time():
-    return int((get_utc_time()-1414016075)*1000)
+    return int((time.time()-1414016075)*1000)
 
 @app.route('/api/clubs/club/can-create', methods=['GET'])
 def api_clubs_club_cancreate():
@@ -1063,12 +1083,13 @@ def api_eventfeed():
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/recommendation/profile', methods=['GET'])
 @app.route('/api/recommendations/recommendation', methods=['GET'])
+@app.route('/api/subscription/plan', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
 def activity_moving_time(activity):
     try:
-        return (datetime.strptime(activity.end_date, '%y-%m-%dT%H:%M:%SZ') - datetime.strptime(activity.start_date, '%y-%m-%dT%H:%M:%SZ')).total_seconds() * 1000
+        return int((datetime.datetime.strptime(activity.end_date, '%Y-%m-%dT%H:%M:%SZ') - datetime.datetime.strptime(activity.start_date, '%Y-%m-%dT%H:%M:%SZ')).total_seconds() * 1000)
     except:
         return 0
 
@@ -1256,15 +1277,37 @@ def api_users_login():
     response.info.relay_url = "https://us-or-rly101.zwift.com/relay"
     response.info.apis.todaysplan_url = "https://whats.todaysplan.com.au"
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
-    response.info.time = int(get_utc_time())
+    response.info.time = int(time.time())
     udp_node = response.info.nodes.nodes.add()
-    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-        udp_node.ip = "127.0.0.1"
-    else:
-        udp_node.ip = server_ip  # TCP telemetry server
+    udp_node.ip = server_ip  # TCP telemetry server
     udp_node.port = 3023
     response.relay_session_id = player_id
     response.expiration = 70
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
+    config_file = os.path.join(profile_dir, 'economy_config.txt')
+    if not os.path.isfile(config_file):
+        with open(os.path.join(SCRIPT_DIR, 'economy_config.txt')) as f:
+            economy_config = json.load(f)
+        profile_file = os.path.join(profile_dir, 'profile.bin')
+        if os.path.isfile(profile_file):
+            profile = profile_pb2.PlayerProfile()
+            with open(profile_file, 'rb') as f:
+                profile.ParseFromString(f.read())
+            current_level = profile.achievement_level // 100
+            levels = [x for x in economy_config['cycling_levels'] if x['level'] >= current_level]
+            if len(levels) > 1 and profile.total_xp > levels[1]['xp']:
+                offset = profile.total_xp - levels[0]['xp']
+                transition_end = [x for x in levels if x['xp'] <= profile.total_xp][-1]['level']
+                for level in economy_config['cycling_levels']:
+                    if level['level'] >= current_level:
+                        level['xp'] += offset
+                if transition_end > current_level:
+                    economy_config['transition_start'] = current_level
+                    economy_config['transition_end'] = transition_end
+        with open(config_file, 'w') as f:
+            json.dump(economy_config, f, indent=2)
+    with open(config_file) as f:
+        Parse(f.read(), response.economy_config)
     return response.SerializeToString(), 200
 
 
@@ -1313,7 +1356,7 @@ def get_events(limit, sport):
     events_list = [('2022 Bambino Fondo', 3368626651, 6),
                    ('2022 Medio Fondo', 2900074211, 6),
                    ('2022 Gran Fondo', 1327147942, 6),
-                   ('Alpe du Zwift Downhill', 1480439148, 6),
+                   ('Big Flat 8', 1917017591, 6),
                    ('Bologna TT', 2843604888, 10),
                    ('Crit City', 947394567, 12),
                    ('Crit City Reverse', 2875658892, 12),
@@ -1321,16 +1364,17 @@ def get_events(limit, sport):
                    ('Gravel Mountain', 3687150686, 16),
                    ('Gravel Mountain Reverse', 2956533021, 16),
                    ('Neokyo Crit', 1127056801, 13),
+                   ('Spiral into the Volcano', 3261167746, 6),
                    ('The Magnificent 8', 2207442179, 6),
-                   ('Ventop Downhill', 2891361683, 14),
                    ('WBR Climbing Series', 2218409282, 6),
+                   ('Zwift Games 2024 - Epic', 762151244, 6),
                    ('Zwift Bambino Fondo', 3621162212, 6),
                    ('Zwift Medio Fondo', 3748780161, 6),
                    ('Zwift Gran Fondo', 242381847, 6)]
     event_id = 1000
     cnt = 0
     events = events_pb2.Events()
-    eventStart = int(get_time()) * 1000 + 60000
+    eventStart = int(time.time()) * 1000 + 60000
     eventStartWT = world_time() + 60000
     if sport == 'CYCLING':
         sport = profile_pb2.Sport.CYCLING
@@ -1373,8 +1417,8 @@ def get_events(limit, sport):
             #event_cat.lineUpStartWT = eventStartWT - 5 * 60000
             #event_cat.lineUpEnd = eventStart
             #event_cat.lineUpEndWT = eventStartWT
-            #event_cat.eventSubgroupStart = eventStart
-            #event_cat.eventSubgroupStartWT = eventStartWT
+            event_cat.eventSubgroupStart = eventStart - 60000 # fixes HUD timer
+            event_cat.eventSubgroupStartWT = eventStartWT - 60000
             event_cat.route_id = item[1]
             event_cat.startLocation = cat
             event_cat.label = cat
@@ -1427,7 +1471,7 @@ def create_event_wat(rel_id, wa_type, pe, dest_ids):
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.timestamp = int(get_utc_time()*1000000)
+    player_update.timestamp = int(time.time()*1000000)
     player_update.rel_id = current_user.player_id
 
     pe.rel_id = rel_id
@@ -1485,28 +1529,50 @@ def relay_race_event_starting_line_id(event_id):
 @jwt_to_session_cookie
 @login_required
 def api_zfiles():
-    zfile = zfiles_pb2.ZFileProto()
-    zfile.ParseFromString(request.stream.read())
-    zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile.folder)
+    if request.headers['Source'] == 'zwift-companion':
+        zfile = json.loads(request.stream.read())
+        zfile_folder = zfile['folder']
+        zfile_filename = zfile['name']
+        zfile_file = base64.b64decode(zfile['content'])
+    else:
+        zfile = zfiles_pb2.ZFileProto()
+        zfile.ParseFromString(request.stream.read())
+        zfile_folder = zfile.folder
+        zfile_filename = zfile.filename
+        zfile_file = zfile.file
+    zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile_folder)
     try:
         if not os.path.isdir(zfiles_dir):
             os.makedirs(zfiles_dir)
     except IOError as e:
         logger.error("failed to create zfiles dir (%s):  %s", zfiles_dir, str(e))
         return '', 400
-    with open(os.path.join(zfiles_dir, quote(zfile.filename, safe=' ')), 'wb') as fd:
-        fd.write(zfile.file)
-    row = Zfile.query.filter_by(folder=zfile.folder, filename=zfile.filename, player_id=current_user.player_id).first()
+    try:
+        zfile_filename = zfile_filename.decode('utf-8', 'ignore')
+    except AttributeError:
+        pass
+    with open(os.path.join(zfiles_dir, quote(zfile_filename, safe=' ')), 'wb') as fd:
+        fd.write(zfile_file)
+    row = Zfile.query.filter_by(folder=zfile_folder, filename=zfile_filename, player_id=current_user.player_id).first()
     if not row:
-        zfile.timestamp = int(get_utc_time())
-        new_zfile = Zfile(folder=zfile.folder, filename=zfile.filename, timestamp=zfile.timestamp, player_id=current_user.player_id)
+        zfile_timestamp = int(time.time())
+        new_zfile = Zfile(folder=zfile_folder, filename=zfile_filename, timestamp=zfile_timestamp, player_id=current_user.player_id)
         db.session.add(new_zfile)
         db.session.commit()
-        zfile.id = new_zfile.id
+        zfile_id = new_zfile.id
     else:
-        zfile.id = row.id
-        zfile.timestamp = row.timestamp
-    return zfile.SerializeToString(), 200
+        zfile_id = row.id
+        zfile_timestamp = row.timestamp
+    if request.headers['Accept'] == 'application/json':
+        return jsonify({"id":zfile_id,"folder":zfile_folder,"name":zfile_filename,"content":None,"lastModified":str_timestamp(zfile_timestamp*1000)})
+    else:
+        response = zfiles_pb2.ZFileProto()
+        response.id = zfile_id
+        response.folder = zfile_folder
+        response.filename = zfile_filename
+        response.timestamp = zfile_timestamp
+        return response.SerializeToString(), 200
+
 
 @app.route('/api/zfiles/list', methods=['GET'])
 @jwt_to_session_cookie
@@ -1911,8 +1977,7 @@ def random_profile(p):
     p.ride_shoes_type = random.choice(GD['bikeshoes'])
     p.ride_socks_type = random.choice(GD['socks'])
     p.ride_jersey = random.choice(GD['jerseys'])
-    p.bike_wheel_front = random.choice(GD['bikefrontwheels'])
-    p.bike_wheel_rear = random.choice(GD['bikerearwheels'])
+    p.bike_wheel_rear, p.bike_wheel_front = random.choice(GD['wheels'])
     p.bike_frame = random.choice(list(GD['bikeframes'].keys()))
     p.run_shirt_type = random.choice(GD['runshirts'])
     p.run_shorts_type = random.choice(GD['runshorts'])
@@ -2036,7 +2101,7 @@ def strava_upload(player_id, activity):
         logger.warning("Failed to read %s. Skipping Strava upload attempt: %s" % (strava_token, repr(exc)))
         return
     try:
-        if get_utc_time() > int(expires_at):
+        if time.time() > int(expires_at):
             refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
                                                            refresh_token=refresh_token)
             with open(strava_token, 'w') as f:
@@ -2177,7 +2242,7 @@ def moving_average(iterable, n):
 def create_power_curve(player_id, fit_file):
     try:
         power_values = []
-        timestamp = int(get_utc_time())
+        timestamp = int(time.time())
         with fitdecode.FitReader(fit_file) as fit:
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
@@ -2188,13 +2253,13 @@ def create_power_curve(player_id, fit_file):
                         t = frame.get_value('timestamp')
                         if t is not None: timestamp = int(t.timestamp())
         if power_values:
-            for time in [5, 60, 300, 1200]:
-                averages = list(moving_average(power_values, time))
+            for t in [5, 60, 300, 1200]:
+                averages = list(moving_average(power_values, t))
                 if averages:
                     power = max(averages)
                     profile = get_partial_profile(player_id)
                     power_wkg = round(power / (profile.weight_in_grams / 1000), 2)
-                    power_curve = PowerCurve(player_id=player_id, time=str(time), power=power, power_wkg=power_wkg, timestamp=timestamp)
+                    power_curve = PowerCurve(player_id=player_id, time=str(t), power=power, power_wkg=power_wkg, timestamp=timestamp)
                     db.session.add(power_curve)
             db.session.commit()
     except Exception as exc:
@@ -2259,7 +2324,7 @@ def api_profiles_activities_rideon(receiving_player_id):
     player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_RIDE_ON
     player_update.world_time_born = world_time()
     player_update.world_time_expire = player_update.world_time_born + 9890
-    player_update.timestamp = int(get_utc_time() * 1000000)
+    player_update.timestamp = int(time.time() * 1000000)
 
     ride_on = udp_node_msgs_pb2.RideOn()
     ride_on.player_id = int(sending_player_id)
@@ -2278,9 +2343,8 @@ def api_profiles_activities_rideon(receiving_player_id):
     return '{}', 200
 
 def stime_to_timestamp(stime):
-    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
     try:
-        return int((datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%SZ') + utc_offset).timestamp())
+        return int(datetime.datetime.strptime(stime, '%Y-%m-%dT%H:%M:%S%z').timestamp())
     except:
         return 0
 
@@ -2291,7 +2355,7 @@ def create_zca_notification(player_id, private_event, organizer):
     argString0 = json.dumps({"eventId":private_event['id'],"eventStartDate":stime_to_timestamp(private_event['eventStart']),
         "otherInviteeCount":len(private_event['invitedProfileIds'])})
     n = { "activity": None, "argLong0": 0, "argLong1": 0, "argString0": argString0,
-        "createdOn": str_timestamp(unix_time_millis(datetime.datetime.now())),
+        "createdOn": str_timestamp(int(time.time()*1000)),
         "fromProfile": {
             "firstName": organizer["firstName"],
             "id": organizer["id"],
@@ -2317,7 +2381,7 @@ def create_zca_notification(player_id, private_event, organizer):
 def api_notifications():
     ret_notifications = []
     for row in Notification.query.filter_by(player_id=current_user.player_id):
-        if json.loads(json.loads(row.json)["argString0"])["eventStartDate"] > get_time() - 1800:
+        if json.loads(json.loads(row.json)["argString0"])["eventStartDate"] > time.time() - 1800:
             ret_notifications.append(row.json)
     return jsonify(ret_notifications)
 
@@ -2385,7 +2449,7 @@ def api_private_event_edit(meetup_id):
     org_json_pe = ActualPrivateEvents()[meetup_id]
     for f in ('culling', 'distanceInMeters', 'durationInSeconds', 'eventStart', 'invitedProfileIds', 'laps', 'routeId', 'rubberbanding', 'showResults', 'sport', 'workoutHash'):
         org_json_pe[f] = json_pe[f]
-    org_json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    org_json_pe['updateDate'] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     newEventInvites = []
     newEventInviteeIds = []
     for i in org_json_pe['eventInvites']:
@@ -2425,7 +2489,7 @@ def create_wa_event_invites(json_pe):
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.timestamp = int(get_utc_time()*1000000)
+    player_update.timestamp = int(time.time()*1000000)
 
     pe.id = json_pe['id']
     pe.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
@@ -2482,7 +2546,7 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     json_pe['allowsLateJoin'] = True #todo_pe
     json_pe['organizerFirstName'] = partial_profile.first_name
     json_pe['organizerLastName'] = partial_profile.last_name
-    json_pe['updateDate'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    json_pe['updateDate'] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     json_pe['organizerImageUrl'] = imageSrc(current_user.player_id)
     eventInvites = [{"invitedProfile": partial_profile.to_json(), "status": "ACCEPTED"}]
     create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
@@ -2548,7 +2612,7 @@ def jsonPrivateEventFeedToProtobuf(jfeed):
 @login_required
 def api_private_event_feed():
     start_date = int(request.args.get('start_date')) / 1000
-    if start_date == -1800: start_date += get_time() # first ZA request has start_date=-1800000
+    if start_date == -1800: start_date += time.time() # first ZA request has start_date=-1800000
     past_events = request.args.get('organizer_only_past_events') == 'true'
     ret = []
     for pe in ActualPrivateEvents().values():
@@ -2643,23 +2707,18 @@ def get_month_range(dt):
      return first, last
 
 
-def unix_time_millis(dt):
-    return int(dt.timestamp()*1000)
-
-
 def fill_in_goal_progress(goal, player_id):
-    local_now = datetime.datetime.now()
-    utc_offset = datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
     if goal.periodicity == 0:  # weekly
-        first_dt, last_dt = get_week_range(local_now)
+        first_dt, last_dt = get_week_range(utc_now)
     else:  # monthly
-        first_dt, last_dt = get_month_range(local_now)
+        first_dt, last_dt = get_month_range(utc_now)
 
     common_sql = """FROM activity
                     WHERE player_id = :p AND sport = :s
                     AND strftime('%s', start_date) >= strftime('%s', :f)
                     AND strftime('%s', start_date) <= strftime('%s', :l)"""
-    args = {"p": player_id, "s": goal.sport, "f": first_dt-utc_offset, "l": last_dt-utc_offset}
+    args = {"p": player_id, "s": goal.sport, "f": first_dt, "l": last_dt}
     if goal.type == goal_pb2.GoalType.DISTANCE:
         distance = db.session.execute(sqlalchemy.text('SELECT SUM(distanceInMeters) %s' % common_sql), args).first()[0]
         if distance:
@@ -2680,12 +2739,11 @@ def fill_in_goal_progress(goal, player_id):
 
 
 def set_goal_end_date_now(goal):
-    local_now = datetime.datetime.now()
-    utc_offset = int((datetime.datetime.fromtimestamp(0) - datetime.datetime.utcfromtimestamp(0)).total_seconds())
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
     if goal.periodicity == 0:  # weekly
-        goal.period_end_date = unix_time_millis(get_week_range(local_now)[1]) - utc_offset
+        goal.period_end_date = int(get_week_range(utc_now)[1].timestamp()*1000)
     else:  # monthly
-        goal.period_end_date = unix_time_millis(get_month_range(local_now)[1]) - utc_offset
+        goal.period_end_date = int(get_month_range(utc_now)[1].timestamp()*1000)
 
 def str_sport(int_sport):
     if int_sport == 1:
@@ -2703,7 +2761,7 @@ def str_timestamp(ts):
     else:
         sec = int(ts/1000)
         ms = ts % 1000
-        return datetime.datetime.utcfromtimestamp(sec).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
+        return datetime.datetime.fromtimestamp(sec, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + str(ms).zfill(3) + "+0000"
 
 def str_timestamp_json(ts):
     if ts == 0:
@@ -2755,8 +2813,8 @@ def select_protobuf_goals(player_id, limit):
         for row in rows:
             goal = goals.goals.add()
             row_to_protobuf(row, goal)
-            end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000)
-            if end_dt < datetime.datetime.utcnow():
+            end_dt = datetime.datetime.fromtimestamp(goal.period_end_date / 1000, datetime.timezone.utc)
+            if end_dt < datetime.datetime.now(datetime.timezone.utc):
                 need_update.append(goal)
             fill_in_goal_progress(goal, player_id)
         for goal in need_update:
@@ -2787,7 +2845,7 @@ def api_profiles_goals(player_id):
             str_goal = request.stream.read()
             json_goal = json.loads(str_goal)
             goal = goalJsonToProtobuf(json_goal)
-        goal.created_on = unix_time_millis(datetime.datetime.utcnow())
+        goal.created_on = int(time.time()*1000)
         set_goal_end_date_now(goal)
         fill_in_goal_progress(goal, player_id)
         goal.id = insert_protobuf_into_db(Goal, goal)
@@ -2823,10 +2881,7 @@ def api_profiles_goals_id(player_id, goal_id):
 def api_tcp_config():
     infos = per_session_info_pb2.TcpConfig()
     info = infos.nodes.add()
-    if request.remote_addr == '127.0.0.1':  # to avoid needing hairpinning
-        info.ip = "127.0.0.1"
-    else:
-        info.ip = server_ip
+    info.ip = server_ip
     info.port = 3023
     return infos.SerializeToString(), 200
 
@@ -2872,7 +2927,7 @@ def relay_worlds_generic(server_realm=None):
                 "followerStatusOfLoggedInPlayer": "NO_RELATIONSHIP", "rideOnGiven": False, "currentSport": profile_pb2.Sport.Name(jsv0(online[player_id], 'sport')),
                 "enrolledZwiftAcademy": False, "mapId": 1, "ftp": 100, "runTime10kmInSeconds": 3600}
             friends.append(friend)
-        world = { 'currentDateTime': int(get_utc_time()),
+        world = { 'currentDateTime': int(time.time()),
                   'currentWorldTime': world_time(),
                   'friendsInWorld': friends,
                   'mapId': 1,
@@ -2895,7 +2950,7 @@ def relay_worlds_generic(server_realm=None):
             world.name = 'Public Watopia'
             world.course_id = course
             world.world_time = world_time()
-            world.real_time = int(get_time())
+            world.real_time = int(time.time())
             world.zwifters = 0
             course_world[course] = world
         for p_id in online.keys():
@@ -3007,7 +3062,7 @@ def transformPrivateEvents(player_id, max_count, status):
     ret = []
     if max_count > 0:
         for e in ActualPrivateEvents().values():
-            if stime_to_timestamp(e['eventStart']) > get_time() - 1800:
+            if stime_to_timestamp(e['eventStart']) > time.time() - 1800:
                 for i in e['eventInvites']:
                     if i['invitedProfile']['id'] == player_id:
                         if i['status'] == status:
@@ -3084,18 +3139,21 @@ def relay_worlds_attributes():
     player_update.ParseFromString(request.stream.read())
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
-    player_update.timestamp = int(get_utc_time() * 1000000)
+    player_update.timestamp = int(time.time() * 1000000)
     state = None
     if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_SPA:
         chat_message = tcp_node_msgs_pb2.SocialPlayerAction()
         chat_message.ParseFromString(player_update.payload)
         if chat_message.player_id in online:
             state = online[chat_message.player_id]
-            if chat_message.message == '/regroup':
-                regroup_ghosts(chat_message.player_id, True)
-                return '', 201
-            if chat_message.message == '/startline':
-                logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
+            if chat_message.message.startswith('.'):
+                command = chat_message.message[1:]
+                if command == 'regroup':
+                    regroup_ghosts(chat_message.player_id, True)
+                elif command == 'position':
+                    logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
+                else:
+                    send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
                 return '', 201
         discord.send_message(chat_message.message, chat_message.player_id)
     for receiving_player_id in online.keys():
@@ -3124,7 +3182,7 @@ def api_segment_results():
     if result.segment_id == 1:
         return '', 400
     result.world_time = world_time()
-    result.finish_time_str = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    result.finish_time_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     result.sport = 0
     result.id = insert_protobuf_into_db(SegmentResult, result)
 
@@ -3135,7 +3193,7 @@ def api_segment_results():
     player_update.payload = data
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
-    player_update.timestamp = int(get_utc_time() * 1000000)
+    player_update.timestamp = int(time.time() * 1000000)
     sending_player_id = result.player_id
     if sending_player_id in online:
         sending_player = online[sending_player_id]
@@ -3176,6 +3234,26 @@ def api_personal_records_my_records():
         row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
 
     return results.SerializeToString(), 200
+
+
+@app.route('/api/personal-records/my-segment-ride-stats/<sport>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_personal_records_my_segment_ride_stats(sport):
+    if not request.args.get('segmentId'):
+        return '', 422
+    stats = segment_result_pb2.SegmentRideStats()
+    stats.segment_id = int(request.args.get('segmentId'))
+    where_stmt = "WHERE segment_id = :s AND player_id = :p AND sport = :sp"
+    args = {"s": stats.segment_id, "p": current_user.player_id, "sp": profile_pb2.Sport.Value(sport)}
+    row = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s ORDER BY elapsed_ms LIMIT 1" % where_stmt), args).first()
+    if row:
+        stats.number_of_results = db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM segment_result %s" % where_stmt), args).scalar()
+        stats.latest_time = row.elapsed_ms # Zwift sends only best
+        stats.latest_percentile = 100
+        stats.best_time = row.elapsed_ms
+        stats.best_percentile = 100
+    return stats.SerializeToString(), 200
 
 
 @app.route('/api/personal-records/results/summary/profiles/me/<sport>', methods=['GET'])
@@ -3263,7 +3341,7 @@ def route_results():
 
 def wtime_to_stime(wtime):
     if wtime:
-        return datetime.datetime.fromtimestamp(wtime / 1000 + 1414016075).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'
+        return datetime.datetime.fromtimestamp(wtime / 1000 + 1414016075, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'
     return ''
 
 @app.route('/api/route-results/completion-stats/all', methods=['GET'])
@@ -3381,8 +3459,20 @@ def achievement_loadPlayerAchievements():
                 converted.achievements.add().id = ach_id
         with open(achievements_file, 'wb') as f:
             f.write(converted.SerializeToString())
+    achievements = profile_pb2.Achievements()
     with open(achievements_file, 'rb') as f:
-        return f.read(), 200
+        achievements.ParseFromString(f.read())
+    climbs = RouteResult.query.filter(RouteResult.player_id == current_user.player_id, RouteResult.route_hash.between(10000, 11000)).count()
+    if climbs:
+        if not any(a.id == 211 for a in achievements.achievements):
+            achievements.achievements.add().id = 211 # Portal Climber
+        if climbs >= 10 and not any(a.id == 212 for a in achievements.achievements):
+            achievements.achievements.add().id = 212 # Climb Portal Pro
+        if climbs >= 25 and not any(a.id == 213 for a in achievements.achievements):
+            achievements.achievements.add().id = 213 # Legs of Steel
+        with open(achievements_file, 'wb') as f:
+            f.write(achievements.SerializeToString())
+    return achievements.SerializeToString(), 200
 
 @app.route('/api/achievement/unlock', methods=['POST'])
 @jwt_to_session_cookie
@@ -3398,7 +3488,8 @@ def achievement_unlock():
         with open(achievements_file, 'rb') as f:
             achievements.ParseFromString(f.read())
     for achievement in new.achievements:
-        achievements.achievements.add().id = achievement.id
+        if not any(a.id == achievement.id for a in achievements.achievements):
+            achievements.achievements.add().id = achievement.id
     with open(achievements_file, 'wb') as f:
         f.write(achievements.SerializeToString())
     return '', 202
@@ -3415,13 +3506,13 @@ def api_achievement_category(category_id):
 @login_required
 def api_power_curve_best(option):
     power_curves = profile_pb2.PowerCurveAggregationMsg()
-    for time in ['5', '60', '300', '1200']:
-        filters = [PowerCurve.player_id == current_user.player_id, PowerCurve.time == time]
+    for t in ['5', '60', '300', '1200']:
+        filters = [PowerCurve.player_id == current_user.player_id, PowerCurve.time == t]
         if option == 'last': #default is "all-time"
-            filters.append(PowerCurve.timestamp > int(get_time()) - int(request.args.get('days')) * 86400)
+            filters.append(PowerCurve.timestamp > int(time.time()) - int(request.args.get('days')) * 86400)
         row = PowerCurve.query.filter(*filters).order_by(PowerCurve.power.desc()).first()
         if row:
-            power_curves.watts[time].power = row.power
+            power_curves.watts[t].power = row.power
     return power_curves.SerializeToString(), 200
 
 
@@ -3458,10 +3549,10 @@ def migrate_database():
         return
     # Database needs to be upgraded, try to back it up first
     try:  # Try writing to storage dir
-        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(get_utc_time())))
+        copyfile(DATABASE_PATH, "%s.v%d.%d.bak" % (DATABASE_PATH, version, int(time.time())))
     except:
         try:  # Fall back to a temporary dir
-            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(get_utc_time())))
+            copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
         except Exception as exc:
             logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
@@ -3581,7 +3672,7 @@ def check_columns(table_class, table_name):
 def send_server_back_online_message():
     time.sleep(30)
     message = "We're back online. Ride on!"
-    send_message_to_all_online(message)
+    send_message(message)
     discord.send_message(message)
 
 
@@ -3661,6 +3752,13 @@ def auth_realms_zwift_protocol_openid_connect_token():
     if username and MULTIPLAYER:
         user = User.query.filter_by(username=username).first()
 
+        if user and user.pass_hash.startswith('sha256'): # sha256 is deprecated in werkzeug 3
+            if check_sha256_hash(user.pass_hash, password):
+                user.pass_hash = generate_password_hash(password, 'scrypt')
+                db.session.commit()
+            else:
+                return '', 401
+
         if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
         else:
@@ -3716,21 +3814,16 @@ def start_zwift():
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
     selected_map = request.form['map']
+    if selected_map != 'CALENDAR':
+        # We have no identifying information when Zwift makes MapSchedule request except for the client's IP.
+        map_override[request.remote_addr] = selected_map
     selected_climb = request.form['climb']
-    if selected_map == 'CALENDAR' and selected_climb == 'CALENDAR':
-        return redirect("/ride", 302)
-    else:
-        response = make_response(redirect("http://cdn.zwift.com/map_override", 302))
-        if selected_map != 'CALENDAR':
-            response.set_cookie('selected_map', selected_map, domain=".zwift.com")
-        if selected_climb != 'CALENDAR':
-            response.set_cookie('selected_climb', selected_climb, domain=".zwift.com")
-        if MULTIPLAYER:
-            response.set_cookie('remember_token', request.cookies['remember_token'], domain=".zwift.com")
-        return response
+    if selected_climb != 'CALENDAR':
+        climb_override[request.remote_addr] = selected_climb
+    return redirect("/ride", 302)
 
 
-def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_regroup_ghosts, passed_player_update_queue, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_regroup_ghosts, passed_player_update_queue, passed_map_override, passed_climb_override, passed_discord):
     global online
     global global_relay
     global global_pace_partners
@@ -3740,6 +3833,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     global save_ghost
     global regroup_ghosts
     global player_update_queue
+    global map_override
+    global climb_override
     global discord
     global login_manager
     online = passed_online
@@ -3751,6 +3846,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     save_ghost = passed_save_ghost
     regroup_ghosts = passed_regroup_ghosts
     player_update_queue = passed_player_update_queue
+    map_override = passed_map_override
+    climb_override = passed_climb_override
     discord = passed_discord
     login_manager = LoginManager()
     login_manager.login_view = 'login'
