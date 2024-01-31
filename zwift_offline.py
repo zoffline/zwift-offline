@@ -1367,7 +1367,6 @@ def get_events(limit, sport):
                    ('Spiral into the Volcano', 3261167746, 6),
                    ('The Magnificent 8', 2207442179, 6),
                    ('WBR Climbing Series', 2218409282, 6),
-                   ('Zwift Games 2024 - Epic', 762151244, 6),
                    ('Zwift Bambino Fondo', 3621162212, 6),
                    ('Zwift Medio Fondo', 3748780161, 6),
                    ('Zwift Gran Fondo', 242381847, 6)]

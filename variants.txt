@@ -10,6 +10,11 @@
       "values": {}
     },
     {
+      "name": "game_1_14_settings_refactor",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -151,6 +156,10 @@
       }
     },
     {
+      "name": "game_1_29_integrate_road_and_bike_type_into_braking_performance",
+      "values": {}
+    },
+    {
       "name": "game_1_29_new_local_trainer_profile",
       "values": {}
     },
@@ -198,6 +207,10 @@
     {
       "name": "game_1_31_pp_data",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_32_enable_autobraking_in_watopia",
       "values": {}
     },
     {
@@ -295,7 +308,17 @@
     },
     {
       "name": "game_1_34_hw_restrictions_forbidden_hw",
-      "values": {}
+      "value": true,
+      "values": {
+        "fields": {
+          "forbidden_device_name_list": {
+            "stringValue": "HR2VP"
+          },
+          "forbidden_manufacturers_name_list": {
+            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
+          }
+        }
+      }
     },
     {
       "name": "game_1_34_monitor_zc_ble_bridge_scanning",
@@ -627,19 +650,25 @@
     },
     {
       "name": "game_1_45_rlog",
+      "value": true,
       "values": {
         "fields": {
           "ENABLED_LEVELS": {
-            "stringValue": ""
+            "stringValue": "ERROR"
           },
           "ENABLED_TYPES": {
-            "stringValue": ""
+            "stringValue": "LOADER"
           }
         }
       }
     },
     {
       "name": "game_1_46_0_sandbagger_expiration",
+      "values": {}
+    },
+    {
+      "name": "game_1_46_fix_pairing_on_homescreen_trainingplan",
+      "value": true,
       "values": {}
     },
     {
@@ -680,6 +709,11 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_46_save_end_ride_no_club_pref",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_1_46_virtual_shifting_leak_prevention",
@@ -947,10 +981,6 @@
       }
     },
     {
-      "name": "game_1_53_zui_tp",
-      "values": {}
-    },
-    {
       "name": "game_1_54_emoji_feature",
       "values": {}
     },
@@ -964,7 +994,7 @@
       "values": {
         "fields": {
           "Delay": {
-            "varintValue": "10000"
+            "varintValue": "6000"
           }
         }
       }
@@ -985,6 +1015,11 @@
       "values": {}
     },
     {
+      "name": "game_1_55_boost_vfx",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_1_56_0_trainer_max_grade_change_per_second",
       "value": true,
       "values": {
@@ -994,11 +1029,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_56_0_use_system_events_for_start_and_end_activity",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_56_draft_indicator",
@@ -1013,28 +1043,10 @@
       "values": {
         "fields": {
           "max_num_activities": {
-            "varintValue": "4"
+            "varintValue": "3"
           }
         }
       }
-    },
-    {
-      "name": "game_1_56_subscribe_interstitial_25_km_free_tier",
-      "values": {}
-    },
-    {
-      "name": "game_1_57_0_use_system_events_for_accumulating_streak_totals",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_57_rideonbomb_vfx",
-      "values": {}
-    },
-    {
-      "name": "game_1_57_workout_repect_power_display_setting",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1240,6 +1252,7 @@
     },
     {
       "name": "visual_lean_v2",
+      "value": true,
       "values": {
         "fields": {
           "leanScalar": {
