@@ -252,6 +252,8 @@ To obtain your current profile:
 <details><summary>Expand</summary>
 
 * If running from source, install garth: ``pip install garth``
+* If needed, create a file ``garmin_domain.txt`` in the ``storage`` directory containing the domain
+  * For China use ``garmin.cn``
 * __NOTE:__ instead of performing the step below you can instead use the "Settings - Garmin" button in the launcher window to enter your credentials (Windows and macOS only).
 * Create a file ``garmin_credentials.txt`` in the ``storage/1`` directory containing your login credentials
   ```

@@ -766,12 +766,10 @@ def authorization():
 
 def encrypt_credentials(file, cred):
     try:
-        credentials = (cred[0] + '\n' + cred[1]).encode('UTF-8')
         cipher_suite = AES.new(credentials_key, AES.MODE_CFB)
-        ciphered_text = cipher_suite.encrypt(credentials)
         with open(file, 'wb') as f:
             f.write(cipher_suite.iv)
-            f.write(ciphered_text)
+            f.write(cipher_suite.encrypt((cred[0] + '\n' + cred[1]).encode('UTF-8')))
         flash("Credentials saved.")
     except Exception as exc:
         logger.warning('encrypt_credentials: %s' % repr(exc))
@@ -780,13 +778,14 @@ def encrypt_credentials(file, cred):
 def decrypt_credentials(file):
     cred = ('', '')
     if os.path.isfile(file):
-        with open(file, 'rb') as f:
-            iv = f.read(16)
-            ciphered_text = f.read()
-            cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=iv)
-            unciphered_text = cipher_suite.decrypt(ciphered_text).decode('UTF-8')
-            cred = unciphered_text.splitlines()
-    return((cred[0], cred[1]))
+        try:
+            with open(file, 'rb') as f:
+                cipher_suite = AES.new(credentials_key, AES.MODE_CFB, iv=f.read(16))
+                lines = cipher_suite.decrypt(f.read()).decode('UTF-8').splitlines()
+                cred = (lines[0], lines[1])
+        except Exception as exc:
+            logger.warning('decrypt_credentials: %s' % repr(exc))
+    return cred
 
 
 @app.route("/profile/<username>/", methods=["GET", "POST"])
@@ -2135,18 +2134,23 @@ def garmin_upload(player_id, activity):
     else:
         logger.info("garmin_credentials missing, skip Garmin activity update")
         return
-    try:
-        if garmin_credentials.endswith('.bin'):
-            cred = decrypt_credentials(garmin_credentials)
-            username = cred[0]
-            password = cred[1]
-        else:
+    if garmin_credentials.endswith('.bin'):
+        username, password = decrypt_credentials(garmin_credentials)
+    else:
+        try:
             with open(garmin_credentials) as f:
                 username = f.readline().rstrip('\r\n')
                 password = f.readline().rstrip('\r\n')
-    except Exception as exc:
-        logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
-        return
+        except Exception as exc:
+            logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
+            return
+    garmin_domain = '%s/garmin_domain.txt' % STORAGE_DIR
+    if os.path.exists(garmin_domain):
+        try:
+            with open(garmin_domain) as f:
+                garth.configure(domain=f.readline().rstrip('\r\n'))
+        except Exception as exc:
+            logger.warning("Failed to read %s: %s" % (garmin_domain, repr(exc)))
     tokens_dir = '%s/garth' % profile_dir
     try:
         garth.resume(tokens_dir)
@@ -2187,13 +2191,7 @@ def intervals_upload(player_id, activity):
     if not os.path.exists(intervals_credentials):
         logger.info("intervals_credentials.bin missing, skip Intervals.icu activity update")
         return
-    try:
-        cred = decrypt_credentials(intervals_credentials)
-        athlete_id = cred[0]
-        api_key = cred[1]
-    except Exception as exc:
-        logger.warning("Failed to read %s. Skipping Intervals.icu upload attempt: %s" % (intervals_credentials, repr(exc)))
-        return
+    athlete_id, api_key = decrypt_credentials(intervals_credentials)
     try:
         from requests.auth import HTTPBasicAuth
         url = 'http://intervals.icu/api/v1/athlete/%s/activities?name=%s' % (athlete_id, activity.name)
@@ -2207,13 +2205,7 @@ def zwift_upload(player_id, activity):
     if not os.path.exists(zwift_credentials):
         logger.info("zwift_credentials.bin missing, skip Zwift activity update")
         return
-    try:
-        cred = decrypt_credentials(zwift_credentials)
-        username = cred[0]
-        password = cred[1]
-    except Exception as exc:
-        logger.warning("Failed to read %s. Skipping Zwift upload attempt: %s" % (zwift_credentials, repr(exc)))
-        return
+    username, password = decrypt_credentials(zwift_credentials)
     try:
         session = requests.session()
         access_token, refresh_token = online_sync.login(session, username, password)
