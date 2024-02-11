@@ -3140,7 +3140,7 @@ def relay_worlds_attributes():
             if chat_message.message.startswith('.'):
                 command = chat_message.message[1:]
                 if command == 'regroup':
-                    regroup_ghosts(chat_message.player_id, True)
+                    regroup_ghosts(chat_message.player_id)
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 else:

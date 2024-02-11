@@ -465,7 +465,7 @@ def load_ghosts(player_id, state, ghosts):
             ghosts.start_road = int(rt[0][1])
             ghosts.start_rt = int(rt[0][2])
 
-def regroup_ghosts(player_id, ahead=False):
+def regroup_ghosts(player_id):
     p = online[player_id]
     ghosts = global_ghosts[player_id]
     if not ghosts.loaded:
@@ -474,17 +474,15 @@ def regroup_ghosts(player_id, ahead=False):
     if not ghosts.started and ghosts.play:
         ghosts.started = True
     for g in ghosts.play:
-        states = []
-        for s in g.route.states:
-            if zo.road_id(s) == zo.road_id(p) and zo.is_forward(s) == zo.is_forward(p):
-                states.append((s.roadTime, s.distance))
+        states = [(s.roadTime, s.distance) for s in g.route.states if zo.road_id(s) == zo.road_id(p) and zo.is_forward(s) == zo.is_forward(p)]
         if states:
             c = min(states, key=lambda x: sum(abs(r - d) for r, d in zip((p.roadTime, p.distance), x)))
             g.position = 0
             while g.route.states[g.position].roadTime != c[0] or g.route.states[g.position].distance != c[1]:
                 g.position += 1
-            if ahead:
+            if is_ahead(p, g.route.states[g.position].roadTime):
                 g.position += 1
+    ghosts.last_play = 0
 
 def load_pace_partners():
     for (root, dirs, files) in os.walk(PACE_PARTNERS_DIR):
@@ -621,6 +619,15 @@ def nearby_distance(s1, s2):
             return True, dist
     return False, None
 
+def is_ahead(state, roadTime):
+    if zo.is_forward(state):
+        if state.roadTime > roadTime and abs(state.roadTime - roadTime) < 500000:
+            return True
+    else:
+        if state.roadTime < roadTime and abs(state.roadTime - roadTime) < 500000:
+            return True
+    return False
+
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
@@ -695,13 +702,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     ghosts.rec.states.append(state)
                     ghosts.last_rec = t
                 #Start loaded ghosts
-                if not ghosts.started and ghosts.play and zo.road_id(state) == ghosts.start_road:
-                    if zo.is_forward(state):
-                        if state.roadTime > ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
-                            regroup_ghosts(player_id)
-                    else:
-                        if state.roadTime < ghosts.start_rt and abs(state.roadTime - ghosts.start_rt) < 500000:
-                            regroup_ghosts(player_id)
+                if not ghosts.started and ghosts.play and zo.road_id(state) == ghosts.start_road and is_ahead(state, ghosts.start_rt):
+                    regroup_ghosts(player_id)
             ghosts.last_rt = state.roadTime
 
         #Set state of player being watched
