@@ -1,6 +1,6 @@
 [
   {
-    "id": 47000,
+    "id": 51000,
     "name": "2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "course": 8,
@@ -21,21 +21,21 @@
     "sport": 0
   },
   {
-    "id": 52000,
+    "id": 56000,
     "name": "Bologna Time Trial",
     "route": 2843604888,
     "course": 10,
     "sport": 0
   },
   {
-    "id": 57000,
+    "id": 62000,
     "name": "Castle Crit",
     "route": 3706527503,
     "course": 13,
     "sport": 0
   },
   {
-    "id": 58000,
+    "id": 63000,
     "name": "Castle Crit Run",
     "route": 1033940053,
     "course": 13,
@@ -49,21 +49,21 @@
     "sport": 1
   },
   {
-    "id": 34000,
+    "id": 38000,
     "name": "Classique Reverse",
     "route": 3599973269,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 31000,
+    "id": 35000,
     "name": "Cobbled Climbs Reverse",
     "route": 4194352271,
     "course": 2,
     "sport": 0
   },
   {
-    "id": 54000,
+    "id": 59000,
     "name": "Downtown Dolphin",
     "route": 947394567,
     "course": 12,
@@ -77,49 +77,49 @@
     "sport": 0
   },
   {
-    "id": 27000,
+    "id": 31000,
     "name": "France Classic Fondo",
     "route": 2136907048,
     "course": 14,
     "sport": 0
   },
   {
-    "id": 45000,
+    "id": 49000,
     "name": "Gotham Grind Reverse",
     "route": 352245150,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 49000,
+    "id": 53000,
     "name": "Grand Central Circuit Reverse",
     "route": 3687251774,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 28000,
+    "id": 32000,
     "name": "Gravel Mountain",
     "route": 3687150686,
     "course": 16,
     "sport": 0
   },
   {
-    "id": 29000,
+    "id": 33000,
     "name": "Gravel Mountain Reverse",
     "route": 2956533021,
     "course": 16,
     "sport": 0
   },
   {
-    "id": 39000,
+    "id": 43000,
     "name": "Greater London Loop Reverse",
     "route": 474781994,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 38000,
+    "id": 42000,
     "name": "Greatest London Loop Reverse",
     "route": 3976402826,
     "course": 7,
@@ -140,7 +140,7 @@
     "sport": 1
   },
   {
-    "id": 53000,
+    "id": 57000,
     "name": "Harrogate Circuit Reverse",
     "route": 620436060,
     "course": 11,
@@ -154,14 +154,14 @@
     "sport": 0
   },
   {
-    "id": 50000,
+    "id": 54000,
     "name": "Innsbruck KOM After Party",
     "route": 3649347250,
     "course": 9,
     "sport": 0
   },
   {
-    "id": 51000,
+    "id": 55000,
     "name": "InnsbruckConti",
     "route": 3101693166,
     "course": 9,
@@ -182,77 +182,105 @@
     "sport": 0
   },
   {
-    "id": 35000,
+    "id": 30000,
+    "name": "Jurassic Coast",
+    "route": 4009130866,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "id": 39000,
     "name": "Keith Hill After Party",
     "route": 3569674525,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 44000,
+    "id": 48000,
     "name": "LaGuardia Loop",
     "route": 2422779354,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 43000,
+    "id": 47000,
     "name": "LaGuardia Loop Reverse",
     "route": 3774003351,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 33000,
+    "id": 37000,
     "name": "Leith Hill After Party",
     "route": 1230300449,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 32000,
+    "id": 36000,
     "name": "Libby Hill After Party",
     "route": 54700404,
     "course": 2,
     "sport": 0
   },
   {
-    "id": 37000,
+    "id": 41000,
     "name": "London 8 Reverse",
     "route": 2165880404,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 36000,
+    "id": 40000,
     "name": "London Loop Reverse",
     "route": 1788889233,
     "course": 7,
     "sport": 0
   },
   {
-    "id": 46000,
+    "id": 27000,
+    "name": "Loop de Loop",
+    "route": 243949867,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "id": 28000,
+    "name": "Mountain Mash",
+    "route": 2953010285,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "id": 50000,
     "name": "NYC KOM After Party",
     "route": 2372883204,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 56000,
+    "id": 61000,
     "name": "Neokyo Crit Course",
     "route": 1127056801,
     "course": 13,
     "sport": 0
   },
   {
-    "id": 42000,
+    "id": 46000,
     "name": "Park Perimeter Reverse",
     "route": 2202609830,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 30000,
+    "id": 58000,
+    "name": "Queens Highway After Party",
+    "route": 87631443,
+    "course": 11,
+    "sport": 0
+  },
+  {
+    "id": 34000,
     "name": "Richmond Rollercoaster",
     "route": 948831673,
     "course": 2,
@@ -280,7 +308,7 @@
     "sport": 0
   },
   {
-    "id": 41000,
+    "id": 45000,
     "name": "Shuman Trail Reverse",
     "route": 274775181,
     "course": 8,
@@ -308,21 +336,21 @@
     "sport": 1
   },
   {
-    "id": 40000,
+    "id": 44000,
     "name": "The 6 Train Reverse",
     "route": 274639515,
     "course": 8,
     "sport": 0
   },
   {
-    "id": 55000,
+    "id": 60000,
     "name": "The Bell Lap",
     "route": 2875658892,
     "course": 12,
     "sport": 0
   },
   {
-    "id": 48000,
+    "id": 52000,
     "name": "The Highline Reverse",
     "route": 1763213625,
     "course": 8,
@@ -374,6 +402,13 @@
     "id": 18000,
     "name": "Zwift Bambino Fondo 2022",
     "route": 3368626651,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "id": 29000,
+    "name": "Zwift Games 2024 Epic",
+    "route": 762151244,
     "course": 6,
     "sport": 0
   },
