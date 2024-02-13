@@ -1069,9 +1069,9 @@ def api_clubs_club_cancreate():
 
 @app.route('/api/event-feed', methods=['GET']) #from=1646723199600&limit=25&sport=CYCLING
 def api_eventfeed():
-    eventCount = int(request.args.get('limit', 50))
-    sport = request.args.get('sport', 'CYCLING')
-    events = get_events(eventCount, sport)
+    limit = int(request.args.get('limit'))
+    sport = request.args.get('sport')
+    events = get_events(limit, sport)
     json_events = convert_events_to_json(events)
     json_data = []
     for e in json_events:
@@ -1351,42 +1351,22 @@ def api_per_session_info():
     info.relay_url = "https://us-or-rly101.zwift.com/relay"
     return info.SerializeToString(), 200
 
-def get_events(limit, sport):
-    events_list = [('2022 Bambino Fondo', 3368626651, 6),
-                   ('2022 Medio Fondo', 2900074211, 6),
-                   ('2022 Gran Fondo', 1327147942, 6),
-                   ('Big Flat 8', 1917017591, 6),
-                   ('Bologna TT', 2843604888, 10),
-                   ('Crit City', 947394567, 12),
-                   ('Crit City Reverse', 2875658892, 12),
-                   ('France Classic Fondo', 2136907048, 14),
-                   ('Gravel Mountain', 3687150686, 16),
-                   ('Gravel Mountain Reverse', 2956533021, 16),
-                   ('Neokyo Crit', 1127056801, 13),
-                   ('Spiral into the Volcano', 3261167746, 6),
-                   ('The Magnificent 8', 2207442179, 6),
-                   ('WBR Climbing Series', 2218409282, 6),
-                   ('Zwift Bambino Fondo', 3621162212, 6),
-                   ('Zwift Medio Fondo', 3748780161, 6),
-                   ('Zwift Gran Fondo', 242381847, 6)]
-    event_id = 1000
-    cnt = 0
+def get_events(limit=None, sport=None):
+    with open(os.path.join(SCRIPT_DIR, 'events.txt')) as f:
+        events_list = json.load(f)
     events = events_pb2.Events()
-    eventStart = int(time.time()) * 1000 + 60000
-    eventStartWT = world_time() + 60000
-    if sport == 'CYCLING':
-        sport = profile_pb2.Sport.CYCLING
-    else:
-        sport = profile_pb2.Sport.RUNNING
-        event_id = 1001 #to get sport back from id
+    eventStart = int(time.time()) * 1000 + 2 * 60000
+    eventStartWT = world_time() + 2 * 60000
     for item in events_list:
+        if sport != None and item['sport'] != profile_pb2.Sport.Value(sport):
+            continue
         event = events.events.add()
         event.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-        event.id = event_id
-        event.name = item[0]
-        event.route_id = item[1] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
-        event.course_id = item[2]
-        event.sport = sport
+        event.id = item['id']
+        event.name = item['name']
+        event.route_id = item['route'] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
+        event.course_id = item['course']
+        event.sport = item['sport']
         event.lateJoinInMinutes = 30
         event.eventStart = eventStart
         event.visible = True
@@ -1406,7 +1386,7 @@ def get_events(limit, sport):
         paceValues = ((4,15), (3,4), (2,3), (1,2), (0.1,1))
         for cat in range(1,5):
             event_cat = event.category.add()
-            event_cat.id = event_id + cat
+            event_cat.id = item['id'] + cat
             #event_cat.registrationStart = eventStart - 30 * 60000
             #event_cat.registrationStartWT = eventStartWT - 30 * 60000
             event_cat.registrationEnd = eventStart
@@ -1415,9 +1395,9 @@ def get_events(limit, sport):
             #event_cat.lineUpStartWT = eventStartWT - 5 * 60000
             #event_cat.lineUpEnd = eventStart
             #event_cat.lineUpEndWT = eventStartWT
-            event_cat.eventSubgroupStart = eventStart - 60000 # fixes HUD timer
-            event_cat.eventSubgroupStartWT = eventStartWT - 60000
-            event_cat.route_id = item[1]
+            event_cat.eventSubgroupStart = eventStart - 2 * 60000 # fixes HUD timer
+            event_cat.eventSubgroupStartWT = eventStartWT - 2 * 60000
+            event_cat.route_id = item['route']
             event_cat.startLocation = cat
             event_cat.label = cat
             event_cat.lateJoinInMinutes = 30
@@ -1434,19 +1414,13 @@ def get_events(limit, sport):
             event_cat.durationInSeconds = 0
             #event_cat.jerseyHash = 36; // 493134166, tag672
             #event_cat.tags = 45; // tag746, semi-colon delimited tags eg: "fenced;3r;created_ryan;communityevent;no_kick_mode;timestamp=1603911177622"
-        event_id += 1000
-        cnt += 1
-        if cnt > limit:
+        if limit != None and len(events.events) >= limit:
             break
     return events
 
 @app.route('/api/events/<int:event_id>', methods=['GET'])
 def api_events_id(event_id):
-    if event_id % 1 == 0:
-        sport = 'CYCLING'
-    else:
-        sport = 'RUNNING'
-    events = get_events(50, sport)
+    events = get_events()
     for e in events.events:
         if e.id == event_id:
             return jsonify(convert_event_to_json(e))
@@ -1455,8 +1429,7 @@ def api_events_id(event_id):
 @app.route('/api/events/search', methods=['POST'])
 def api_events_search():
     limit = int(request.args.get('limit'))
-    sport = request.args.get('sport', 'CYCLING')
-    events = get_events(limit, sport)
+    events = get_events(limit)
     if request.headers['Accept'] == 'application/json':
         return jsonify(convert_events_to_json(events))
     else:
@@ -3064,7 +3037,7 @@ def transformPrivateEvents(player_id, max_count, status):
                                 return ret
     return ret
 
-#todo: followingCount=3&playerSport=all&eventSport=CYCLING&fetchCampaign=true
+#todo: followingCount=3&playerSport=all&fetchCampaign=true
 @app.route('/relay/worlds/<int:server_realm>/aggregate/mobile', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
@@ -3075,7 +3048,8 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     activityCount = int(request.args.get('activityCount'))
     json_activities = select_activities_json(current_user.player_id, activityCount)
     eventCount = int(request.args.get('eventCount'))
-    events = get_events(eventCount, 'CYCLING') #runners, sorry!
+    eventSport = request.args.get('eventSport')
+    events = get_events(eventCount, eventSport)
     json_events = convert_events_to_json(events)
     pendingEventInviteCount = int(request.args.get('pendingEventInviteCount'))
     ppeFeed = transformPrivateEvents(current_user.player_id, pendingEventInviteCount, 'PENDING')
