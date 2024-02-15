@@ -115,7 +115,7 @@ def main(argv):
     session = requests.session()
     access_token, refresh_token, expired_in = post_credentials(session, username, password)
     game_info = get_game_info(session, access_token).decode('utf-8')
-    with open('../game_info.txt', 'wb') as f:
+    with open('../data/game_info.txt', 'wb') as f:
         f.write(game_info.encode('utf-8-sig'))
 
     logout(session, refresh_token)

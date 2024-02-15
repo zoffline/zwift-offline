@@ -458,7 +458,7 @@ def load_ghosts(player_id, state, ghosts):
         load_ghosts_folder('%s/%s' % (folder, state.route), ghosts)
     ghosts.start_road = zo.road_id(state)
     ghosts.start_rt = state.roadTime
-    with open('%s/start_lines.csv' % SCRIPT_DIR) as fd:
+    with open('%s/data/start_lines.csv' % SCRIPT_DIR) as fd:
         sl = [tuple(line) for line in csv.reader(fd)]
         rt = [t for t in sl if t[0] == str(state.route)]
         if rt:
@@ -524,7 +524,7 @@ def load_bots():
             pass
     bots_file = '%s/bot.txt' % STORAGE_DIR
     if not os.path.isfile(bots_file):
-        bots_file = '%s/bot.txt' % SCRIPT_DIR
+        bots_file = '%s/data/bot.txt' % SCRIPT_DIR
     with open(bots_file) as f:
         data = json.load(f)
     i = 1

@@ -10,13 +10,7 @@ version = ET.parse('cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml').getroo
 a = Analysis(['standalone.py'],
              pathex=['protobuf'],
              binaries=[],
-             datas=[('ssl/*', 'ssl'),
-                    ('start_lines.csv', '.'),
-                    ('game_info.txt', '.'),
-                    ('events.txt', '.'),
-                    ('variants.txt', '.'),
-                    ('economy_config.txt', '.'),
-                    ('bot.txt', '.')],
+             datas=[('ssl/*', 'ssl'), ('data/*', 'data')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -25,9 +19,6 @@ a = Analysis(['standalone.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-a.binaries = [x for x in a.binaries
-              if not os.path.dirname(x[1]).lower().startswith("c:\\program files")
-              and not os.path.dirname(x[1]).lower().startswith("c:\\windows")]
 a.datas += Tree('cdn', prefix='cdn')
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
@@ -42,7 +33,7 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          upx_exclude=['greenlet\*.pyd'],
+          upx_exclude=['greenlet\\*.pyd', '_uuid.pyd', 'python3.dll', 'api-ms-win-*.dll'],
           runtime_tmpdir=None,
           console=True )
 

@@ -10,7 +10,7 @@ with open("variant", "rb") as f:
 
 keep = ['zwift_launcher_']
 
-with open("../variants.txt") as f:
+with open("../data/variants.txt") as f:
     vs = [d for d in json.load(f)['variants'] if any(d['name'].startswith(s) for s in keep)]
 
 for v in MessageToDict(variants)['variants']:
@@ -18,5 +18,5 @@ for v in MessageToDict(variants)['variants']:
         v['values']['fields'] = dict(sorted(v['values']['fields'].items()))
     vs.append(v)
 
-with open("../variants.txt", "w") as f:
+with open("../data/variants.txt", "w") as f:
     json.dump({'variants': sorted(vs, key=lambda x: x['name'])}, f, indent=2)

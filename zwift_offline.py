@@ -1249,14 +1249,14 @@ def api_proto_empty():
 
 @app.route('/api/game_info/version', methods=['GET'])
 def api_gameinfo_version():
-    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "data", "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         data = json.load(f)
         return {"version": data['gameInfoHash']}
 
 @app.route('/api/game_info', methods=['GET'])
 def api_gameinfo():
-    game_info_file = os.path.join(SCRIPT_DIR, "game_info.txt")
+    game_info_file = os.path.join(SCRIPT_DIR, "data", "game_info.txt")
     with open(game_info_file, mode="r", encoding="utf-8-sig") as f:
         r = make_response(f.read())
         r.mimetype = 'application/json'
@@ -1285,7 +1285,7 @@ def api_users_login():
     profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
     config_file = os.path.join(profile_dir, 'economy_config.txt')
     if not os.path.isfile(config_file):
-        with open(os.path.join(SCRIPT_DIR, 'economy_config.txt')) as f:
+        with open(os.path.join(SCRIPT_DIR, 'data', 'economy_config.txt')) as f:
             economy_config = json.load(f)
         profile_file = os.path.join(profile_dir, 'profile.bin')
         if os.path.isfile(profile_file):
@@ -1352,7 +1352,7 @@ def api_per_session_info():
     return info.SerializeToString(), 200
 
 def get_events(limit=None, sport=None):
-    with open(os.path.join(SCRIPT_DIR, 'events.txt')) as f:
+    with open(os.path.join(SCRIPT_DIR, 'data', 'events.txt')) as f:
         events_list = json.load(f)
     events = events_pb2.Events()
     eventStart = int(time.time()) * 1000 + 2 * 60000
@@ -3385,7 +3385,7 @@ def experimentation_v1_variant():
     req = variants_pb2.FeatureRequest()
     req.ParseFromString(request.stream.read())
     variants = {}
-    with open(os.path.join(SCRIPT_DIR, "variants.txt")) as f:
+    with open(os.path.join(SCRIPT_DIR, "data", "variants.txt")) as f:
         vs = variants_pb2.FeatureResponse()
         Parse(f.read(), vs)
         for v in vs.variants:

@@ -46,5 +46,5 @@ for directory in os.listdir(worlds):
                 data.append(event)
                 event_id += 1000
 
-with open('../events.txt', 'w') as f:
+with open('../data/events.txt', 'w') as f:
     json.dump(sorted(data, key=lambda row: row['name']), f, indent=2)
