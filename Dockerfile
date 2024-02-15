@@ -1,4 +1,4 @@
-FROM python:3.11-alpine as builder
+FROM python:3.12-alpine as builder
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --user --requirement requirements.txt
 RUN pip install --user garth
 
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 MAINTAINER zoffline <zoffline@tutanota.com>
 
 WORKDIR /usr/src/app
