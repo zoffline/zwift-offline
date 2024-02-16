@@ -3291,10 +3291,11 @@ def api_route_results_completion_stats_all():
         for achievement in achievements.achievements:
             if achievement.id in GD['achievements']:
                 badges.append(GD['achievements'][achievement.id])
-    if db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM route_result WHERE player_id = :p"), {"p": player_id}).scalar() < len(badges):
-        for badge in badges:
+    results = [r[0] for r in db.session.execute(sqlalchemy.text("SELECT route_hash FROM route_result WHERE player_id = :p"), {"p": player_id})]
+    for badge in badges:
+        if not badge in results:
             db.session.add(RouteResult(player_id=player_id, route_hash=badge))
-        db.session.commit()
+            db.session.commit()
     stats = []
     rows = db.session.execute(sqlalchemy.text("SELECT route_hash, min(world_time) AS first, max(world_time) AS last FROM route_result WHERE player_id = :p GROUP BY route_hash"), {"p": player_id})
     for row in rows:
