@@ -6,7 +6,6 @@ import struct
 import sys
 import threading
 import time
-import csv
 import json
 import math
 import random
@@ -458,12 +457,11 @@ def load_ghosts(player_id, state, ghosts):
         load_ghosts_folder('%s/%s' % (folder, state.route), ghosts)
     ghosts.start_road = zo.road_id(state)
     ghosts.start_rt = state.roadTime
-    with open('%s/data/start_lines.csv' % SCRIPT_DIR) as fd:
-        sl = [tuple(line) for line in csv.reader(fd)]
-        rt = [t for t in sl if t[0] == str(state.route)]
-        if rt:
-            ghosts.start_road = int(rt[0][1])
-            ghosts.start_rt = int(rt[0][2])
+    with open('%s/data/start_lines.txt' % SCRIPT_DIR) as fd:
+        sl = json.load(fd, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
+        if state.route in sl:
+            ghosts.start_road = sl[state.route]['road']
+            ghosts.start_rt = sl[state.route]['time']
 
 def regroup_ghosts(player_id):
     p = online[player_id]

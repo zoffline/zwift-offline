@@ -153,9 +153,7 @@ restarting_in_minutes = 0
 reload_pacer_bots = False
 
 with open(os.path.join(SCRIPT_DIR, "data", "game_dictionary.txt")) as f:
-    GD = json.load(f)
-GD['bikeframes'] = {int(k): v for k, v in GD['bikeframes'].items()}
-GD['achievements'] = {int(k): v for k, v in GD['achievements'].items()}
+    GD = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
 
 class User(UserMixin, db.Model):
     player_id = db.Column(db.Integer, primary_key=True)

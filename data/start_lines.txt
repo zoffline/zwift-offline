@@ -1,0 +1,1072 @@
+{
+  "-1451362408": {
+    "name": "Bologna - Bologna Time Trial",
+    "road": 0,
+    "time": 38183
+  },
+  "947394567": {
+    "name": "Crit City - Downtown Dolphin",
+    "road": 0,
+    "time": 614865
+  },
+  "-1419308404": {
+    "name": "Crit City - The Bell Lap",
+    "road": 0,
+    "time": 614865
+  },
+  "-375055007": {
+    "name": "France - Casse-Pattes",
+    "road": 26,
+    "time": 487179
+  },
+  "-145031253": {
+    "name": "France - Climb Portal - Mont Saint-Michel",
+    "road": 26,
+    "time": 344976
+  },
+  "986252325": {
+    "name": "France - Douce France",
+    "road": 0,
+    "time": 23330
+  },
+  "2136907048": {
+    "name": "France - France Classic Fondo",
+    "road": 26,
+    "time": 487179
+  },
+  "1433431343": {
+    "name": "France - La Reine",
+    "road": 26,
+    "time": 518316
+  },
+  "-1442814000": {
+    "name": "France - Petit Boucle",
+    "road": 26,
+    "time": 487179
+  },
+  "1776635757": {
+    "name": "France - R.G.V.",
+    "road": 26,
+    "time": 487179
+  },
+  "872351836": {
+    "name": "France - Roule Ma Poule",
+    "road": 0,
+    "time": 971365
+  },
+  "-1881526724": {
+    "name": "France - Tire-Bouchon",
+    "road": 0,
+    "time": 971365
+  },
+  "-1721499149": {
+    "name": "France - Ven-Top",
+    "road": 26,
+    "time": 519342
+  },
+  "-607816610": {
+    "name": "Gravel Mountain - Gravel Mountain",
+    "road": 0,
+    "time": 652593
+  },
+  "-1338434275": {
+    "name": "Gravel Mountain - Gravel Mountain Reverse",
+    "road": 0,
+    "time": 548908
+  },
+  "-1180363988": {
+    "name": "Innsbruck - 2018 Worlds Short Lap",
+    "road": 7,
+    "time": 157428
+  },
+  "-285732192": {
+    "name": "Innsbruck - Achterbahn",
+    "road": 7,
+    "time": 157428
+  },
+  "-645620046": {
+    "name": "Innsbruck - Innsbruck KOM After Party",
+    "road": 7,
+    "time": 157428
+  },
+  "-1193274130": {
+    "name": "Innsbruck - InnsbruckConti",
+    "road": 7,
+    "time": 117884
+  },
+  "-1702939696": {
+    "name": "Innsbruck - Innsbruckring",
+    "road": 7,
+    "time": 157428
+  },
+  "156457316": {
+    "name": "Innsbruck - Lutscher",
+    "road": 7,
+    "time": 573873
+  },
+  "-493725582": {
+    "name": "Innsbruck - Lutscher CCW",
+    "road": 7,
+    "time": 573780
+  },
+  "-1600800906": {
+    "name": "London - Classique",
+    "road": 0,
+    "time": 532687
+  },
+  "-694994027": {
+    "name": "London - Classique Reverse",
+    "road": 0,
+    "time": 532687
+  },
+  "87055383": {
+    "name": "London - Greater London 8",
+    "road": 7,
+    "time": 809519
+  },
+  "928793662": {
+    "name": "London - Greater London Flat",
+    "road": 0,
+    "time": 532687
+  },
+  "-1018563692": {
+    "name": "London - Greater London Loop",
+    "road": 7,
+    "time": 809519
+  },
+  "474781994": {
+    "name": "London - Greater London Loop Reverse",
+    "road": 7,
+    "time": 809519
+  },
+  "1880443431": {
+    "name": "London - Greatest London Flat",
+    "road": 0,
+    "time": 532687
+  },
+  "-441312475": {
+    "name": "London - Greatest London Loop",
+    "road": 7,
+    "time": 809519
+  },
+  "-318564470": {
+    "name": "London - Greatest London Loop Reverse",
+    "road": 7,
+    "time": 809519
+  },
+  "-725292771": {
+    "name": "London - Keith Hill After Party",
+    "road": 7,
+    "time": 809519
+  },
+  "1230300449": {
+    "name": "London - Leith Hill After Party",
+    "road": 7,
+    "time": 809519
+  },
+  "-282320817": {
+    "name": "London - London 8",
+    "road": 7,
+    "time": 809519
+  },
+  "-2129086892": {
+    "name": "London - London 8 Reverse",
+    "road": 7,
+    "time": 809519
+  },
+  "913172163": {
+    "name": "London - London Loop",
+    "road": 7,
+    "time": 809519
+  },
+  "1788889233": {
+    "name": "London - London Loop Reverse",
+    "road": 7,
+    "time": 809519
+  },
+  "-587176267": {
+    "name": "London - Surrey Hills",
+    "road": 7,
+    "time": 146860
+  },
+  "163688809": {
+    "name": "London - The London Pretzel",
+    "road": 7,
+    "time": 809519
+  },
+  "-2090505677": {
+    "name": "London - The PRL Full",
+    "road": 7,
+    "time": 809519
+  },
+  "764532081": {
+    "name": "London - The PRL Half",
+    "road": 7,
+    "time": 809519
+  },
+  "-84918359": {
+    "name": "London - Triple Loops",
+    "road": 7,
+    "time": 809519
+  },
+  "1760877317": {
+    "name": "Makuri Islands - Bridges and Boardwalks",
+    "road": 134,
+    "time": 172723
+  },
+  "-588439793": {
+    "name": "Makuri Islands - Castle Crit",
+    "road": 1,
+    "time": 875012
+  },
+  "1033940053": {
+    "name": "Makuri Islands - Castle Crit Run",
+    "road": 1,
+    "time": 875012
+  },
+  "-552779580": {
+    "name": "Makuri Islands - Castle to Castle",
+    "road": 6,
+    "time": 696976
+  },
+  "-603048413": {
+    "name": "Makuri Islands - Chain Chomper",
+    "road": 0,
+    "time": 497383
+  },
+  "-1428486734": {
+    "name": "Makuri Islands - Chasing the Sun",
+    "road": 4,
+    "time": 875625
+  },
+  "576953930": {
+    "name": "Makuri Islands - Country to Coastal",
+    "road": 0,
+    "time": 909256
+  },
+  "525689100": {
+    "name": "Makuri Islands - Countryside Tour",
+    "road": 0,
+    "time": 880548
+  },
+  "910684583": {
+    "name": "Makuri Islands - Electric Loop",
+    "road": 4,
+    "time": 875625
+  },
+  "-1314347541": {
+    "name": "Makuri Islands - Farmland Loop",
+    "road": 0,
+    "time": 880548
+  },
+  "468624015": {
+    "name": "Makuri Islands - Fine and Sandy",
+    "road": 129,
+    "time": 253575
+  },
+  "-1012355859": {
+    "name": "Makuri Islands - Flatland Loop",
+    "road": 0,
+    "time": 880548
+  },
+  "2140131142": {
+    "name": "Makuri Islands - Island Hopper",
+    "road": 129,
+    "time": 113581
+  },
+  "211138252": {
+    "name": "Makuri Islands - Island Outskirts",
+    "road": 129,
+    "time": 113581
+  },
+  "1562187590": {
+    "name": "Makuri Islands - Kappa Quest",
+    "road": 41,
+    "time": 481731
+  },
+  "1454553567": {
+    "name": "Makuri Islands - Kappa Quest Reverse",
+    "road": 41,
+    "time": 481731
+  },
+  "890800649": {
+    "name": "Makuri Islands - Makuri 40",
+    "road": 0,
+    "time": 909256
+  },
+  "1366943680": {
+    "name": "Makuri Islands - Mech Isle Loop",
+    "road": 129,
+    "time": 253575
+  },
+  "1453570384": {
+    "name": "Makuri Islands - Neokyo All-Nighter",
+    "road": 4,
+    "time": 32431
+  },
+  "1127056801": {
+    "name": "Makuri Islands - Neokyo Crit Course",
+    "road": 4,
+    "time": 793392
+  },
+  "-887604976": {
+    "name": "Makuri Islands - Neon Flats",
+    "road": 4,
+    "time": 33852
+  },
+  "246712730": {
+    "name": "Makuri Islands - Railways and Rooftops",
+    "road": 19,
+    "time": 770354
+  },
+  "-729536506": {
+    "name": "Makuri Islands - Rooftop Rendezvous",
+    "road": 70,
+    "time": 134604
+  },
+  "-691331742": {
+    "name": "Makuri Islands - Sea to Tree",
+    "road": 0,
+    "time": 247026
+  },
+  "-992013557": {
+    "name": "Makuri Islands - Sleepless City",
+    "road": 4,
+    "time": 76517
+  },
+  "-771160870": {
+    "name": "Makuri Islands - Spirit Forest",
+    "road": 41,
+    "time": 481731
+  },
+  "-938089035": {
+    "name": "Makuri Islands - Sprinter's Playground",
+    "road": 4,
+    "time": 33852
+  },
+  "-927780947": {
+    "name": "Makuri Islands - Suki's Playground",
+    "road": 0,
+    "time": 880548
+  },
+  "-1398808254": {
+    "name": "Makuri Islands - Temples and Towers",
+    "road": 6,
+    "time": 542154
+  },
+  "-915188049": {
+    "name": "Makuri Islands - Three Village Loop",
+    "road": 0,
+    "time": 497383
+  },
+  "-36023909": {
+    "name": "Makuri Islands - Turf N Surf",
+    "road": 4,
+    "time": 872306
+  },
+  "1457923570": {
+    "name": "Makuri Islands - Twilight Harbor",
+    "road": 4,
+    "time": 936443
+  },
+  "-1641108600": {
+    "name": "Makuri Islands - Two Village Loop",
+    "road": 0,
+    "time": 880548
+  },
+  "1941800093": {
+    "name": "Makuri Islands - Valley to Mountaintop",
+    "road": 0,
+    "time": 299965
+  },
+  "-380438255": {
+    "name": "Makuri Islands - Wandering Flats",
+    "road": 0,
+    "time": 297926
+  },
+  "-1858871695": {
+    "name": "New York - 2022 Cycling Esports World Championships Route",
+    "road": 4,
+    "time": 173378
+  },
+  "1509089537": {
+    "name": "New York - Astoria Line 8",
+    "road": 4,
+    "time": 173378
+  },
+  "1790569309": {
+    "name": "New York - Couch To Sky K",
+    "road": 3,
+    "time": 633941
+  },
+  "1327665278": {
+    "name": "New York - Everything Bagel",
+    "road": 4,
+    "time": 173378
+  },
+  "711818913": {
+    "name": "New York - Flat Irons",
+    "road": 3,
+    "time": 880661
+  },
+  "480315274": {
+    "name": "New York - Gotham Grind",
+    "road": 4,
+    "time": 173378
+  },
+  "352245150": {
+    "name": "New York - Gotham Grind Reverse",
+    "road": 4,
+    "time": 173378
+  },
+  "-1349154056": {
+    "name": "New York - Grand Central Circuit",
+    "road": 4,
+    "time": 914829
+  },
+  "-607715522": {
+    "name": "New York - Grand Central Circuit Reverse",
+    "road": 4,
+    "time": 914829
+  },
+  "-629007892": {
+    "name": "New York - Hudson Roll",
+    "road": 3,
+    "time": 684316
+  },
+  "-1340600634": {
+    "name": "New York - Knickerbocker",
+    "road": 4,
+    "time": 173378
+  },
+  "2001106885": {
+    "name": "New York - Knickerbocker Reverse",
+    "road": 4,
+    "time": 173378
+  },
+  "-1872187942": {
+    "name": "New York - LaGuardia Loop",
+    "road": 4,
+    "time": 914829
+  },
+  "-520963945": {
+    "name": "New York - LaGuardia Loop Reverse",
+    "road": 4,
+    "time": 914829
+  },
+  "5103974": {
+    "name": "New York - Lady Liberty",
+    "road": 4,
+    "time": 173378
+  },
+  "-421989162": {
+    "name": "New York - Mighty Metropolitan",
+    "road": 4,
+    "time": 173378
+  },
+  "-1922084092": {
+    "name": "New York - NYC KOM After Party",
+    "road": 4,
+    "time": 173378
+  },
+  "1919980508": {
+    "name": "New York - Park Perimeter Loop",
+    "road": 4,
+    "time": 173378
+  },
+  "-2092357466": {
+    "name": "New York - Park Perimeter Reverse",
+    "road": 4,
+    "time": 173378
+  },
+  "1378559127": {
+    "name": "New York - Park To Peak",
+    "road": 3,
+    "time": 632077
+  },
+  "-1216301327": {
+    "name": "New York - Rising Empire",
+    "road": 4,
+    "time": 173378
+  },
+  "-1704397990": {
+    "name": "New York - Shuman Trail Loop",
+    "road": 3,
+    "time": 643043
+  },
+  "274775181": {
+    "name": "New York - Shuman Trail Reverse",
+    "road": 3,
+    "time": 675557
+  },
+  "-697027596": {
+    "name": "New York - The 6 Train",
+    "road": 4,
+    "time": 173378
+  },
+  "274639515": {
+    "name": "New York - The 6 Train Reverse",
+    "road": 4,
+    "time": 173378
+  },
+  "1732356505": {
+    "name": "New York - The Highline",
+    "road": 24,
+    "time": 556294
+  },
+  "1763213625": {
+    "name": "New York - The Highline Reverse",
+    "road": 24,
+    "time": 551875
+  },
+  "-930393161": {
+    "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es",
+    "road": 0,
+    "time": 485917
+  },
+  "1236439870": {
+    "name": "Paris - Lutece Express",
+    "road": 0,
+    "time": 485917
+  },
+  "-2098947784": {
+    "name": "Richmond - 2015 Worlds Course",
+    "road": 0,
+    "time": 996941
+  },
+  "1545087483": {
+    "name": "Richmond - Cobbled Climbs",
+    "road": 0,
+    "time": 996941
+  },
+  "-100615025": {
+    "name": "Richmond - Cobbled Climbs Reverse",
+    "road": 0,
+    "time": 996941
+  },
+  "54700404": {
+    "name": "Richmond - Libby Hill After Party",
+    "road": 0,
+    "time": 996941
+  },
+  "1039983620": {
+    "name": "Richmond - Richmond 2015 Worlds Reverse",
+    "road": 0,
+    "time": 996941
+  },
+  "948831673": {
+    "name": "Richmond - Richmond Rollercoaster",
+    "road": 0,
+    "time": 209369
+  },
+  "1638640398": {
+    "name": "Richmond - The Fan Flats",
+    "road": 0,
+    "time": 209509
+  },
+  "-187217705": {
+    "name": "Scotland - City and the Sgurr",
+    "road": 3,
+    "time": 366100
+  },
+  "-529627940": {
+    "name": "Scotland - Glasgow Crit Circuit",
+    "road": 9,
+    "time": 1001667
+  },
+  "742057576": {
+    "name": "Scotland - Loch Loop",
+    "road": 2,
+    "time": 905327
+  },
+  "46799750": {
+    "name": "Scotland - Rolling Highlands",
+    "road": 2,
+    "time": 251962
+  },
+  "-632261715": {
+    "name": "Scotland - The Muckle Yin",
+    "road": 9,
+    "time": 1001667
+  },
+  "-54639337": {
+    "name": "Watopia - 11.1 Ocean Blvd",
+    "road": 47,
+    "time": 350274
+  },
+  "-475871543": {
+    "name": "Watopia - 5K Loop",
+    "road": 47,
+    "time": 349578
+  },
+  "1115260805": {
+    "name": "Watopia - Accelerate to Elevate",
+    "road": 81,
+    "time": 30426
+  },
+  "-1820739709": {
+    "name": "Watopia - Beach Island Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "1917017591": {
+    "name": "Watopia - Big Flat 8",
+    "road": 81,
+    "time": 30426
+  },
+  "-373554961": {
+    "name": "Watopia - Big Foot Hills",
+    "road": 81,
+    "time": 30426
+  },
+  "-1347856247": {
+    "name": "Watopia - Big Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "-187122806": {
+    "name": "Watopia - Big Loop Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "2139708890": {
+    "name": "Watopia - Bigger Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "-1699508175": {
+    "name": "Watopia - Canopies and Coastlines",
+    "road": 81,
+    "time": 561265
+  },
+  "1373909093": {
+    "name": "Watopia - Chili Pepper",
+    "road": 47,
+    "time": 362617
+  },
+  "-600015192": {
+    "name": "Watopia - Chili Pepper Reverse",
+    "road": 47,
+    "time": 347020
+  },
+  "-1613077956": {
+    "name": "Watopia - Climb Portal - Volcano",
+    "road": 23,
+    "time": 488947
+  },
+  "-1271607938": {
+    "name": "Watopia - Climber's Gambit",
+    "road": 0,
+    "time": 987711
+  },
+  "-1725581316": {
+    "name": "Watopia - Coast Crusher",
+    "road": 149,
+    "time": 129132
+  },
+  "5745690": {
+    "name": "Watopia - Downtown Titans",
+    "road": 0,
+    "time": 987711
+  },
+  "-1619903700": {
+    "name": "Watopia - Dust In The Wind",
+    "road": 81,
+    "time": 913245
+  },
+  "-1548491836": {
+    "name": "Watopia - Eastern Eight",
+    "road": 81,
+    "time": 30426
+  },
+  "-912947484": {
+    "name": "Watopia - Figure 8",
+    "road": 0,
+    "time": 987711
+  },
+  "553661379": {
+    "name": "Watopia - Figure 8 Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-899269028": {
+    "name": "Watopia - Flat Route",
+    "road": 0,
+    "time": 987711
+  },
+  "-483398031": {
+    "name": "Watopia - Flat Route Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-1416786329": {
+    "name": "Watopia - Four Horsemen",
+    "road": 0,
+    "time": 987711
+  },
+  "1635842477": {
+    "name": "Watopia - Going Coastal",
+    "road": 81,
+    "time": 30426
+  },
+  "1993374659": {
+    "name": "Watopia - Handful Of Gravel",
+    "road": 35,
+    "time": 316602
+  },
+  "-1586440278": {
+    "name": "Watopia - Handful of Gravel Run",
+    "road": 35,
+    "time": 316602
+  },
+  "-1557483915": {
+    "name": "Watopia - Hilly Route",
+    "road": 0,
+    "time": 987711
+  },
+  "107363867": {
+    "name": "Watopia - Hilly Route Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-721879714": {
+    "name": "Watopia - Italian Villas Circuit",
+    "road": 117,
+    "time": 641396
+  },
+  "136957568": {
+    "name": "Watopia - Jon's Route",
+    "road": 47,
+    "time": 350580
+  },
+  "743730361": {
+    "name": "Watopia - Jungle Circuit",
+    "road": 35,
+    "time": 546940
+  },
+  "-1455910170": {
+    "name": "Watopia - Jungle Circuit Reverse",
+    "road": 35,
+    "time": 546940
+  },
+  "-285836430": {
+    "name": "Watopia - Jurassic Coast",
+    "road": 81,
+    "time": 913245
+  },
+  "-430109420": {
+    "name": "Watopia - Legends and Lava",
+    "road": 81,
+    "time": 913245
+  },
+  "243949867": {
+    "name": "Watopia - Loop de Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "-1282378735": {
+    "name": "Watopia - May Field",
+    "road": 99,
+    "time": 185302
+  },
+  "1082034232": {
+    "name": "Watopia - Mayan Bridge Loop",
+    "road": 36,
+    "time": 770795
+  },
+  "-1075893284": {
+    "name": "Watopia - Mountain 8",
+    "road": 0,
+    "time": 987711
+  },
+  "-1341957011": {
+    "name": "Watopia - Mountain Mash",
+    "road": 36,
+    "time": 770795
+  },
+  "-1328149290": {
+    "name": "Watopia - Mountain Route",
+    "road": 0,
+    "time": 987711
+  },
+  "2139465450": {
+    "name": "Watopia - Muir And The Mountain",
+    "road": 81,
+    "time": 561265
+  },
+  "1386460176": {
+    "name": "Watopia - Ocean Lava Cliffside Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "-1546309583": {
+    "name": "Watopia - Out And Back Again",
+    "road": 81,
+    "time": 30426
+  },
+  "-1325015219": {
+    "name": "Watopia - Quatch Quest",
+    "road": 81,
+    "time": 913245
+  },
+  "762747962": {
+    "name": "Watopia - Repack Rush",
+    "road": 135,
+    "time": 975720
+  },
+  "-1327354915": {
+    "name": "Watopia - Road To Ruins Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-593398481": {
+    "name": "Watopia - Road to Ruins",
+    "road": 0,
+    "time": 987711
+  },
+  "-1631058747": {
+    "name": "Watopia - Road to Sky",
+    "road": 36,
+    "time": 770795
+  },
+  "772562418": {
+    "name": "Watopia - Run Path Reverse",
+    "road": 47,
+    "time": 430386
+  },
+  "604330868": {
+    "name": "Watopia - Sand And Sequoias",
+    "road": 81,
+    "time": 30426
+  },
+  "-840629157": {
+    "name": "Watopia - Seaside Sprint",
+    "road": 0,
+    "time": 609902
+  },
+  "-1465337769": {
+    "name": "Watopia - Serpentine 8",
+    "road": 35,
+    "time": 546940
+  },
+  "-1966465318": {
+    "name": "Watopia - Shorelines and Summits",
+    "road": 35,
+    "time": 316602
+  },
+  "-1033799550": {
+    "name": "Watopia - Spiral into the Volcano",
+    "road": 0,
+    "time": 987711
+  },
+  "1988847319": {
+    "name": "Watopia - Splash and Dash",
+    "road": 99,
+    "time": 195242
+  },
+  "240388043": {
+    "name": "Watopia - Sugar Cookie",
+    "road": 35,
+    "time": 546940
+  },
+  "-62240442": {
+    "name": "Watopia - Surfin' Safari",
+    "road": 36,
+    "time": 770795
+  },
+  "-1964332641": {
+    "name": "Watopia - Temple Trek",
+    "road": 35,
+    "time": 316602
+  },
+  "2128890027": {
+    "name": "Watopia - Tempus Fugit",
+    "road": 81,
+    "time": 30426
+  },
+  "263936293": {
+    "name": "Watopia - That's Amore",
+    "road": 47,
+    "time": 365699
+  },
+  "1586193601": {
+    "name": "Watopia - That's Amore Reverse",
+    "road": 47,
+    "time": 354429
+  },
+  "1656629976": {
+    "name": "Watopia - The Big Ring",
+    "road": 81,
+    "time": 30426
+  },
+  "-2087525117": {
+    "name": "Watopia - The Magnificent 8",
+    "road": 0,
+    "time": 987711
+  },
+  "-446475279": {
+    "name": "Watopia - The Mega Pretzel",
+    "road": 33,
+    "time": 770102
+  },
+  "-1799991412": {
+    "name": "Watopia - The Pretzel",
+    "road": 0,
+    "time": 987711
+  },
+  "1475638265": {
+    "name": "Watopia - The Uber Pretzel",
+    "road": 0,
+    "time": 987711
+  },
+  "-1667361048": {
+    "name": "Watopia - Three Little Sisters",
+    "road": 0,
+    "time": 987711
+  },
+  "-152194466": {
+    "name": "Watopia - Three Sisters",
+    "road": 0,
+    "time": 987711
+  },
+  "-31795178": {
+    "name": "Watopia - Three Sisters Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-928742216": {
+    "name": "Watopia - Tick Tock",
+    "road": 81,
+    "time": 30426
+  },
+  "1766405776": {
+    "name": "Watopia - Tour of Fire and Ice",
+    "road": 23,
+    "time": 788778
+  },
+  "-841773096": {
+    "name": "Watopia - Triple Flat Loops",
+    "road": 81,
+    "time": 30426
+  },
+  "-982929680": {
+    "name": "Watopia - Two Bridges Loop",
+    "road": 0,
+    "time": 987711
+  },
+  "686828068": {
+    "name": "Watopia - Volcano Circuit",
+    "road": 23,
+    "time": 788778
+  },
+  "-428725966": {
+    "name": "Watopia - Volcano Circuit CCW",
+    "road": 23,
+    "time": 788778
+  },
+  "849508252": {
+    "name": "Watopia - Volcano Climb",
+    "road": 0,
+    "time": 987711
+  },
+  "387309391": {
+    "name": "Watopia - Volcano Climb After Party",
+    "road": 0,
+    "time": 987711
+  },
+  "-300032622": {
+    "name": "Watopia - Volcano Flat",
+    "road": 0,
+    "time": 987711
+  },
+  "1397026382": {
+    "name": "Watopia - Volcano Flat Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "-2076558014": {
+    "name": "Watopia - WBR Climbing Series",
+    "road": 0,
+    "time": 987711
+  },
+  "1064303857": {
+    "name": "Watopia - Watopia's Waistband",
+    "road": 81,
+    "time": 30426
+  },
+  "982239385": {
+    "name": "Watopia - Whole Lotta Lava",
+    "road": 23,
+    "time": 788778
+  },
+  "-673805084": {
+    "name": "Watopia - Zwift Bambino Fondo",
+    "road": 0,
+    "time": 987711
+  },
+  "-926340645": {
+    "name": "Watopia - Zwift Bambino Fondo 2022",
+    "road": 0,
+    "time": 987711
+  },
+  "762151244": {
+    "name": "Watopia - Zwift Games 2024 Epic",
+    "road": 0,
+    "time": 189032
+  },
+  "242381847": {
+    "name": "Watopia - Zwift Gran Fondo",
+    "road": 0,
+    "time": 987711
+  },
+  "1327147942": {
+    "name": "Watopia - Zwift Gran Fondo 2022",
+    "road": 0,
+    "time": 987711
+  },
+  "-546187135": {
+    "name": "Watopia - Zwift Medio Fondo",
+    "road": 0,
+    "time": 987711
+  },
+  "-1394893085": {
+    "name": "Watopia - Zwift Medio Fondo 2022",
+    "road": 0,
+    "time": 987711
+  },
+  "2007026433": {
+    "name": "Yorkshire - 2019 Worlds Harrogate Circuit",
+    "road": 0,
+    "time": 5068
+  },
+  "1233527301": {
+    "name": "Yorkshire - Duchy Estate",
+    "road": 0,
+    "time": 718743
+  },
+  "620436060": {
+    "name": "Yorkshire - Harrogate Circuit Reverse",
+    "road": 0,
+    "time": 5068
+  },
+  "-1287700625": {
+    "name": "Yorkshire - Queen's Highway",
+    "road": 0,
+    "time": 718743
+  },
+  "87631443": {
+    "name": "Yorkshire - Queens Highway After Party",
+    "road": 0,
+    "time": 718743
+  },
+  "-1389586229": {
+    "name": "Yorkshire - Royal Pump Room 8",
+    "road": 0,
+    "time": 5068
+  },
+  "1086718516": {
+    "name": "Yorkshire - Tour Of Tewit Well",
+    "road": 0,
+    "time": 5068
+  }
+}
