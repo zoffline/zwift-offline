@@ -511,9 +511,6 @@ def play_pace_partners():
         if pause > 0: time.sleep(pause)
 
 def load_bots():
-    body_types = [16, 48, 80, 272, 304, 336, 528, 560, 592]
-    hair_types = [25953412, 175379869, 398510584, 659452569, 838618949, 924073005, 1022111028, 1262230565, 1305767757, 1569595897, 1626212425, 1985754517, 2234835005, 2507058825, 3092564365, 3200039653, 3296520581, 3351295312, 3536770137, 4021222889, 4179410997, 4294226781]
-    facial_hair_types = [248681634, 398510584, 867351826, 1947387842, 2173853954, 3169994930, 4131541011, 4216468066]
     multiplier = 1
     with open(ENABLE_BOTS_FILE) as f:
         try:
@@ -556,12 +553,14 @@ def load_bots():
                             for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
                                 if item in rider:
                                     setattr(p, item, rider[item])
-                            p.body_type = random.choice(body_types)
-                            p.hair_type = random.choice(hair_types)
+                            p.hair_type = random.choice(zo.GD['hair_types'])
+                            p.hair_colour = random.randrange(5)
                             if p.is_male:
-                                p.facial_hair_type = random.choice(facial_hair_types)
+                                p.body_type = random.choice(zo.GD['body_types_male'])
+                                p.facial_hair_type = random.choice(zo.GD['facial_hair_types'])
+                                p.facial_hair_colour = random.randrange(5)
                             else:
-                                p.body_type += 1
+                                p.body_type = random.choice(zo.GD['body_types_female'])
                             bot.profile = p
                         i += 1
 

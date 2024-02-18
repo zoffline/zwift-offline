@@ -28,12 +28,14 @@ route_exceptions = {
     'CASTLE CRIT (RUNNING)': 'CASTLE CRIT RUN'
 }
 
+with open('../data/game_dictionary.txt') as f:
+    gd = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
+
 base_url = 'http://cdn.zwift.com/gameassets/'
 filename = 'GameDictionary.xml'
 open(filename, 'wb').write(PoolManager().request('GET', base_url + filename).data)
 tree = ET.parse(filename)
 root = tree.getroot()
-gd = {}
 gd['headgears'] = [int(x.get('signature')) for x in root.findall("./HEADGEARS/HEADGEAR")]
 gd['glasses'] = [int(x.get('signature')) for x in root.findall("./GLASSES/GLASS")]
 gd['bikeshoes'] = [int(x.get('signature')) for x in root.findall("./BIKESHOES/BIKESHOE")]
