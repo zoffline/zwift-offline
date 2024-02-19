@@ -7,23 +7,22 @@ import subprocess
 worlds = 'C:\\Program Files (x86)\\Zwift\\assets\\Worlds'
 
 world_to_course = {
-    '1': 6,
-    '2': 2,
-    '3': 7,
-    '4': 8,
-    '5': 9,
-    '6': 10,
-    '7': 11,
-    '8': 12,
-    '9': 13,
-    '10': 14,
-    '11': 15,
-    '12': 16,
-    '13': 17
+    '1': (6, 'Watopia'),
+    '2': (2, 'Richmond'),
+    '3': (7, 'London'),
+    '4': (8, 'New York'),
+    '5': (9, 'Innsbruck'),
+    '6': (10, 'Bologna'),
+    '7': (11, 'Yorkshire'),
+    '8': (12, 'Crit City'),
+    '9': (13, 'Makuri Islands'),
+    '10': (14, 'France'),
+    '11': (15, 'Paris'),
+    '12': (16, 'Gravel Mountain'),
+    '13': (17, 'Scotland')
 }
 
 data = []
-event_id = 1000
 
 for directory in os.listdir(worlds):
     world = directory[5:]
@@ -37,14 +36,12 @@ for directory in os.listdir(worlds):
             route = tree.find('route')
             if route.get('eventOnly') == '1':
                 event = {
-                    'id': event_id,
-                    'name': route.get('name').strip(),
+                    'name': '%s - %s' % (world_to_course[world][1], route.get('name').strip()),
                     'route': int(route.get('nameHash')),
-                    'course': world_to_course[world],
+                    'course': world_to_course[world][0],
                     'sport': 1 if route.get('sportType') == '2' else 0
                 }
                 data.append(event)
-                event_id += 1000
 
 with open('../data/events.txt', 'w') as f:
     json.dump(sorted(data, key=lambda row: row['name']), f, indent=2)

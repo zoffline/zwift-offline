@@ -1321,12 +1321,14 @@ def get_events(limit=None, sport=None):
     events = events_pb2.Events()
     eventStart = int(time.time()) * 1000 + 2 * 60000
     eventStartWT = world_time() + 2 * 60000
+    event_id = 0
     for item in events_list:
+        event_id += 10
         if sport != None and item['sport'] != profile_pb2.Sport.Value(sport):
             continue
         event = events.events.add()
         event.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-        event.id = item['id']
+        event.id = event_id
         event.name = item['name']
         event.route_id = item['route'] #otherwise new home screen hangs trying to find route in all (even non-existent) courses
         event.course_id = item['course']
@@ -1350,7 +1352,7 @@ def get_events(limit=None, sport=None):
         paceValues = ((4,15), (3,4), (2,3), (1,2), (0.1,1))
         for cat in range(1,5):
             event_cat = event.category.add()
-            event_cat.id = item['id'] + cat
+            event_cat.id = event_id + cat
             #event_cat.registrationStart = eventStart - 30 * 60000
             #event_cat.registrationStartWT = eventStartWT - 30 * 60000
             event_cat.registrationEnd = eventStart
