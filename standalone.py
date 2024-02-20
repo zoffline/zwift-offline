@@ -786,6 +786,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                         socket.sendto(r, client_address)
                         message.msgnum += 1
                         del message.states[:]
+                    if player.groupId:
+                        player.groupId = state.groupId # fix bots in event only routes
                     message.states.append(player)
         else:
             message.num_msgs = 1
