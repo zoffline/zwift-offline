@@ -553,7 +553,7 @@
             "boolValue": false
           },
           "UseEventAssets": {
-            "varintValue": "3"
+            "varintValue": "0"
           },
           "allowPortalRoadDifficultySelection": {
             "boolValue": true
@@ -1058,6 +1058,20 @@
     {
       "name": "game_1_58_steer_to_select_intersection",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_58_support_zp_user_inputs",
+      "values": {
+        "fields": {
+          "enable_settings_ui": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_59_queued_recommendations",
       "values": {}
     },
     {
