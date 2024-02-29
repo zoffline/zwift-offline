@@ -152,6 +152,9 @@ restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
 
+with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
+    CLIMBS = json.load(f)
+
 with open(os.path.join(SCRIPT_DIR, "data", "game_dictionary.txt")) as f:
     GD = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
 
@@ -826,9 +829,7 @@ def intervals(username):
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
-    with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
-        climbs = json.load(f)
-    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), climbs=climbs,
+    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), climbs=CLIMBS,
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
 def enqueue_player_update(player_id, wa_bytes):
@@ -3652,7 +3653,7 @@ def launch_zwift():
             return redirect(url_for('login'))
         else:
             return render_template("user_home.html", username=current_user.username, enable_ghosts=os.path.exists(ENABLEGHOSTS_FILE), online=get_online(),
-                is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
+                climbs=CLIMBS, is_admin=False, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
     else:
         if MULTIPLAYER:
             return redirect("http://zwift/?code=zwift_refresh_token%s" % fake_refresh_token_with_session_cookie(request.cookies.get('remember_token')), 302)
