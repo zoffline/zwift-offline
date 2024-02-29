@@ -127,15 +127,13 @@ to generate your own certificates and do the same.
   * If your Zwift version is 1.0.126283, you're all set.
   * If Zwift is not installed, install it before installing zoffline.
   * If your Zwift version is newer than 1.0.126283: copy ``~/Library/Application Support/Zwift/ZwiftMac_ver_cur.xml`` to zoffline's ``cdn/gameassets/Zwift_Updates_Root/`` overwriting the existing file.
-* On your Mac machine running Zwift, copy the following files in this repo to a known location:
-  * [ssl/cert-zwift-com.p12](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.p12)
-  * [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem)
+* On your Mac machine running Zwift, copy the file [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem) in this repo to a known location.
 * Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
-    * Click "File - Import Items..." and import ``ssl/cert-zwift-com.p12``
+    * Click "File - Import Items..." and import cert-zwift-com.pem
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
-    * If you're prompted for a password, just leave it blank. There is no password.
 * Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
-  * Append the contents of the SSL certificate ``ssl/cert-zwift-com.pem`` to cacert.pem (only the certificate and not the included private key)
+  * Append only the certificate (lines 29 to 53) from cert-zwift-com.pem to cacert.pem
+  * __IMPORTANT:__ do not append the private key (lines 1 to 28)
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
