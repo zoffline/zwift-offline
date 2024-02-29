@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Bealach na Ba",
+    "road": "10011"
+  },
+  {
+    "name": "Cheddar Gorge",
+    "road": "10021"
+  },
+  {
+    "name": "Cipressa",
+    "road": "10022"
+  },
+  {
+    "name": "Climb to Hollywood Sign",
+    "road": "10001"
+  },
+  {
+    "name": "Col d'Aspin",
+    "road": "10004"
+  },
+  {
+    "name": "Col de la Madone",
+    "road": "10015"
+  },
+  {
+    "name": "Col des Aravis",
+    "road": "10005"
+  },
+  {
+    "name": "Col du Platzerwasel",
+    "road": "10008"
+  },
+  {
+    "name": "Col du Rosier",
+    "road": "10023"
+  },
+  {
+    "name": "Col du Tourmalet",
+    "road": "10010"
+  },
+  {
+    "name": "Coll d'Ordino",
+    "road": "10013"
+  },
+  {
+    "name": "Cote de Domancy",
+    "road": "10007"
+  },
+  {
+    "name": "Cote de Pike",
+    "road": "10003"
+  },
+  {
+    "name": "Cote de Trebiac",
+    "road": "10009"
+  },
+  {
+    "name": "Crow Road",
+    "road": "10012"
+  },
+  {
+    "name": "Eazy Rider",
+    "road": "10002"
+  },
+  {
+    "name": "La Laguna Negra",
+    "road": "10014"
+  },
+  {
+    "name": "La Super Planche des Belles Filles",
+    "road": "10019"
+  },
+  {
+    "name": "Old La Honda",
+    "road": "10018"
+  },
+  {
+    "name": "Old Willunga Hill",
+    "road": "10020"
+  },
+  {
+    "name": "Puy de Dome",
+    "road": "10006"
+  },
+  {
+    "name": "Rocacorba",
+    "road": "10017"
+  },
+  {
+    "name": "Sa Calobra",
+    "road": "10016"
+  },
+  {
+    "name": "Ski Lift Climb",
+    "road": "10000"
+  }
+]

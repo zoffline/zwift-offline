@@ -5,6 +5,7 @@
 import datetime
 import random
 import sys
+import json
 
 from xml.dom import minidom
 
@@ -13,7 +14,7 @@ MAPS = ['FRANCE', 'INNSBRUCK', 'LONDON', 'MAKURIISLANDS', 'RICHMOND', 'SCOTLAND'
 dom = minidom.parseString('<MapSchedule><appointments></appointments><VERSION>1</VERSION></MapSchedule>')
 appts = dom.getElementsByTagName('appointments')[0]
 
-now = datetime.datetime.utcnow().replace(day=1)
+now = datetime.datetime.now(datetime.timezone.utc).replace(day=1)
 prev_map = None
 for i in range(0, 500):
     map_choice = random.choice(MAPS)
@@ -30,13 +31,14 @@ for i in range(0, 500):
 with open('MapSchedule_v2.xml', 'w') as f:
     f.write(dom.toprettyxml())
 
-
-CLIMBS = [str(x) for x in range(10000, 10024)]
+with open('../data/climbs.txt') as f:
+    data = json.load(f)
+CLIMBS = [x['road'] for x in data]
 
 dom = minidom.parseString('<PortalRoads><PortalRoadSchedule><appointments></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>')
 appts = dom.getElementsByTagName('appointments')[0]
 
-now = datetime.datetime.utcnow()
+now = datetime.datetime.now(datetime.timezone.utc)
 prev_climb = None
 for i in range(0, 100):
     climb_choice = random.choice(CLIMBS)

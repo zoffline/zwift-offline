@@ -826,7 +826,9 @@ def intervals(username):
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
-    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts),
+    with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
+        climbs = json.load(f)
+    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), climbs=climbs,
         online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
 
 def enqueue_player_update(player_id, wa_bytes):

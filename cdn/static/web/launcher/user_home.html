@@ -49,30 +49,9 @@
             <label class="text-shadow">Climb</label>
             <select name="climb" class="form-control form-control-sm">
               <option value="CALENDAR">Calendar</option>
-              <option value="10000">Ski Lift Climb</option>
-              <option value="10001">Climb to Hollywood Sign</option>
-              <option value="10002">Eazy Rider</option>
-              <option value="10003">Cote de Pike</option>
-              <option value="10004">Col d'Aspin</option>
-              <option value="10005">Col des Aravis</option>
-              <option value="10006">Puy de Dome</option>
-              <option value="10007">Cote de Domancy</option>
-              <option value="10008">Col du Platzerwasel</option>
-              <option value="10009">Cote de Trebiac</option>
-              <option value="10010">Col du Tourmalet</option>
-              <option value="10011">Bealach na Ba</option>
-              <option value="10012">Crow Road</option>
-              <option value="10013">Coll d'Ordino</option>
-              <option value="10014">La Laguna Negra</option>
-              <option value="10015">Col de la Madone</option>
-              <option value="10016">Sa Calobra</option>
-              <option value="10017">Rocacorba</option>
-              <option value="10018">Old La Honda</option>
-              <option value="10019">La Super Planche des Belles Filles</option>
-              <option value="10020">Old Willunga Hill</option>
-              <option value="10021">Cheddar Gorge</option>
-              <option value="10022">Cipressa</option>
-              <option value="10023">Col du Rosier</option>
+              {% for climb in climbs %}
+                <option value="{{ climb['road'] }}">{{ climb['name'] }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
@@ -105,11 +84,4 @@
       {% endwith %}
     </div>
   </div>
-{% endblock %}
-{% block scripts %}
-  <script>
-    setTimeout(function() {
-      window.location.reload();
-    }, 20000);
-  </script>
 {% endblock %}
