@@ -1,98 +1,98 @@
 [
   {
-    "name": "Bealach na Ba",
+    "name": "Bealach na Ba (9 km / 632 m)",
     "road": "10011"
   },
   {
-    "name": "Cheddar Gorge",
+    "name": "Cheddar Gorge (4.7 km / 171 m)",
     "road": "10021"
   },
   {
-    "name": "Cipressa",
+    "name": "Cipressa (6.4 km / 228 m)",
     "road": "10022"
   },
   {
-    "name": "Climb to Hollywood Sign",
+    "name": "Climb to Hollywood Sign (8 km / 477 m)",
     "road": "10001"
   },
   {
-    "name": "Col d'Aspin",
+    "name": "Col d'Aspin (13.5 km / 811 m)",
     "road": "10004"
   },
   {
-    "name": "Col de la Madone",
+    "name": "Col de la Madone (15.9 km / 898 m)",
     "road": "10015"
   },
   {
-    "name": "Col des Aravis",
+    "name": "Col des Aravis (5.2 km / 280 m)",
     "road": "10005"
   },
   {
-    "name": "Col du Platzerwasel",
+    "name": "Col du Platzerwasel (7.9 km / 596 m)",
     "road": "10008"
   },
   {
-    "name": "Col du Rosier",
+    "name": "Col du Rosier (5 km / 222 m)",
     "road": "10023"
   },
   {
-    "name": "Col du Tourmalet",
+    "name": "Col du Tourmalet (17.1 km / 1216 m)",
     "road": "10010"
   },
   {
-    "name": "Coll d'Ordino",
+    "name": "Coll d'Ordino (10.3 km / 505 m)",
     "road": "10013"
   },
   {
-    "name": "Cote de Domancy",
+    "name": "Cote de Domancy (3 km / 240 m)",
     "road": "10007"
   },
   {
-    "name": "Cote de Pike",
+    "name": "Cote de Pike (2.2 km / 215 m)",
     "road": "10003"
   },
   {
-    "name": "Cote de Trebiac",
+    "name": "Cote de Trebiac (4.6 km / 207 m)",
     "road": "10009"
   },
   {
-    "name": "Crow Road",
+    "name": "Crow Road (7 km / 251 m)",
     "road": "10012"
   },
   {
-    "name": "Eazy Rider",
+    "name": "Eazy Rider (1.3 km / 21 m)",
     "road": "10002"
   },
   {
-    "name": "La Laguna Negra",
+    "name": "La Laguna Negra (9.1 km / 509 m)",
     "road": "10014"
   },
   {
-    "name": "La Super Planche des Belles Filles",
+    "name": "La Super Planche des Belles Filles (8.6 km / 602 m)",
     "road": "10019"
   },
   {
-    "name": "Old La Honda",
+    "name": "Old La Honda (5.6 km / 395 m)",
     "road": "10018"
   },
   {
-    "name": "Old Willunga Hill",
+    "name": "Old Willunga Hill (4 km / 252 m)",
     "road": "10020"
   },
   {
-    "name": "Puy de Dome",
+    "name": "Puy de Dome (13 km / 913 m)",
     "road": "10006"
   },
   {
-    "name": "Rocacorba",
+    "name": "Rocacorba (11.8 km / 756 m)",
     "road": "10017"
   },
   {
-    "name": "Sa Calobra",
+    "name": "Sa Calobra (10.8 km / 658 m)",
     "road": "10016"
   },
   {
-    "name": "Ski Lift Climb",
+    "name": "Ski Lift Climb (8.6 km / 689 m)",
     "road": "10000"
   }
 ]

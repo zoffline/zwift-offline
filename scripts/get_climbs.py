@@ -11,8 +11,13 @@ for file in os.listdir(climbs):
     if file.startswith('road_'):
         tree = ET.parse(os.path.join(climbs, file))
         metadata = tree.find('.//metadata')
+        name = metadata.find('m_PortalRoadUserFacingName').text
+        length = round(float(metadata.find('m_PortalRoadCourseLength').text) / 100000, 1)
+        if length.is_integer():
+            length = int(length)
+        ascent = int(float(metadata.find('m_PortalRoadCourseAscentF').text) / 100)
         climb = {
-            'name': metadata.find('m_PortalRoadUserFacingName').text,
+            'name': '%s (%s km / %s m)' % (name, length, ascent),
             'road': metadata.find('m_PortalRoadHash').text
         }
         data.append(climb)
