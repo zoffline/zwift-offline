@@ -38,6 +38,7 @@ for directory in os.listdir(worlds):
                 event = {
                     'name': '%s - %s' % (world_to_course[world][1], route.get('name').strip()),
                     'route': int(route.get('nameHash')),
+                    'distance': float(route.get('distanceInMeters')),
                     'course': world_to_course[world][0],
                     'sport': 1 if route.get('sportType') == '2' else 0
                 }

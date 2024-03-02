@@ -1342,7 +1342,7 @@ def get_events(limit=None, sport=None):
         event.overrideMapPreferences = False
         event.invisibleToNonParticipants = False
         event.description = "Auto-generated event"
-        event.distanceInMeters = 0
+        event.distanceInMeters = item['distance']
         event.laps = 0
         event.durationInSeconds = 0
         #event.rules_id = 
@@ -1378,7 +1378,7 @@ def get_events(limit=None, sport=None):
             event_cat.toPaceValue = paceValues[cat - 1][1]
             #event_cat.scode = 7; // ex: "PT3600S"
             #event_cat.rules_id = 8; // 320 and others
-            event_cat.distanceInMeters = 0
+            event_cat.distanceInMeters = item['distance']
             event_cat.laps = 0
             event_cat.durationInSeconds = 0
             #event_cat.jerseyHash = 36; // 493134166, tag672
