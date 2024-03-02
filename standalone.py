@@ -510,6 +510,20 @@ def play_pace_partners():
         pause = pacer_update_freq - (time.perf_counter() - start)
         if pause > 0: time.sleep(pause)
 
+def get_names():
+    bots_file = '%s/bot.txt' % STORAGE_DIR
+    if os.path.isfile(bots_file):
+        with open(bots_file) as f:
+            return json.load(f)['riders']
+    with open('%s/data/names.txt' % SCRIPT_DIR) as f:
+        data = json.load(f)
+    riders = []
+    for _ in range(1000):
+        is_male = bool(random.getrandbits(1))
+        riders.append({'first_name': random.choice(data['male_first_names']) if is_male else random.choice(data['female_first_names']),
+            'last_name': random.choice(data['last_names']), 'is_male': is_male, 'country_code': random.choice(zo.GD['country_codes'])})
+    return riders
+
 def load_bots():
     multiplier = 1
     with open(ENABLE_BOTS_FILE) as f:
@@ -517,11 +531,6 @@ def load_bots():
             multiplier = int(f.readline().rstrip('\r\n'))
         except ValueError:
             pass
-    bots_file = '%s/bot.txt' % STORAGE_DIR
-    if not os.path.isfile(bots_file):
-        bots_file = '%s/data/bot.txt' % SCRIPT_DIR
-    with open(bots_file) as f:
-        data = json.load(f)
     i = 1
     loop_riders = []
     for name in os.listdir(STORAGE_DIR):
@@ -547,7 +556,7 @@ def load_bots():
                                 bot.route = global_bots[i + 1000000].route
                             bot.position = positions.pop()
                             if not loop_riders:
-                                loop_riders = data['riders'].copy()
+                                loop_riders = get_names()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
                             for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
