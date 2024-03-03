@@ -34,13 +34,13 @@
           <div class="col-md-12">
             <label class="text-shadow">Map</label>
             <select name="map" class="form-control form-control-sm">
-              <option value="CALENDAR">Calendar ({{online.total}} online total)</option>
-              <option value="LONDON">London / Yorkshire ({{online.london + online.yorkshire}} online)</option>
-              <option value="MAKURIISLANDS">Makuri Islands / NYC ({{online.makuriislands + online.newyork}} online)</option>
-              <option value="FRANCE">France / Paris ({{online.france + online.paris}} online)</option>
-              <option value="RICHMOND">Richmond / London ({{online.richmond + online.london}} online)</option>
-              <option value="INNSBRUCK">Innsbruck / Richmond ({{online.innsbruck + online.richmond}} online)</option>
-              <option value="SCOTLAND">Scotland / Makuri Islands ({{online.scotland + online.makuriislands}} online)</option>
+              <option value="CALENDAR">Calendar{% if online.total > 0 %} ({{online.total}} online total){% endif %}</option>
+              <option value="LONDON">London / Yorkshire{% if online.london + online.yorkshire > 0 %} ({{online.london + online.yorkshire}} online){% endif %}</option>
+              <option value="MAKURIISLANDS">Makuri Islands / NYC{% if online.makuriislands + online.newyork > 0 %} ({{online.makuriislands + online.newyork}} online){% endif %}</option>
+              <option value="FRANCE">France / Paris{% if online.france + online.paris > 0 %} ({{online.france + online.paris}} online){% endif %}</option>
+              <option value="RICHMOND">Richmond / London{% if online.richmond + online.london > 0 %} ({{online.richmond + online.london}} online){% endif %}</option>
+              <option value="INNSBRUCK">Innsbruck / Richmond{% if online.innsbruck + online.richmond > 0 %} ({{online.innsbruck + online.richmond}} online){% endif %}</option>
+              <option value="SCOTLAND">Scotland / Makuri Islands{% if online.scotland + online.makuriislands > 0 %} ({{online.scotland + online.makuriislands}} online){% endif %}</option>
             </select>
           </div>
         </div>
