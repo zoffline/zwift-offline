@@ -2,7 +2,7 @@
 
 zoffline enables the use of [Zwift](http://zwift.com) offline by acting as a partial implementation of a Zwift server. By default zoffline is only for a single player. See [Step 6: Enable Multiplayer](#step-6-optional-enable-multiplayer) for how to enable support for multiple users/profiles.
 
-zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See [ghosts and bots](https://github.com/zoffline/zwift-offline/wiki/Ghosts-and-bots) for extra details.
+zoffline also offers riding against ghosts (your previous rides). Enable this feature by checking "Enable ghosts" in zoffline's launcher. See [Ghosts and bots](#ghosts-and-bots) for extra details.
 
 Additionally, zoffline's launcher allows selecting a specific map to ride on without mucking about with config files.
 
@@ -318,6 +318,25 @@ To enable support for multiple users perform the steps below:
   MinProtocol = TLSv1.0
   CipherString = DEFAULT@SECLEVEL=1
   ```
+</details>
+
+### Ghosts and bots
+
+<details><summary>Expand</summary>
+
+#### Ghosts
+
+* Enable this feature by checking "Enable ghosts" in zoffline's launcher.
+* If you are running Zwift on Android, create a file ``enable_ghosts.txt`` inside the ``storage`` folder or access ``https://<zoffline_ip>/login/`` from a browser if you are using multiplayer (you must click the "Start Zwift" button to save the option).
+* When you save an activity, the ghost will be saved in ``storage/<player_id>/ghosts/<world>/<route>``. Next time you ride the same route, the ghost will be loaded.
+* Type ``.regroup`` in chat to regroup the ghosts.
+
+#### Bots
+
+* Create a file ``enable_bots.txt`` inside the ``storage`` folder to load ghosts as bots, they will keep riding around regardless of the route you are riding.
+* Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
+* Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The scripts ``get_pro_names.py`` and ``get_strava_names.py`` can be used to populate this file.
+* If you want some random bots, download [zoffline-bots-main.zip](https://codeload.github.com/oldnapalm/zoffline-bots/zip/refs/heads/main) and extract the ``bots`` folder to your ``storage`` folder.
 </details>
 
 ## Community Discord server and Strava club
