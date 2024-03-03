@@ -74,6 +74,10 @@
       }
     },
     {
+      "name": "game_1_26_event_survey",
+      "values": {}
+    },
+    {
       "name": "game_1_27_atv_remote_gestures",
       "value": true,
       "values": {
@@ -156,6 +160,7 @@
     },
     {
       "name": "game_1_29_player_highlight",
+      "value": true,
       "values": {
         "fields": {
           "HighlightWorkoutFX": {
@@ -390,8 +395,11 @@
           "assistDelaySecs": {
             "numberValue": 4.0
           },
-          "heavyPress": {
-            "numberValue": 400.0
+          "heavyPressAnalog": {
+            "numberValue": 450.0
+          },
+          "heavyPressDigital": {
+            "numberValue": 650.0
           },
           "lightPress": {
             "numberValue": 10.0
@@ -698,6 +706,7 @@
     },
     {
       "name": "game_1_47_onboarding_quest_rpc",
+      "value": true,
       "values": {}
     },
     {
@@ -884,7 +893,7 @@
       "values": {
         "fields": {
           "activity_count": {
-            "varintValue": "15"
+            "varintValue": "7"
           }
         }
       }
@@ -1053,6 +1062,7 @@
     },
     {
       "name": "game_1_58_fit_record_utc_timestamp",
+      "value": true,
       "values": {}
     },
     {

@@ -1045,11 +1045,16 @@ def api_eventfeed():
         json_data.append({"event": e})
     return jsonify({"data":json_data,"cursor":None})
 
+@app.route('/api/recommendations/recommendation', methods=['GET'])
+def api_recommendations_recommendation():
+    return jsonify([{"type": "EVENT"}])
+
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/recommendation/profile', methods=['GET'])
-@app.route('/api/recommendations/recommendation', methods=['GET'])
 @app.route('/api/subscription/plan', methods=['GET'])
+@app.route('/api/quest/quests/all-quests', methods=['GET'])
+@app.route('/api/quest/quests/my-quests', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
@@ -1211,6 +1216,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/player-playbacks/player/settings', methods=['GET', 'POST']) # TODO: private = \x08\x01 (1: 1)
 @app.route('/api/scoring/current', methods=['GET'])
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
+@app.route('/api/race-results', methods=['POST'])
 def api_proto_empty():
     return '', 200
 
@@ -1450,7 +1456,7 @@ def api_events_subgroups_register_id(ev_sg_id):
 
 @app.route('/api/events/subgroups/entrants/<int:ev_sg_id>', methods=['GET'])
 def api_events_subgroups_entrants_id(ev_sg_id):
-    return '[]', 200
+    return '', 200
 
 @app.route('/api/events/subgroups/invited_ride_sweepers/<int:ev_sg_id>', methods=['GET'])
 def api_events_subgroups_invited_ride_sweepers_id(ev_sg_id):

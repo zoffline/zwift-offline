@@ -8,7 +8,7 @@ with open("variant", "rb") as f:
     variants = variants_pb2.FeatureResponse()
     variants.ParseFromString(f.read())
 
-keep = ['zwift_launcher_']
+keep = ['zwift_launcher_', 'game_1_26_event_survey']
 
 with open("../data/variants.txt") as f:
     vs = [d for d in json.load(f)['variants'] if any(d['name'].startswith(s) for s in keep)]

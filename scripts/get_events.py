@@ -35,10 +35,14 @@ for directory in os.listdir(worlds):
             tree = ET.fromstring(re.sub(r"(<\?xml[^>]+\?>)", r"\1<root>", xml) + "</root>")
             route = tree.find('route')
             if route.get('eventOnly') == '1':
+                wname = world_to_course[world][1]
+                name = route.get('name').strip()
+                if not name.startswith(wname):
+                    name = '%s - %s' % (wname, name)
                 event = {
-                    'name': '%s - %s' % (world_to_course[world][1], route.get('name').strip()),
+                    'name': name,
                     'route': int(route.get('nameHash')),
-                    'distance': float(route.get('distanceInMeters')),
+                    'distance': round(float(route.get('distanceInMeters')) + float(route.get('leadinDistanceInMeters')), 1),
                     'course': world_to_course[world][0],
                     'sport': 1 if route.get('sportType') == '2' else 0
                 }
