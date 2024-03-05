@@ -217,6 +217,13 @@
     "sport": 0
   },
   {
+    "name": "Scotland - Glasgow Reverse",
+    "route": 1258415487,
+    "distance": 4208.3,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Big Flat 8",
     "route": 1917017591,
     "distance": 31491.1,

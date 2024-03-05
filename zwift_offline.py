@@ -1456,7 +1456,9 @@ def api_events_subgroups_register_id(ev_sg_id):
 
 @app.route('/api/events/subgroups/entrants/<int:ev_sg_id>', methods=['GET'])
 def api_events_subgroups_entrants_id(ev_sg_id):
-    return '', 200
+    if request.headers['Accept'] == 'application/x-protobuf-lite':
+        return '', 200
+    return '[]', 200
 
 @app.route('/api/events/subgroups/invited_ride_sweepers/<int:ev_sg_id>', methods=['GET'])
 def api_events_subgroups_invited_ride_sweepers_id(ev_sg_id):
@@ -1744,6 +1746,8 @@ def api_profiles_id_privacy(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_followers(m_player_id, t_player_id=0):
+    if request.headers['Accept'] == 'application/x-protobuf-lite':
+        return '', 200
     rows = db.session.execute(sqlalchemy.text("SELECT player_id, first_name, last_name FROM user"))
     json_data_list = []
     for row in rows:

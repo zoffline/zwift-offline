@@ -259,38 +259,6 @@
       "values": {}
     },
     {
-      "name": "game_1_34_coffee_stop",
-      "value": true,
-      "values": {
-        "fields": {
-          "end_event_distance_meters": {
-            "numberValue": 5000.0
-          },
-          "end_event_duration_milliseconds": {
-            "varintValue": "900000"
-          },
-          "initial_delay": {
-            "numberValue": 0.0
-          },
-          "initial_duration": {
-            "numberValue": 30.0
-          },
-          "initial_expiry": {
-            "numberValue": 300.0
-          },
-          "max_speed_adjustment_kph": {
-            "numberValue": 60.0
-          },
-          "middle_delay": {
-            "numberValue": 1800.0
-          },
-          "middle_duration": {
-            "numberValue": 180.0
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_34_ct_auto_pair_check",
       "values": {}
     },
@@ -337,11 +305,6 @@
     },
     {
       "name": "game_1_39_atv_connection_limit_check",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_delete_robopacer_entities",
       "value": true,
       "values": {}
     },
@@ -426,10 +389,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_41_leader_replay_dynamic_bias",
-      "values": {}
     },
     {
       "name": "game_1_41_show_racing_score",
@@ -871,7 +830,7 @@
             "numberValue": 0.8
           },
           "lowZone2FTPRelation": {
-            "numberValue": 0.7
+            "numberValue": 0.72
           },
           "midZone2FTPRelation": {
             "numberValue": 0.75
@@ -1008,11 +967,6 @@
       }
     },
     {
-      "name": "game_1_56_0_use_system_events_for_start_and_end_activity",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_56_draft_indicator",
       "values": {}
     },
@@ -1035,12 +989,8 @@
       "values": {}
     },
     {
-      "name": "game_1_57_0_use_system_events_for_accumulating_streak_totals",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_57_rideonbomb_vfx",
+      "value": true,
       "values": {}
     },
     {
@@ -1082,6 +1032,23 @@
     },
     {
       "name": "game_1_59_queued_recommendations",
+      "values": {}
+    },
+    {
+      "name": "game_1_60_app_hang_fix_join_world",
+      "values": {}
+    },
+    {
+      "name": "game_1_60_rideon_confetti",
+      "values": {}
+    },
+    {
+      "name": "game_1_60_sbsv2",
+      "values": {}
+    },
+    {
+      "name": "game_1_60_steering_shifting_braking_hvc_analytics",
+      "value": true,
       "values": {}
     },
     {
