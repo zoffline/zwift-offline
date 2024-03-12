@@ -89,18 +89,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(six.b("</script></head><body>Access token obtained successfully<br><br>"))
                 self.wfile.write(six.b("<button onclick=\"download()\">Download</button></body></html>"))
                 with open('%s/strava_token.txt' % SCRIPT_DIR, 'w') as f:
-                    f.write(self.server.client_id + '\n');
-                    f.write(self.server.client_secret + '\n');
-                    f.write(access_token + '\n');
-                    f.write(refresh_token + '\n');
-                    f.write(str(expires_at) + '\n');
+                    f.write(str(self.server.client_id) + '\n')
+                    f.write(self.server.client_secret + '\n')
+                    f.write(access_token + '\n')
+                    f.write(refresh_token + '\n')
+                    f.write(str(expires_at) + '\n')
             else:
                 self.server.logger.error("No code param received.")
                 self.wfile.write(six.b("ERROR: No code param recevied.\n"))
         else:
             url = client.authorization_url(client_id=self.server.client_id,
                                            redirect_uri='http://localhost:{}/authorization'.format(self.server.server_port),
-                                           scope='activity:write')
+                                           scope=['activity:write'])
 
             self.send_response(302)
             self.send_header(six.b("Content-type"), six.b("text/plain"))
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                         action='store', type=int, default=8000)
 
     parser.add_argument('--client-id', help='Strava API Client ID',
-                        action='store', default='28117')
+                        action='store', default=28117)
     parser.add_argument('--client-secret', help='Strava API Client Secret',
                         action='store', default='41b7b7b76d8cfc5dc12ad5f020adfea17da35468')
     args = parser.parse_args()
