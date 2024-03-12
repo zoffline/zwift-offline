@@ -5,7 +5,6 @@ import datetime
 import logging
 import os
 import signal
-import platform
 import random
 import sys
 import tempfile
@@ -13,7 +12,8 @@ import time
 import math
 import threading
 import re
-import smtplib, ssl
+import smtplib
+import ssl
 import requests
 import json
 import base64
@@ -25,9 +25,8 @@ from copy import deepcopy
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile, rmtree
-from logging.handlers import RotatingFileHandler
 from urllib.parse import quote
-from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, abort, make_response, send_file, send_from_directory
+from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.json_format import MessageToDict, Parse
@@ -127,7 +126,7 @@ import warnings
 with warnings.catch_warnings():
     from stravalib.client import Client
 
-STRAVA_CLIENT_ID = '28117'
+STRAVA_CLIENT_ID = 28117
 STRAVA_CLIENT_SECRET = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
 
 from tokens import *
@@ -336,6 +335,11 @@ class ActivityFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     activity_id = db.Column(db.Integer, nullable=False)
     full = db.Column(db.Integer, nullable=False)
+
+class ActivityImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    activity_id = db.Column(db.Integer, nullable=False)
 
 class PowerCurve(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -707,7 +711,7 @@ def strava():
     client = Client()
     url = client.authorization_url(client_id=STRAVA_CLIENT_ID,
                                    redirect_uri='https://launcher.zwift.com/authorization',
-                                   scope='activity:write')
+                                   scope=['activity:write'])
     return redirect(url)
 
 
@@ -719,11 +723,11 @@ def authorization():
         code = request.args.get('code')
         token_response = client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET, code=code)
         with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'strava_token.txt'), 'w') as f:
-            f.write(STRAVA_CLIENT_ID + '\n');
-            f.write(STRAVA_CLIENT_SECRET + '\n');
-            f.write(token_response['access_token'] + '\n');
-            f.write(token_response['refresh_token'] + '\n');
-            f.write(str(token_response['expires_at']) + '\n');
+            f.write(str(STRAVA_CLIENT_ID) + '\n')
+            f.write(STRAVA_CLIENT_SECRET + '\n')
+            f.write(token_response['access_token'] + '\n')
+            f.write(token_response['refresh_token'] + '\n')
+            f.write(str(token_response['expires_at']) + '\n')
         flash("Strava authorized.")
     except Exception as exc:
         logger.warning('Strava: %s' % repr(exc))
@@ -1217,6 +1221,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/scoring/current', methods=['GET'])
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
 @app.route('/api/race-results', methods=['POST'])
+@app.route('/api/workout/progress', methods=['POST'])
 def api_proto_empty():
     return '', 200
 
@@ -1659,7 +1664,7 @@ def do_api_profiles(profile_id, is_json):
             "imageSrc": imageSrc(profile.id), "imageSrcLarge": imageSrc(profile.id), "playerType": profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1)), "playerTypeId": jsf(profile, 'player_type', 1), "playerSubTypeId": None, 
             "emailAddress": jsf(profile, 'email'), "countryCode": jsf(profile, 'country_code'), "dob": jsf(profile, 'dob'), "countryAlpha3": "rus", "useMetric": jsb1(profile, 'use_metric'), "privacy": privacy(profile), "age": jsv0(profile, 'age'), 
             "ftp": jsf(profile, 'ftp'), "b": False, "weight": jsf(profile, 'weight_in_grams'), "connectedToStrava": jsb0(profile, 'connected_to_strava'), "connectedToTrainingPeaks": jsb0(profile, 'connected_to_training_peaks'), 
-            "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), "location": "", 
+            "connectedToTodaysPlan": jsb0(profile, 'connected_to_todays_plan'), "connectedToUnderArmour": jsb0(profile, 'connected_to_under_armour'), "connectedToFitbit": jsb0(profile, 'connected_to_fitbit'), "connectedToGarmin": jsb0(profile, 'connected_to_garmin'), "height": jsf(profile, 'height_in_millimeters'), 
             "totalExperiencePoints": jsv0(profile, 'total_xp'), "worldId": jsf(profile, 'server_realm'), "totalDistance": jsv0(profile, 'total_distance_in_meters'), "totalDistanceClimbed": jsv0(profile, 'elevation_gain_in_meters'), "totalTimeInMinutes": jsv0(profile, 'time_ridden_in_minutes'), 
             "achievementLevel": jsv0(profile, 'achievement_level'), "totalWattHours": jsv0(profile, 'total_watt_hours'), "runTime1miInSeconds": jsv0(profile, 'run_time_1mi_in_seconds'), "runTime5kmInSeconds": jsv0(profile, 'run_time_5km_in_seconds'), "runTime10kmInSeconds": jsv0(profile, 'run_time_10km_in_seconds'), 
             "runTimeHalfMarathonInSeconds": jsv0(profile, 'run_time_half_marathon_in_seconds'), "runTimeFullMarathonInSeconds": jsv0(profile, 'run_time_full_marathon_in_seconds'), "totalInKomJersey": jsv0(profile, 'total_in_kom_jersey'), "totalInSprintersJersey": jsv0(profile, 'total_in_sprinters_jersey'), 
@@ -1898,6 +1903,26 @@ def api_profiles_activities(player_id):
         row_to_protobuf(row, activity, exclude_fields=['fit'])
     return activities.SerializeToString(), 200
 
+@app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>/images', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_activities_images(player_id, activity_id):
+    images_dir = '%s/%s/images' % (STORAGE_DIR, player_id)
+    try:
+        if not os.path.isdir(images_dir):
+            os.makedirs(images_dir)
+    except IOError as e:
+        logger.error("failed to create images dir (%s):  %s", images_dir, str(e))
+        return '', 400
+    row = ActivityImage(player_id=player_id, activity_id=activity_id)
+    db.session.add(row)
+    db.session.commit()
+    image = activity_pb2.ActivityImage()
+    image.ParseFromString(request.stream.read())
+    with open('%s/%s.jpg' % (images_dir, row.id), 'wb') as f:
+        f.write(image.jpg)
+    return jsonify({"id": row.id, "id_str": str(row.id)})
+
 def time_since(date):
     seconds = (world_time() - date) // 1000
     interval = seconds // 31536000
@@ -2052,7 +2077,7 @@ def strava_upload(player_id, activity):
         return
     try:
         if time.time() > int(expires_at):
-            refresh_response = strava.refresh_access_token(client_id=client_id, client_secret=client_secret,
+            refresh_response = strava.refresh_access_token(client_id=int(client_id), client_secret=client_secret,
                                                            refresh_token=refresh_token)
             with open(strava_token, 'w') as f:
                 f.write(client_id + '\n')
@@ -3499,9 +3524,9 @@ def migrate_database():
         try:  # Fall back to a temporary dir
             copyfile(DATABASE_PATH, "%s/zwift-offline.db.v%s.%d.bak" % (tempfile.gettempdir(), version, int(time.time())))
         except Exception as exc:
-            logging.warn("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
+            logging.warning("Failed to create a zoffline database backup prior to upgrading it. %s" % repr(exc))
 
-    logging.warn("Migrating database, please wait")
+    logging.warning("Migrating database, please wait")
     db.session.execute(sqlalchemy.text('ALTER TABLE activity RENAME TO activity_old'))
     db.session.execute(sqlalchemy.text('ALTER TABLE goal RENAME TO goal_old'))
     db.session.execute(sqlalchemy.text('ALTER TABLE segment_result RENAME TO segment_result_old'))
@@ -3577,7 +3602,7 @@ def migrate_database():
     Version.query.filter_by(version=2).update(dict(version=DATABASE_CUR_VER))
     db.session.commit()
     db.session.execute(sqlalchemy.text('vacuum')) #shrink database
-    logging.warn("Database migration completed")
+    logging.warning("Database migration completed")
 
 def update_playback():
     for row in Playback.query.all():
@@ -3587,7 +3612,7 @@ def update_playback():
                 pb.ParseFromString(f.read())
                 row.type = pb.type
         except Exception as exc:
-            logging.warn("update_playback: %s" % repr(exc))
+            logging.warning("update_playback: %s" % repr(exc))
     db.session.commit()
 
 def check_columns(table_class, table_name):

@@ -152,3 +152,8 @@ message Activity {  //where is primaryImageUrl, feedImageThumbnailUrl, activityR
 message ActivityList {
 	repeated Activity activities = 1;
 }
+
+message ActivityImage {
+	required uint64 activity_id = 2;
+	required bytes jpg = 3;
+}
