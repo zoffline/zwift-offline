@@ -181,7 +181,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride"
           }
         }
       }
@@ -197,21 +197,6 @@
     },
     {
       "name": "game_1_31_fquery",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_31_pp_data",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_32_meetups_rubberbanding_v2",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_33_5_events_rubberbanding_v2",
       "value": true,
       "values": {}
     },
@@ -603,10 +588,10 @@
       "values": {
         "fields": {
           "ENABLED_LEVELS": {
-            "stringValue": "ERROR"
+            "stringValue": "*"
           },
           "ENABLED_TYPES": {
-            "stringValue": "LOADER"
+            "stringValue": "EVENT_AUDIO"
           }
         }
       }
@@ -1052,6 +1037,11 @@
       "values": {}
     },
     {
+      "name": "game_1_61_persist_session_entitlements",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_3second_power_average_smoothing",
       "value": true,
       "values": {
@@ -1085,6 +1075,9 @@
           "EnableStreaksSounds": {
             "boolValue": true
           },
+          "QualifyingRideCountBonusCap": {
+            "varintValue": "2"
+          },
           "ReEarnMaxLevel": {
             "boolValue": true
           },
@@ -1093,6 +1086,9 @@
           },
           "ShowRideStreaksScreen": {
             "boolValue": true
+          },
+          "ShowWhenAwardingBonusXP": {
+            "boolValue": false
           },
           "ShowXPFastForward": {
             "boolValue": true
@@ -1230,6 +1226,7 @@
     },
     {
       "name": "gfx_drawinstanced",
+      "value": true,
       "values": {}
     },
     {
