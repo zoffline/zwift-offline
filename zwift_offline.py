@@ -21,6 +21,7 @@ import uuid
 import jwt
 import sqlalchemy
 import fitdecode
+import xml.etree.ElementTree as ET
 from copy import deepcopy
 from functools import wraps
 from io import BytesIO
@@ -83,6 +84,7 @@ except IOError as e:
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 3
+ZWIFT_VER_CUR = ET.parse('cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml').getroot().get('sversion')
 
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
@@ -841,7 +843,7 @@ def enqueue_player_update(player_id, wa_bytes):
         player_update_queue[player_id] = list()
     player_update_queue[player_id].append(wa_bytes)
 
-def send_message(message, sender='Server', recipients=online.keys()):
+def send_message(message, sender='Server', recipients=None):
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
     player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_SPA
@@ -861,6 +863,8 @@ def send_message(message, sender='Server', recipients=online.keys()):
 
     player_update.payload = chat_message.SerializeToString()
     player_update_s = player_update.SerializeToString()
+    if not recipients:
+        recipients = online.keys()
     for receiving_player_id in recipients:
         enqueue_player_update(receiving_player_id, player_update_s)
 
@@ -3641,7 +3645,7 @@ def check_columns(table_class, table_name):
 
 def send_server_back_online_message():
     time.sleep(30)
-    message = "We're back online. Ride on!"
+    message = "Server version %s is back online. Ride on!" % ZWIFT_VER_CUR
     send_message(message)
     discord.send_message(message)
 
@@ -3853,7 +3857,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
 
     send_message_thread = threading.Thread(target=send_server_back_online_message)
     send_message_thread.start()
-    logger.info("Server is running.")
+    logger.info("Server version %s is running." % ZWIFT_VER_CUR)
     server = WSGIServer(('0.0.0.0', 443), app, certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR, log=logger)
     server.serve_forever()
 
