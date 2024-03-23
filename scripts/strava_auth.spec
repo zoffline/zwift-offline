@@ -34,6 +34,6 @@ exe = EXE(pyz,
           console=True )
 import subprocess
 subprocess.call(['C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe', 'sign',
-                '/f', '..\ssl\cert-zwift-com.p12',
+                '/f', '..\\ssl\\cert-zwift-com.p12', '/fd', 'sha1',
                 '/t', 'http://timestamp.digicert.com',
-                'dist\strava_auth.exe'])
+                'dist\\strava_auth.exe'])
