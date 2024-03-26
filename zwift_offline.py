@@ -1955,6 +1955,7 @@ def random_profile(p):
     p.glasses_type = random.choice(GD['glasses'])
     p.ride_shoes_type = random.choice(GD['bikeshoes'])
     p.ride_socks_type = random.choice(GD['socks'])
+    p.ride_socks_length = random.randrange(4)
     p.ride_jersey = random.choice(GD['jerseys'])
     p.bike_wheel_rear, p.bike_wheel_front = random.choice(GD['wheels'])
     p.bike_frame = random.choice(list(GD['bikeframes'].keys()))
