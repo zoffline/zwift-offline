@@ -5,7 +5,6 @@ import threading
 import time
 
 from configparser import ConfigParser
-from urllib import request
 
 import discord
 import requests
@@ -14,8 +13,8 @@ import zwift_offline
 
 
 class DiscordBot(discord.Client):
-    # TODO: this should be part of __init__()
-    def set_vars(self, channel, welcome_msg, help_msg):
+    def __init__(self, intents, channel, welcome_msg, help_msg):
+        discord.Client.__init__(self, intents=intents)
         self.channel = channel
         self.welcome_msg = welcome_msg
         self.help_msg = help_msg
@@ -62,8 +61,7 @@ class DiscordThread(threading.Thread):
         self.start()
 
     async def starter(self):
-        self.discord_bot = DiscordBot(intents=self.intents)
-        self.discord_bot.set_vars(self.channel, self.welcome_msg, self.help_msg)
+        self.discord_bot = DiscordBot(self.intents, self.channel, self.welcome_msg, self.help_msg)
         await self.discord_bot.start(self.token)
 
     def run(self):
