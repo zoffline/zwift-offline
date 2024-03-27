@@ -234,13 +234,29 @@ To obtain your current profile:
 
 <details><summary>Expand</summary>
 
-* __NOTE:__ instead of performing the steps below you can instead use the "Settings - Strava" button in the launcher window to authorize (Windows and macOS only).
-* [OPTIONAL] Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
+* Get CLIENT_ID and CLIENT_SECRET from https://www.strava.com/settings/api
+
+<details><summary>Using launcher (Windows and macOS only)</summary>
+
+* Set the authorization callback domain of your API application to ``launcher.zwift.com``
+* Create a ``strava-api.txt`` file in the ``storage`` directory containing your client ID and secret
+```
+CLIENT_ID
+CLIENT_SECRET
+```
+* Use the "Settings - Strava" button in the launcher window to authorize.
+
+</details>
+
+<details><summary>Using strava_auth script</summary>
+
 * Run ``scripts/strava_auth.py --client-id CLIENT_ID --client-secret CLIENT_SECRET``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/strava_auth.py``
-  * Run without arguments to use default values.
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/1`` directory.
+
+</details>
+
 * If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>

@@ -12,10 +12,12 @@
       {% endif %}
       <a href="{{ url_for('power_curves', username=username) }}" class="btn btn-sm btn-secondary">Power curves</a>
       <a href="{{ url_for('profile', username=username) }}" class="btn btn-sm btn-secondary">Zwift</a>
-      {% if not token %}
-        <a href="{{ url_for('strava') }}" class="btn btn-sm btn-secondary">Strava</a>
-      {% else %}
-        <a href="/delete/strava_token.txt" class="btn btn-sm btn-danger">Remove Strava token</a>
+      {% if api %}
+        {% if not token %}
+          <a href="{{ url_for('strava') }}" class="btn btn-sm btn-secondary">Strava</a>
+        {% else %}
+          <a href="/delete/strava_token.txt" class="btn btn-sm btn-danger">Remove Strava token</a>
+        {% endif %}
       {% endif %}
       <a href="{{ url_for('garmin', username=username) }}" class="btn btn-sm btn-secondary">Garmin</a>
       <a href="{{ url_for('intervals', username=username) }}" class="btn btn-sm btn-secondary">Intervals</a>

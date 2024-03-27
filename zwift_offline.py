@@ -128,8 +128,11 @@ import warnings
 with warnings.catch_warnings():
     from stravalib.client import Client
 
-STRAVA_CLIENT_ID = 28117
-STRAVA_CLIENT_SECRET = '41b7b7b76d8cfc5dc12ad5f020adfea17da35468'
+STRAVA_API_FILE = "%s/strava-api.txt" % STORAGE_DIR
+if os.path.exists(STRAVA_API_FILE):
+    with open(STRAVA_API_FILE) as f:
+        STRAVA_CLIENT_ID = int(f.readline().rstrip('\r\n'))
+        STRAVA_CLIENT_SECRET = f.readline().rstrip('\r\n')
 
 from tokens import *
 
@@ -942,8 +945,9 @@ def settings(username):
     if os.path.isfile(achievements_file):
         stat = os.stat(achievements_file)
         achievements = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
+    api = os.path.isfile(STRAVA_API_FILE)
     token = os.path.isfile(os.path.join(profile_dir, 'strava_token.txt'))
-    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements, token=token)
+    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements, api=api, token=token)
 
 
 @app.route("/download/<filename>", methods=["GET"])

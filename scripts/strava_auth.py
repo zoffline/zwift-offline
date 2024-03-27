@@ -113,9 +113,9 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--port', help='Which port to bind to',
                         action='store', type=int, default=8000)
     parser.add_argument('--client-id', help='Strava API Client ID',
-                        action='store', type=int, default=28117)
+                        action='store', type=int, required=True)
     parser.add_argument('--client-secret', help='Strava API Client Secret',
-                        action='store', default='41b7b7b76d8cfc5dc12ad5f020adfea17da35468')
+                        action='store', required=True)
     args = parser.parse_args()
 
     main(port=args.port, client_id=args.client_id, client_secret=args.client_secret)
