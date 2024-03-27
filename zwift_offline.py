@@ -128,12 +128,6 @@ import warnings
 with warnings.catch_warnings():
     from stravalib.client import Client
 
-STRAVA_API_FILE = "%s/strava-api.txt" % STORAGE_DIR
-if os.path.exists(STRAVA_API_FILE):
-    with open(STRAVA_API_FILE) as f:
-        STRAVA_CLIENT_ID = int(f.readline().rstrip('\r\n'))
-        STRAVA_CLIENT_SECRET = f.readline().rstrip('\r\n')
-
 from tokens import *
 
 # Android uses https for cdn
@@ -710,11 +704,27 @@ def reset(username):
     return render_template("reset.html", username=current_user.username)
 
 
-@app.route("/strava", methods=['GET'])
+@app.route("/strava/<username>/", methods=["GET", "POST"])
 @login_required
-def strava():
+def strava(username):
+    profile_dir = '%s/%s' % (STORAGE_DIR, current_user.player_id)
+    api = '%s/strava_api.bin' % profile_dir
+    token = os.path.isfile('%s/strava_token.txt' % profile_dir)
+    if request.method == "POST":
+        if request.form['client_id'] == "" or request.form['client_secret'] == "":
+            flash("Client ID and secret can't be empty.")
+            return render_template("strava.html", username=current_user.username, token=token)
+        encrypt_credentials(api, (request.form['client_id'], request.form['client_secret']))
+    cred = decrypt_credentials(api)
+    return render_template("strava.html", username=current_user.username, cid=cred[0], cs=cred[1], token=token)
+
+
+@app.route("/strava_auth", methods=['GET'])
+@login_required
+def strava_auth():
+    cred = decrypt_credentials('%s/%s/strava_api.bin' % (STORAGE_DIR, current_user.player_id))
     client = Client()
-    url = client.authorization_url(client_id=STRAVA_CLIENT_ID,
+    url = client.authorization_url(client_id=cred[0],
                                    redirect_uri='https://launcher.zwift.com/authorization',
                                    scope=['activity:write'])
     return redirect(url)
@@ -723,13 +733,14 @@ def strava():
 @app.route("/authorization", methods=["GET", "POST"])
 @login_required
 def authorization():
-    try: 
+    try:
+        cred = decrypt_credentials('%s/%s/strava_api.bin' % (STORAGE_DIR, current_user.player_id))
         client = Client()
         code = request.args.get('code')
-        token_response = client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET, code=code)
+        token_response = client.exchange_code_for_token(client_id=int(cred[0]), client_secret=cred[1], code=code)
         with open(os.path.join(STORAGE_DIR, str(current_user.player_id), 'strava_token.txt'), 'w') as f:
-            f.write(str(STRAVA_CLIENT_ID) + '\n')
-            f.write(STRAVA_CLIENT_SECRET + '\n')
+            f.write(cred[0] + '\n')
+            f.write(cred[1] + '\n')
             f.write(token_response['access_token'] + '\n')
             f.write(token_response['refresh_token'] + '\n')
             f.write(str(token_response['expires_at']) + '\n')
@@ -737,7 +748,7 @@ def authorization():
     except Exception as exc:
         logger.warning('Strava: %s' % repr(exc))
         flash("Strava authorization canceled.")
-    return redirect(url_for('settings', username=current_user.username))
+    return redirect(url_for('strava', username=current_user.username))
 
 
 def encrypt_credentials(file, cred):
@@ -945,9 +956,7 @@ def settings(username):
     if os.path.isfile(achievements_file):
         stat = os.stat(achievements_file)
         achievements = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-    api = os.path.isfile(STRAVA_API_FILE)
-    token = os.path.isfile(os.path.join(profile_dir, 'strava_token.txt'))
-    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements, api=api, token=token)
+    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements)
 
 
 @app.route("/download/<filename>", methods=["GET"])
@@ -968,14 +977,15 @@ def download_avatarLarge(player_id):
 @app.route("/delete/<filename>", methods=["GET"])
 @login_required
 def delete(filename):
-    player_id = current_user.player_id
     credentials = ['garmin_credentials.bin', 'zwift_credentials.bin', 'intervals_credentials.bin']
-    if filename not in ['profile.bin', 'achievements.bin', 'strava_token.txt'] and filename not in credentials:
+    strava = ['strava_api.bin', 'strava_token.txt']
+    if filename not in ['profile.bin', 'achievements.bin'] + credentials + strava:
         return '', 403
-    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
-    delete_file = os.path.join(profile_dir, filename)
+    delete_file = os.path.join(STORAGE_DIR, str(current_user.player_id), filename)
     if os.path.isfile(delete_file):
         os.remove("%s" % delete_file)
+    if filename in strava:
+        return redirect(url_for('strava', username=current_user.username))
     if filename in credentials:
         flash("Credentials removed.")
     return redirect(url_for('settings', username=current_user.username))
