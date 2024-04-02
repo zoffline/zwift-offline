@@ -20,6 +20,10 @@
     "road": "10004"
   },
   {
+    "name": "Col de la Couillole (18.1 km / 1209 m)",
+    "road": "10025"
+  },
+  {
     "name": "Col de la Madone (15.9 km / 898 m)",
     "road": "10015"
   },
@@ -72,12 +76,20 @@
     "road": "10019"
   },
   {
+    "name": "Mt Fuji (25.3 km / 1208 m)",
+    "road": "10026"
+  },
+  {
     "name": "Old La Honda (5.6 km / 395 m)",
     "road": "10018"
   },
   {
     "name": "Old Willunga Hill (4 km / 252 m)",
     "road": "10020"
+  },
+  {
+    "name": "Passo dello Stelvio (23.5 km / 1667 m)",
+    "road": "10024"
   },
   {
     "name": "Puy de Dome (13 km / 913 m)",

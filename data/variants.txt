@@ -1011,6 +1011,9 @@
         "fields": {
           "enable_settings_ui": {
             "boolValue": true
+          },
+          "show_hardware_tab": {
+            "boolValue": true
           }
         }
       }
@@ -1021,10 +1024,12 @@
     },
     {
       "name": "game_1_60_app_hang_fix_join_world",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_60_rideon_confetti",
+      "value": true,
       "values": {}
     },
     {
@@ -1039,6 +1044,14 @@
     {
       "name": "game_1_61_persist_session_entitlements",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_62_batch_load_tapi_workouts",
+      "values": {}
+    },
+    {
+      "name": "game_1_62_tapi_workouts",
       "values": {}
     },
     {
@@ -1076,7 +1089,7 @@
             "boolValue": true
           },
           "QualifyingRideCountBonusCap": {
-            "varintValue": "2"
+            "varintValue": "1"
           },
           "ReEarnMaxLevel": {
             "boolValue": true
@@ -1088,7 +1101,7 @@
             "boolValue": true
           },
           "ShowWhenAwardingBonusXP": {
-            "boolValue": false
+            "boolValue": true
           },
           "ShowXPFastForward": {
             "boolValue": true
@@ -1097,7 +1110,7 @@
             "boolValue": true
           },
           "StreaksDismissTimeout": {
-            "numberValue": 15.0
+            "numberValue": 20.0
           },
           "XPPerKilometerCycling": {
             "varintValue": "20"
@@ -1119,6 +1132,11 @@
           }
         }
       }
+    },
+    {
+      "name": "game_RideReportRideXp",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_VideoCapture",
@@ -1178,6 +1196,10 @@
     },
     {
       "name": "game_log_rssi",
+      "values": {}
+    },
+    {
+      "name": "game_show_about_menu",
       "values": {}
     },
     {
