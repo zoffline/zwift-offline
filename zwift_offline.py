@@ -775,6 +775,10 @@ def decrypt_credentials(file):
     return cred
 
 
+def backup_file(file):
+    if os.path.isfile(file):
+        copyfile(file, "%s-%s.bak" % (file, datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S")))
+
 @app.route("/profile/<username>/", methods=["GET", "POST"])
 @login_required
 def profile(username):
@@ -796,11 +800,15 @@ def profile(username):
             try:
                 if request.form.get("zwift_profile"):
                     profile = online_sync.query(session, access_token, "api/profiles/me")
-                    with open('%s/profile.bin' % profile_dir, 'wb') as f:
+                    profile_file = '%s/profile.bin' % profile_dir
+                    backup_file(profile_file)
+                    with open(profile_file, 'wb') as f:
                         f.write(profile)
                 if request.form.get("achievements"):
                     achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
-                    with open('%s/achievements.bin' % profile_dir, 'wb') as f:
+                    achievements_file = '%s/achievements.bin' % profile_dir
+                    backup_file(achievements_file)
+                    with open(achievements_file, 'wb') as f:
                         f.write(achievements)
                 online_sync.logout(session, refresh_token)
                 if request.form.get("save_zwift"):
@@ -943,6 +951,7 @@ def settings(username):
         uploaded_file = request.files['file']
         if uploaded_file.filename in ['profile.bin', 'achievements.bin']:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
+            backup_file(file_path)
             uploaded_file.save(file_path)
         else:
             flash("Invalid file name.")
