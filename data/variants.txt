@@ -6,10 +6,6 @@
       "values": {}
     },
     {
-      "name": "disable_yaw_adjustment",
-      "values": {}
-    },
-    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -139,11 +135,6 @@
       "values": {}
     },
     {
-      "name": "game_1_29_client_recommendations",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_29_event_carousel",
       "value": true,
       "values": {
@@ -181,7 +172,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024"
           }
         }
       }
@@ -644,11 +635,6 @@
       "values": {}
     },
     {
-      "name": "game_1_47_new_powerup",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_47_onboarding_quest_rpc",
       "value": true,
       "values": {}
@@ -830,6 +816,7 @@
     },
     {
       "name": "game_1_50_next_up_zui",
+      "value": true,
       "values": {}
     },
     {
@@ -920,6 +907,10 @@
       "values": {}
     },
     {
+      "name": "game_1_54_m0b1",
+      "values": {}
+    },
+    {
       "name": "game_1_54_orcd",
       "value": true,
       "values": {
@@ -957,7 +948,25 @@
     },
     {
       "name": "game_1_56_home_screen_linear_scaling",
-      "values": {}
+      "values": {
+        "fields": {
+          "large_layout_container_min_width": {
+            "varintValue": "1600"
+          },
+          "large_layout_devices": {
+            "stringValue": "Desktop"
+          },
+          "large_layout_scale_factor": {
+            "numberValue": 1.5
+          },
+          "small_layout_scale_factor": {
+            "numberValue": 1.0
+          },
+          "viewbox_width_calculation_mode": {
+            "stringValue": "None"
+          }
+        }
+      }
     },
     {
       "name": "game_1_56_push_tutorial_on_home_screen",
@@ -1048,10 +1057,32 @@
     },
     {
       "name": "game_1_62_batch_load_tapi_workouts",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_62_tapi_workouts",
+      "values": {}
+    },
+    {
+      "name": "game_1_62_zp_user_input_device_event_logging",
+      "values": {}
+    },
+    {
+      "name": "game_1_63_0_braking_sensitivity_setting_enabled",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_63_autobraking",
+      "values": {}
+    },
+    {
+      "name": "game_1_63_concurrent_profile_update",
+      "values": {}
+    },
+    {
+      "name": "game_1_63_roadmarkertexturescale",
       "values": {}
     },
     {
@@ -1195,6 +1226,16 @@
       "values": {}
     },
     {
+      "name": "game_hud_phase_1",
+      "values": {
+        "fields": {
+          "central_hud_refactor": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_log_rssi",
       "values": {}
     },
@@ -1265,10 +1306,6 @@
     },
     {
       "name": "gn_lights",
-      "values": {}
-    },
-    {
-      "name": "gradient_min_speed",
       "values": {}
     },
     {

@@ -105,20 +105,6 @@
     "sport": 0
   },
   {
-    "name": "Makuri Islands - Castle Crit",
-    "route": 3706527503,
-    "distance": 4970.5,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Castle Crit Run",
-    "route": 1033940053,
-    "distance": 4970.5,
-    "course": 13,
-    "sport": 1
-  },
-  {
     "name": "Makuri Islands - Neokyo Crit Course",
     "route": 1127056801,
     "distance": 4660.0,
@@ -224,13 +210,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Big Flat 8",
-    "route": 1917017591,
-    "distance": 31491.1,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Big Loop Reverse",
     "route": 4107844490,
     "distance": 42819.2,
@@ -287,27 +266,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Jurassic Coast",
-    "route": 4009130866,
-    "distance": 19539.8,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Loop de Loop",
-    "route": 243949867,
-    "distance": 12610.1,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Mountain Mash",
-    "route": 2953010285,
-    "distance": 5999.5,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Road To Ruins Reverse",
     "route": 2967612381,
     "distance": 29846.1,
@@ -325,13 +283,6 @@
     "name": "Watopia - Seaside Sprint",
     "route": 3454338139,
     "distance": 9253.1,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Spiral into the Volcano",
-    "route": 3261167746,
-    "distance": 55828.2,
     "course": 6,
     "sport": 0
   },
@@ -395,13 +346,6 @@
     "name": "Watopia - Zwift Bambino Fondo 2022",
     "route": 3368626651,
     "distance": 53250.2,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Zwift Games 2024 Epic",
-    "route": 762151244,
-    "distance": 81779.9,
     "course": 6,
     "sport": 0
   },
