@@ -580,6 +580,15 @@ def check_sha256_hash(pwhash, password):
         return False
     return hmac.compare_digest(hmac.new(salt.encode("utf-8"), password.encode("utf-8"), method).hexdigest(), hashval)
 
+def make_profile_dir(player_id):
+    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
+    try:
+        if not os.path.isdir(profile_dir):
+            os.makedirs(profile_dir)
+    except IOError as e:
+        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+        return False
+    return True
 
 @app.route("/login/", methods=["GET", "POST"])
 def login():
@@ -606,12 +615,7 @@ def login():
             login_user(user, remember=True)
             user.remember = remember
             db.session.commit()
-            profile_dir = os.path.join(STORAGE_DIR, str(user.player_id))
-            try:
-                if not os.path.isdir(profile_dir):
-                    os.makedirs(profile_dir)
-            except IOError as e:
-                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+            if not make_profile_dir(user.player_id):
                 return '', 500
             return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
         else:
@@ -628,6 +632,26 @@ def login():
     return render_template("login_form.html")
 
 
+def send_mail(username, token):
+    try:
+        with open('%s/gmail_credentials.txt' % STORAGE_DIR) as f:
+            sender_email = f.readline().rstrip('\r\n')
+            password = f.readline().rstrip('\r\n')
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
+            server.login(sender_email, password)
+            message = MIMEMultipart()
+            message['From'] = sender_email
+            message['To'] = username
+            message['Subject'] = "Password reset"
+            content = "https://%s/login/?token=%s" % (server_ip, token)
+            message.attach(MIMEText(content, 'plain'))
+            server.sendmail(sender_email, username, message.as_string())
+            server.close()
+    except Exception as exc:
+        logger.warning('send e-mail: %s' % repr(exc))
+        return False
+    return True
+
 @app.route("/forgot/", methods=["GET", "POST"])
 def forgot():
     if request.method == "POST":
@@ -641,23 +665,9 @@ def forgot():
 
         user = User.query.filter_by(username=username).first()
         if user:
-            try:
-                with open('%s/gmail_credentials.txt' % STORAGE_DIR, 'r') as f:
-                    sender_email = f.readline().rstrip('\r\n')
-                    password = f.readline().rstrip('\r\n')
-                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
-                        server.login(sender_email, password)
-                        message = MIMEMultipart()
-                        message['From'] = sender_email
-                        message['To'] = username
-                        message['Subject'] = "Password reset"
-                        content = "https://%s/login/?token=%s" % (server_ip, user.get_token())
-                        message.attach(MIMEText(content, 'plain'))
-                        server.sendmail(sender_email, username, message.as_string())
-                        server.close()
-                        flash("E-mail sent.")
-            except Exception as exc:
-                logger.warning('send e-mail: %s' % repr(exc))
+            if send_mail(username, user.get_token()):
+                flash("E-mail sent.")
+            else:
                 flash("Could not send e-mail.")
         else:
             flash("Invalid username.")
@@ -668,6 +678,38 @@ def forgot():
 @app.route("/api/push/fcm/<type>/<token>/enables", methods=["PUT"])
 def api_push_fcm_production(type, token):
     return '', 500
+
+@app.route("/api/users", methods=["POST"])  # Android user registration
+def api_users():
+    first_name = request.json['profile']['firstName']
+    last_name = request.json['profile']['lastName']
+    if MULTIPLAYER:
+        username = request.json['email']
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", username):
+            return '', 400
+        pass_hash = generate_password_hash(request.json['password'], 'scrypt')
+        user = User(username=username, pass_hash=pass_hash, first_name=first_name, last_name=last_name)
+        db.session.add(user)
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            return '', 400
+        login_user(user, remember=True)
+        if not make_profile_dir(user.player_id):
+            return '', 500
+    else:
+        AnonUser.first_name = first_name
+        AnonUser.last_name = last_name
+    return '', 200
+
+@app.route("/api/users/reset-password-email", methods=["PUT"])  # Android password reset
+def api_users_reset_password_email():
+    username = request.form['username']
+    if re.match(r"[^@]+@[^@]+\.[^@]+", username):
+        user = User.query.filter_by(username=username).first()
+        if user:
+            send_mail(username, user.get_token())
+    return '', 200
 
 @app.route("/api/users/password-reset/", methods=["POST"])
 @jwt_to_session_cookie
@@ -999,7 +1041,7 @@ def delete(filename):
         flash("Credentials removed.")
     return redirect(url_for('settings', username=current_user.username))
 
-@app.route("/power_curves/<username>", methods=["GET", "POST"])
+@app.route("/power_curves/<username>/", methods=["GET", "POST"])
 @login_required
 def power_curves(username):
     if request.method == "POST":
@@ -3759,6 +3801,8 @@ def auth_realms_zwift_protocol_openid_connect_token():
 
         if user and check_password_hash(user.pass_hash, password):
             login_user(user, remember=True)
+            if not make_profile_dir(user.player_id):
+                return '', 500
         else:
             return '', 401
 
@@ -3864,12 +3908,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
                 break
         if not player_id:
             player_id = 1
-            profile_dir = '%s/%s' % (STORAGE_DIR, player_id)
-            try:
-                if not os.path.isdir(profile_dir):
-                    os.makedirs(profile_dir)
-            except IOError as e:
-                logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
+            if not make_profile_dir(player_id):
                 sys.exit(1)
         AnonUser.player_id = player_id
         login_manager.anonymous_user = AnonUser

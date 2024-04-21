@@ -167,8 +167,7 @@ to generate your own certificates and do the same.
   * Run Zwift, hopefully it verifies download and runs
 * Play Zwift:
   * Virtual Hosts button must be ON
-  * Start Zwift and sign in using any email/password
-    * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files. (You must accept an invalid certificate alert).
+  * Start Zwift and create a new user.
 
 Why: We need to redirect Zwift to use zoffline (this is done by the Virtual Hosts app) and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names (this is done by the patch tool ZofflineObb).
@@ -194,8 +193,7 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of modifying your ``hosts`` file.
-* Start Zwift and sign in using any email/password
-  * If multiplayer is enabled, access `https://<zoffline ip>/signup/` to sign up and import your files.
+* Start Zwift and create a new user.
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
@@ -270,7 +268,7 @@ To enable support for multiple users perform the steps below:
 * Create a ``multiplayer.txt`` file in the ``storage`` directory.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
   * TCP ports 80, 443, 3025 and UDP port 3024 will need to be open on the PC running zoffline if its running remotely.
-* Start Zwift and create an account in the launcher (desktop solution only, for Android go to `https://<zoffline ip>/signup/`).
+* Start Zwift and create an account.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
 
 </details>
@@ -326,7 +324,8 @@ To enable support for multiple users perform the steps below:
 #### Ghosts
 
 * Enable this feature by checking "Enable ghosts" in zoffline's launcher.
-* If you are running Zwift on Android, create a file ``enable_ghosts.txt`` inside the ``storage`` folder or access ``https://<zoffline_ip>/login/`` from a browser if you are using multiplayer (you must click the "Start Zwift" button to save the option).
+* If you are running Zwift on Android, create a file ``enable_ghosts.txt`` inside the ``storage`` folder.
+  * If multiplayer is enabled, access ``https://<zoffline_ip>/login/``, check "Enable ghosts" and click "Start Zwift" to save the option.
 * When you save an activity, the ghost will be saved in ``storage/<player_id>/ghosts/<world>/<route>``. Next time you ride the same route, the ghost will be loaded.
 * Type ``.regroup`` in chat to regroup the ghosts.
 
