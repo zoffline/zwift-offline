@@ -73,12 +73,17 @@ else:
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
     LOGS_DIR = "%s/logs" % SCRIPT_DIR
 
-try:
-    # Ensure storage dir exists
-    if not os.path.isdir(STORAGE_DIR):
-        os.makedirs(STORAGE_DIR)
-except IOError as e:
-    logger.error("failed to create storage dir (%s):  %s", STORAGE_DIR, str(e))
+def make_dir(name):
+    try:
+        if not os.path.isdir(name):
+            os.makedirs(name)
+    except IOError as e:
+        logger.error("failed to create dir (%s):  %s", name, str(e))
+        return False
+    return True
+
+# Ensure storage dir exists
+if not make_dir(STORAGE_DIR):
     sys.exit(1)
 
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
@@ -107,11 +112,7 @@ SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
 if MULTIPLAYER:
-    try:
-        if not os.path.isdir(LOGS_DIR):
-            os.makedirs(LOGS_DIR)
-    except IOError as e:
-        logger.error("failed to create logs dir (%s):  %s", LOGS_DIR, str(e))
+    if not make_dir(LOGS_DIR):
         sys.exit(1)
     from logging.handlers import RotatingFileHandler
     logHandler = RotatingFileHandler('%s/zoffline.log' % LOGS_DIR, maxBytes=1000000, backupCount=10)
@@ -144,8 +145,12 @@ db = SQLAlchemy()
 db.init_app(app)
 
 online = {}
+ghosts_enabled = {}
+player_update_queue = {}
 zc_connect_queue = {}
 player_partial_profiles = {}
+map_override = {}
+climb_override = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
@@ -467,17 +472,18 @@ def get_partial_profile(player_id):
             partial_profile.last_name = time_since(global_ghosts[p_id].play[g_id-1].date)
             return partial_profile
         else:
+            profile = profile_pb2.PlayerProfile()
             #Read from disk
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
-                    profile = profile_pb2.PlayerProfile()
                     profile.ParseFromString(fd.read())
             else:
                 user = User.query.filter_by(player_id=player_id).first()
-                partial_profile.first_name = user.first_name
-                partial_profile.last_name = user.last_name
-                return partial_profile
+                if user:
+                    partial_profile.first_name = user.first_name
+                    partial_profile.last_name = user.last_name
+                    return partial_profile
         partial_profile.imageSrc = imageSrc(player_id)
         partial_profile.first_name = profile.first_name
         partial_profile.last_name = profile.last_name
@@ -581,14 +587,7 @@ def check_sha256_hash(pwhash, password):
     return hmac.compare_digest(hmac.new(salt.encode("utf-8"), password.encode("utf-8"), method).hexdigest(), hashval)
 
 def make_profile_dir(player_id):
-    profile_dir = os.path.join(STORAGE_DIR, str(player_id))
-    try:
-        if not os.path.isdir(profile_dir):
-            os.makedirs(profile_dir)
-    except IOError as e:
-        logger.error("failed to create profile dir (%s):  %s", profile_dir, str(e))
-        return False
-    return True
+    return make_dir(os.path.join(STORAGE_DIR, str(player_id)))
 
 @app.route("/login/", methods=["GET", "POST"])
 def login():
@@ -1229,11 +1228,7 @@ def api_activities(activity_id):
     if row:
         activity = activity_row_to_json(row, True)
         activities_dir = '%s/activities' % STORAGE_DIR
-        try:
-            if not os.path.isdir(activities_dir):
-                os.makedirs(activities_dir)
-        except IOError as e:
-            logger.error("failed to create activities dir (%s):  %s", activities_dir, str(e))
+        if not make_dir(activities_dir):
             return '', 400
         fit_file = '%s/%s/fit/%s - %s' % (STORAGE_DIR, row.player_id, row.id, row.fit_filename)
         # fullDataUrl is never fetched, creating only downsampled file
@@ -1367,9 +1362,17 @@ def relay_session_refresh():
     return refresh.SerializeToString(), 200
 
 
+def save_bookmark(state, name):
+    bookmarks_dir = os.path.join(STORAGE_DIR, str(state.id), 'bookmarks', str(get_course(state)))
+    if not make_dir(bookmarks_dir):
+        return
+    with open(os.path.join(bookmarks_dir, name + '.bin'), 'wb') as f:
+        f.write(state.SerializeToString())
+
 def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
+        save_bookmark(online[player_id], 'Last activity')
         online.pop(player_id)
         discord.change_presence(len(online))
     if player_id in global_ghosts:
@@ -1563,11 +1566,7 @@ def api_zfiles():
         zfile_filename = zfile.filename
         zfile_file = zfile.file
     zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile_folder)
-    try:
-        if not os.path.isdir(zfiles_dir):
-            os.makedirs(zfiles_dir)
-    except IOError as e:
-        logger.error("failed to create zfiles dir (%s):  %s", zfiles_dir, str(e))
+    if not make_dir(zfiles_dir):
         return '', 400
     try:
         zfile_filename = zfile_filename.decode('utf-8', 'ignore')
@@ -1866,7 +1865,6 @@ def api_profiles_id_statistics(player_id):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me_phone():
-    global zc_connect_queue
     if not request.stream:
         return '', 400
     phoneAddress = request.json['phoneAddress']
@@ -1977,11 +1975,7 @@ def api_profiles_activities(player_id):
 @login_required
 def api_profiles_activities_images(player_id, activity_id):
     images_dir = '%s/%s/images' % (STORAGE_DIR, player_id)
-    try:
-        if not os.path.isdir(images_dir):
-            os.makedirs(images_dir)
-    except IOError as e:
-        logger.error("failed to create images dir (%s):  %s", images_dir, str(e))
+    if not make_dir(images_dir):
         return '', 400
     row = ActivityImage(player_id=player_id, activity_id=activity_id)
     db.session.add(row)
@@ -2049,6 +2043,11 @@ def api_profiles():
                     p.first_name = ''
                     p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
                     p.country_code = 0
+        elif p_id > 9000000:
+            p = profiles.profiles.add()
+            p.id = p_id
+            p.last_name = 'Bookmark'
+            p.country_code = 0
         else:
             if p_id in global_pace_partners.keys():
                 profile = global_pace_partners[p_id].profile
@@ -2057,11 +2056,10 @@ def api_profiles():
             else:
                 profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, p_id)
                 if os.path.isfile(profile_file):
-                    try:
-                        with open(profile_file, 'rb') as fd:
-                            profile.ParseFromString(fd.read())
-                    except Exception as exc:
-                        logger.warning('api_profiles: %s' % repr(exc))
+                    with open(profile_file, 'rb') as fd:
+                        profile.ParseFromString(fd.read())
+                else:
+                    profile.id = p_id
             profiles.profiles.append(profile)
     return profiles.SerializeToString(), 200
 
@@ -2070,11 +2068,7 @@ def api_profiles():
 @login_required
 def player_playbacks_player_playback():
     pb_dir = '%s/playbacks' % STORAGE_DIR
-    try:
-        if not os.path.isdir(pb_dir):
-            os.makedirs(pb_dir)
-    except IOError as e:
-        logger.error("failed to create playbacks dir (%s):  %s", pb_dir, str(e))
+    if not make_dir(pb_dir):
         return '', 400
     stream = request.stream.read()
     pb = playback_pb2.PlaybackData()
@@ -2303,6 +2297,22 @@ def create_power_curve(player_id, fit_file):
     except Exception as exc:
         logger.warning('create_power_curve: %s' % repr(exc))
 
+def save_ghost(player_id, name):
+    if not player_id in global_ghosts.keys(): return
+    ghosts = global_ghosts[player_id]
+    if len(ghosts.rec.states) > 0:
+        state = ghosts.rec.states[0]
+        folder = '%s/%s/ghosts/%s/' % (STORAGE_DIR, player_id, get_course(state))
+        if state.route: folder += str(state.route)
+        else:
+            folder += str(road_id(state))
+            if not is_forward(state): folder += '/reverse'
+        if not make_dir(folder):
+            return
+        ghosts.rec.player_id = player_id
+        f = '%s/%s-%s.bin' % (folder, datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S"), name)
+        with open(f, 'wb') as fd:
+            fd.write(ghosts.rec.SerializeToString())
 
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
@@ -2336,7 +2346,7 @@ def api_profiles_activities_id(player_id, activity_id):
     create_power_curve(player_id, BytesIO(activity.fit))
     save_fit(player_id, '%s - %s' % (activity_id, activity.fit_filename), activity.fit)
     if current_user.enable_ghosts:
-        save_ghost(quote(activity.name, safe=' '), player_id)
+        save_ghost(player_id, quote(activity.name, safe=' '))
     # For using with upload_activity
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
@@ -3015,7 +3025,7 @@ def relay_worlds():
     return relay_worlds_generic()
 
 
-def add_teleport_target(player, targets, is_pace_partner=True):
+def add_teleport_target(player, targets, is_pace_partner=True, name=None):
     partial_profile = get_partial_profile(player.id)
     if is_pace_partner:
         target = targets.pacer_groups.add()
@@ -3025,7 +3035,10 @@ def add_teleport_target(player, targets, is_pace_partner=True):
         target.route = player.route
     target.id = player.id
     target.firstName = partial_profile.first_name
-    target.lastName = partial_profile.last_name
+    if name:
+        target.lastName = name
+    else:
+        target.lastName = partial_profile.last_name
     target.distance = player.distance
     target.time = player.time
     target.country_code = partial_profile.country_code
@@ -3053,6 +3066,9 @@ def relay_teleport_targets():
             player = online[p_id]
             if get_course(player) == course:
                 add_teleport_target(player, targets, False)
+    if current_user.player_id in global_bookmarks.keys():
+        for bookmark in list(global_bookmarks[current_user.player_id].values()):
+            add_teleport_target(bookmark.state, targets, False, bookmark.name)
     return targets.SerializeToString()
 
 
@@ -3191,6 +3207,9 @@ def relay_worlds_attributes():
                     regroup_ghosts(chat_message.player_id)
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
+                elif command.startswith('bookmark') and len(command) > 9:
+                    save_bookmark(state, quote(command[9:], safe=' '))
+                    send_message('Bookmark saved', recipients=[chat_message.player_id])
                 else:
                     send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
                 return '', 201
@@ -3565,11 +3584,7 @@ def teardown_request(exception):
 
 def save_fit(player_id, name, data):
     fit_dir = os.path.join(STORAGE_DIR, str(player_id), 'fit')
-    try:
-        if not os.path.isdir(fit_dir):
-            os.makedirs(fit_dir)
-    except IOError as e:
-        logger.error("failed to create fit dir (%s):  %s", fit_dir, str(e))
+    if not make_dir(fit_dir):
         return
     with open(os.path.join(fit_dir, name), 'wb') as f:
         f.write(data)
@@ -3865,18 +3880,14 @@ def start_zwift():
     return redirect("/ride", 302)
 
 
-def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_ghosts_enabled, passed_save_ghost, passed_regroup_ghosts, passed_player_update_queue, passed_map_override, passed_climb_override, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_global_bookmarks, passed_regroup_ghosts, passed_discord):
     global online
     global global_relay
     global global_pace_partners
     global global_bots
     global global_ghosts
-    global ghosts_enabled
-    global save_ghost
+    global global_bookmarks
     global regroup_ghosts
-    global player_update_queue
-    global map_override
-    global climb_override
     global discord
     global login_manager
     online = passed_online
@@ -3884,12 +3895,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     global_pace_partners = passed_global_pace_partners
     global_bots = passed_global_bots
     global_ghosts = passed_global_ghosts
-    ghosts_enabled = passed_ghosts_enabled
-    save_ghost = passed_save_ghost
+    global_bookmarks = passed_global_bookmarks
     regroup_ghosts = passed_regroup_ghosts
-    player_update_queue = passed_player_update_queue
-    map_override = passed_map_override
-    climb_override = passed_climb_override
     discord = passed_discord
     login_manager = LoginManager()
     login_manager.login_view = 'login'

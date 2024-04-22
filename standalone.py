@@ -13,7 +13,7 @@ import itertools
 import socketserver
 from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from Crypto.Cipher import AES
 
 import zwift_offline as zo
@@ -77,17 +77,15 @@ pacer_update_freq = 1
 simulated_latency = 300 #makes bots animation smoother than using current time
 last_pp_updates = {}
 last_bot_updates = {}
+last_bookmark_updates = {}
 global_ghosts = {}
-ghosts_enabled = {}
 online = {}
-player_update_queue = {}
 global_pace_partners = {}
 global_bots = {}
+global_bookmarks = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
-map_override = {}
-climb_override = {}
 
 def sigint_handler(num, frame):
     httpd.shutdown()
@@ -109,23 +107,23 @@ class CDNHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         # Check if client requested the map be overridden
-        if self.path == '/gameassets/MapSchedule_v2.xml' and self.client_address[0] in map_override:
+        if self.path == '/gameassets/MapSchedule_v2.xml' and self.client_address[0] in zo.map_override:
             self.send_response(200)
             self.send_header('Content-type', 'text/xml')
             self.end_headers()
             start = datetime.today() - timedelta(days=1)
-            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (map_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            output = '<MapSchedule><appointments><appointment map="%s" start="%s"/></appointments><VERSION>1</VERSION></MapSchedule>' % (zo.map_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
             self.wfile.write(output.encode())
-            del map_override[self.client_address[0]]
+            del zo.map_override[self.client_address[0]]
             return
-        if self.path == '/gameassets/PortalRoadSchedule_v1.xml' and self.client_address[0] in climb_override:
+        if self.path == '/gameassets/PortalRoadSchedule_v1.xml' and self.client_address[0] in zo.climb_override:
             self.send_response(200)
             self.send_header('Content-type', 'text/xml')
             self.end_headers()
             start = datetime.today() - timedelta(days=1)
-            output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (climb_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
+            output = '<PortalRoads><PortalRoadSchedule><appointments><appointment road="%s" portal="0" start="%s"/></appointments><VERSION>1</VERSION></PortalRoadSchedule></PortalRoads>' % (zo.climb_override[self.client_address[0]], start.strftime("%Y-%m-%dT00:01-04"))
             self.wfile.write(output.encode())
-            del climb_override[self.client_address[0]]
+            del zo.climb_override[self.client_address[0]]
             return
         if CDN_PROXY and self.path.startswith('/gameassets/') and not self.path.endswith('_ver_cur.xml') and not ('User-Agent' in self.headers and 'python-urllib3' in self.headers['User-Agent']):
             try:
@@ -357,9 +355,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 message.world_time = zo.world_time()
 
                 #PlayerUpdate
-                if player_id in player_update_queue and len(player_update_queue[player_id]) > 0:
+                if player_id in zo.player_update_queue and len(zo.player_update_queue[player_id]) > 0:
                     added_player_updates = list()
-                    for player_update_proto in player_update_queue[player_id]:
+                    for player_update_proto in zo.player_update_queue[player_id]:
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
 
@@ -379,7 +377,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
                         added_player_updates.append(player_update_proto)
                     for player_update_proto in added_player_updates:
-                        player_update_queue[player_id].remove(player_update_proto)
+                        zo.player_update_queue[player_id].remove(player_update_proto)
 
                 #Check if any updates are added and should be sent to client, otherwise just keep alive
                 if len(message.updates) > 0:
@@ -415,27 +413,6 @@ class GhostsVariables:
     last_rt = 0
     start_road = 0
     start_rt = 0
-
-def save_ghost(name, player_id):
-    if not player_id in global_ghosts.keys(): return
-    ghosts = global_ghosts[player_id]
-    if len(ghosts.rec.states) > 0:
-        state = ghosts.rec.states[0]
-        folder = '%s/%s/ghosts/%s/' % (STORAGE_DIR, player_id, zo.get_course(state))
-        if state.route: folder += str(state.route)
-        else:
-            folder += str(zo.road_id(state))
-            if not zo.is_forward(state): folder += '/reverse'
-        try:
-            if not os.path.isdir(folder):
-                os.makedirs(folder)
-        except Exception as exc:
-            print('save_ghost: %s' % repr(exc))
-            return
-        ghosts.rec.player_id = player_id
-        f = '%s/%s-%s.bin' % (folder, datetime.now(timezone.utc).strftime("%Y-%m-%d-%H-%M-%S"), name)
-        with open(f, 'wb') as fd:
-            fd.write(ghosts.rec.SerializeToString())
 
 def load_ghosts_folder(folder, ghosts):
     if os.path.isdir(folder):
@@ -550,10 +527,11 @@ def load_bots():
                                 bot.route = udp_node_msgs_pb2.Ghost()
                                 with open(os.path.join(root, f), 'rb') as fd:
                                     bot.route.ParseFromString(fd.read())
-                                positions = list(range(len(bot.route.states)))
-                                random.shuffle(positions)
                             else:
                                 bot.route = global_bots[i + 1000000].route
+                            if not positions:
+                                positions = list(range(len(bot.route.states)))
+                                random.shuffle(positions)
                             bot.position = positions.pop()
                             if not loop_riders:
                                 loop_riders = get_names()
@@ -588,6 +566,26 @@ def play_bots():
             bot.route.states[bot.position].id = bot_id
         pause = bot_update_freq - (time.perf_counter() - start)
         if pause > 0: time.sleep(pause)
+
+class Bookmark:
+    name = ''
+    state = None
+
+def load_bookmarks(player_id, course, bookmarks):
+    bookmarks.clear()
+    bookmarks_dir = os.path.join(STORAGE_DIR, str(player_id), 'bookmarks', str(course))
+    if os.path.isdir(bookmarks_dir):
+        for i, name in enumerate(os.listdir(bookmarks_dir)):
+            if name.endswith('.bin'):
+                state = udp_node_msgs_pb2.PlayerState()
+                with open(os.path.join(bookmarks_dir, name), 'rb') as f:
+                    state.ParseFromString(f.read())
+                if zo.get_course(state) == course:
+                    state.id = i + 9000000 + player_id * 1000
+                    bookmark = Bookmark()
+                    bookmark.name = name[:-4]
+                    bookmark.state = state
+                    bookmarks[state.id] = bookmark
 
 def remove_inactive():
     while True:
@@ -677,8 +675,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
             last_pp_updates[player_id] = 0
         if not player_id in last_bot_updates.keys():
             last_bot_updates[player_id] = 0
+        if not player_id in last_bookmark_updates.keys():
+            last_bookmark_updates[player_id] = 0
 
-        t = time.monotonic()
+        #Add bookmarks for player if missing
+        if not player_id in global_bookmarks.keys():
+            global_bookmarks[player_id] = {}
+        bookmarks = global_bookmarks[player_id]
 
         #Update player online state
         if state.roadTime:
@@ -686,6 +689,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if online[player_id].worldTime > state.worldTime:
                     return #udp is unordered -> drop old state
             else:
+                load_bookmarks(player_id, zo.get_course(state), bookmarks)
                 discord.change_presence(len(online) + 1)
             online[player_id] = state
 
@@ -694,10 +698,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
             global_ghosts[player_id] = GhostsVariables()
             global_ghosts[player_id].rec = udp_node_msgs_pb2.Ghost()
             global_ghosts[player_id].play = []
-
         ghosts = global_ghosts[player_id]
 
-        if player_id in ghosts_enabled and ghosts_enabled[player_id]:
+        t = time.monotonic()
+
+        if player_id in zo.ghosts_enabled and zo.ghosts_enabled[player_id]:
             if state.roadTime and ghosts.last_rt and state.roadTime != ghosts.last_rt:
                 #Load ghosts when start moving (as of version 1.39 player sometimes enters course 6 road 0 at home screen)
                 if not ghosts.loaded:
@@ -724,6 +729,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
         elif state.watchingRiderId in global_bots.keys():
             bot = global_bots[state.watchingRiderId]
             watching_state = bot.route.states[bot.position]
+        elif state.watchingRiderId in bookmarks.keys():
+            watching_state = bookmarks[state.watchingRiderId].state
         elif state.watchingRiderId > 10000000:
             ghost = ghosts.play[math.floor(state.watchingRiderId / 10000000) - 1]
             if len(ghost.route.states) > ghost.position:
@@ -749,6 +756,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             for p_id in global_bots.keys():
                 bot = global_bots[p_id]
                 is_nearby, distance = nearby_distance(watching_state, bot.route.states[bot.position])
+                if is_nearby:
+                    nearby[p_id] = distance
+        if t >= last_bookmark_updates[player_id] + 10:
+            last_bookmark_updates[player_id] = t
+            for p_id in bookmarks.keys():
+                is_nearby, distance = nearby_distance(watching_state, bookmarks[p_id].state)
                 if is_nearby:
                     nearby[p_id] = distance
         if ghosts.started and t >= ghosts.last_play + bot_update_freq:
@@ -779,6 +792,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     bot = global_bots[p_id]
                     player = bot.route.states[bot.position]
                     player.worldTime = zo.world_time() - simulated_latency
+                elif p_id in bookmarks.keys():
+                    player = bookmarks[p_id].state
+                    player.worldTime = zo.world_time()
                 elif p_id > 10000000:
                     ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
                     player = ghost.route.states[ghost.position - 1]
@@ -843,4 +859,4 @@ if os.path.exists(FAKE_DNS_FILE):
     dns = threading.Thread(target=fake_dns, args=(zo.server_ip,))
     dns.start()
 
-zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, ghosts_enabled, save_ghost, regroup_ghosts, player_update_queue, map_override, climb_override, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, global_bookmarks, regroup_ghosts, discord)
