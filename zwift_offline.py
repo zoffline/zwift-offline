@@ -151,6 +151,7 @@ zc_connect_queue = {}
 player_partial_profiles = {}
 map_override = {}
 climb_override = {}
+global_bookmarks = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
@@ -386,6 +387,10 @@ class PartialProfile:
                 "lastName": self.last_name,
                 "male": self.male,
                 "playerType": self.player_type }
+
+class Bookmark:
+    name = ''
+    state = None
 
 class Online:
     total = 0
@@ -1119,7 +1124,7 @@ def api_eventfeed():
 
 @app.route('/api/recommendations/recommendation', methods=['GET'])
 def api_recommendations_recommendation():
-    return jsonify([{"type": "EVENT"}])
+    return jsonify([{"type": "EVENT"}, {"type": "RIDE_WITH"}])
 
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
@@ -2934,7 +2939,7 @@ def api_tcp_config():
     return infos.SerializeToString(), 200
 
 
-def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=False):
+def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=False, is_bookmark=False, name=None):
     course_id = get_course(player)
     if course_id in course_world.keys():
         partial_profile = get_partial_profile(player.id)
@@ -2948,11 +2953,17 @@ def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=Fals
                 online_player.speed = player.speed
         elif is_bot:
             online_player = course_world[course_id].others.add()
+        elif is_bookmark:
+            online_player = course_world[course_id].pro_players.add()
         else: # to be able to join zwifter using new home screen
             online_player = course_world[course_id].followees.add()
         online_player.id = player.id
-        online_player.firstName = partial_profile.first_name
-        online_player.lastName = partial_profile.last_name
+        if name:
+            online_player.firstName = courses_lookup[course_id]
+            online_player.lastName = name
+        else:
+            online_player.firstName = partial_profile.first_name
+            online_player.lastName = partial_profile.last_name
         online_player.distance = player.distance
         online_player.time = player.time
         online_player.country_code = partial_profile.country_code
@@ -2964,15 +2975,15 @@ def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=Fals
         course_world[course_id].zwifters += 1
 
 
-def relay_worlds_generic(server_realm=None):
+def relay_worlds_generic(server_realm=None, player_id=None):
     # Android client also requests a JSON version
     if request.headers['Accept'] == 'application/json':
         friends = []
-        for player_id in online:
-            profile = get_partial_profile(player_id)
-            friend = {"playerId": player_id, "firstName": profile.first_name, "lastName": profile.last_name, "male": profile.male, "countryISOCode": profile.country_code,
-                "totalDistanceInMeters": jsv0(online[player_id], 'distance'), "rideDurationInSeconds": jsv0(online[player_id], 'time'), "playerType": profile.player_type,
-                "followerStatusOfLoggedInPlayer": "NO_RELATIONSHIP", "rideOnGiven": False, "currentSport": profile_pb2.Sport.Name(jsv0(online[player_id], 'sport')),
+        for p_id in online:
+            profile = get_partial_profile(p_id)
+            friend = {"playerId": p_id, "firstName": profile.first_name, "lastName": profile.last_name, "male": profile.male, "countryISOCode": profile.country_code,
+                "totalDistanceInMeters": jsv0(online[p_id], 'distance'), "rideDurationInSeconds": jsv0(online[p_id], 'time'), "playerType": profile.player_type,
+                "followerStatusOfLoggedInPlayer": "NO_RELATIONSHIP", "rideOnGiven": False, "currentSport": profile_pb2.Sport.Name(jsv0(online[p_id], 'sport')),
                 "enrolledZwiftAcademy": False, "mapId": 1, "ftp": 100, "runTime10kmInSeconds": 3600}
             friends.append(friend)
         world = { 'currentDateTime': int(time.time()),
@@ -3012,6 +3023,9 @@ def relay_worlds_generic(server_realm=None):
             bot_variables = global_bots[p_id]
             bot = bot_variables.route.states[bot_variables.position]
             add_player_to_world(bot, course_world, is_bot=True)
+        if player_id in global_bookmarks.keys():
+            for bookmark in global_bookmarks[player_id].values():
+                add_player_to_world(bookmark.state, course_world, is_bookmark=True, name=bookmark.name)
         if server_realm:
             world.id = server_realm
             return world.SerializeToString()
@@ -3019,10 +3033,34 @@ def relay_worlds_generic(server_realm=None):
             return worlds.SerializeToString()
 
 
+def load_bookmarks(player_id):
+    if not player_id in global_bookmarks.keys():
+        global_bookmarks[player_id] = {}
+    bookmarks = global_bookmarks[player_id]
+    bookmarks.clear()
+    bookmarks_dir = os.path.join(STORAGE_DIR, str(player_id), 'bookmarks')
+    if os.path.isdir(bookmarks_dir):
+        i = 1
+        for (root, dirs, files) in os.walk(bookmarks_dir):
+            for file in files:
+                if file.endswith('.bin'):
+                    state = udp_node_msgs_pb2.PlayerState()
+                    with open(os.path.join(root, file), 'rb') as f:
+                        state.ParseFromString(f.read())
+                    state.id = i + 9000000 + player_id * 1000
+                    bookmark = Bookmark()
+                    bookmark.name = file[:-4]
+                    bookmark.state = state
+                    bookmarks[state.id] = bookmark
+                    i += 1
+
 @app.route('/relay/worlds', methods=['GET'])
 @app.route('/relay/dropin', methods=['GET']) #zwift::protobuf::DropInWorldList
+@jwt_to_session_cookie
+@login_required
 def relay_worlds():
-    return relay_worlds_generic()
+    load_bookmarks(current_user.player_id)
+    return relay_worlds_generic(player_id=current_user.player_id)
 
 
 def add_teleport_target(player, targets, is_pace_partner=True, name=None):
@@ -3067,8 +3105,9 @@ def relay_teleport_targets():
             if get_course(player) == course:
                 add_teleport_target(player, targets, False)
     if current_user.player_id in global_bookmarks.keys():
-        for bookmark in list(global_bookmarks[current_user.player_id].values()):
-            add_teleport_target(bookmark.state, targets, False, bookmark.name)
+        for bookmark in global_bookmarks[current_user.player_id].values():
+            if get_course(bookmark.state) == course:
+                add_teleport_target(bookmark.state, targets, False, bookmark.name)
     return targets.SerializeToString()
 
 
@@ -3880,13 +3919,12 @@ def start_zwift():
     return redirect("/ride", 302)
 
 
-def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_global_bookmarks, passed_regroup_ghosts, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_regroup_ghosts, passed_discord):
     global online
     global global_relay
     global global_pace_partners
     global global_bots
     global global_ghosts
-    global global_bookmarks
     global regroup_ghosts
     global discord
     global login_manager
@@ -3895,7 +3933,6 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     global_pace_partners = passed_global_pace_partners
     global_bots = passed_global_bots
     global_ghosts = passed_global_ghosts
-    global_bookmarks = passed_global_bookmarks
     regroup_ghosts = passed_regroup_ghosts
     discord = passed_discord
     login_manager = LoginManager()

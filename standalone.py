@@ -82,7 +82,6 @@ global_ghosts = {}
 online = {}
 global_pace_partners = {}
 global_bots = {}
-global_bookmarks = {}
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
@@ -567,26 +566,6 @@ def play_bots():
         pause = bot_update_freq - (time.perf_counter() - start)
         if pause > 0: time.sleep(pause)
 
-class Bookmark:
-    name = ''
-    state = None
-
-def load_bookmarks(player_id, course, bookmarks):
-    bookmarks.clear()
-    bookmarks_dir = os.path.join(STORAGE_DIR, str(player_id), 'bookmarks', str(course))
-    if os.path.isdir(bookmarks_dir):
-        for i, name in enumerate(os.listdir(bookmarks_dir)):
-            if name.endswith('.bin'):
-                state = udp_node_msgs_pb2.PlayerState()
-                with open(os.path.join(bookmarks_dir, name), 'rb') as f:
-                    state.ParseFromString(f.read())
-                if zo.get_course(state) == course:
-                    state.id = i + 9000000 + player_id * 1000
-                    bookmark = Bookmark()
-                    bookmark.name = name[:-4]
-                    bookmark.state = state
-                    bookmarks[state.id] = bookmark
-
 def remove_inactive():
     while True:
         for p_id in list(online.keys()):
@@ -679,9 +658,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             last_bookmark_updates[player_id] = 0
 
         #Add bookmarks for player if missing
-        if not player_id in global_bookmarks.keys():
-            global_bookmarks[player_id] = {}
-        bookmarks = global_bookmarks[player_id]
+        if not player_id in zo.global_bookmarks.keys():
+            zo.global_bookmarks[player_id] = {}
+        bookmarks = zo.global_bookmarks[player_id]
 
         #Update player online state
         if state.roadTime:
@@ -689,7 +668,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if online[player_id].worldTime > state.worldTime:
                     return #udp is unordered -> drop old state
             else:
-                load_bookmarks(player_id, zo.get_course(state), bookmarks)
                 discord.change_presence(len(online) + 1)
             online[player_id] = state
 
@@ -859,4 +837,4 @@ if os.path.exists(FAKE_DNS_FILE):
     dns = threading.Thread(target=fake_dns, args=(zo.server_ip,))
     dns.start()
 
-zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, global_bookmarks, regroup_ghosts, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, regroup_ghosts, discord)
