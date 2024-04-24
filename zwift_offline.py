@@ -1368,7 +1368,7 @@ def relay_session_refresh():
 
 
 def save_bookmark(state, name):
-    bookmarks_dir = os.path.join(STORAGE_DIR, str(state.id), 'bookmarks', str(get_course(state)))
+    bookmarks_dir = os.path.join(STORAGE_DIR, str(state.id), 'bookmarks', str(get_course(state)), str(state.sport))
     if not make_dir(bookmarks_dir):
         return
     with open(os.path.join(bookmarks_dir, name + '.bin'), 'wb') as f:
@@ -1377,7 +1377,8 @@ def save_bookmark(state, name):
 def logout_player(player_id):
     #Remove player from online when leaving game/world
     if player_id in online:
-        save_bookmark(online[player_id], 'Last activity')
+        activity = 'run' if online[player_id].sport == profile_pb2.Sport.RUNNING else 'ride'
+        save_bookmark(online[player_id], 'Last ' + activity)
         online.pop(player_id)
         discord.change_presence(len(online))
     if player_id in global_ghosts:
@@ -2958,12 +2959,8 @@ def add_player_to_world(player, course_world, is_pace_partner=False, is_bot=Fals
         else: # to be able to join zwifter using new home screen
             online_player = course_world[course_id].followees.add()
         online_player.id = player.id
-        if name:
-            online_player.firstName = courses_lookup[course_id]
-            online_player.lastName = name
-        else:
-            online_player.firstName = partial_profile.first_name
-            online_player.lastName = partial_profile.last_name
+        online_player.firstName = courses_lookup[course_id] if name else partial_profile.first_name
+        online_player.lastName = name if name else partial_profile.last_name
         online_player.distance = player.distance
         online_player.time = player.time
         online_player.country_code = partial_profile.country_code
@@ -3073,10 +3070,7 @@ def add_teleport_target(player, targets, is_pace_partner=True, name=None):
         target.route = player.route
     target.id = player.id
     target.firstName = partial_profile.first_name
-    if name:
-        target.lastName = name
-    else:
-        target.lastName = partial_profile.last_name
+    target.lastName = name if name else partial_profile.last_name
     target.distance = player.distance
     target.time = player.time
     target.country_code = partial_profile.country_code
