@@ -337,6 +337,16 @@ To enable support for multiple users perform the steps below:
 * If you want some random bots, check [this repository](https://github.com/oldnapalm/zoffline-bots).
 </details>
 
+### Bookmarks
+
+<details><summary>Expand</summary>
+
+* When you finish an activity, your last position will be saved as a bookmark.
+* Bookmarks can also be saved using the command ``.bookmark <name>`` in the chat.
+* You can start a new activity from a bookmark by selecting it in "Join a Zwifter" on the home screen.
+* You can teleport to a bookmark using the teleport icon on the action bar.
+</details>
+
 ## Community Discord server and Strava club
 
 Please join the community supported [Discord](https://discord.gg/GMdn8F8) server and [Strava](https://www.strava.com/clubs/zoffline) club.
