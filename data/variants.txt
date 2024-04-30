@@ -948,6 +948,7 @@
     },
     {
       "name": "game_1_56_home_screen_linear_scaling",
+      "value": true,
       "values": {
         "fields": {
           "large_layout_container_min_width": {
@@ -957,13 +958,13 @@
             "stringValue": "Desktop"
           },
           "large_layout_scale_factor": {
-            "numberValue": 1.5
+            "numberValue": 1.25
           },
           "small_layout_scale_factor": {
             "numberValue": 1.0
           },
           "viewbox_width_calculation_mode": {
-            "stringValue": "None"
+            "stringValue": "Device"
           }
         }
       }
@@ -1083,7 +1084,33 @@
     },
     {
       "name": "game_1_63_roadmarkertexturescale",
+      "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_64_home_screen_update",
+      "values": {}
+    },
+    {
+      "name": "game_1_64_rubberbanding_v3",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_64_tgc",
+      "values": {
+        "fields": {
+          "allowList": {
+            "stringValue": ""
+          },
+          "bypassAllowList": {
+            "boolValue": false
+          },
+          "quick_autoselect": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1190,6 +1217,10 @@
       "values": {}
     },
     {
+      "name": "game_button_rideon_bomb_prompt_delay",
+      "values": {}
+    },
+    {
       "name": "game_check_for_video_updates",
       "values": {
         "fields": {
@@ -1227,20 +1258,19 @@
     },
     {
       "name": "game_hud_phase_1",
-      "values": {
-        "fields": {
-          "central_hud_refactor": {
-            "boolValue": false
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_log_rssi",
       "values": {}
     },
     {
+      "name": "game_minimap_graph_update",
+      "values": {}
+    },
+    {
       "name": "game_show_about_menu",
+      "value": true,
       "values": {}
     },
     {

@@ -16,7 +16,7 @@
   {
     "name": "Crit City - The Bell Lap",
     "route": 2875658892,
-    "distance": 2060.4,
+    "distance": 2031.6,
     "course": 12,
     "sport": 0
   },

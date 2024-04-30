@@ -1975,6 +1975,7 @@
     "3628259811": "Colnago Colnago V3RS",
     "3660740142": "Felt FeltFR2022",
     "3710262807": "Zwift Safety",
+    "3713154300": "Pinarello DogmaX2024",
     "3772124007": "Specialized Shiv",
     "3787085621": "Lauf Lauf True Grit",
     "3867639546": "Focus Izalco Max 2020",
