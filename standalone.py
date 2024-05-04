@@ -348,48 +348,32 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(struct.pack('!h', len(r)) + r)
                     zo.zc_connect_queue.pop(player_id)
 
-                message = udp_node_msgs_pb2.ServerToClient()
-                message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-                message.player_id = player_id
-                message.world_time = zo.world_time()
+                messages = []
 
                 #PlayerUpdate
                 if player_id in zo.player_update_queue and len(zo.player_update_queue[player_id]) > 0:
-                    added_player_updates = list()
-                    for player_update_proto in zo.player_update_queue[player_id]:
+                    message = udp_node_msgs_pb2.ServerToClient()
+                    message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+                    message.player_id = player_id
+                    message.world_time = zo.world_time()
+                    for player_update_proto in list(zo.player_update_queue[player_id]):
+                        if len(message.SerializeToString()) + len(player_update_proto) > 1400:
+                            new_msg = udp_node_msgs_pb2.ServerToClient()
+                            new_msg.CopyFrom(message)
+                            messages.append(new_msg)
+                            del message.updates[:]
                         player_update = message.updates.add()
                         player_update.ParseFromString(player_update_proto)
-
-                        #Send if 10 updates has already been added and start a new message
-                        if len(message.updates) > 9:
-                            message_payload = message.SerializeToString()
-                            iv.ct = ChannelType.TcpServer
-                            iv.sn = relay.tcp_t_sn
-                            r = encode_packet(message_payload, relay.key, iv, None, None, None)
-                            relay.tcp_t_sn += 1
-                            self.request.sendall(struct.pack('!h', len(r)) + r)
-
-                            message = udp_node_msgs_pb2.ServerToClient()
-                            message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-                            message.player_id = player_id
-                            message.world_time = zo.world_time()
-
-                        added_player_updates.append(player_update_proto)
-                    for player_update_proto in added_player_updates:
                         zo.player_update_queue[player_id].remove(player_update_proto)
+                    messages.append(message)
+                else: #keepalive
+                    messages.append(msg)
 
-                #Check if any updates are added and should be sent to client, otherwise just keep alive
-                if len(message.updates) > 0:
+                for message in messages:
                     message_payload = message.SerializeToString()
                     iv.ct = ChannelType.TcpServer
                     iv.sn = relay.tcp_t_sn
                     r = encode_packet(message_payload, relay.key, iv, None, None, None)
-                    relay.tcp_t_sn += 1
-                    self.request.sendall(struct.pack('!h', len(r)) + r)
-                else:
-                    iv.ct = ChannelType.TcpServer
-                    iv.sn = relay.tcp_t_sn
-                    r = encode_packet(payload, relay.key, iv, None, None, None)
                     relay.tcp_t_sn += 1
                     self.request.sendall(struct.pack('!h', len(r)) + r)
             except Exception as exc:
@@ -573,16 +557,6 @@ def remove_inactive():
                 zo.logout_player(p_id)
         time.sleep(1)
 
-def get_empty_message(player_id):
-    message = udp_node_msgs_pb2.ServerToClient()
-    message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
-    message.player_id = player_id
-    message.seqno = 1
-    message.stc_f5 = 1
-    message.stc_f11 = 1
-    message.msgnum = 1
-    return message
-
 def is_state_new_for(peer_player_state, player_id):
     if not player_id in global_news.keys():
         global_news[player_id] = {}
@@ -752,55 +726,50 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     g.position += 1
 
         #Send nearby riders states or empty message
-        message = get_empty_message(player_id)
-        if nearby:
-            if len(nearby) > 100:
-                nearby = dict(sorted(nearby.items(), key=lambda item: item[1]))
-                nearby = dict(itertools.islice(nearby.items(), 100))
-            message.num_msgs = math.ceil(len(nearby) / 10)
-            for p_id in nearby:
-                player = None
-                if p_id in online.keys():
-                    player = online[p_id]
-                elif p_id in global_pace_partners.keys():
-                    pp = global_pace_partners[p_id]
-                    player = pp.route.states[pp.position]
-                    player.worldTime = zo.world_time() - simulated_latency
-                elif p_id in global_bots.keys():
-                    bot = global_bots[p_id]
-                    player = bot.route.states[bot.position]
-                    player.worldTime = zo.world_time() - simulated_latency
-                elif p_id in bookmarks.keys():
-                    player = bookmarks[p_id].state
-                    player.worldTime = zo.world_time()
-                elif p_id > 10000000:
-                    ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
-                    player = ghost.route.states[ghost.position - 1]
-                    player.id = p_id
-                    player.worldTime = zo.world_time() - simulated_latency
-                if player != None:
-                    if len(message.states) > 9:
-                        message.world_time = zo.world_time()
-                        message.cts_latency = message.world_time - recv.world_time
-                        iv.ct = ChannelType.UdpServer
-                        iv.sn = relay.udp_t_sn
-                        r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_t_sn)
-                        relay.udp_t_sn += 1
-                        socket.sendto(r, client_address)
-                        message.msgnum += 1
-                        del message.states[:]
-                    if player.groupId:
-                        player.groupId = state.groupId # fix bots in event only routes
-                    message.states.append(player)
-        else:
-            message.num_msgs = 1
+        messages = []
+        message = udp_node_msgs_pb2.ServerToClient()
+        message.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+        message.player_id = player_id
         message.world_time = zo.world_time()
         message.cts_latency = message.world_time - recv.world_time
-        iv.ct = ChannelType.UdpServer
-        iv.sn = relay.udp_t_sn
-        r = encode_packet(message.SerializeToString(), relay.key, iv, None, None, relay.udp_t_sn)
-        relay.udp_t_sn += 1
-        socket.sendto(r, client_address)
+        if len(nearby) > 100:
+            nearby = dict(sorted(nearby.items(), key=lambda item: item[1]))
+            nearby = dict(itertools.islice(nearby.items(), 100))
+        for p_id in nearby:
+            player = None
+            if p_id in online.keys():
+                player = online[p_id]
+            elif p_id in global_pace_partners.keys():
+                pp = global_pace_partners[p_id]
+                player = pp.route.states[pp.position]
+            elif p_id in global_bots.keys():
+                bot = global_bots[p_id]
+                player = bot.route.states[bot.position]
+            elif p_id in bookmarks.keys():
+                player = bookmarks[p_id].state
+            elif p_id > 10000000:
+                ghost = ghosts.play[math.floor(p_id / 10000000) - 1]
+                player = ghost.route.states[ghost.position - 1]
+                player.id = p_id
+            if player != None:
+                if not p_id in online.keys():
+                    player.worldTime = message.world_time - simulated_latency
+                    player.groupId = 0 # fix bots in event only routes
+                if len(message.SerializeToString()) + len(player.SerializeToString()) > 1400:
+                    new_msg = udp_node_msgs_pb2.ServerToClient()
+                    new_msg.CopyFrom(message)
+                    messages.append(new_msg)
+                    del message.states[:]
+                message.states.append(player)
+        messages.append(message)
+        for i, msg in enumerate(messages):
+            msg.num_msgs = len(messages)
+            msg.msgnum = i + 1
+            iv.ct = ChannelType.UdpServer
+            iv.sn = relay.udp_t_sn
+            r = encode_packet(msg.SerializeToString(), relay.key, iv, None, None, relay.udp_t_sn)
+            relay.udp_t_sn += 1
+            socket.sendto(r, client_address)
 
 if os.path.isdir(PACE_PARTNERS_DIR):
     load_pace_partners()
