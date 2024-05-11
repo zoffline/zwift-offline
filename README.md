@@ -17,7 +17,7 @@ There are three ways with which to install and run zoffline depending on your pl
 To install zoffline on Windows:
 
 * Download the latest zoffline release from https://github.com/zoffline/zwift-offline/releases/latest
-  * If you want the pace partners, download the source code package and extract the ``pace_partners`` directory to the same folder zoffline is in.
+  * If you want the RoboPacers, download the source code package and extract the ``pace_partners`` directory to the same folder zoffline is in.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Run the downloaded zoffline.exe
   * Once run, zoffline will create a ``storage`` directory in the same folder it's in to store your Zwift progress.
@@ -335,6 +335,15 @@ To enable support for multiple users perform the steps below:
 * Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
 * Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The scripts ``get_pro_names.py`` and ``get_strava_names.py`` can be used to populate this file.
 * If you want some random bots, check [this repository](https://github.com/oldnapalm/zoffline-bots).
+
+#### RoboPacers (formerly known as Pace Partners)
+
+* RoboPacers are ghosts saved using a power simulator.
+* The ghost must be recorded using update frequency of 1 second (default is 3 seconds).
+* The activity must start and finish at the same position and speed, otherwise the bot won't loop smoothly.
+* The profile must contain a unique player ID and the route ID, so that when you join the bot you take the same turns at intersections.
+* The script ``bot_editor.py`` can be used to modify ``profile.bin`` (set name, player ID and route ID) and ``route.bin`` (cut the exceeding points to make a perfect loop).
+* If you want to create a dynamic RoboPacer (increase power on climbs and decrease on descents) you can use [standalone_power.py](https://github.com/oldnapalm/zwift-offline/blob/master/standalone_power.py) (requires 2 ANT sticks, [python-ant](https://github.com/mch/python-ant) and [PowerMeterTx.py](https://github.com/oldnapalm/zwift-offline/blob/master/PowerMeterTx.py)).
 </details>
 
 ### Bookmarks
