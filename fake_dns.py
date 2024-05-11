@@ -52,7 +52,8 @@ class DNSServer:
         DNSServer.namemap[name] = ip
     def start(self):
         HOST, PORT = "0.0.0.0", self.port
-        server = socketserver.UDPServer((HOST, PORT), DNSUDPHandler)
+        socketserver.ThreadingUDPServer.allow_reuse_address = True
+        server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
 
 def fake_dns(server_ip):
