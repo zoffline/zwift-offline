@@ -182,11 +182,6 @@
       "values": {}
     },
     {
-      "name": "game_1_31_enable_join_zwifter",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_31_fquery",
       "value": true,
       "values": {}
@@ -1030,6 +1025,7 @@
     },
     {
       "name": "game_1_59_queued_recommendations",
+      "value": true,
       "values": {}
     },
     {
@@ -1048,11 +1044,6 @@
     },
     {
       "name": "game_1_60_steering_shifting_braking_hvc_analytics",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_61_persist_session_entitlements",
       "value": true,
       "values": {}
     },
@@ -1088,6 +1079,10 @@
       "values": {}
     },
     {
+      "name": "game_1_64_climbportalevent_endattoptag",
+      "values": {}
+    },
+    {
       "name": "game_1_64_home_screen_update",
       "values": {}
     },
@@ -1101,16 +1096,21 @@
       "values": {
         "fields": {
           "allowList": {
-            "stringValue": ""
+            "stringValue": "Wahoo Fitness;KICKR RUN;1.0.11\n"
           },
           "bypassAllowList": {
             "boolValue": false
           },
-          "quick_autoselect": {
+          "syncHudInclineDisplay": {
             "boolValue": true
           }
         }
       }
+    },
+    {
+      "name": "game_1_65_remove_curate_route_checkpoints",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1258,7 +1258,13 @@
     },
     {
       "name": "game_hud_phase_1",
-      "values": {}
+      "values": {
+        "fields": {
+          "ride_stats_refactor_enabled": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_log_rssi",
@@ -1276,6 +1282,10 @@
     {
       "name": "game_st3_swap",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_user_storage_service",
       "values": {}
     },
     {

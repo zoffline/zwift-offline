@@ -385,7 +385,7 @@
     "sport": 0
   },
   {
-    "name": "Yorkshire - Queens Highway After Party",
+    "name": "Yorkshire - Queen's Highway After Party",
     "route": 87631443,
     "distance": 19912.8,
     "course": 11,

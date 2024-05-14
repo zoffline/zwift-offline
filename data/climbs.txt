@@ -20,7 +20,11 @@
     "road": "10004"
   },
   {
-    "name": "Col de la Couillole (18.1 km / 1209 m)",
+    "name": "Col de Peyresourde (Avajan) (8.3 km / 559 m)",
+    "road": "10033"
+  },
+  {
+    "name": "Col de la Couillole (18.1 km / 1202 m)",
     "road": "10025"
   },
   {
@@ -30,6 +34,10 @@
   {
     "name": "Col des Aravis (5.2 km / 280 m)",
     "road": "10005"
+  },
+  {
+    "name": "Col du Galibier (Lautaret) (10.4 km / 539 m)",
+    "road": "10032"
   },
   {
     "name": "Col du Platzerwasel (7.9 km / 596 m)",
@@ -64,8 +72,16 @@
     "road": "10012"
   },
   {
+    "name": "C\u00f4te des Forche (3 km / 148 m)",
+    "road": "10029"
+  },
+  {
     "name": "Eazy Rider (1.3 km / 21 m)",
     "road": "10002"
+  },
+  {
+    "name": "Isola 2000 (18.9 km / 1145 m)",
+    "road": "10030"
   },
   {
     "name": "La Laguna Negra (9.1 km / 509 m)",
@@ -76,7 +92,11 @@
     "road": "10019"
   },
   {
-    "name": "Mt Fuji (25.3 km / 1208 m)",
+    "name": "La Turbie + Col d'Eze (15.9 km / 616 m)",
+    "road": "10031"
+  },
+  {
+    "name": "Mt Fuji (25.4 km / 1208 m)",
     "road": "10026"
   },
   {
@@ -88,8 +108,16 @@
     "road": "10020"
   },
   {
-    "name": "Passo dello Stelvio (23.5 km / 1667 m)",
+    "name": "Pas de Peyrol/Puy Mary (10.3 km / 603 m)",
+    "road": "10028"
+  },
+  {
+    "name": "Passo dello Stelvio (23.4 km / 1596 m)",
     "road": "10024"
+  },
+  {
+    "name": "Pla d'Adet (12.1 km / 847 m)",
+    "road": "10027"
   },
   {
     "name": "Puy de Dome (13 km / 913 m)",
