@@ -1285,6 +1285,7 @@ def api_clubs_club_my_clubs_summary():
 
 @app.route('/api/clubs/club/list/my-clubs.proto', methods=['GET'])
 @app.route('/api/campaign/proto/campaigns', methods=['GET'])
+@app.route('/api/campaign/proto/campaigns/completed', methods=['GET'])
 @app.route('/api/campaign/public/proto/campaigns/active', methods=['GET'])
 @app.route('/api/player-playbacks/player/settings', methods=['GET', 'POST']) # TODO: private = \x08\x01 (1: 1)
 @app.route('/api/scoring/current', methods=['GET'])
@@ -1656,6 +1657,7 @@ def api_telemetry_config():
 
 @app.route('/v1/track', methods=['POST'])
 @app.route('/hvc-ingestion-service/batch', methods=['POST'])
+@app.route('/api/hvc-ingestion-service/batch', methods=['POST'])
 def hvc_ingestion_service_batch():
     #print(json.dumps(request.json, indent=4))
     return jsonify({"success": True})
@@ -3044,7 +3046,7 @@ def load_bookmarks(player_id):
                     state = udp_node_msgs_pb2.PlayerState()
                     with open(os.path.join(root, file), 'rb') as f:
                         state.ParseFromString(f.read())
-                    state.id = i + 9000000 + player_id * 1000
+                    state.id = i + 9000000 + player_id % 1000 * 1000
                     bookmark = Bookmark()
                     bookmark.name = file[:-4]
                     bookmark.state = state
