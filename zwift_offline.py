@@ -1414,7 +1414,7 @@ def get_events(limit=None, sport=None):
     events = events_pb2.Events()
     eventStart = int(time.time()) * 1000 + 2 * 60000
     eventStartWT = world_time() + 2 * 60000
-    event_id = 0
+    event_id = 1000000  # can't conflict with private event ID
     for item in events_list:
         event_id += 10
         if sport != None and item['sport'] != profile_pb2.Sport.Value(sport):
