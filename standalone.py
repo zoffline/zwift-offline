@@ -488,7 +488,7 @@ def load_bots():
     multiplier = 1
     with open(ENABLE_BOTS_FILE) as f:
         try:
-            multiplier = int(f.readline().rstrip('\r\n'))
+            multiplier = min(int(f.readline().rstrip('\r\n')), 100)
         except ValueError:
             pass
     i = 1
