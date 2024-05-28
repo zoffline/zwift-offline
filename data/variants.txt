@@ -32,11 +32,6 @@
       "values": {}
     },
     {
-      "name": "game_1_20_hw_experiment_1",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_21_ble_data_guard_v2",
       "values": {}
     },
@@ -546,11 +541,6 @@
       }
     },
     {
-      "name": "game_1_44_virtual_shifting",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_44_workout_start_delay",
       "values": {}
     },
@@ -627,11 +617,6 @@
     },
     {
       "name": "game_1_46_virtual_shifting_leak_prevention",
-      "values": {}
-    },
-    {
-      "name": "game_1_47_onboarding_quest_rpc",
-      "value": true,
       "values": {}
     },
     {
@@ -859,11 +844,6 @@
       "values": {}
     },
     {
-      "name": "game_1_52_onboarding_tutorial_progress_bar",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_53_0_workout_detail_screen_tooltips",
       "value": true,
       "values": {}
@@ -1014,6 +994,9 @@
       "name": "game_1_58_support_zp_user_inputs",
       "values": {
         "fields": {
+          "enable_paintscheme_entitlement_grant": {
+            "boolValue": false
+          },
           "enable_settings_ui": {
             "boolValue": true
           },
@@ -1084,7 +1067,13 @@
     },
     {
       "name": "game_1_64_home_screen_update",
-      "values": {}
+      "values": {
+        "fields": {
+          "hero_carousel_id": {
+            "stringValue": ""
+          }
+        }
+      }
     },
     {
       "name": "game_1_64_rubberbanding_v3",
@@ -1098,19 +1087,84 @@
           "allowList": {
             "stringValue": "Wahoo Fitness;KICKR RUN;1.0.11\n"
           },
+          "autoPairSkipsAllowList": {
+            "boolValue": true
+          },
           "bypassAllowList": {
             "boolValue": false
           },
+          "grant_kickr_run_kit": {
+            "boolValue": true
+          },
           "syncHudInclineDisplay": {
             "boolValue": true
+          },
+          "usePaywall": {
+            "boolValue": false
           }
         }
       }
     },
     {
+      "name": "game_1_65_binary_asset_patching",
+      "values": {}
+    },
+    {
       "name": "game_1_65_remove_curate_route_checkpoints",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_66_autosteering_v5",
+      "values": {
+        "fields": {
+          "enabledForAllWorlds": {
+            "boolValue": false
+          },
+          "enabledForEvents": {
+            "boolValue": false
+          },
+          "enabledForJapan": {
+            "boolValue": false
+          },
+          "enabledForRaces": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_66_change_pause_title_to_menu",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_66_dont_hold_player_during_pairing_while_paused",
+      "values": {}
+    },
+    {
+      "name": "game_1_66_enqueue_next_up",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_66_hide_transition_start_level_on_pause_screen",
+      "values": {}
+    },
+    {
+      "name": "game_1_66_missing_log_capture",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_66_tpeaks_multiday",
+      "values": {
+        "fields": {
+          "num_days": {
+            "varintValue": "7"
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1249,6 +1303,19 @@
       "values": {}
     },
     {
+      "name": "game_dlc",
+      "values": {
+        "fields": {
+          "loose_files": {
+            "boolValue": false
+          },
+          "tenant": {
+            "stringValue": "dev"
+          }
+        }
+      }
+    },
+    {
       "name": "game_end_game_session",
       "values": {}
     },
@@ -1260,6 +1327,9 @@
       "name": "game_hud_phase_1",
       "values": {
         "fields": {
+          "dark_mode_color_scheme": {
+            "boolValue": false
+          },
           "ride_stats_refactor_enabled": {
             "boolValue": false
           }
