@@ -131,15 +131,13 @@ to generate your own certificates and do the same.
 * Open Keychain Access, select "System" under "Keychains", select "Certificates" under "Category"
     * Click "File - Import Items..." and import cert-zwift-com.pem
     * Right click "\*.zwift.com", select "Get Info" and under "Trust" choose "When using this certificate: Always Trust".
-* Using a text editor open ``~/Library/Application Support/Zwift/data/cacert.pem``
-  * Append only the certificate (lines 29 to 53) from cert-zwift-com.pem to cacert.pem
-  * __IMPORTANT:__ do not append the private key (lines 1 to 28)
+* From the cert-zwift-com.pem location, run ``sed -n '29,53p' cert-zwift-com.pem >> ~/Library/Application\ Support/Zwift/data/cacert.pem``
 * Using a text editor (with admin privileges) open ``/etc/hosts``
   * Append this line: ``<zoffline ip> us-or-rly101.zwift.com secure.zwift.com cdn.zwift.com launcher.zwift.com``
     <br />(Where ``<zoffline ip>`` is the ip address of the machine running zoffline. If
     it's running on the same machine as Zwift, use ``127.0.0.1`` as the ip.)
 
-Why: We need to redirect Zwift to use zoffline and convince OS X and Zwift to
+Why: We need to redirect Zwift to use zoffline and convince macOS and Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
 to generate your own certificates and do the same.
 
@@ -167,7 +165,7 @@ to generate your own certificates and do the same.
   * Run Zwift, hopefully it verifies download and runs
 * Play Zwift:
   * Virtual Hosts button must be ON
-  * Start Zwift and create a new user.
+  * Start Zwift and sign in using any email/password or create a new user if multiplayer is enabled.
 
 Why: We need to redirect Zwift to use zoffline (this is done by the Virtual Hosts app) and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names (this is done by the patch tool ZofflineObb).
@@ -193,7 +191,7 @@ accept zoffline's self signed certificates for Zwift's domain names (this is don
     * (modify on PC)
     * ``adb push hosts /etc/hosts``
   * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of modifying your ``hosts`` file.
-* Start Zwift and create a new user.
+* Start Zwift and sign in using any email/password or create a new user if multiplayer is enabled.
 
 Why: We need to redirect Zwift to use zoffline and convince Zwift to
 accept zoffline's self signed certificates for Zwift's domain names. Feel free
@@ -239,6 +237,7 @@ To obtain your current profile:
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/1`` directory.
 * If testing, ride at least 300 meters, shorter activities won't be uploaded.
+* Automatic screenshots upload is not possible, see [#28](https://github.com/zoffline/zwift-offline/issues/28) for details.
 
 </details>
 
