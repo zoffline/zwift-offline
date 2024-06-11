@@ -259,9 +259,58 @@
     "sport": 1
   },
   {
+    "name": "Watopia - Itza Climb Finish",
+    "route": 2333249368,
+    "distance": 31043.0,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Itza Party",
+    "route": 4131664304,
+    "distance": 46249.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Jungle Circuit Reverse",
     "route": 2839057126,
     "distance": 14150.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Mayan 8",
+    "route": 4084028627,
+    "distance": 26148.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Mayan San Remo",
+    "route": 226950646,
+    "distance": 21412.9,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Navig8",
+    "route": 806114032,
+    "distance": 66136.7,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Power to the Tower",
+    "route": 2064290391,
+    "distance": 45648.9,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Radio Rendezvous",
+    "route": 4102513789,
+    "distance": 23598.1,
     "course": 6,
     "sport": 0
   },

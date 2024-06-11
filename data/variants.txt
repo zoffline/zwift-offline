@@ -167,7 +167,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,zwiftacademy2024"
           }
         }
       }
@@ -490,6 +490,9 @@
           },
           "allowPortalRoadDifficultySelection": {
             "boolValue": true
+          },
+          "timingArchNotStartingWhenGameLagsFix": {
+            "boolValue": true
           }
         }
       }
@@ -626,11 +629,6 @@
     },
     {
       "name": "game_1_48_conditional_entities",
-      "values": {}
-    },
-    {
-      "name": "game_1_48_fitfile_update_v2",
-      "value": true,
       "values": {}
     },
     {
@@ -981,11 +979,6 @@
       "values": {}
     },
     {
-      "name": "game_1_58_fit_record_utc_timestamp",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_58_steer_to_select_intersection",
       "value": true,
       "values": {}
@@ -1097,10 +1090,10 @@
             "boolValue": true
           },
           "syncHudInclineDisplay": {
-            "boolValue": true
+            "boolValue": false
           },
           "usePaywall": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -1129,6 +1122,9 @@
           },
           "enabledForRaces": {
             "boolValue": false
+          },
+          "pillDistanceScale": {
+            "numberValue": 0.39
           }
         }
       }
@@ -1144,7 +1140,6 @@
     },
     {
       "name": "game_1_66_enqueue_next_up",
-      "value": true,
       "values": {}
     },
     {
@@ -1158,6 +1153,7 @@
     },
     {
       "name": "game_1_66_tpeaks_multiday",
+      "value": true,
       "values": {
         "fields": {
           "num_days": {
@@ -1165,6 +1161,40 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_67_asset_cms_tenant",
+      "value": true,
+      "values": {
+        "fields": {
+          "tenant": {
+            "stringValue": "production"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_67_donut_fail_safe_v2",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_67_fit_file_timestamps_consistency",
+      "values": {}
+    },
+    {
+      "name": "game_1_67_grade_ftp",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_67_sport_switch_to_change_cached_config",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_67_tp_cards",
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1328,6 +1358,9 @@
       "values": {
         "fields": {
           "dark_mode_color_scheme": {
+            "boolValue": false
+          },
+          "game_minimap_graph_update": {
             "boolValue": false
           },
           "ride_stats_refactor_enabled": {

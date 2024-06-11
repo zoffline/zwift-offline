@@ -669,6 +669,11 @@
     "road": 149,
     "time": 129132
   },
+  "-1526666341": {
+    "name": "Watopia - Coastal Crown Loop",
+    "road": 133,
+    "time": 248631
+  },
   "5745690": {
     "name": "Watopia - Downtown Titans",
     "road": 0,
@@ -683,6 +688,11 @@
     "name": "Watopia - Eastern Eight",
     "road": 81,
     "time": 30426
+  },
+  "183635628": {
+    "name": "Watopia - Elevation Evaluation",
+    "road": 149,
+    "time": 588021
   },
   "-912947484": {
     "name": "Watopia - Figure 8",
@@ -708,6 +718,11 @@
     "name": "Watopia - Four Horsemen",
     "road": 0,
     "time": 987711
+  },
+  "1631692097": {
+    "name": "Watopia - Glyph Heights",
+    "road": 133,
+    "time": 248631
   },
   "1635842477": {
     "name": "Watopia - Going Coastal",
@@ -738,6 +753,16 @@
     "name": "Watopia - Italian Villas Circuit",
     "road": 117,
     "time": 641396
+  },
+  "-1961717928": {
+    "name": "Watopia - Itza Climb Finish",
+    "road": 1,
+    "time": 89601
+  },
+  "-163302992": {
+    "name": "Watopia - Itza Party",
+    "road": 0,
+    "time": 12149
   },
   "136957568": {
     "name": "Watopia - Jon's Route",
@@ -774,8 +799,23 @@
     "road": 99,
     "time": 185302
   },
+  "-210938669": {
+    "name": "Watopia - Mayan 8",
+    "road": 149,
+    "time": 270820
+  },
   "1082034232": {
     "name": "Watopia - Mayan Bridge Loop",
+    "road": 36,
+    "time": 770795
+  },
+  "-14339870": {
+    "name": "Watopia - Mayan Mash",
+    "road": 149,
+    "time": 270820
+  },
+  "226950646": {
+    "name": "Watopia - Mayan San Remo",
     "road": 36,
     "time": 770795
   },
@@ -799,20 +839,45 @@
     "road": 81,
     "time": 561265
   },
+  "806114032": {
+    "name": "Watopia - Navig8",
+    "road": 81,
+    "time": 30426
+  },
   "1386460176": {
     "name": "Watopia - Ocean Lava Cliffside Loop",
     "road": 0,
     "time": 987711
+  },
+  "-762100323": {
+    "name": "Watopia - Oh Hill No",
+    "road": 150,
+    "time": 69866
   },
   "-1546309583": {
     "name": "Watopia - Out And Back Again",
     "road": 81,
     "time": 30426
   },
+  "-736277954": {
+    "name": "Watopia - Peak Performance",
+    "road": 1,
+    "time": 89601
+  },
+  "2064290391": {
+    "name": "Watopia - Power to the Tower",
+    "road": 1,
+    "time": 89601
+  },
   "-1325015219": {
     "name": "Watopia - Quatch Quest",
     "road": 81,
     "time": 913245
+  },
+  "-192453507": {
+    "name": "Watopia - Radio Rendezvous",
+    "road": 149,
+    "time": 270820
   },
   "762747962": {
     "name": "Watopia - Repack Rush",
@@ -858,6 +923,11 @@
     "name": "Watopia - Shorelines and Summits",
     "road": 35,
     "time": 316602
+  },
+  "-970694872": {
+    "name": "Watopia - Snowman",
+    "road": 0,
+    "time": 987711
   },
   "-1033799550": {
     "name": "Watopia - Spiral into the Volcano",
@@ -943,6 +1013,11 @@
     "name": "Watopia - Tick Tock",
     "road": 81,
     "time": 30426
+  },
+  "270817258": {
+    "name": "Watopia - Tides and Temples",
+    "road": 149,
+    "time": 588021
   },
   "1766405776": {
     "name": "Watopia - Tour of Fire and Ice",
