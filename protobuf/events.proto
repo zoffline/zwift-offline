@@ -9,6 +9,7 @@ message InvitedProfileProto {
 	optional bool enrolledZwiftAcademy = 5;
 	optional bool male = 6;
 	optional PlayerType player_type = 7;
+	optional EventCategory event_category = 8;
 }
 
 enum EventInviteStatus {
@@ -160,6 +161,12 @@ enum EventCulling {
 	CULLING_EVENT_ONLY = 2;
 	CULLING_SUBGROUP_ONLY = 3;
 }
+enum EventCategory {
+	EC_FEMALE = 0;
+	EC_MALE = 1;
+	EC_BINARY = 2;
+}
+
 message Event { //real name: EventProtobuf; where is shortName, shortDescription, rulesSet, routeUrl, bikeHash, 
 //privateEvent, followeeEntrantCount, totalEntrantCount, followeeSignedUpCount, totalSignedUpCount, followeeJoinedCount,
 //totalJoinedCount, auxiliaryUrl, imageS3Name, imageS3Bucket, cullingType, recurring, recurringOffset, publishRecurring, parentId, type, workoutHash,

@@ -2522,7 +2522,7 @@ def api_private_event_edit(meetup_id):
         if not peer_id in newEventInviteeIds:
             create_zca_notification(peer_id, org_json_pe, newEventInvites[0]["invitedProfile"])
             player_update.rel_id = peer_id
-            enqueue_wa_event_invites(peer_id, player_update)
+            enqueue_player_update(peer_id, player_update.SerializeToString())
             p_partial_profile = get_partial_profile(peer_id)
             newEventInvites.append({"invitedProfile": p_partial_profile.to_json(), "status": "PENDING"})
     org_json_pe['eventInvites'] = newEventInvites
@@ -2537,15 +2537,11 @@ def api_private_event_edit(meetup_id):
     db.session.commit()
     return jsonify({"id":meetup_id})
 
-def enqueue_wa_event_invites(player_id, wa):
-    for wat in (udp_node_msgs_pb2.WA_TYPE.WAT_EVENT, udp_node_msgs_pb2.WA_TYPE.WAT_INV_W):
-        wa.wa_type = wat
-        enqueue_player_update(player_id, wa.SerializeToString())
-
 def create_wa_event_invites(json_pe):
     pe = events_pb2.Event()
     player_update = udp_node_msgs_pb2.WorldAttribute()
     player_update.server_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
+    player_update.wa_type = udp_node_msgs_pb2.WA_TYPE.WAT_INV_W
     player_update.world_time_born = world_time()
     player_update.world_time_expire = world_time() + 60000
     player_update.wa_f12 = 1
@@ -2612,12 +2608,12 @@ def api_private_event_new(): #{"culling":true,"description":"mesg","distanceInMe
     create_event_wat(ev_sg_id, udp_node_msgs_pb2.WA_TYPE.WAT_JOIN_E, events_pb2.PlayerJoinedEvent(), online.keys())
 
     player_update = create_wa_event_invites(json_pe)
-    enqueue_wa_event_invites(current_user.player_id, player_update)
+    enqueue_player_update(current_user.player_id, player_update.SerializeToString())
 
     for peer_id in json_pe['invitedProfileIds']:
         create_zca_notification(peer_id, json_pe, eventInvites[0]["invitedProfile"])
         player_update.rel_id = peer_id
-        enqueue_wa_event_invites(peer_id, player_update)
+        enqueue_player_update(peer_id, player_update.SerializeToString())
         p_partial_profile = get_partial_profile(peer_id)
         eventInvites.append({"invitedProfile": p_partial_profile.to_json(), "status": "PENDING"})
     json_pe['eventInvites'] = eventInvites
@@ -2701,11 +2697,12 @@ def jsonPrivateEventToProtobuf(je):
         inv.profile.player_id = jp['id']
         inv.profile.firstName = jp['firstName']
         inv.profile.lastName = jp['lastName']
-        if jp['imageSrc'] is not None:
+        if jp['imageSrc']:
             inv.profile.imageSrc = jp['imageSrc']
         inv.profile.enrolledZwiftAcademy = jp['enrolledZwiftAcademy']
         inv.profile.male = jp['male']
         inv.profile.player_type = profile_pb2.PlayerType.Value(jp['playerType'])
+        inv.profile.event_category = int(jp['male'])
         inv.status = events_pb2.EventInviteStatus.Value(jinv['status'])
     ret.showResults = je['showResults']
     ret.laps = je['laps']
