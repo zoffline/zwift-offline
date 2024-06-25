@@ -6,6 +6,19 @@
       "values": {}
     },
     {
+      "name": "fitness_widget",
+      "values": {
+        "fields": {
+          "goal_unit": {
+            "stringValue": "kJ"
+          },
+          "is_fitness_score_visible": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -324,6 +337,9 @@
           "assistDelaySecs": {
             "numberValue": 4.0
           },
+          "draftRange": {
+            "numberValue": 0.5
+          },
           "heavyPressAnalog": {
             "numberValue": 450.0
           },
@@ -486,7 +502,7 @@
             "boolValue": false
           },
           "UseEventAssets": {
-            "varintValue": "0"
+            "varintValue": "1"
           },
           "allowPortalRoadDifficultySelection": {
             "boolValue": true
@@ -976,6 +992,7 @@
     },
     {
       "name": "game_1_58_delighter_codes",
+      "value": true,
       "values": {}
     },
     {
@@ -985,10 +1002,11 @@
     },
     {
       "name": "game_1_58_support_zp_user_inputs",
+      "value": true,
       "values": {
         "fields": {
           "enable_paintscheme_entitlement_grant": {
-            "boolValue": false
+            "boolValue": true
           },
           "enable_settings_ui": {
             "boolValue": true
@@ -1001,11 +1019,6 @@
     },
     {
       "name": "game_1_59_queued_recommendations",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_60_app_hang_fix_join_world",
       "value": true,
       "values": {}
     },
@@ -1034,6 +1047,7 @@
     },
     {
       "name": "game_1_62_zp_user_input_device_event_logging",
+      "value": true,
       "values": {}
     },
     {
@@ -1079,6 +1093,12 @@
         "fields": {
           "allowList": {
             "stringValue": "Wahoo Fitness;KICKR RUN;1.0.11\n"
+          },
+          "allowNegativeIncline": {
+            "boolValue": false
+          },
+          "allowRunFreeMode": {
+            "boolValue": false
           },
           "autoPairSkipsAllowList": {
             "boolValue": true
@@ -1194,6 +1214,23 @@
     },
     {
       "name": "game_1_67_tp_cards",
+      "values": {}
+    },
+    {
+      "name": "game_1_68_0_tdffaz_alpe_spinner",
+      "values": {
+        "fields": {
+          "date_end": {
+            "varintValue": "1725173999"
+          },
+          "date_start": {
+            "varintValue": "0"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_68_challenge_card",
       "values": {}
     },
     {
@@ -1339,6 +1376,9 @@
           "loose_files": {
             "boolValue": false
           },
+          "map_dlc": {
+            "boolValue": false
+          },
           "tenant": {
             "stringValue": "dev"
           }
@@ -1375,6 +1415,10 @@
     },
     {
       "name": "game_minimap_graph_update",
+      "values": {}
+    },
+    {
+      "name": "game_settings_service",
       "values": {}
     },
     {

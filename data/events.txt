@@ -191,7 +191,7 @@
   {
     "name": "Richmond - Libby Hill After Party",
     "route": 54700404,
-    "distance": 33171.6,
+    "distance": 33183.3,
     "course": 2,
     "sport": 0
   },
