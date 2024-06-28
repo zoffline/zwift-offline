@@ -2326,6 +2326,13 @@ def save_ghost(player_id, name):
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
+def activity_uploads(player_id, activity):
+    strava_upload(player_id, activity)
+    garmin_upload(player_id, activity)
+    runalyze_upload(player_id, activity)
+    intervals_upload(player_id, activity)
+    zwift_upload(player_id, activity)
+
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])
 @jwt_to_session_cookie
 @login_required
@@ -2362,14 +2369,9 @@ def api_profiles_activities_id(player_id, activity_id):
     # For using with upload_activity
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
-    # Unconditionally *try* and upload to strava and garmin since profile may
-    # not be properly linked to strava/garmin (i.e. no 'upload-to-strava' call
-    # will occur with these profiles).
-    strava_upload(player_id, activity)
-    garmin_upload(player_id, activity)
-    runalyze_upload(player_id, activity)
-    intervals_upload(player_id, activity)
-    zwift_upload(player_id, activity)
+    # Upload in separate thread to avoid client freezing if it takes longer than expected
+    upload = threading.Thread(target=activity_uploads, args=(player_id, activity))
+    upload.start()
     logout_player(player_id)
     return response, 200
 
