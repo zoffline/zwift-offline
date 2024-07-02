@@ -180,7 +180,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,zwiftacademy2024"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,zwiftacademy2024,climbportal2024"
           }
         }
       }
@@ -374,6 +374,7 @@
     },
     {
       "name": "game_1_41_show_racing_score",
+      "value": true,
       "values": {}
     },
     {
@@ -579,14 +580,13 @@
     },
     {
       "name": "game_1_45_rlog",
-      "value": true,
       "values": {
         "fields": {
           "ENABLED_LEVELS": {
-            "stringValue": "*"
+            "stringValue": ""
           },
           "ENABLED_TYPES": {
-            "stringValue": "EVENT_AUDIO"
+            "stringValue": ""
           }
         }
       }
@@ -834,6 +834,7 @@
     },
     {
       "name": "game_1_51_scored_event_filter",
+      "value": true,
       "values": {}
     },
     {
@@ -1070,14 +1071,16 @@
     },
     {
       "name": "game_1_64_climbportalevent_endattoptag",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_64_home_screen_update",
+      "value": true,
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": ""
+            "stringValue": "home_page_hero_carousel"
           }
         }
       }
@@ -1098,7 +1101,10 @@
             "boolValue": false
           },
           "allowRunFreeMode": {
-            "boolValue": false
+            "boolValue": true
+          },
+          "allowedNegativeRunFreeIncline": {
+            "numberValue": -1.0
           },
           "autoPairSkipsAllowList": {
             "boolValue": true
@@ -1195,11 +1201,11 @@
     },
     {
       "name": "game_1_67_donut_fail_safe_v2",
-      "value": true,
       "values": {}
     },
     {
       "name": "game_1_67_fit_file_timestamps_consistency",
+      "value": true,
       "values": {}
     },
     {
@@ -1224,7 +1230,7 @@
             "varintValue": "1725173999"
           },
           "date_start": {
-            "varintValue": "0"
+            "varintValue": "1719435840"
           }
         }
       }
