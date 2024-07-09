@@ -561,10 +561,6 @@
       }
     },
     {
-      "name": "game_1_44_workout_start_delay",
-      "values": {}
-    },
-    {
       "name": "game_1_45_0_ble_source_lock",
       "values": {}
     },
@@ -985,6 +981,7 @@
     },
     {
       "name": "game_1_58_0_display_steering_collision_visuals",
+      "value": true,
       "values": {}
     },
     {
@@ -1062,6 +1059,7 @@
     },
     {
       "name": "game_1_63_concurrent_profile_update",
+      "value": true,
       "values": {}
     },
     {
@@ -1084,6 +1082,14 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_64_override_run_free_incline_control",
+      "values": {}
+    },
+    {
+      "name": "game_1_64_override_run_free_negative_incline",
+      "values": {}
     },
     {
       "name": "game_1_64_rubberbanding_v3",
@@ -1125,12 +1131,12 @@
       }
     },
     {
-      "name": "game_1_65_binary_asset_patching",
+      "name": "game_1_65_remove_curate_route_checkpoints",
+      "value": true,
       "values": {}
     },
     {
-      "name": "game_1_65_remove_curate_route_checkpoints",
-      "value": true,
+      "name": "game_1_65_stream_reader_update",
       "values": {}
     },
     {
@@ -1162,6 +1168,7 @@
     },
     {
       "name": "game_1_66_dont_hold_player_during_pairing_while_paused",
+      "value": true,
       "values": {}
     },
     {
@@ -1201,6 +1208,7 @@
     },
     {
       "name": "game_1_67_donut_fail_safe_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -1237,6 +1245,29 @@
     },
     {
       "name": "game_1_68_challenge_card",
+      "values": {
+        "fields": {
+          "assign_default_challenge": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_69_fix_riding_offset",
+      "values": {}
+    },
+    {
+      "name": "game_1_69_last_used",
+      "values": {}
+    },
+    {
+      "name": "game_1_69_missing_zc_route_completion_fix",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_69_smooth_road_transition",
       "values": {}
     },
     {
@@ -1420,10 +1451,6 @@
       "values": {}
     },
     {
-      "name": "game_minimap_graph_update",
-      "values": {}
-    },
-    {
       "name": "game_settings_service",
       "values": {}
     },
@@ -1507,11 +1534,6 @@
     },
     {
       "name": "log_ble_packets",
-      "values": {}
-    },
-    {
-      "name": "rc1_onboarding_tutorial",
-      "value": true,
       "values": {}
     },
     {
