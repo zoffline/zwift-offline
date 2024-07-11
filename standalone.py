@@ -46,12 +46,16 @@ if not CDN_PROXY:
         from urllib3.util import connection
         orig_create_connection = connection.create_connection
         def patched_create_connection(address, *args, **kwargs):
-            try:
-                host, port = address
-                answer = resolver.resolve(host)[0].to_text()
-                address = (answer, port)
-            except Exception as exc:
-                print('dns.resolver: %s' % repr(exc))
+            host, port = address
+            answer = resolver.cache.data.get((host, 1, 1))
+            if not answer:
+                try:
+                    answer = resolver.resolve(host)
+                    resolver.cache.put((host, 1, 1), answer)
+                except Exception as exc:
+                    print('dns.resolver: %s' % repr(exc))
+            if answer:
+                address = (answer[0].to_text(), port)
             return orig_create_connection(address, *args, **kwargs)
         connection.create_connection = patched_create_connection
         CDN_PROXY = True
