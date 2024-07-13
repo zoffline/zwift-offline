@@ -1346,7 +1346,7 @@ def api_users_login():
                 profile.ParseFromString(f.read())
             current_level = profile.achievement_level // 100
             levels = [x for x in economy_config['cycling_levels'] if x['level'] >= current_level]
-            if len(levels) > 1 and profile.total_xp > levels[1]['xp']:
+            if len(levels) > 1 and profile.total_xp > levels[1]['xp']:  # avoid instant promotion
                 offset = profile.total_xp - levels[0]['xp']
                 transition_end = [x for x in levels if x['xp'] <= profile.total_xp][-1]['level']
                 for level in economy_config['cycling_levels']:
@@ -1355,6 +1355,11 @@ def api_users_login():
                 if transition_end > current_level:
                     economy_config['transition_start'] = current_level
                     economy_config['transition_end'] = transition_end
+            elif levels and profile.total_xp < levels[0]['xp']:  # avoid demotion
+                offset = levels[0]['xp'] - profile.total_xp
+                for level in economy_config['cycling_levels']:
+                    if level['level'] <= current_level:
+                        level['xp'] = max(level['xp'] - offset, 0)
         with open(config_file, 'w') as f:
             json.dump(economy_config, f, indent=2)
     with open(config_file) as f:
