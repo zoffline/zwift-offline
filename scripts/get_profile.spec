@@ -6,7 +6,7 @@ import sys
 sys.modules['FixTk'] = None
 
 a = Analysis(['get_profile.py'],
-             pathex=[],
+             pathex=['../protobuf'],
              binaries=[],
              datas=[],
              hiddenimports=[],

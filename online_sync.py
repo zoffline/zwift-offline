@@ -66,12 +66,33 @@ def post_credentials(session, username, password):
         print('Invalid uname and/or password')
 
 
-def query(session, access_token, route):
+def get(session, access_token, route):
     try:
         response = session.get(
             url="https://us-or-rly101.zwift.com/%s" % route,
             headers={
                 "Accept-Encoding": "gzip, deflate",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+        )
+
+        return response.content
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def post(session, access_token, route):
+    try:
+        response = session.post(
+            url="https://us-or-rly101.zwift.com/%s" % route,
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
                 "Accept": "application/x-protobuf-lite",
                 "Connection": "keep-alive",
                 "Host": "us-or-rly101.zwift.com",

@@ -31,6 +31,9 @@ import json
 import os
 import requests
 import sys
+sys.path.insert(0, '../protobuf')
+import login_pb2
+from google.protobuf.json_format import MessageToDict
 
 
 if getattr(sys, 'frozen', False):
@@ -92,12 +95,38 @@ def post_credentials(session, username, password):
         exit(-1)
 
 
-def query(session, access_token, route):
+def get(session, access_token, route):
     try:
         response = session.get(
             url="https://us-or-rly101.zwift.com/%s" % route,
             headers={
                 "Accept-Encoding": "gzip, deflate",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            verify=args.verifyCert,
+        )
+
+        if args.verbose:
+            print('Response HTTP Status Code: {status_code}'.format(
+                status_code=response.status_code))
+
+        return response.content
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def post(session, access_token, route):
+    try:
+        response = session.post(
+            url="https://us-or-rly101.zwift.com/%s" % route,
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
                 "Accept": "application/x-protobuf-lite",
                 "Connection": "keep-alive",
                 "Host": "us-or-rly101.zwift.com",
@@ -197,12 +226,16 @@ def main(argv):
     session = requests.session()
 
     access_token, refresh_token = login(session, username, password)
-    profile = query(session, access_token, "api/profiles/me")
+    profile = get(session, access_token, "api/profiles/me")
     with open('%s/profile.bin' % SCRIPT_DIR, 'wb') as f:
         f.write(profile)
-    achievements = query(session, access_token, "achievement/loadPlayerAchievements")
+    achievements = get(session, access_token, "achievement/loadPlayerAchievements")
     with open('%s/achievements.bin' % SCRIPT_DIR, 'wb') as f:
         f.write(achievements)
+    login_response = login_pb2.LoginResponse()
+    login_response.ParseFromString(post(session, access_token, "api/users/login"))
+    with open('%s/economy_config.txt' % SCRIPT_DIR, 'w') as f:
+        json.dump(MessageToDict(login_response, preserving_proto_field_name=True)['economy_config'], f, indent=2)
 
     logout(session, refresh_token)
 
