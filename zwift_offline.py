@@ -2686,7 +2686,9 @@ def api_private_event_feed():
     past_events = request.args.get('organizer_only_past_events') == 'true'
     ret = []
     for pe in ActualPrivateEvents().values():
-        if stime_to_timestamp(pe['eventStart']) > start_date or (past_events and int(pe['organizerProfileId']) == current_user.player_id):
+        if ((current_user.player_id in pe['invitedProfileIds'] or current_user.player_id == pe['organizerProfileId']) \
+          and stime_to_timestamp(pe['eventStart']) > start_date) \
+          or (past_events and pe['organizerProfileId'] == current_user.player_id):
             ret.append(clone_and_append_social(current_user.player_id, pe))
     if request.headers['Accept'] == 'application/json':
         return jsonify(ret)
