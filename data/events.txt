@@ -112,6 +112,13 @@
     "sport": 0
   },
   {
+    "name": "Makuri Islands - Shisha Shakedown",
+    "route": 3330165223,
+    "distance": 53480.8,
+    "course": 13,
+    "sport": 0
+  },
+  {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54963.3,
@@ -192,6 +199,13 @@
     "name": "Richmond - Libby Hill After Party",
     "route": 54700404,
     "distance": 33183.3,
+    "course": 2,
+    "sport": 0
+  },
+  {
+    "name": "Richmond Loop Around",
+    "route": 3912793970,
+    "distance": 42663.4,
     "course": 2,
     "sport": 0
   },
@@ -336,13 +350,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Splash and Dash",
-    "route": 1988847319,
-    "distance": 6246.7,
-    "course": 6,
-    "sport": 1
-  },
-  {
     "name": "Watopia - That's Amore Reverse",
     "route": 1586193601,
     "distance": 5954.1,
@@ -437,6 +444,13 @@
     "name": "Yorkshire - Queen's Highway After Party",
     "route": 87631443,
     "distance": 19912.8,
+    "course": 11,
+    "sport": 0
+  },
+  {
+    "name": "Yorkshire Double Loop",
+    "route": 1788218813,
+    "distance": 29670.4,
     "course": 11,
     "sport": 0
   }

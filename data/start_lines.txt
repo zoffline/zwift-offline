@@ -299,6 +299,11 @@
     "road": 129,
     "time": 253575
   },
+  "525587103": {
+    "name": "Makuri Islands - Mech Isle Loop Run",
+    "road": 129,
+    "time": 253575
+  },
   "1453570384": {
     "name": "Makuri Islands - Neokyo All-Nighter",
     "road": 4,
@@ -328,6 +333,11 @@
     "name": "Makuri Islands - Sea to Tree",
     "road": 0,
     "time": 247026
+  },
+  "-964802073": {
+    "name": "Makuri Islands - Shisha Shakedown",
+    "road": 134,
+    "time": 697444
   },
   "-992013557": {
     "name": "Makuri Islands - Sleepless City",
@@ -524,8 +534,18 @@
     "road": 0,
     "time": 485917
   },
+  "-1476431023": {
+    "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es Run",
+    "road": 0,
+    "time": 485917
+  },
   "1236439870": {
     "name": "Paris - Lutece Express",
+    "road": 0,
+    "time": 485917
+  },
+  "86621553": {
+    "name": "Paris - Lutece Express Run",
     "road": 0,
     "time": 485917
   },
@@ -544,6 +564,11 @@
     "road": 0,
     "time": 996941
   },
+  "-1128431664": {
+    "name": "Richmond - Cobbled Climbs Run",
+    "road": 0,
+    "time": 996941
+  },
   "54700404": {
     "name": "Richmond - Libby Hill After Party",
     "road": 0,
@@ -553,6 +578,11 @@
     "name": "Richmond - Richmond 2015 Worlds Reverse",
     "road": 0,
     "time": 996941
+  },
+  "-382173326": {
+    "name": "Richmond - Richmond Loop Around",
+    "road": 0,
+    "time": 977359
   },
   "948831673": {
     "name": "Richmond - Richmond Rollercoaster",
@@ -574,6 +604,11 @@
     "road": 9,
     "time": 1001667
   },
+  "-943302084": {
+    "name": "Scotland - Glasgow Crit Circuit Run",
+    "road": 9,
+    "time": 1001667
+  },
   "1258415487": {
     "name": "Scotland - Glasgow Reverse",
     "road": 9,
@@ -581,6 +616,11 @@
   },
   "742057576": {
     "name": "Scotland - Loch Loop",
+    "road": 2,
+    "time": 905327
+  },
+  "1384155764": {
+    "name": "Scotland - Loch Loop Run",
     "road": 2,
     "time": 905327
   },
@@ -694,6 +734,11 @@
     "road": 149,
     "time": 588021
   },
+  "1695691428": {
+    "name": "Watopia - Epic Run",
+    "road": 6,
+    "time": 449655
+  },
   "-912947484": {
     "name": "Watopia - Figure 8",
     "road": 0,
@@ -746,6 +791,11 @@
   },
   "107363867": {
     "name": "Watopia - Hilly Route Reverse",
+    "road": 0,
+    "time": 987711
+  },
+  "1696938496": {
+    "name": "Watopia - Hilly Route Reverse Run",
     "road": 0,
     "time": 987711
   },
@@ -1019,6 +1069,11 @@
     "road": 149,
     "time": 588021
   },
+  "-1195742902": {
+    "name": "Watopia - Titan's Run",
+    "road": 81,
+    "time": 913245
+  },
   "1766405776": {
     "name": "Watopia - Tour of Fire and Ice",
     "road": 23,
@@ -1134,6 +1189,11 @@
     "road": 0,
     "time": 718743
   },
+  "-416671431": {
+    "name": "Yorkshire - Queen's Highway Run",
+    "road": 0,
+    "time": 718743
+  },
   "87631443": {
     "name": "Yorkshire - Queens Highway After Party",
     "road": 0,
@@ -1148,5 +1208,10 @@
     "name": "Yorkshire - Tour Of Tewit Well",
     "road": 0,
     "time": 5068
+  },
+  "1788218813": {
+    "name": "Yorkshire - Yorkshire Double Loop",
+    "road": 0,
+    "time": 999601
   }
 }

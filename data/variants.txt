@@ -180,7 +180,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024"
           }
         }
       }
@@ -768,11 +768,6 @@
       }
     },
     {
-      "name": "game_1_49_0_disable_pairing_to_tutorial",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_49_0_track_rssi",
       "values": {}
     },
@@ -883,11 +878,6 @@
     },
     {
       "name": "game_1_54_emoji_feature",
-      "values": {}
-    },
-    {
-      "name": "game_1_54_event_hud_time",
-      "value": true,
       "values": {}
     },
     {
@@ -1240,6 +1230,7 @@
     },
     {
       "name": "game_1_68_challenge_card",
+      "value": true,
       "values": {
         "fields": {
           "assign_default_challenge": {
@@ -1273,6 +1264,28 @@
     },
     {
       "name": "game_1_69_smooth_road_transition",
+      "values": {}
+    },
+    {
+      "name": "game_1_70_device_identifier_analytics",
+      "values": {}
+    },
+    {
+      "name": "game_1_71_challenge_carousel",
+      "values": {
+        "fields": {
+          "challenge_carousel_id": {
+            "stringValue": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_71_csos",
+      "values": {}
+    },
+    {
+      "name": "game_1_71_solid_steering_collision",
       "values": {}
     },
     {
@@ -1419,11 +1432,29 @@
       "name": "game_dlc",
       "values": {
         "fields": {
+          "asset_type": {
+            "stringValue": "dlc_asset"
+          },
+          "build_id": {
+            "stringValue": "unused"
+          },
           "canary_test": {
             "boolValue": true
           },
+          "formatted_api": {
+            "stringValue": "api/assetcms/delivery/tenant/{tenant}/static/asset/{asset_type}/{path_root}/{path}"
+          },
           "loose_files": {
             "boolValue": false
+          },
+          "path_root": {
+            "stringValue": "zwift/zwift-game-client/Projects/ZwiftApp/patching/dlc"
+          },
+          "platform_zip_path": {
+            "stringValue": "{platform}/{path}.zip"
+          },
+          "server": {
+            "stringValue": "https://us-or-rly101.zwift.com"
           },
           "tenant": {
             "stringValue": "dev"
@@ -1447,6 +1478,9 @@
       "name": "game_hud_phase_1",
       "values": {
         "fields": {
+          "average_power_from_bike_computer": {
+            "boolValue": true
+          },
           "dark_mode_color_scheme": {
             "boolValue": false
           },
@@ -1454,6 +1488,9 @@
             "boolValue": false
           },
           "ride_stats_refactor_enabled": {
+            "boolValue": false
+          },
+          "standard_minimap_direction": {
             "boolValue": false
           }
         }
@@ -1465,6 +1502,10 @@
     },
     {
       "name": "game_log_rssi",
+      "values": {}
+    },
+    {
+      "name": "game_nb_world_load",
       "values": {}
     },
     {
@@ -1480,6 +1521,61 @@
       "name": "game_st3_swap",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_tow_extra_xp",
+      "values": {
+        "fields": {
+          "event_xp_multiplier": {
+            "numberValue": 2.0
+          },
+          "on_demand_xp_multiplier": {
+            "numberValue": 1.5
+          },
+          "tow_end": {
+            "varintValue": "1732521599"
+          },
+          "tow_start": {
+            "varintValue": "1729004400"
+          },
+          "zwift_tow_cycling_route_01": {
+            "varintValue": "2966818006"
+          },
+          "zwift_tow_cycling_route_02": {
+            "varintValue": "3382019812"
+          },
+          "zwift_tow_cycling_route_03": {
+            "varintValue": "982239385"
+          },
+          "zwift_tow_cycling_route_04": {
+            "varintValue": "2663908549"
+          },
+          "zwift_tow_cycling_route_05": {
+            "varintValue": "2829629527"
+          },
+          "zwift_tow_cycling_route_06": {
+            "varintValue": "743730361"
+          },
+          "zwift_tow_cycling_route_07": {
+            "varintValue": "2746475460"
+          },
+          "zwift_tow_cycling_route_08": {
+            "varintValue": "604330868"
+          },
+          "zwift_tow_cycling_route_09": {
+            "varintValue": "2128890027"
+          },
+          "zwift_tow_cycling_route_10": {
+            "varintValue": "4131664304"
+          },
+          "zwift_tow_cycling_route_11": {
+            "varintValue": "4084028627"
+          },
+          "zwift_tow_cycling_route_12": {
+            "varintValue": "1635842477"
+          }
+        }
+      }
     },
     {
       "name": "game_user_storage_service",
