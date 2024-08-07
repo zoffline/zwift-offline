@@ -22,9 +22,9 @@ cc = coco.CountryConverter()
 
 teams = {
         'UAE Team Emirates': {'abv': 'UAD', 'jersey_name': 'UAE', 'jersey_signature': 1751349769, 'bike_name': 'Colnago Colnago V3RS', 'bike_signature': 3628259811, 'front_wheel_name': 'Enve SES 3.4', 'front_wheel_signature': 2223270801, 'rear_wheel_name': 'Enve SES 3.4', 'rear_wheel_signature': 3835575171},
-        'Soudal - Quick Step': {'abv': 'SOQ', 'jersey_name': 'Deceuninck-Quick-Step', 'jersey_signature': 2906189156, 'bike_name': 'Specialized Tarmac SL7', 'bike_signature': 935373427, 'front_wheel_name': 'Roval Rapide CLX', 'front_wheel_signature': 2181416413, 'rear_wheel_name': 'Roval Rapide CLX', 'rear_wheel_signature': 3548735686, 'helmet_name': 'S-Works Evade', 'helmet_signature': 3109903878},
+        'Soudal Quick-Step': {'abv': 'SOQ', 'jersey_name': 'Deceuninck-Quick-Step', 'jersey_signature': 2906189156, 'bike_name': 'Specialized Tarmac SL7', 'bike_signature': 935373427, 'front_wheel_name': 'Roval Rapide CLX', 'front_wheel_signature': 2181416413, 'rear_wheel_name': 'Roval Rapide CLX', 'rear_wheel_signature': 3548735686, 'helmet_name': 'S-Works Evade', 'helmet_signature': 3109903878},
         'Jumbo-Visma': {'abv': 'TJV', 'jersey_name': 'Jumbo Visma TdF Edition 2023', 'jersey_signature': 2246416303, 'womens_jersey': 2922761319, 'bike_name': 'Cervelo R5', 'bike_signature': 106535518, 'front_wheel_name': 'Reserve Reserve 25 GR', 'front_wheel_signature': 635220876, 'rear_wheel_name': 'Reserve Reserve 25 GR', 'rear_wheel_signature': 1842698274, 'helmet_name': 'LOC_ACCESSORY_LAZERBULLET', 'helmet_signature': 1292376041},
-        'Team Visma | Lease a Bike': {'abv': 'TJV', 'jersey_name': 'Jumbo Visma TdF Edition 2023', 'jersey_signature': 2246416303, 'womens_jersey': 2922761319, 'bike_name': 'Cervelo R5', 'bike_signature': 106535518, 'front_wheel_name': 'Reserve Reserve 25 GR', 'front_wheel_signature': 635220876, 'rear_wheel_name': 'Reserve Reserve 25 GR', 'rear_wheel_signature': 1842698274, 'helmet_name': 'LOC_ACCESSORY_LAZERBULLET', 'helmet_signature': 1292376041},
+        'Team Visma | Lease a Bike': {'abv': 'TVL', 'jersey_name': 'Jumbo Visma TdF Edition 2023', 'jersey_signature': 2246416303, 'womens_jersey': 2922761319, 'bike_name': 'Cervelo R5', 'bike_signature': 106535518, 'front_wheel_name': 'Reserve Reserve 25 GR', 'front_wheel_signature': 635220876, 'rear_wheel_name': 'Reserve Reserve 25 GR', 'rear_wheel_signature': 1842698274, 'helmet_name': 'LOC_ACCESSORY_LAZERBULLET', 'helmet_signature': 1292376041},
         'Alpecin-Deceuninck': {'abv': 'ADC', 'jersey_name': 'Alpecin Deceuninck 2023', 'jersey_signature': 1905664161, 'bike_name': 'Canyon Aeroad 2015', 'bike_signature': 1520594784, 'front_wheel_name': 'Shimano C50', 'front_wheel_signature': 1742598126, 'rear_wheel_name': 'Shimano C50', 'rear_wheel_signature': 3725678091, 'helmet_name': 'ABUS GameChanger', 'helmet_signature': 1387973863},
         'Alpecin - Deceuninck': {'abv': 'ADC', 'jersey_name': 'Alpecin Deceuninck 2023', 'jersey_signature': 1905664161, 'bike_name': 'Canyon Aeroad 2015', 'bike_signature': 1520594784, 'front_wheel_name': 'Shimano C50', 'front_wheel_signature': 1742598126, 'rear_wheel_name': 'Shimano C50', 'rear_wheel_signature': 3725678091, 'helmet_name': 'ABUS GameChanger', 'helmet_signature': 1387973863},
         'Lidl - Trek': {'abv': 'TRK', 'jersey_name': 'Trek-Segafredo Men', 'jersey_signature': 2140478849, 'womens_jersey_signature': 1154847422, 'bike_name': 'Trek Madone', 'bike_signature': 4129467727, 'front_wheel_name': 'Bontrager Aeolus5', 'front_wheel_signature': 702195190, 'rear_wheel_name': 'Bontrager Aeolus5', 'rear_wheel_signature': 3594144634},
@@ -87,9 +87,16 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                 code = td.span.get_attribute_list("class")[1]
                 tmp['country_code'] = cc.convert(names=code, to='ISOnumeric')
                 tmp['is_male'] = male
-                if td.a:
-                    tmp['first_name'] = (td.a.contents[1].strip())
-                    tmp['last_name'] = (td.a.span.contents[0])
+                if td.a.contents:
+                    fn = []
+                    ln = []
+                    for n in td.a.contents[0].split():
+                        if n.isupper():
+                            ln.append(n.title())
+                        else:
+                            fn.append(n)
+                    tmp['first_name'] = ' '.join(fn)
+                    tmp['last_name'] = ' '.join(ln)
         if td.a and td.contents[0]:
             if "cu600" in repr(td) and td.a.contents:
                 if 'first_name' in tmp:
