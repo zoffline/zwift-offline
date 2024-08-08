@@ -845,19 +845,13 @@ def profile(username):
             access_token, refresh_token = online_sync.login(session, username, password)
             try:
                 if request.form.get("zwift_profile"):
-                    profile = online_sync.get(session, access_token, "api/profiles/me")
+                    profile = online_sync.query(session, access_token, "api/profiles/me")
                     profile_file = '%s/profile.bin' % profile_dir
                     backup_file(profile_file)
                     with open(profile_file, 'wb') as f:
                         f.write(profile)
-                    login_response = login_pb2.LoginResponse()
-                    login_response.ParseFromString(online_sync.post(session, access_token, "api/users/login"))
-                    economy_config_file = '%s/economy_config.txt' % profile_dir
-                    backup_file(economy_config_file)
-                    with open(economy_config_file, 'w') as f:
-                        json.dump(MessageToDict(login_response, preserving_proto_field_name=True)['economy_config'], f, indent=2)
                 if request.form.get("achievements"):
-                    achievements = online_sync.get(session, access_token, "achievement/loadPlayerAchievements")
+                    achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
                     achievements_file = '%s/achievements.bin' % profile_dir
                     backup_file(achievements_file)
                     with open(achievements_file, 'wb') as f:

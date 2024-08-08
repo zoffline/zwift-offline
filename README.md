@@ -220,7 +220,7 @@ To obtain your current profile:
 * Ensure zoffline is disabled.
 * Run ``scripts/get_profile.py -u <your_zwift_username>``
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``get_profile.exe`` obtained from https://github.com/zoffline/zwift-offline/releases/tag/zoffline_helper in place of ``scripts/get_profile.py``
-* Move the resulting ``profile.bin``, ``achievements.bin`` and ``economy_config.txt`` (saved in whatever directory you ran get_profile.py in) into the ``storage/1`` directory.
+* Move the resulting ``profile.bin`` and ``achievements.bin`` (saved in whatever directory you ran get_profile.py in) into the ``storage/1`` directory.
   * If using zoffline.exe on Windows, create a ``storage/1`` directory within the same folder as zoffline.exe if it does not already exist.
   * If using Docker, the directory ``1`` should be in the path you passed to ``-v``
 
