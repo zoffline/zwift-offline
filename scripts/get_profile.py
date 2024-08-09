@@ -31,6 +31,10 @@ import json
 import os
 import requests
 import sys
+sys.path.insert(0, '../protobuf')
+import login_pb2
+from google.protobuf.json_format import MessageToDict
+from random import randbytes
 
 
 if getattr(sys, 'frozen', False):
@@ -105,6 +109,33 @@ def query(session, access_token, route):
                 "Authorization": "Bearer %s" % access_token,
                 "Accept-Language": "en-us",
             },
+            verify=args.verifyCert,
+        )
+
+        if args.verbose:
+            print('Response HTTP Status Code: {status_code}'.format(
+                status_code=response.status_code))
+
+        return response.content
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
+def api_login(session, access_token, login_request):
+    try:
+        response = session.post(
+            url="https://us-or-rly101.zwift.com/api/users/login",
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            data=login_request.SerializeToString(),
             verify=args.verifyCert,
         )
 
@@ -203,6 +234,14 @@ def main(argv):
     achievements = query(session, access_token, "achievement/loadPlayerAchievements")
     with open('%s/achievements.bin' % SCRIPT_DIR, 'wb') as f:
         f.write(achievements)
+    login_request = login_pb2.LoginRequest()
+    login_request.key = randbytes(16)
+    login_response = login_pb2.LoginResponse()
+    login_response.ParseFromString(api_login(session, access_token, login_request))
+    login_response_dict = MessageToDict(login_response, preserving_proto_field_name=True)
+    if 'economy_config' in login_response_dict:
+        with open('%s/economy_config.txt' % SCRIPT_DIR, 'w') as f:
+            json.dump(login_response_dict['economy_config'], f, indent=2)
 
     logout(session, refresh_token)
 

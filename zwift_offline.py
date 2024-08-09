@@ -850,6 +850,16 @@ def profile(username):
                     backup_file(profile_file)
                     with open(profile_file, 'wb') as f:
                         f.write(profile)
+                    login_request = login_pb2.LoginRequest()
+                    login_request.key = random.randbytes(16)
+                    login_response = login_pb2.LoginResponse()
+                    login_response.ParseFromString(online_sync.api_login(session, access_token, login_request))
+                    login_response_dict = MessageToDict(login_response, preserving_proto_field_name=True)
+                    if 'economy_config' in login_response_dict:
+                        economy_config_file = '%s/economy_config.txt' % profile_dir
+                        backup_file(economy_config_file)
+                        with open(economy_config_file, 'w') as f:
+                            json.dump(login_response_dict['economy_config'], f, indent=2)
                 if request.form.get("achievements"):
                     achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
                     achievements_file = '%s/achievements.bin' % profile_dir

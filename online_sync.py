@@ -87,6 +87,28 @@ def query(session, access_token, route):
         print('HTTP Request failed: %s' % e)
 
 
+def api_login(session, access_token, login_request):
+    try:
+        response = session.post(
+            url="https://us-or-rly101.zwift.com/api/users/login",
+            headers={
+                "Content-Type": "application/x-protobuf-lite",
+                "Accept": "application/x-protobuf-lite",
+                "Connection": "keep-alive",
+                "Host": "us-or-rly101.zwift.com",
+                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+                "Authorization": "Bearer %s" % access_token,
+                "Accept-Language": "en-us",
+            },
+            data=login_request.SerializeToString(),
+        )
+
+        return response.content
+
+    except requests.exceptions.RequestException as e:
+        print('HTTP Request failed: %s' % e)
+
+
 def logout(session, refresh_token):
     # Logout
     # POST https://secure.zwift.com/auth/realms/zwift/tokens/logout

@@ -11,7 +11,7 @@ message LoginResponse {
 }
 
 message LoginRequest {
-	required AnalyticsEventProperties properties = 1;
+	optional AnalyticsEventProperties properties = 1;
 	required bytes key = 2;
 }
 
