@@ -1,4 +1,4 @@
-FROM python:3.12-alpine as builder
+FROM python:3.12-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -11,7 +11,7 @@ RUN pip install --user --requirement ./zwift-offline/requirements.txt
 RUN pip install --user garth
 
 FROM python:3.12-alpine
-MAINTAINER zoffline <zoffline@tutanota.com>
+LABEL maintainer="zoffline <zoffline@tutanota.com>"
 
 WORKDIR /usr/src/app
 
