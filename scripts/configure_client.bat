@@ -5,8 +5,6 @@ ECHO.
 
 NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '%~0' & EXIT /B )
 
-CD /D "%~dp0"
-
 SET HOSTS="%WINDIR%\system32\drivers\etc\hosts"
 COPY %HOSTS% %HOSTS%.bak >nul
 TYPE %HOSTS%.bak | FINDSTR /V /I zwift > %HOSTS%
@@ -163,5 +161,7 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE ( ECHO Certificate found in cacert.pem, no changes will be made )
 
 ECHO.
+
+TASKKILL /F /IM ZwiftLauncher.exe >nul 2>&1
 
 PAUSE
