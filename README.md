@@ -277,6 +277,21 @@ To enable support for multiple users perform the steps below:
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
+* Edit ``%USERPROFILE%\AppData\Roaming\npm\node_modules\apk-mitm\dist\tools\apktool.js`` and modify it like this:
+  ``` js
+      decode(inputPath, outputPath) {
+          return this.run([
+              'decode',
+              '-resm', // add this
+              'dummy', // add this
+              inputPath,
+              '--output',
+              outputPath,
+              '--frame-path',
+              this.options.frameworkPath,
+          ], 'decoding');
+      }
+  ```
 * Copy the file [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem) in this repo and the Zwift Companion apk (e.g. ``zca.apk``) to a known location
 * Open Command Prompt, cd to that location and run
   * ``apk-mitm --certificate cert-zwift-com.pem zca.apk``
