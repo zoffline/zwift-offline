@@ -277,7 +277,7 @@ To enable support for multiple users perform the steps below:
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
-* Edit ``%USERPROFILE%\AppData\Roaming\npm\node_modules\apk-mitm\dist\tools\apktool.js`` and modify it like this:
+* Open ``apk-mitm/dist/tools/apktool.js`` (run ``npm root -g`` to find its location) and edit it like this:
   ``` js
       decode(inputPath, outputPath) {
           return this.run([
