@@ -96,6 +96,10 @@
     "road": "10031"
   },
   {
+    "name": "Lagos de Covadonga (14.5 km / 976 m)",
+    "road": "10035"
+  },
+  {
     "name": "Mont\u00e9e du Chinaillon (8.1 km / 353 m)",
     "road": "10034"
   },

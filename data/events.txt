@@ -2,7 +2,7 @@
   {
     "name": "Bologna Time Trial",
     "route": 2843604888,
-    "distance": 8050.0,
+    "distance": 8049.8,
     "course": 10,
     "sport": 0
   },
@@ -196,13 +196,6 @@
     "sport": 0
   },
   {
-    "name": "Richmond - Libby Hill After Party",
-    "route": 54700404,
-    "distance": 33183.3,
-    "course": 2,
-    "sport": 0
-  },
-  {
     "name": "Richmond Loop Around",
     "route": 3912793970,
     "distance": 42663.4,
@@ -273,20 +266,6 @@
     "sport": 1
   },
   {
-    "name": "Watopia - Itza Climb Finish",
-    "route": 2333249368,
-    "distance": 31043.0,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Itza Party",
-    "route": 4131664304,
-    "distance": 46249.6,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Jungle Circuit Reverse",
     "route": 2839057126,
     "distance": 14150.6,
@@ -297,13 +276,6 @@
     "name": "Watopia - Mayan 8",
     "route": 4084028627,
     "distance": 26148.6,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Mayan San Remo",
-    "route": 226950646,
-    "distance": 21412.9,
     "course": 6,
     "sport": 0
   },

@@ -1148,7 +1148,7 @@ def api_empty_arrays():
 
 @app.route('/api/assetcms/<path:path>', methods=['GET'])
 def api_assetcms(path):
-    return jsonify([])
+    return jsonify()
 
 def activity_moving_time(activity):
     try:
