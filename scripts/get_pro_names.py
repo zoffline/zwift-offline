@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 # Use this script to populate bot.txt with names from https://www.procyclingstats.com
+# Refer to http://cdn.zwift.com/gameassets/GameDictionary.xml
 # pip install beautifulsoup4 country-converter fuzzywuzzy
 # scripts/get_pro_names.py -h
 
@@ -61,6 +62,8 @@ teams = {
     'jersey_signature': 1905664161,
     'bike_name': 'Canyon AeroadSRAM2024',
     'bike_signature': 1122831861,
+    'bike_frame_colour_name': 'Canyon Aeroad2024-Aeroad Alpecin-Deceuninck',
+    'bike_frame_colour_signature': '1978783051',
     'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
@@ -82,8 +85,10 @@ teams = {
     'Movistar Team': {'abv': 'MOV',
     'jersey_name': 'Movistar 2023',
     'jersey_signature': 436926002,
-    'bike_name': 'Canyon AeroadSRAM2024',
-    'bike_signature': 1122831861,
+    'bike_name': 'Canyon Aeroad Team Edition',
+    'bike_signature': 390579581,
+    'bike_frame_colour_name': 'Canyon Aeroad Team Edition-Movistar 2023',
+    'bike_frame_colour_signature': '2280475316',
     'front_wheel_name': 'Zipp 404',
     'front_wheel_signature': 613983807,
     'rear_wheel_name': 'Zipp 404',
@@ -96,6 +101,8 @@ teams = {
     'jersey_signature': 712380058,
     'bike_name': 'Ridley Noah Fast 2019',
     'bike_signature': 4288910569,
+    'bike_frame_colour_name': 'Ridley Noah Fast 2019-Lotto Soudal',
+    'bike_frame_colour_signature': '1205664811',
     'front_wheel_name': 'DTSwiss ARC 1100 DICUT 62',
     'front_wheel_signature': 346409677,
     'rear_wheel_name': 'DTSwiss ARC 1100 DICUT 62',
@@ -106,6 +113,8 @@ teams = {
     'jersey_signature': 2349035663,
     'bike_name': 'Cannondale System Six',
     'bike_signature': 2005280203,
+    'bike_frame_colour_name': 'Cannondale Super Six Evo-Education First',
+    'bike_frame_colour_signature': '507139888',
     'front_wheel_name': 'HED HED Vanquish RC6 Pro',
     'front_wheel_signature': 1791179228,
     'rear_wheel_name': 'HED HED Vanquish RC6 Pro',
@@ -118,6 +127,8 @@ teams = {
     'jersey_signature': 542207259,
     'bike_name': 'Pinarello Dogma F',
     'bike_signature': 4208139356,
+    'bike_frame_colour_name': 'Pinarello Dogma F-Ineos',
+    'bike_frame_colour_signature': '870887764',
     'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
@@ -140,6 +151,8 @@ teams = {
     'Bahrain - Victorious': {'abv': 'TBV',
     'jersey_name': 'Bahrain McLaren',
     'jersey_signature': 2155858980,
+    'bike_frame_colour_name': 'Merida Scultura-Merida Scultura Bahrain McLaren',
+    'bike_frame_colour_signature': '2063693653',
     'bike_name': 'Merida Scultura',
     'bike_signature': 3033010663},
    
@@ -171,10 +184,12 @@ teams = {
     'jersey_signature': 1756517729},
    
     'Cofidis': {'abv': 'COF',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Cofidis De Rosa',
+    'bike_frame_colour_signature': '2273815071',
     'jersey_name': 'Cofidis 2018',
     'jersey_signature': 927604154,
-    'bike_name': 'Cervelo CerveloS52021',
-    'bike_signature': 1972610461,
     'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
@@ -185,7 +200,7 @@ teams = {
     'jersey_signature': 2642337455,
     'bike_name': 'Cube Cube Litening',
     'bike_signature': 1767548815,
-     'front_wheel_name': 'Shimano C50',
+    'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
     'rear_wheel_signature': 3725678091},
@@ -211,6 +226,10 @@ teams = {
     'rear_wheel_signature': 3725678091},
    
     'Decathlon AG2R La Mondiale Team': {'abv': 'ACT',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-AG2R',
+    'bike_frame_colour_signature': '455876950',
     'jersey_name': 'AG2R La Mondiale',
     'jersey_signature': 1587982785,
     'front_wheel_name': 'Campagnolo Bora Ultra 35',
@@ -221,6 +240,10 @@ teams = {
     'Astana Qazaqstan Team': {'abv': 'AST',
     'jersey_name': 'ASTANA PRO TEAM',
     'jersey_signature': 1969335676,
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Astana',
+    'bike_frame_colour_signature': '1208416225',
     'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
@@ -235,10 +258,12 @@ teams = {
     'bike_signature': 3469325930},
    
     'TotalEnergies': {'abv': 'TEN',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Total Direct Energie',
+    'bike_frame_colour_signature': '1215759893',
     'jersey_name': 'Total Direct Energie',
     'jersey_signature': 2092402045,
-    'bike_name': 'Specialized Tarmac SL7',
-    'bike_signature': 935373427,
     'front_wheel_name': 'Shimano C50',
     'front_wheel_signature': 1742598126,
     'rear_wheel_name': 'Shimano C50',
@@ -269,6 +294,10 @@ teams = {
     'jersey_signature': 1751349769},
    
     'FDJ - SUEZ': {'abv': 'FST',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Lapierre FDJ',
+    'bike_frame_colour_signature': '1248651886',
     'jersey_name': 'FDJ Suez 2023',
     'jersey_signature': 3360845221,
     'front_wheel_name': 'Shimano C50',
@@ -303,8 +332,8 @@ teams = {
     'bike_signature': 3002729519},
    
     'Liv AlUla Jayco': {'abv': 'LAJ',
-    'jersey_name': 'Liv Racing 2019',
-    'jersey_signature': 3932519699,
+    'jersey_name': 'Liv AlUla Jayco 2024',
+    'jersey_signature': 2095486697,
     'bike_name': 'Liv Langma Advanced SL',
     'bike_signature': 3495124341},
    
@@ -313,6 +342,8 @@ teams = {
     'jersey_signature': 552170906,
     'bike_name': 'Factor One',
     'bike_signature': 3469325930,
+    'bike_frame_colour_name': 'Factor One-One Israel',
+    'bike_frame_colour_signature': '3959514452',
     'helmet_name': 'Limar Air Speed TWENTY24',
     'helmet_signature': 9439966},
    
@@ -337,6 +368,10 @@ teams = {
     'jersey_signature': 3290712389},
    
     'Ceratizit-WNT': {'abv': 'WNT',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Orbea Orca',
+    'bike_frame_colour_signature': '806402273',
     'jersey_name': 'Ceratizit-WNT',
     'jersey_signature': 97975537},
    
@@ -357,6 +392,10 @@ teams = {
     'jersey_signature': 3553917933},
    
     'Cofidis Women Team': {'abv': 'COF',
+    'bike_name': 'Zwift Carbon',
+    'bike_signature': '2106340733',
+    'bike_frame_colour_name': 'Zwift Carbon-Cofidis De Rosa',
+    'bike_frame_colour_signature': '2273815071',
     'jersey_name': 'Cofidis',
     'jersey_signature': 4191972189},
    
@@ -399,8 +438,8 @@ teams = {
     'jersey_signature': 2330819669},
    
     'Lotto Dstny Ladies': {'abv': 'LDL',
-    'jersey_name': 'Lotto Soudal Ladies',
-    'jersey_signature': 1423767803},
+    'jersey_name': 'Lotto Dstny 2023',
+    'jersey_signature': 712380058},
    
     'Parkhotel Valkenburg': {'abv': 'PHV',
     'bike_name': 'Giant Propel Advanced SL Disc',
@@ -485,6 +524,8 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                             team = teams[td.a.contents[0]]
                             if 'bike_signature' in team:
                                 tmp['bike_frame'] = team['bike_signature']
+                            if 'bike_frame_colour_signature' in team:
+                                tmp['bike_frame_colour'] = team['bike_frame_colour_signature']
                             if 'front_wheel_signature' in team:
                                 tmp['bike_wheel_front'] = team['front_wheel_signature']
                             if 'rear_wheel_signature' in team:

@@ -524,7 +524,7 @@ def load_bots():
                                 loop_riders = get_names()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
-                            for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                            for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
                                 if item in rider:
                                     setattr(p, item, rider[item])
                             p.hair_type = random.choice(zo.GD['hair_types'])
