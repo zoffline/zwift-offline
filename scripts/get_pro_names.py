@@ -589,7 +589,7 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                             if 'bike_signature' in team:
                                 tmp['bike_frame'] = team['bike_signature']
                             if 'bike_frame_colour_signature' in team:
-                                tmp['bike_frame_colour'] = team['bike_frame_colour_signature']
+                                tmp['bike_frame_colour'] = (team['bike_frame_colour_signature'] << 32) + 80
                             if 'front_wheel_signature' in team:
                                 tmp['bike_wheel_front'] = team['front_wheel_signature']
                             if 'rear_wheel_signature' in team:
