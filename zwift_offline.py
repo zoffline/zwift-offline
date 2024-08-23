@@ -110,6 +110,11 @@ else:
     logger.info("server-ip.txt not found, using %s", server_ip)
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
+GHOST_PROFILE = None
+GHOST_PROFILE_FILE = "%s/ghost_profile.txt" % STORAGE_DIR
+if os.path.exists(GHOST_PROFILE_FILE):
+    with open(GHOST_PROFILE_FILE) as f:
+        GHOST_PROFILE = json.load(f)
 MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
 if MULTIPLAYER:
     if not make_dir(LOGS_DIR):
@@ -2067,6 +2072,10 @@ def api_profiles():
                     profile.ParseFromString(fd.read())
                     p = profiles.profiles.add()
                     p.CopyFrom(random_profile(profile))
+                    if GHOST_PROFILE:
+                        for item in ['ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                            if item in GHOST_PROFILE:
+                                setattr(p, item, GHOST_PROFILE[item])
                     p.id = p_id
                     p.first_name = ''
                     p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
