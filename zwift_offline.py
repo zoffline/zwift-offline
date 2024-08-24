@@ -2072,14 +2072,14 @@ def api_profiles():
                     profile.ParseFromString(fd.read())
                     p = profiles.profiles.add()
                     p.CopyFrom(random_profile(profile))
-                    if GHOST_PROFILE:
-                        for item in ['ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
-                            if item in GHOST_PROFILE:
-                                setattr(p, item, GHOST_PROFILE[item])
                     p.id = p_id
                     p.first_name = ''
                     p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
                     p.country_code = 0
+                    if GHOST_PROFILE:
+                        for item in ['country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                            if item in GHOST_PROFILE:
+                                setattr(p, item, GHOST_PROFILE[item])
         elif p_id > 9000000:
             p = profiles.profiles.add()
             p.id = p_id
