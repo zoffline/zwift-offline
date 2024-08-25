@@ -342,6 +342,15 @@ To enable support for multiple users perform the steps below:
   * If multiplayer is enabled, access ``https://<zoffline_ip>/login/``, check "Enable ghosts" and click "Start Zwift" to save the option.
 * When you save an activity, the ghost will be saved in ``storage/<player_id>/ghosts/<world>/<route>``. Next time you ride the same route, the ghost will be loaded.
 * Type ``.regroup`` in chat to regroup the ghosts.
+* Equipment ("bike_frame", "bike_wheel_front", "bike_wheel_rear", "ride_jersey", "ride_helmet_type", "glasses_type", "ride_shoes_type" and "ride_socks_type") can be customized by creating a file ``ghost_profile.txt`` inside the ``storage`` folder. Values (signature) can be found in [GameDictionary](http://cdn.zwift.com/gameassets/GameDictionary.xml).
+
+  Example:
+  ``` json
+  {
+    "ride_jersey": 90433914,
+    "bike_frame": 1456463855
+  }
+  ```
 
 #### Bots
 
