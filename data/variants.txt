@@ -1129,6 +1129,9 @@
           "enabledForRaces": {
             "boolValue": false
           },
+          "enabledForWatopia": {
+            "boolValue": false
+          },
           "pillDistanceScale": {
             "numberValue": 0.39
           }
@@ -1240,8 +1243,11 @@
           "current_equipped_first": {
             "boolValue": true
           },
+          "sort_accessories": {
+            "boolValue": false
+          },
           "ugs_enabled": {
-            "boolValue": true
+            "boolValue": false
           },
           "use_last_selected_for_config_hash": {
             "boolValue": false
@@ -1469,6 +1475,9 @@
             "boolValue": true
           },
           "direct_download": {
+            "boolValue": true
+          },
+          "disable_cache": {
             "boolValue": false
           },
           "formatted_api": {
@@ -1506,22 +1515,26 @@
     },
     {
       "name": "game_hud_phase_1",
+      "value": true,
       "values": {
         "fields": {
           "average_power_from_bike_computer": {
             "boolValue": true
           },
           "dark_mode_color_scheme": {
-            "boolValue": false
+            "boolValue": true
           },
           "game_minimap_graph_update": {
-            "boolValue": false
+            "boolValue": true
+          },
+          "optimized_tss_calculation": {
+            "boolValue": true
           },
           "ride_stats_refactor_enabled": {
-            "boolValue": false
+            "boolValue": true
           },
           "standard_minimap_direction": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -1603,6 +1616,15 @@
           },
           "zwift_tow_cycling_route_12": {
             "varintValue": "1635842477"
+          },
+          "zwift_tow_cycling_route_13": {
+            "varintValue": "454871454"
+          },
+          "zwift_tow_cycling_route_14": {
+            "varintValue": "3378411990"
+          },
+          "zwift_tow_cycling_route_15": {
+            "varintValue": "1092181131"
           }
         }
       }
