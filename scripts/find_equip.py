@@ -99,7 +99,7 @@ def main(argv):
         total_data['glass_type_name'] = best_match[0]
     if args.paintjob:
         best_match = process.extractOne(args.paintjob, paintjobs.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_frame_colour'] = paintjobs[best_match[0]]
+        total_data['bike_frame_colour'] = paintjobs[best_match[0]] << 32
         total_data['bike_frame_colour_name'] = best_match[0]
         bike_frame_match = process.extractOne(best_match[0].split('-')[0], bikes.keys(), scorer=fuzz.token_set_ratio)
         total_data['bike_frame'] = bikes[bike_frame_match[0]]
