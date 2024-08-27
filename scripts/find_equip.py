@@ -9,7 +9,6 @@ import urllib.request
 import json
 import country_converter as coco
 import argparse
-import getpass
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -23,15 +22,13 @@ if not os.path.isfile(gd_file):
     open(gd_file, 'wb').write(urllib.request.urlopen('http://cdn.zwift.com/gameassets/%s' % gd_file).read())
 tree = ET.parse(gd_file)
 
-def get_item(equip, location, item, json_name):
+def get_item(location, item, json_name):
     items = {}
     for x in tree.findall(location):
         items[x.get('name')] = int(x.get('signature'))
     best_match = process.extractOne(item, items.keys(), scorer=fuzz.token_set_ratio)
-    if ( json_name == 'bike_frame_colour' ):
-        equip[json_name] = items[best_match[0]] << 32
-    else:
-        equip[json_name] = items[best_match[0]]
+    equip = {}
+    equip[json_name] = items[best_match[0]]
     equip[json_name+'_name'] = best_match[0]
     return equip
 
@@ -55,23 +52,24 @@ def main(argv):
     if args.nation:
         total_data['country_code'] = cc.convert(names=args.nation, to='ISOnumeric')
     if args.jersey:
-        total_data = get_item(total_data, "./JERSEYS/JERSEY", args.jersey, 'ride_jersey')
+        total_data.update(get_item("./JERSEYS/JERSEY", args.jersey, 'ride_jersey'))
     if args.bike:
-        total_data = get_item(total_data, "./BIKEFRAMES/BIKEFRAME", args.bike, 'bike_frame')
+        total_data.update(get_item("./BIKEFRAMES/BIKEFRAME", args.bike, 'bike_frame'))
     if args.wheels:
-        total_data = get_item(total_data, "./BIKEFRONTWHEELS/BIKEFRONTWHEEL", args.wheels, 'bike_wheel_front')
-        total_data = get_item(total_data, "./BIKEREARWHEELS/BIKEREARWHEEL", args.wheels, 'bike_wheel_rear')
+        total_data.update(get_item("./BIKEFRONTWHEELS/BIKEFRONTWHEEL", args.wheels, 'bike_wheel_front'))
+        total_data.update(get_item("./BIKEREARWHEELS/BIKEREARWHEEL", args.wheels, 'bike_wheel_rear'))
     if args.helmet:
-        total_data = get_item(total_data, "./HEADGEARS/HEADGEAR", args.helmet, 'ride_helmet_type')
+        total_data.update(get_item("./HEADGEARS/HEADGEAR", args.helmet, 'ride_helmet_type'))
     if args.socks:
-        total_data = get_item(total_data, "./SOCKS/SOCK", args.socks, 'ride_socks_type')
+        total_data.update(get_item("./SOCKS/SOCK", args.socks, 'ride_socks_type'))
     if args.shoes:
-        total_data = get_item(total_data, "./BIKESHOES/BIKESHOE", args.shoes, 'ride_shoes_type')
+        total_data.update(get_item("./BIKESHOES/BIKESHOE", args.shoes, 'ride_shoes_type'))
     if args.glasses:
-        total_data = get_item(total_data, "./GLASSES/GLASS", args.glasses, 'glass_type')
+        total_data.update(get_item("./GLASSES/GLASS", args.glasses, 'glass_type'))
     if args.paintjob:
-        total_data = get_item(total_data, "./PAINTJOBS/PAINTJOB", args.paintjob, 'bike_frame_colour')
-        total_data = get_item(total_data, "./BIKEFRAMES/BIKEFRAME", total_data['bike_frame_colour_name'].split('-')[0], 'bike_frame')
+        total_data.update(get_item("./PAINTJOBS/PAINTJOB", args.paintjob, 'bike_frame_colour'))
+        total_data['bike_frame_colour'] <<= 32
+        total_data.update(get_item("./BIKEFRAMES/BIKEFRAME", total_data['bike_frame_colour_name'].split('-')[0], 'bike_frame'))
 
     data = json.dumps(total_data, indent=2)
     print(data)
