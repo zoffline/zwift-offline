@@ -19,7 +19,10 @@ from fuzzywuzzy import fuzz
 
 cc = coco.CountryConverter()
 
-tree = ET.fromstring(urllib.request.urlopen('http://cdn.zwift.com/gameassets/GameDictionary.xml').read())
+gd_file = 'GameDictionary.xml'
+if not os.path.isfile(gd_file):
+    open(gd_file, 'wb').write(urllib.request.urlopen('http://cdn.zwift.com/gameassets/%s' % gd_file).read())
+tree = ET.parse(gd_file)
 
 def get_item(equip, location, item, json_name):
     items = {}
@@ -73,6 +76,7 @@ def main(argv):
 
     data = json.dumps(total_data, indent=2)
     print(data)
+    open('ghost_profile.txt', 'w').write(data)
 
 if __name__ == '__main__':
     try:
