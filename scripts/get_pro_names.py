@@ -601,7 +601,10 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
 
     return data
 
-tree = ET.fromstring(urllib.request.urlopen('http://cdn.zwift.com/gameassets/GameDictionary.xml').read())
+gd_file = 'GameDictionary.xml'
+if not os.path.isfile(gd_file):
+    open(gd_file, 'wb').write(urllib.request.urlopen('http://cdn.zwift.com/gameassets/%s' % gd_file).read())
+tree = ET.parse(gd_file)
 jerseys = {}
 for x in tree.findall("./JERSEYS/JERSEY"):
     jerseys[x.get('name')] = int(x.get('signature'))
