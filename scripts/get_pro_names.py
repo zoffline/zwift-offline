@@ -11,7 +11,6 @@ import urllib.request
 import json
 import country_converter as coco
 import argparse
-import getpass
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -589,7 +588,7 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
                             if 'bike_signature' in team:
                                 tmp['bike_frame'] = team['bike_signature']
                             if 'bike_frame_colour_signature' in team:
-                                tmp['bike_frame_colour'] = (team['bike_frame_colour_signature'] << 32)
+                                tmp['bike_frame_colour'] = team['bike_frame_colour_signature'] << 32
                             if 'front_wheel_signature' in team:
                                 tmp['bike_wheel_front'] = team['front_wheel_signature']
                             if 'rear_wheel_signature' in team:
@@ -601,7 +600,10 @@ def get_pros(url, male, get_jersey, get_equipment, team_abbrv):
 
     return data
 
-tree = ET.fromstring(urllib.request.urlopen('http://cdn.zwift.com/gameassets/GameDictionary.xml').read())
+gd_file = 'GameDictionary.xml'
+if not os.path.isfile(gd_file):
+    open(gd_file, 'wb').write(urllib.request.urlopen('http://cdn.zwift.com/gameassets/%s' % gd_file).read())
+tree = ET.parse(gd_file)
 jerseys = {}
 for x in tree.findall("./JERSEYS/JERSEY"):
     jerseys[x.get('name')] = int(x.get('signature'))
