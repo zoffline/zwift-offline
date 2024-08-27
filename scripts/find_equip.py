@@ -52,15 +52,16 @@ def main(argv):
     global args
 
     parser = argparse.ArgumentParser(description='Print out json for bot.txt or ghost_profile.txt')
+    megroup = parser.add_mutually_exclusive_group()
     parser.add_argument('-n', '--nation', help='Specify nation', default=False)
     parser.add_argument('-j', '--jersey', help='Get jersey', default=False)
-    parser.add_argument('-b', '--bike', help='Get bike', default=False)
+    megroup.add_argument('-b', '--bike', help='Get bike', default=False)
     parser.add_argument('-w', '--wheels', help='Get wheels', default=False)
     parser.add_argument('-e', '--helmet', help='Get helmet', default=False)
     parser.add_argument('-s', '--shoes', help='Get shoes', default=False)
     parser.add_argument('-o', '--socks', help='Get socks', default=False)
     parser.add_argument('-g', '--glasses', help='Get glasses', default=False)
-    parser.add_argument('-p', '--paintjob', help='Get paintjob', default=False)
+    megroup.add_argument('-p', '--paintjob', help='Get paintjob', default=False)
     args = parser.parse_args()
 
     total_data = {}
