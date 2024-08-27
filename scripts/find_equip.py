@@ -27,6 +27,8 @@ def get_item(equip, location, item, json_name):
         items[x.get('name')] = int(x.get('signature'))
     best_match = process.extractOne(item, items.keys(), scorer=fuzz.token_set_ratio)
     equip[json_name] = items[best_match[0]]
+    if ( json_name == 'bike_frame_colour' ):
+        equip[json_name] = items[best_match[0]] << 32
     equip[json_name+'_name'] = best_match[0]
     return equip
 
