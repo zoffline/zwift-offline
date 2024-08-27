@@ -20,33 +20,15 @@ from fuzzywuzzy import fuzz
 cc = coco.CountryConverter()
 
 tree = ET.fromstring(urllib.request.urlopen('http://cdn.zwift.com/gameassets/GameDictionary.xml').read())
-jerseys = {}
-for x in tree.findall("./JERSEYS/JERSEY"):
-    jerseys[x.get('name')] = int(x.get('signature'))
-bikes = {}
-for x in tree.findall("./BIKEFRAMES/BIKEFRAME"):
-    bikes[x.get('name')] = int(x.get('signature'))
-fwheel = {}
-for x in tree.findall("./BIKEFRONTWHEELS/BIKEFRONTWHEEL"):
-    fwheel[x.get('name')] = int(x.get('signature'))
-rwheel = {}
-for x in tree.findall("./BIKEREARWHEELS/BIKEREARWHEEL"):
-    rwheel[x.get('name')] = int(x.get('signature'))
-helmets = {}
-for x in tree.findall("./HEADGEARS/HEADGEAR"):
-    helmets[x.get('name')] = int(x.get('signature'))
-glasses = {}
-for x in tree.findall("./GLASSES/GLASS"):
-    glasses[x.get('name')] = int(x.get('signature'))
-socks = {}
-for x in tree.findall("./SOCKS/SOCK"):
-    socks[x.get('name')] = int(x.get('signature'))
-paintjobs = {}
-for x in tree.findall("./PAINTJOBS/PAINTJOB"):
-    paintjobs[x.get('name')] = int(x.get('signature'))
-shoes = {}
-for x in tree.findall("./BIKESHOES/BIKESHOE"):
-    shoes[x.get('name')] = int(x.get('signature'))
+
+def get_item(equip, location, item, json_name):
+    items = {}
+    for x in tree.findall(location):
+        items[x.get('name')] = int(x.get('signature'))
+    best_match = process.extractOne(item, items.keys(), scorer=fuzz.token_set_ratio)
+    equip[json_name] = items[best_match[0]]
+    equip[json_name+'_name'] = best_match[0]
+    return equip
 
 def main(argv):
     global args
@@ -68,43 +50,23 @@ def main(argv):
     if args.nation:
         total_data['country_code'] = cc.convert(names=args.nation, to='ISOnumeric')
     if args.jersey:
-        best_match = process.extractOne(args.jersey, jerseys.keys(), scorer=fuzz.token_set_ratio)
-        total_data['ride_jersey'] = jerseys[best_match[0]]
-        total_data['ride_jersey_name'] = best_match[0]
+        total_data = get_item(total_data, "./JERSEYS/JERSEY", args.jersey, 'ride_jersey')
     if args.bike:
-        best_match = process.extractOne(args.bike, bikes.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_frame'] = bikes[best_match[0]]
-        total_data['bike_frame_name'] = best_match[0]
+        total_data = get_item(total_data, "./BIKEFRAMES/BIKEFRAME", args.bike, 'bike_frame')
     if args.wheels:
-        best_match = process.extractOne(args.wheels, fwheel.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_wheel_front'] = fwheel[best_match[0]]
-        total_data['bike_wheel_front_name'] = best_match[0]
-        best_match = process.extractOne(args.wheels, rwheel.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_wheel_rear'] = rwheel[best_match[0]]
-        total_data['bike_wheel_rear_name'] = best_match[0]
+        total_data = get_item(total_data, "./BIKEFRONTWHEELS/BIKEFRONTWHEEL", args.wheels, 'bike_wheel_front')
+        total_data = get_item(total_data, "./BIKEREARWHEELS/BIKEREARWHEEL", args.wheels, 'bike_wheel_rear')
     if args.helmet:
-        best_match = process.extractOne(args.helmet, helmets.keys(), scorer=fuzz.token_set_ratio)
-        total_data['ride_helmet_type'] = helmets[best_match[0]]
-        total_data['ride_helmet_type_name'] = best_match[0]
+        total_data = get_item(total_data, "./HEADGEARS/HEADGEAR", args.helmet, 'ride_helmet_type')
     if args.socks:
-        best_match = process.extractOne(args.socks, socks.keys(), scorer=fuzz.token_set_ratio)
-        total_data['ride_socks_type'] = socks[best_match[0]]
-        total_data['ride_socks_name'] = best_match[0]
+        total_data = get_item(total_data, "./SOCKS/SOCK", args.socks, 'ride_socks_type')
     if args.shoes:
-        best_match = process.extractOne(args.shoes, shoes.keys(), scorer=fuzz.token_set_ratio)
-        total_data['ride_shoes_type'] = shoes[best_match[0]]
-        total_data['ride_shoes_type_name'] = best_match[0]
+        total_data = get_item(total_data, "./BIKESHOES/BIKESHOE", args.shoes, 'ride_shoes_type')
     if args.glasses:
-        best_match = process.extractOne(args.glasses, glasses.keys(), scorer=fuzz.token_set_ratio)
-        total_data['glass_type'] = glasses[best_match[0]]
-        total_data['glass_type_name'] = best_match[0]
+        total_data = get_item(total_data, "./GLASSES/GLASS", args.glasses, 'glass_type')
     if args.paintjob:
-        best_match = process.extractOne(args.paintjob, paintjobs.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_frame_colour'] = paintjobs[best_match[0]] << 32
-        total_data['bike_frame_colour_name'] = best_match[0]
-        bike_frame_match = process.extractOne(best_match[0].split('-')[0], bikes.keys(), scorer=fuzz.token_set_ratio)
-        total_data['bike_frame'] = bikes[bike_frame_match[0]]
-        total_data['bike_frame_name'] = bike_frame_match[0]
+        total_data = get_item(total_data, "./PAINTJOBS/PAINTJOB", args.paintjob, 'bike_frame_colour')
+        total_data = get_item(total_data, "./BIKEFRAMES/BIKEFRAME", total_data['bike_frame_colour_name'].split('-')[0], 'bike_frame')
 
     data = json.dumps(total_data, indent=2)
     print(data)
