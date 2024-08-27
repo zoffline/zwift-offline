@@ -1,11 +1,10 @@
 #! /usr/bin/env python
 
-# pip install beautifulsoup4 country-converter fuzzywuzzy
+# pip install country-converter fuzzywuzzy
 #
 # use to find and print entries from http://cdn.zwift.com/gameassets/GameDictionary.xml
 # scripts/find_equip.py -p emonda -s sworks -o blue -j zwift -e kask
 
-from bs4 import BeautifulSoup
 import urllib.request
 import json
 import country_converter as coco
