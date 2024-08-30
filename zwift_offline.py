@@ -115,6 +115,7 @@ GHOST_PROFILE_FILE = "%s/ghost_profile.txt" % STORAGE_DIR
 if os.path.exists(GHOST_PROFILE_FILE):
     with open(GHOST_PROFILE_FILE) as f:
         GHOST_PROFILE = json.load(f)
+ALL_TIME_LEADERBOARDS = os.path.exists("%s/all_time_leaderboards.txt" % STORAGE_DIR)
 MULTIPLAYER = os.path.exists("%s/multiplayer.txt" % STORAGE_DIR)
 if MULTIPLAYER:
     if not make_dir(LOGS_DIR):
@@ -2132,7 +2133,7 @@ def player_playbacks_player_playbacks(player_id, segment_id, option):
     pb_type = playback_pb2.PlaybackType.Value(request.args.get('type'))
     query = "SELECT * FROM playback WHERE player_id = :p AND segment_id = :s AND type = :t"
     args = {"p": player_id, "s": segment_id, "t": pb_type}
-    if after != '18446744065933551616':
+    if after != '18446744065933551616' and not ALL_TIME_LEADERBOARDS:
         query += " AND world_time > :a"
         args.update({"a": after})
     if before != '0':
@@ -3345,13 +3346,13 @@ def api_personal_records_my_records():
 
     where_stmt = "WHERE segment_id = :s AND player_id = :p"
     args = {"s": segment_id, "p": current_user.player_id}
-    if from_date:
+    if from_date and not ALL_TIME_LEADERBOARDS:
         where_stmt += " AND strftime('%s', finish_time_str) > strftime('%s', :f)"
         args.update({"f": from_date})
     if to_date:
         where_stmt += " AND strftime('%s', finish_time_str) < strftime('%s', :t)"
         args.update({"t": to_date})
-    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s" % where_stmt), args).mappings()
+    rows = db.session.execute(sqlalchemy.text("SELECT * FROM segment_result %s ORDER BY elapsed_ms LIMIT 100" % where_stmt), args).mappings()
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['server_realm', 'course_id', 'segment_id', 'event_subgroup_id', 'finish_time_str', 'f14', 'time', 'player_type', 'f22', 'f23'])
@@ -3498,6 +3499,14 @@ def api_route_results_completion_stats_all():
     return jsonify(response)
 
 
+def add_segment_results(results, rows):
+    for row in rows:
+        result = results.segment_results.add()
+        row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
+        if ALL_TIME_LEADERBOARDS and result.world_time < world_time()-60*60*1000:
+            result.player_id += 1000000  # avoid taking the jersey
+            result.world_time = world_time()  # otherwise client filters it out
+
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
 def live_segment_results_service_leaders():
     results = segment_result_pb2.SegmentResults()
@@ -3507,11 +3516,9 @@ def live_segment_results_service_leaders():
         JOIN (SELECT s.player_id, s.segment_id, MIN(s.elapsed_ms) AS min_time
             FROM segment_result s WHERE world_time > :w GROUP BY s.player_id, s.segment_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 1000""")
-    rows = db.session.execute(stmt, {"w": world_time()-60*60*1000}).mappings()
-    for row in rows:
-        result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 100""")
+    rows = db.session.execute(stmt, {"w": 0 if ALL_TIME_LEADERBOARDS else world_time()-60*60*1000}).mappings()
+    add_segment_results(results, rows)
     return results.SerializeToString(), 200
 
 
@@ -3525,11 +3532,9 @@ def live_segment_results_service_leaderboard_segment_id(segment_id):
         JOIN (SELECT s.player_id, MIN(s.elapsed_ms) AS min_time
             FROM segment_result s WHERE segment_id = :s AND world_time > :w GROUP BY s.player_id) s2
             ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 1000""")
-    rows = db.session.execute(stmt, {"s": segment_id, "w": world_time()-60*60*1000}).mappings()
-    for row in rows:
-        result = results.segment_results.add()
-        row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 100""")
+    rows = db.session.execute(stmt, {"s": segment_id, "w": 0 if ALL_TIME_LEADERBOARDS else world_time()-60*60*1000}).mappings()
+    add_segment_results(results, rows)
     return results.SerializeToString(), 200
 
 
