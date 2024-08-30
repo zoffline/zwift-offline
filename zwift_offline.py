@@ -3503,8 +3503,8 @@ def add_segment_results(results, rows):
     for row in rows:
         result = results.segment_results.add()
         row_to_protobuf(row, result, ['f14', 'time', 'player_type', 'f22'])
-        if ALL_TIME_LEADERBOARDS and result.world_time < world_time()-60*60*1000:
-            result.player_id += 1000000  # avoid taking the jersey
+        if ALL_TIME_LEADERBOARDS and result.world_time <= world_time() - 60 * 60 * 1000:
+            result.player_id += 100000  # avoid taking the jersey
             result.world_time = world_time()  # otherwise client filters it out
 
 @app.route('/live-segment-results-service/leaders', methods=['GET'])
@@ -3512,12 +3512,17 @@ def live_segment_results_service_leaders():
     results = segment_result_pb2.SegmentResults()
     results.server_realm = 0
     results.segment_id = 0
+    where_stmt = ""
+    args = {}
+    if not ALL_TIME_LEADERBOARDS:
+        where_stmt = "WHERE world_time > :w"
+        args = {"w": world_time() - 60 * 60 * 1000}
     stmt = sqlalchemy.text("""SELECT s1.* FROM segment_result s1
         JOIN (SELECT s.player_id, s.segment_id, MIN(s.elapsed_ms) AS min_time
-            FROM segment_result s WHERE world_time > :w GROUP BY s.player_id, s.segment_id) s2
-            ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 100""")
-    rows = db.session.execute(stmt, {"w": 0 if ALL_TIME_LEADERBOARDS else world_time()-60*60*1000}).mappings()
+        FROM segment_result s %s GROUP BY s.player_id, s.segment_id) s2
+        ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.segment_id, s1.elapsed_ms LIMIT 100""" % where_stmt)
+    rows = db.session.execute(stmt, args).mappings()
     add_segment_results(results, rows)
     return results.SerializeToString(), 200
 
@@ -3528,12 +3533,17 @@ def live_segment_results_service_leaderboard_segment_id(segment_id):
     results = segment_result_pb2.SegmentResults()
     results.server_realm = 0
     results.segment_id = segment_id
+    where_stmt = "WHERE segment_id = :s"
+    args = {"s": segment_id}
+    if not ALL_TIME_LEADERBOARDS:
+        where_stmt += " AND world_time > :w"
+        args.update({"w": world_time() - 60 * 60 * 1000})
     stmt = sqlalchemy.text("""SELECT s1.* FROM segment_result s1
         JOIN (SELECT s.player_id, MIN(s.elapsed_ms) AS min_time
-            FROM segment_result s WHERE segment_id = :s AND world_time > :w GROUP BY s.player_id) s2
-            ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
-        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 100""")
-    rows = db.session.execute(stmt, {"s": segment_id, "w": 0 if ALL_TIME_LEADERBOARDS else world_time()-60*60*1000}).mappings()
+        FROM segment_result s %s GROUP BY s.player_id) s2
+        ON s2.player_id = s1.player_id AND s2.min_time = s1.elapsed_ms
+        GROUP BY s1.player_id, s1.elapsed_ms ORDER BY s1.elapsed_ms LIMIT 100""" % where_stmt)
+    rows = db.session.execute(stmt, args).mappings()
     add_segment_results(results, rows)
     return results.SerializeToString(), 200
 
