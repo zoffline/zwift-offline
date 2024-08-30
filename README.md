@@ -371,6 +371,10 @@ To enable support for multiple users perform the steps below:
 * You can teleport to a bookmark using the teleport icon on the action bar.
 </details>
 
+### All-time leaderboards
+
+To enable all-time leaderboards (override 60 minutes live results and 90 days personal records), create a file ``all_time_leaderboards.txt`` in the ``storage`` directory.
+
 ## Community Discord server and Strava club
 
 Please join the community supported [Discord](https://discord.gg/GMdn8F8) server and [Strava](https://www.strava.com/clubs/zoffline) club.
