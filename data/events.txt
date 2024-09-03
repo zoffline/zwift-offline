@@ -273,34 +273,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Mayan 8",
-    "route": 4084028627,
-    "distance": 26148.6,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Navig8",
-    "route": 806114032,
-    "distance": 66136.7,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Power to the Tower",
-    "route": 2064290391,
-    "distance": 45648.9,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Radio Rendezvous",
-    "route": 4102513789,
-    "distance": 23598.1,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Road To Ruins Reverse",
     "route": 2967612381,
     "distance": 29846.1,

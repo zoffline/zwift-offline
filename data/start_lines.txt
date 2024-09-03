@@ -294,6 +294,11 @@
     "road": 0,
     "time": 909256
   },
+  "-1367316000": {
+    "name": "Makuri Islands - Makuri Pretzel",
+    "road": 4,
+    "time": 731960
+  },
   "1366943680": {
     "name": "Makuri Islands - Mech Isle Loop",
     "road": 129,

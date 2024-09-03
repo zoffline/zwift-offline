@@ -6,6 +6,10 @@
       "values": {}
     },
     {
+      "name": "dynamic_ftp_estimation",
+      "values": {}
+    },
+    {
       "name": "fitness_widget",
       "values": {
         "fields": {
@@ -490,7 +494,7 @@
             "boolValue": false
           },
           "UseEventAssets": {
-            "varintValue": "2"
+            "varintValue": "0"
           },
           "allowPortalRoadDifficultySelection": {
             "boolValue": true
@@ -1002,11 +1006,6 @@
       "values": {}
     },
     {
-      "name": "game_1_62_batch_load_tapi_workouts",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_62_tapi_workouts",
       "value": true,
       "values": {}
@@ -1046,18 +1045,10 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "home_page_hero_carousel_1_72"
+            "stringValue": "home_page_hero_carousel"
           }
         }
       }
-    },
-    {
-      "name": "game_1_64_override_run_free_incline_control",
-      "values": {}
-    },
-    {
-      "name": "game_1_64_override_run_free_negative_incline",
-      "values": {}
     },
     {
       "name": "game_1_64_rubberbanding_v3",
@@ -1201,6 +1192,7 @@
     },
     {
       "name": "game_1_67_tp_cards",
+      "value": true,
       "values": {}
     },
     {
@@ -1234,6 +1226,7 @@
     },
     {
       "name": "game_1_69_fix_riding_offset",
+      "value": true,
       "values": {}
     },
     {
@@ -1295,6 +1288,7 @@
     },
     {
       "name": "game_1_71_prevent_sending_ble_messages_prior_com_setup",
+      "value": true,
       "values": {}
     },
     {
@@ -1313,6 +1307,15 @@
     },
     {
       "name": "game_1_72_reset_route_manager_on_logout",
+      "values": {}
+    },
+    {
+      "name": "game_1_73_sweeper_check",
+      "values": {}
+    },
+    {
+      "name": "game_1_73_ui_scheduler",
+      "value": true,
       "values": {}
     },
     {
@@ -1469,7 +1472,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "david.brickhill.20240813065321"
+            "stringValue": "david.brickhill.20240903071851"
           },
           "canary_test": {
             "boolValue": true
@@ -1497,6 +1500,9 @@
           },
           "tenant": {
             "stringValue": "production"
+          },
+          "use_startup": {
+            "boolValue": false
           }
         }
       }
@@ -1525,7 +1531,7 @@
             "boolValue": true
           },
           "game_minimap_graph_update": {
-            "boolValue": true
+            "boolValue": false
           },
           "optimized_tss_calculation": {
             "boolValue": true
@@ -1534,7 +1540,7 @@
             "boolValue": true
           },
           "standard_minimap_direction": {
-            "boolValue": true
+            "boolValue": false
           }
         }
       }
@@ -1636,6 +1642,10 @@
     {
       "name": "game_workout_detail_screen",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_workout_downloader",
       "values": {}
     },
     {
