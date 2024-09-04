@@ -1234,7 +1234,7 @@
       "values": {
         "fields": {
           "current_equipped_first": {
-            "boolValue": true
+            "boolValue": false
           },
           "sort_accessories": {
             "boolValue": false
@@ -1559,6 +1559,7 @@
     },
     {
       "name": "game_settings_service",
+      "value": true,
       "values": {}
     },
     {
@@ -1637,6 +1638,7 @@
     },
     {
       "name": "game_user_storage_service",
+      "value": true,
       "values": {}
     },
     {

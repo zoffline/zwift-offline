@@ -1313,6 +1313,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
 @app.route('/api/race-results', methods=['POST'])
 @app.route('/api/workout/progress', methods=['POST'])
+@app.route('/api/player-profile/user-game-storage/attributes', methods=['GET', 'POST'])  # will load from prefs.xml
 def api_proto_empty():
     return '', 200
 
