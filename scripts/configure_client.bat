@@ -3,7 +3,9 @@ TITLE configure_client
 ECHO Configuring Zwift client to use zoffline
 ECHO.
 
-NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '%~0' & EXIT /B )
+NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '"%~0"' & EXIT /B )
+
+CD /D "%~dp0"
 
 SET HOSTS="%WINDIR%\system32\drivers\etc\hosts"
 COPY %HOSTS% %HOSTS%.bak >nul

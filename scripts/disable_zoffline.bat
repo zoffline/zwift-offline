@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE disable_zoffline
 
-NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '%~0' & EXIT /B )
+NET SESSION >nul 2>&1 || ( PowerShell start -verb runas '"%~0"' & EXIT /B )
 
 SET HOSTS="%WINDIR%\system32\drivers\etc\hosts"
 COPY %HOSTS% %HOSTS%.bak >nul
