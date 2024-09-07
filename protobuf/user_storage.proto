@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+message UserStorage {
+    optional GameSettings game_settings = 2;
+}
+
+message GameSettings {
+    optional Attributes f22 = 22;
+}
+
+message Attributes {
+    optional float f2 = 2;
+    optional int32 f3 = 3;
+    optional int32 f4 = 4;
+    optional int32 f5 = 5;
+    optional int32 f6 = 6;
+    optional int32 f7 = 7;
+}

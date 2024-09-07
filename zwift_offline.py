@@ -56,6 +56,7 @@ import hash_seeds_pb2
 import events_pb2
 import variants_pb2
 import playback_pb2
+import user_storage_pb2
 import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -1313,7 +1314,6 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
 @app.route('/api/race-results', methods=['POST'])
 @app.route('/api/workout/progress', methods=['POST'])
-@app.route('/api/player-profile/user-game-storage/attributes', methods=['GET', 'POST'])  # will load from prefs.xml
 def api_proto_empty():
     return '', 200
 
@@ -3654,6 +3654,31 @@ def api_power_curve_best(option):
         if row:
             power_curves.watts[t].power = row.power
     return power_curves.SerializeToString(), 200
+
+
+@app.route('/api/player-profile/user-game-storage/attributes', methods=['GET', 'POST'])
+@jwt_to_session_cookie
+@login_required
+def api_player_profile_user_game_storage_attributes():
+    user_storage = user_storage_pb2.UserStorage()
+    user_storage_file = os.path.join(STORAGE_DIR, str(current_user.player_id), 'user_storage.bin')
+    if os.path.isfile(user_storage_file):
+        with open(user_storage_file, 'rb') as f:
+            user_storage.ParseFromString(f.read())
+    if request.method == 'POST':
+        new = user_storage_pb2.UserStorage()
+        new.ParseFromString(request.stream.read())
+        user_storage.MergeFrom(new)
+        with open(user_storage_file, 'wb') as f:
+            f.write(user_storage.SerializeToString())
+        return '', 202
+    ret = user_storage_pb2.UserStorage()
+    n = int(request.args.get('n'))
+    if n in user_storage.game_settings.DESCRIPTOR.fields_by_number:
+        field = user_storage.game_settings.DESCRIPTOR.fields_by_number[n].name
+        if user_storage.game_settings.HasField(field):
+            getattr(ret.game_settings, field).CopyFrom(getattr(user_storage.game_settings, field))
+    return ret.SerializeToString(), 200
 
 
 @app.teardown_request

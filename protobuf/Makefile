@@ -14,6 +14,7 @@ all:
 	protoc --python_out=. variants.proto
 	protoc --python_out=. playback.proto
 	protoc --python_out=. route-result.proto
+	protoc --python_out=. user_storage.proto
 
 clean:
 	rm -f *_pb2.py *_pb2.pyc
