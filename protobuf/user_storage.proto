@@ -1,18 +1,18 @@
 syntax = "proto2";
 
 message UserStorage {
-    optional GameSettings game_settings = 2;
-}
-
-message GameSettings {
-    optional Attributes f22 = 22;
+    optional Attributes attributes = 2;
 }
 
 message Attributes {
+    optional GameSettings game_settings = 22;
+}
+
+message GameSettings {
     optional float f2 = 2;
-    optional int32 f3 = 3;
-    optional int32 f4 = 4;
-    optional int32 f5 = 5;
-    optional int32 f6 = 6;
-    optional int32 f7 = 7;
+    optional int32 leaderboards = 3;
+    optional int32 power_meter_slot0 = 4;
+    optional int32 power_meter_slot1 = 5;
+    optional int32 power_meter_slot2 = 6;
+    optional int32 power_meter_slot3 = 7;
 }

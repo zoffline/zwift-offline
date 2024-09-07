@@ -3674,10 +3674,10 @@ def api_player_profile_user_game_storage_attributes():
         return '', 202
     ret = user_storage_pb2.UserStorage()
     n = int(request.args.get('n'))
-    if n in user_storage.game_settings.DESCRIPTOR.fields_by_number:
-        field = user_storage.game_settings.DESCRIPTOR.fields_by_number[n].name
-        if user_storage.game_settings.HasField(field):
-            getattr(ret.game_settings, field).CopyFrom(getattr(user_storage.game_settings, field))
+    if n in user_storage.attributes.DESCRIPTOR.fields_by_number:
+        field = user_storage.attributes.DESCRIPTOR.fields_by_number[n].name
+        if user_storage.attributes.HasField(field):
+            getattr(ret.attributes, field).CopyFrom(getattr(user_storage.attributes, field))
     return ret.SerializeToString(), 200
 
 
