@@ -1331,6 +1331,7 @@
     },
     {
       "name": "game_ClassyJazzFlute",
+      "value": true,
       "values": {}
     },
     {
@@ -1527,6 +1528,9 @@
           "average_power_from_bike_computer": {
             "boolValue": true
           },
+          "calculate_road_position_by_dist_fix": {
+            "varintValue": "0"
+          },
           "dark_mode_color_scheme": {
             "boolValue": true
           },
@@ -1700,6 +1704,7 @@
     },
     {
       "name": "gn_deferred_lighting",
+      "value": true,
       "values": {}
     },
     {
