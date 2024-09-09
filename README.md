@@ -255,6 +255,7 @@ To obtain your current profile:
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
+* If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
 
@@ -298,10 +299,11 @@ To enable support for multiple users perform the steps below:
 * Copy ``zca-patched.apk`` to your phone and install it
 * Download and install ``app-Github-release.apk`` from [here](https://github.com/x-falcon/Virtual-Hosts/releases/latest)
 * Create a ``hosts.txt`` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
-```
-<zoffline ip> us-or-rly101.zwift.com
-<zoffline ip> secure.zwift.com
-```
+  ```
+  <zoffline ip> us-or-rly101.zwift.com
+  <zoffline ip> secure.zwift.com
+  ```
+  * Important: don't add ``cdn.zwift.com`` to ``hosts.txt``, Companion needs to download images from the official server
 * Run "Virtual Hosts", select the created ``hosts.txt`` file, fully close (touch the "overview" button and swipe up) the app and run it again
 * Optionally, instead of using the "Virtual Hosts" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
 * Note: If you know what you're doing and have a capable enough router you can adjust your router to alter these DNS records instead of using the "Virtual Hosts" app or changing your phone DNS.
