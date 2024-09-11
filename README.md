@@ -337,6 +337,9 @@ To enable support for multiple users perform the steps below:
 
 <details><summary>Expand</summary>
 
+#### Player
+* Equipment can be customized by creating a file ``player_profile.txt`` inside the ``storage/id`` folder. The script ``find_equip.py`` can be used to populate this file.
+
 #### Ghosts
 
 * Enable this feature by checking "Enable ghosts" in zoffline's launcher.

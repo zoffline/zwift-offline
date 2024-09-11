@@ -1744,6 +1744,10 @@ def bikeFrameToStr(val):
 def do_api_profiles(profile_id, is_json):
     profile = profile_pb2.PlayerProfile()
     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+    PLAYER_PROFILE_FILE = "%s/%s/player_profile.txt" % (STORAGE_DIR, profile_id)
+    if os.path.exists(PLAYER_PROFILE_FILE):
+        with open(PLAYER_PROFILE_FILE) as f:
+            PLAYER_PROFILE = json.load(f)
     if not os.path.isfile(profile_file):
         profile.id = profile_id
         profile.email = current_user.username
@@ -1759,6 +1763,10 @@ def do_api_profiles(profile_id, is_json):
                 del profile.entitlements[:]
             if not profile.mix_panel_distinct_id:
                 profile.mix_panel_distinct_id = str(uuid.uuid4())
+            if PLAYER_PROFILE:
+                for item in ['country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                    if item in PLAYER_PROFILE:
+                        setattr(profile, item, PLAYER_PROFILE[item])
     if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
         if profile.dob != "":
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
