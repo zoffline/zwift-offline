@@ -211,7 +211,7 @@ message ProfileEntitlement {
 		USE = 4;
 	}
 	
-	optional int64 f2 = 2; // always -1 when "RIDE"; increasing small value when "USE" (437, 438, 911, ..., 1229)
+	optional int64 id = 2; // always -1 when "RIDE"; increasing small value when "USE" (437, 438, 911, ..., 1229)
 	
 	optional ProfileEntitlementStatus status = 3;
 	enum ProfileEntitlementStatus {
