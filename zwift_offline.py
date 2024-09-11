@@ -1752,13 +1752,23 @@ def do_api_profiles(profile_id, is_json):
     else: 
         with open(profile_file, 'rb') as fd:
             profile.ParseFromString(fd.read())
-            profile.id = profile_id
-            if not profile.email:
-                profile.email = 'user@email.com'
-            if profile.entitlements:
-                del profile.entitlements[:]
-            if not profile.mix_panel_distinct_id:
-                profile.mix_panel_distinct_id = str(uuid.uuid4())
+        profile.id = profile_id
+        if not profile.email:
+            profile.email = 'user@email.com'
+        for entitlement in list(profile.entitlements):
+            if entitlement.type == profile_pb2.ProfileEntitlement.EntitlementType.RIDE:
+                profile.entitlements.remove(entitlement)
+        if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR):
+            with open('%s/data/entitlements.txt' % SCRIPT_DIR) as f:
+                entitlements = json.load(f)
+            for entitlement in entitlements:
+                if not any(e.id == entitlement['id'] for e in profile.entitlements):
+                    e = profile.entitlements.add()
+                    e.type = profile_pb2.ProfileEntitlement.EntitlementType.USE
+                    e.id = entitlement['id']
+                    e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
+        if not profile.mix_panel_distinct_id:
+            profile.mix_panel_distinct_id = str(uuid.uuid4())
     if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
         if profile.dob != "":
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
