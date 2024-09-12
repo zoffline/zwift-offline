@@ -375,11 +375,19 @@ To enable support for multiple users perform the steps below:
 
 ### All-time leaderboards
 
-To enable all-time leaderboards (override 60 minutes live results and 90 days personal records), create a file ``all_time_leaderboards.txt`` in the ``storage`` directory.
+<details><summary>Expand</summary>
+
+* To enable all-time leaderboards (override 60 minutes live results and 90 days personal records), create a file ``all_time_leaderboards.txt`` in the ``storage`` directory.
+* Jerseys are still valid for 60 minutes but will be granted only when a new all-time record is set.
+</details>
 
 ### Entitlements
 
-To unlock entitlements (special equipment), create a file ``unlock_entitlements.txt`` in the ``storage`` directory.
+<details><summary>Expand</summary>
+
+* To unlock entitlements (special equipment), create a file ``unlock_entitlements.txt`` in the ``storage`` directory.
+* To unlock all equipment, create a file ``unlock_all_equipment.txt`` instead.
+</details>
 
 ## Community Discord server and Strava club
 
