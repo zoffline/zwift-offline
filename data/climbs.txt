@@ -108,6 +108,10 @@
     "road": "10026"
   },
   {
+    "name": "Mt. Hamilton (31.3 km / 1259 m)",
+    "road": "10036"
+  },
+  {
     "name": "Old La Honda (5.6 km / 395 m)",
     "road": "10018"
   },

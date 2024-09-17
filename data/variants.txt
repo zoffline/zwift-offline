@@ -173,7 +173,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024"
           }
         }
       }
@@ -289,11 +289,6 @@
     },
     {
       "name": "game_1_39_repack_rampage_steering_route_list",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_robopacer_colorized_models",
       "value": true,
       "values": {}
     },
@@ -1057,6 +1052,7 @@
     },
     {
       "name": "game_1_64_tgc",
+      "value": true,
       "values": {
         "fields": {
           "allowList": {
@@ -1265,6 +1261,7 @@
     },
     {
       "name": "game_1_69_smooth_road_transition",
+      "value": true,
       "values": {}
     },
     {
@@ -1274,16 +1271,18 @@
     },
     {
       "name": "game_1_71_challenge_carousel",
+      "value": true,
       "values": {
         "fields": {
           "challenge_carousel_id": {
-            "stringValue": ""
+            "stringValue": "prod_home_challenge_carousel"
           }
         }
       }
     },
     {
       "name": "game_1_71_csos",
+      "value": true,
       "values": {}
     },
     {
@@ -1311,12 +1310,49 @@
     },
     {
       "name": "game_1_73_sweeper_check",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_73_ui_scheduler",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_74_0_robopacer_10_year_anniversary",
+      "values": {}
+    },
+    {
+      "name": "game_1_74_intersection_level_lock_override_by_route",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_74_sku_enhance",
+      "values": {}
+    },
+    {
+      "name": "game_1_74_zp_manual_calibration",
+      "values": {}
+    },
+    {
+      "name": "game_1_76_bike_leveling",
+      "values": {
+        "fields": {
+          "ConfigVariant": {
+            "stringValue": ""
+          },
+          "EnableBikeModifiers": {
+            "boolValue": true
+          },
+          "EnableBikeUnlocks": {
+            "boolValue": true
+          },
+          "EnableLeakPrevention": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1465,6 +1501,11 @@
       "values": {}
     },
     {
+      "name": "game_debug_screenshots",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_dlc",
       "value": true,
       "values": {
@@ -1535,7 +1576,7 @@
             "boolValue": true
           },
           "game_minimap_graph_update": {
-            "boolValue": false
+            "boolValue": true
           },
           "optimized_tss_calculation": {
             "boolValue": true
@@ -1544,7 +1585,7 @@
             "boolValue": true
           },
           "standard_minimap_direction": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
