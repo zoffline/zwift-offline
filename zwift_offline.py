@@ -1758,6 +1758,10 @@ def do_api_profiles(profile_id, is_json):
         for entitlement in list(profile.entitlements):
             if entitlement.type == profile_pb2.ProfileEntitlement.EntitlementType.RIDE:
                 profile.entitlements.remove(entitlement)
+        e = profile.entitlements.add()
+        e.type = profile_pb2.ProfileEntitlement.EntitlementType.RIDE
+        e.id = -1
+        e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
         if not profile.mix_panel_distinct_id:
             profile.mix_panel_distinct_id = str(uuid.uuid4())
     if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR) or os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):

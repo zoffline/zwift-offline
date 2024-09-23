@@ -156,7 +156,7 @@
       "values": {
         "fields": {
           "HighlightWorkoutFX": {
-            "boolValue": true
+            "boolValue": false
           },
           "MaxHighlightedFriends": {
             "varintValue": "3"
@@ -1080,7 +1080,7 @@
             "boolValue": true
           },
           "strongerMinimapBump": {
-            "boolValue": true
+            "boolValue": false
           },
           "syncHudInclineDisplay": {
             "boolValue": false
@@ -1193,14 +1193,13 @@
     },
     {
       "name": "game_1_68_0_tdffaz_alpe_spinner",
-      "value": true,
       "values": {
         "fields": {
           "date_end": {
             "varintValue": "1725173999"
           },
           "date_start": {
-            "varintValue": "1722470400"
+            "varintValue": "1719435840"
           }
         }
       }
@@ -1282,7 +1281,6 @@
     },
     {
       "name": "game_1_71_csos",
-      "value": true,
       "values": {}
     },
     {
@@ -1745,7 +1743,6 @@
     },
     {
       "name": "gn_deferred_lighting",
-      "value": true,
       "values": {}
     },
     {
