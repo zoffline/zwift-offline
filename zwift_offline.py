@@ -1741,29 +1741,14 @@ def bikeFrameToStr(val):
         return GD['bikeframes'][val]
     return "---"
 
-def do_api_profiles(profile_id, is_json):
-    profile = profile_pb2.PlayerProfile()
-    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
-    if not os.path.isfile(profile_file):
-        profile.id = profile_id
-        profile.email = current_user.username
-        profile.first_name = current_user.first_name
-        profile.last_name = current_user.last_name
-    else: 
-        with open(profile_file, 'rb') as fd:
-            profile.ParseFromString(fd.read())
-        profile.id = profile_id
-        if not profile.email:
-            profile.email = 'user@email.com'
-        for entitlement in list(profile.entitlements):
-            if entitlement.type == profile_pb2.ProfileEntitlement.EntitlementType.RIDE:
-                profile.entitlements.remove(entitlement)
-        e = profile.entitlements.add()
-        e.type = profile_pb2.ProfileEntitlement.EntitlementType.RIDE
-        e.id = -1
-        e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
-        if not profile.mix_panel_distinct_id:
-            profile.mix_panel_distinct_id = str(uuid.uuid4())
+def update_entitlements(profile):
+    for entitlement in list(profile.entitlements):
+        if entitlement.type == profile_pb2.ProfileEntitlement.EntitlementType.RIDE:
+            profile.entitlements.remove(entitlement)
+    e = profile.entitlements.add()
+    e.type = profile_pb2.ProfileEntitlement.EntitlementType.RIDE
+    e.id = -1
+    e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
     if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR) or os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
         with open('%s/data/entitlements.txt' % SCRIPT_DIR) as f:
             entitlements = json.load(f)
@@ -1776,6 +1761,19 @@ def do_api_profiles(profile_id, is_json):
                 e.type = profile_pb2.ProfileEntitlement.EntitlementType.USE
                 e.id = entitlement['id']
                 e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
+
+def do_api_profiles(profile_id, is_json):
+    profile = profile_pb2.PlayerProfile()
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, profile_id)
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile.ParseFromString(fd.read())
+    else:
+        profile.email = current_user.username
+        profile.first_name = current_user.first_name
+        profile.last_name = current_user.last_name
+        profile.mix_panel_distinct_id = str(uuid.uuid4())
+    profile.id = profile_id
     if is_json: #todo: publicId, bodyType, totalRunCalories != total_watt_hours, totalRunTimeInMinutes != time_ridden_in_minutes etc
         if profile.dob != "":
             profile.age = age(datetime.datetime.strptime(profile.dob, "%m/%d/%Y"))
@@ -1798,6 +1796,7 @@ def do_api_profiles(profile_id, is_json):
         copyAttributes(jprofile, jprofileFull, 'privateAttributes')
         return jsonify(jprofile)
     else:
+        update_entitlements(profile)
         return profile.SerializeToString(), 200
 
 @app.route('/api/profiles/me', methods=['GET'], strict_slashes=False)
@@ -1808,6 +1807,20 @@ def api_profiles_me():
         return do_api_profiles(current_user.player_id, True)
     else:
         return do_api_profiles(current_user.player_id, False)
+
+@app.route('/api/profiles/me/entitlements', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_me_entitlements():
+    profile = profile_pb2.PlayerProfile()
+    profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
+    if os.path.isfile(profile_file):
+        with open(profile_file, 'rb') as fd:
+            profile.ParseFromString(fd.read())
+    update_entitlements(profile)
+    entitlements = profile_pb2.ProfileEntitlements()
+    entitlements.entitlements.extend(profile.entitlements)
+    return entitlements.SerializeToString(), 200
 
 @app.route('/api/profiles/<int:profile_id>', methods=['GET'])
 @jwt_to_session_cookie
