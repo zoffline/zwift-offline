@@ -173,7 +173,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride"
           }
         }
       }
@@ -1318,6 +1318,7 @@
     },
     {
       "name": "game_1_74_0_robopacer_10_year_anniversary",
+      "value": true,
       "values": {}
     },
     {
@@ -1331,6 +1332,33 @@
     },
     {
       "name": "game_1_74_zp_manual_calibration",
+      "values": {}
+    },
+    {
+      "name": "game_1_75_0_friend_dropin_and_scrolling_hud_messages",
+      "value": true,
+      "values": {
+        "fields": {
+          "friend_dropped_in_message_enabled": {
+            "boolValue": false
+          },
+          "scrolling_hud_messages": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_75_bypass_zpe",
+      "values": {}
+    },
+    {
+      "name": "game_1_75_fix_pause_button_position",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_75_sweeper_check",
       "values": {}
     },
     {
@@ -1504,6 +1532,10 @@
       "values": {}
     },
     {
+      "name": "game_disable_cached_subgroup_protobuf",
+      "values": {}
+    },
+    {
       "name": "game_dlc",
       "value": true,
       "values": {
@@ -1552,6 +1584,10 @@
       "values": {}
     },
     {
+      "name": "game_fireworks",
+      "values": {}
+    },
+    {
       "name": "game_garage_gearing",
       "values": {}
     },
@@ -1574,6 +1610,9 @@
             "boolValue": true
           },
           "game_minimap_graph_update": {
+            "boolValue": true
+          },
+          "minimap_use_only_good_routes": {
             "boolValue": true
           },
           "optimized_tss_calculation": {

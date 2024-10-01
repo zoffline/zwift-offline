@@ -146,5 +146,9 @@
   {
     "name": "Ski Lift Climb (8.6 km / 689 m)",
     "road": "10000"
+  },
+  {
+    "name": "Trollstigen (12.4 km / 784 m)",
+    "road": "10037"
   }
 ]

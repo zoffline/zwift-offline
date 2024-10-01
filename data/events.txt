@@ -210,6 +210,13 @@
     "sport": 0
   },
   {
+    "name": "Scotland - BRAEk-fast Crits and Grits",
+    "route": 377566656,
+    "distance": 22144.7,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
@@ -261,7 +268,7 @@
   {
     "name": "Watopia - Italian Villas Circuit",
     "route": 3573087582,
-    "distance": 2714.5,
+    "distance": 4342.4,
     "course": 6,
     "sport": 1
   },
