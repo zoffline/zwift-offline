@@ -40,7 +40,6 @@
     },
     {
       "name": "game_1_18_holiday_mode",
-      "value": true,
       "values": {}
     },
     {
@@ -1612,7 +1611,7 @@
           "game_minimap_graph_update": {
             "boolValue": true
           },
-          "minimap_use_only_good_routes": {
+          "minimap_use_only_approved_routes": {
             "boolValue": true
           },
           "optimized_tss_calculation": {
