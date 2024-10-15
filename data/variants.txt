@@ -1648,7 +1648,7 @@
             "boolValue": false
           },
           "minimap_use_only_approved_routes": {
-            "boolValue": true
+            "boolValue": false
           },
           "optimized_tss_calculation": {
             "boolValue": true
