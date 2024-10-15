@@ -80,6 +80,10 @@
     "road": "10002"
   },
   {
+    "name": "Gotthard Pass (14.4 km / 909 m)",
+    "road": "10038"
+  },
+  {
     "name": "Isola 2000 (18.9 km / 1145 m)",
     "road": "10030"
   },

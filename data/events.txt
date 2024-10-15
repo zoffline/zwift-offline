@@ -112,7 +112,7 @@
     "sport": 0
   },
   {
-    "name": "Makuri Islands - Shisha Shakedown",
+    "name": "Makuri Islands - Shisa Shakedown",
     "route": 3330165223,
     "distance": 53480.8,
     "course": 13,
@@ -196,13 +196,6 @@
     "sport": 0
   },
   {
-    "name": "Richmond Loop Around",
-    "route": 3912793970,
-    "distance": 42663.4,
-    "course": 2,
-    "sport": 0
-  },
-  {
     "name": "Richmond Rollercoaster",
     "route": 948831673,
     "distance": 17203.8,
@@ -236,6 +229,20 @@
     "distance": 7501.8,
     "course": 6,
     "sport": 1
+  },
+  {
+    "name": "Watopia - Coast to Coast",
+    "route": 4199497144,
+    "distance": 26761.9,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Deca Dash",
+    "route": 454871454,
+    "distance": 52575.4,
+    "course": 6,
+    "sport": 0
   },
   {
     "name": "Watopia - Flat Route Reverse",
@@ -280,6 +287,13 @@
     "sport": 0
   },
   {
+    "name": "Watopia - Loopin Lava",
+    "route": 1092181131,
+    "distance": 18395.0,
+    "course": 6,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Road To Ruins Reverse",
     "route": 2967612381,
     "distance": 29846.1,
@@ -308,6 +322,20 @@
     "sport": 1
   },
   {
+    "name": "Watopia - The Classic",
+    "route": 2698009951,
+    "distance": 9017.4,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - The Classic Run",
+    "route": 3068694512,
+    "distance": 9017.3,
+    "course": 6,
+    "sport": 1
+  },
+  {
     "name": "Watopia - The Magnificent 8",
     "route": 2207442179,
     "distance": 29137.0,
@@ -318,6 +346,13 @@
     "name": "Watopia - Three Sisters Reverse",
     "route": 4263172118,
     "distance": 45893.7,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Triple Twist",
+    "route": 2644664789,
+    "distance": 24521.1,
     "course": 6,
     "sport": 0
   },
@@ -339,6 +374,13 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Waisted 8",
+    "route": 3378411990,
+    "distance": 30880.4,
     "course": 6,
     "sport": 0
   },

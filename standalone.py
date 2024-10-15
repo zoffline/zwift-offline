@@ -260,7 +260,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             return
         hello = udp_node_msgs_pb2.ClientToServer()
         try:
-            hello.ParseFromString(p.payload[2:-8]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
+            hello.ParseFromString(p.payload[2:-4]) #2 bytes: payload length, 1 byte: =0x1 (TcpClient::sendClientToServer) 1 byte: type; payload; 4 bytes: hash
             #type: TcpClient::sayHello(=0x0), TcpClient::sendSubscribeToSegment(=0x1), TcpClient::processSegmentUnsubscription(=0x1)
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
@@ -314,7 +314,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     if len(p.payload) > 1 and p.payload[1] == 1:
                         subscr = udp_node_msgs_pb2.ClientToServer()
                         try:
-                            subscr.ParseFromString(p.payload[2:-8])
+                            subscr.ParseFromString(p.payload[2:-4])
                         except Exception as exc:
                             print('TCPHandler ParseFromString exception: %s' % repr(exc))
                         if subscr.subsSegments:
@@ -614,14 +614,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
         recv = udp_node_msgs_pb2.ClientToServer()
 
         try:
-            recv.ParseFromString(p.payload[:-8])
-        except:
-            try:
-                #If no sensors connected, first byte must be skipped
-                recv.ParseFromString(p.payload[1:-8])
-            except Exception as exc:
-                print('UDPHandler ParseFromString exception: %s' % repr(exc))
-                return
+            recv.ParseFromString(p.payload[1:-4])
+        except Exception as exc:
+            print('UDPHandler ParseFromString exception: %s' % repr(exc))
+            return
 
         client_address = self.client_address
         player_id = recv.player_id

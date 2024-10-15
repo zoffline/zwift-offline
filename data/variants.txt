@@ -241,7 +241,7 @@
             "stringValue": "HR2VP"
           },
           "forbidden_manufacturers_name_list": {
-            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\""
+            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\" \"FITSHOW\""
           }
         }
       }
@@ -427,7 +427,6 @@
     },
     {
       "name": "game_1_43_3_ble_dll_v2",
-      "value": true,
       "values": {}
     },
     {
@@ -945,11 +944,6 @@
       "values": {}
     },
     {
-      "name": "game_1_57_workout_repect_power_display_setting",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_58_0_display_steering_collision_visuals",
       "value": true,
       "values": {}
@@ -1016,11 +1010,6 @@
     },
     {
       "name": "game_1_63_autobraking",
-      "values": {}
-    },
-    {
-      "name": "game_1_63_concurrent_profile_update",
-      "value": true,
       "values": {}
     },
     {
@@ -1126,11 +1115,6 @@
     },
     {
       "name": "game_1_66_change_pause_title_to_menu",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_66_dont_hold_player_during_pairing_while_paused",
       "value": true,
       "values": {}
     },
@@ -1317,7 +1301,6 @@
     },
     {
       "name": "game_1_74_0_robopacer_10_year_anniversary",
-      "value": true,
       "values": {}
     },
     {
@@ -1357,6 +1340,10 @@
       "values": {}
     },
     {
+      "name": "game_1_75_support_core_body_sensor",
+      "values": {}
+    },
+    {
       "name": "game_1_75_sweeper_check",
       "values": {}
     },
@@ -1364,6 +1351,9 @@
       "name": "game_1_76_bike_leveling",
       "values": {
         "fields": {
+          "AutoSaveIntervalSeconds": {
+            "varintValue": "1800"
+          },
           "ConfigVariant": {
             "stringValue": ""
           },
@@ -1375,6 +1365,20 @@
           },
           "EnableLeakPrevention": {
             "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_76_dont_hold_player_during_pairing_while_paused",
+      "values": {}
+    },
+    {
+      "name": "game_1_76_max_clubs_to_display",
+      "values": {
+        "fields": {
+          "max_clubs_to_display": {
+            "varintValue": "10"
           }
         }
       }
@@ -1512,9 +1516,35 @@
       }
     },
     {
-      "name": "game_cheerful_polka_accordion",
-      "value": true,
-      "values": {}
+      "name": "game_cheerful_polka_accordion2",
+      "values": {
+        "fields": {
+          "cutsj": {
+            "boolValue": false
+          },
+          "endj": {
+            "varintValue": "1735718399"
+          },
+          "intj": {
+            "boolValue": false
+          },
+          "minij": {
+            "boolValue": false
+          },
+          "routej": {
+            "boolValue": false
+          },
+          "screenj": {
+            "boolValue": true
+          },
+          "startj": {
+            "varintValue": "1731513600"
+          },
+          "teleportj": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_choose_any_avatar",
@@ -1611,6 +1641,12 @@
           "game_minimap_graph_update": {
             "boolValue": true
           },
+          "minimap_approved_worlds_list": {
+            "stringValue": ""
+          },
+          "minimap_use_approved_worlds": {
+            "boolValue": false
+          },
           "minimap_use_only_approved_routes": {
             "boolValue": true
           },
@@ -1655,6 +1691,7 @@
     },
     {
       "name": "game_tow_extra_xp",
+      "value": true,
       "values": {
         "fields": {
           "event_xp_multiplier": {

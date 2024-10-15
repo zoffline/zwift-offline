@@ -719,10 +719,20 @@
     "road": 149,
     "time": 129132
   },
+  "-95470152": {
+    "name": "Watopia - Coast to Coast",
+    "road": 149,
+    "time": 588021
+  },
   "-1526666341": {
     "name": "Watopia - Coastal Crown Loop",
     "road": 133,
     "time": 248631
+  },
+  "454871454": {
+    "name": "Watopia - Deca Dash",
+    "road": 192,
+    "time": 731769
   },
   "5745690": {
     "name": "Watopia - Downtown Titans",
@@ -853,6 +863,11 @@
     "name": "Watopia - Loop de Loop",
     "road": 0,
     "time": 987711
+  },
+  "1092181131": {
+    "name": "Watopia - Loopin Lava",
+    "road": 192,
+    "time": 897647
   },
   "-1282378735": {
     "name": "Watopia - May Field",
@@ -1034,6 +1049,16 @@
     "road": 81,
     "time": 30426
   },
+  "-1596957345": {
+    "name": "Watopia - The Classic",
+    "road": 192,
+    "time": 897647
+  },
+  "-1226272784": {
+    "name": "Watopia - The Classic Run",
+    "road": 192,
+    "time": 897647
+  },
   "-2087525117": {
     "name": "Watopia - The Magnificent 8",
     "road": 0,
@@ -1094,6 +1119,11 @@
     "road": 81,
     "time": 30426
   },
+  "-1650302507": {
+    "name": "Watopia - Triple Twist",
+    "road": 192,
+    "time": 731769
+  },
   "-982929680": {
     "name": "Watopia - Two Bridges Loop",
     "road": 0,
@@ -1131,6 +1161,11 @@
   },
   "-2076558014": {
     "name": "Watopia - WBR Climbing Series",
+    "road": 0,
+    "time": 987711
+  },
+  "-916555306": {
+    "name": "Watopia - Waisted 8",
     "road": 0,
     "time": 987711
   },
