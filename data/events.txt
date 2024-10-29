@@ -203,13 +203,6 @@
     "sport": 0
   },
   {
-    "name": "Scotland - BRAEk-fast Crits and Grits",
-    "route": 377566656,
-    "distance": 22144.7,
-    "course": 17,
-    "sport": 0
-  },
-  {
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
@@ -226,7 +219,7 @@
   {
     "name": "Watopia - Chili Pepper Reverse",
     "route": 3694952104,
-    "distance": 7501.8,
+    "distance": 7501.9,
     "course": 6,
     "sport": 1
   },
@@ -294,6 +287,13 @@
     "sport": 0
   },
   {
+    "name": "Watopia - Power to the Portal",
+    "route": 3030004732,
+    "distance": 18525.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Road To Ruins Reverse",
     "route": 2967612381,
     "distance": 29846.1,
@@ -317,7 +317,7 @@
   {
     "name": "Watopia - That's Amore Reverse",
     "route": 1586193601,
-    "distance": 5954.1,
+    "distance": 5954.0,
     "course": 6,
     "sport": 1
   },
@@ -345,7 +345,7 @@
   {
     "name": "Watopia - Three Sisters Reverse",
     "route": 4263172118,
-    "distance": 45893.7,
+    "distance": 45892.8,
     "course": 6,
     "sport": 0
   },
@@ -394,35 +394,35 @@
   {
     "name": "Watopia - Zwift Bambino Fondo 2022",
     "route": 3368626651,
-    "distance": 53250.2,
+    "distance": 53250.5,
     "course": 6,
     "sport": 0
   },
   {
     "name": "Watopia - Zwift Gran Fondo",
     "route": 242381847,
-    "distance": 97962.9,
+    "distance": 97963.9,
     "course": 6,
     "sport": 0
   },
   {
     "name": "Watopia - Zwift Gran Fondo 2022",
     "route": 1327147942,
-    "distance": 92761.8,
+    "distance": 92757.6,
     "course": 6,
     "sport": 0
   },
   {
     "name": "Watopia - Zwift Medio Fondo",
     "route": 3748780161,
-    "distance": 72998.8,
+    "distance": 72999.2,
     "course": 6,
     "sport": 0
   },
   {
     "name": "Watopia - Zwift Medio Fondo 2022",
     "route": 2900074211,
-    "distance": 79318.4,
+    "distance": 79318.5,
     "course": 6,
     "sport": 0
   },

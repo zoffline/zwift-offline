@@ -57,11 +57,6 @@
       "values": {}
     },
     {
-      "name": "game_1_23_3_wahoo_direct_connect_trainer",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
@@ -241,7 +236,7 @@
             "stringValue": "HR2VP"
           },
           "forbidden_manufacturers_name_list": {
-            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\" \"FITSHOW\""
+            "stringValue": "\"Apple Inc.\" \"Apple, Inc.\" \"FITSHOW\" \"Kettler GmbH\""
           }
         }
       }
@@ -432,38 +427,6 @@
     {
       "name": "game_1_43_android_road_height_fixup",
       "values": {}
-    },
-    {
-      "name": "game_1_43_asset_patching",
-      "value": true,
-      "values": {
-        "fields": {
-          "asset_backoff": {
-            "varintValue": "100"
-          },
-          "asset_retry_count": {
-            "varintValue": "3"
-          },
-          "manifest_backoff": {
-            "varintValue": "100"
-          },
-          "manifest_retry_count": {
-            "varintValue": "3"
-          },
-          "portal_patching": {
-            "boolValue": false
-          },
-          "use_bundled_assets_dictionary": {
-            "boolValue": false
-          },
-          "validate_asset_hash_after_downloading": {
-            "boolValue": false
-          },
-          "validate_asset_hash_on_manifest_loading": {
-            "boolValue": false
-          }
-        }
-      }
     },
     {
       "name": "game_1_43_ride_data_leak_prevention",
@@ -989,11 +952,6 @@
       "values": {}
     },
     {
-      "name": "game_1_60_steering_shifting_braking_hvc_analytics",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_62_tapi_workouts",
       "value": true,
       "values": {}
@@ -1107,6 +1065,12 @@
           "enabledForWatopia": {
             "boolValue": false
           },
+          "maxDistanceForFavoringCorrectSideInCm": {
+            "numberValue": 5.0
+          },
+          "maxLateralDistanceForDraftChasingInCm": {
+            "numberValue": 250.0
+          },
           "pillDistanceScale": {
             "numberValue": 0.39
           }
@@ -1209,19 +1173,20 @@
     },
     {
       "name": "game_1_69_last_used",
+      "value": true,
       "values": {
         "fields": {
           "current_equipped_first": {
-            "boolValue": false
+            "boolValue": true
           },
           "sort_accessories": {
-            "boolValue": false
+            "boolValue": true
           },
           "ugs_enabled": {
-            "boolValue": false
+            "boolValue": true
           },
           "use_last_selected_for_config_hash": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -1322,7 +1287,7 @@
       "values": {
         "fields": {
           "friend_dropped_in_message_enabled": {
-            "boolValue": false
+            "boolValue": true
           },
           "scrolling_hud_messages": {
             "boolValue": true
@@ -1371,17 +1336,54 @@
     },
     {
       "name": "game_1_76_dont_hold_player_during_pairing_while_paused",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_76_dpr",
       "values": {}
     },
     {
       "name": "game_1_76_max_clubs_to_display",
+      "value": true,
       "values": {
         "fields": {
           "max_clubs_to_display": {
-            "varintValue": "10"
+            "varintValue": "50"
           }
         }
       }
+    },
+    {
+      "name": "game_1_76_normalized_power_field_enabled",
+      "values": {}
+    },
+    {
+      "name": "game_1_76_routes_new_tag",
+      "values": {
+        "fields": {
+          "days_until_tag_expires": {
+            "varintValue": "30"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_76_second_entitlements_chunk",
+      "values": {}
+    },
+    {
+      "name": "game_1_76_teleportation_fix",
+      "values": {}
+    },
+    {
+      "name": "game_1_77_prevent_teleport_to_player_type",
+      "values": {}
+    },
+    {
+      "name": "game_1_77_ttt_team_car_shows_znl_when_fanviewing",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1396,6 +1398,11 @@
     },
     {
       "name": "game_ClassyJazzFlute",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_ClassyJazzFlute_2",
       "value": true,
       "values": {}
     },
@@ -1493,6 +1500,10 @@
       "values": {}
     },
     {
+      "name": "game_barun",
+      "values": {}
+    },
+    {
       "name": "game_button_rideon_bomb_prompt_delay",
       "values": {}
     },
@@ -1517,19 +1528,23 @@
     },
     {
       "name": "game_cheerful_polka_accordion2",
+      "value": true,
       "values": {
         "fields": {
           "cutsj": {
-            "boolValue": false
+            "boolValue": true
           },
           "endj": {
             "varintValue": "1735718399"
           },
           "intj": {
-            "boolValue": false
+            "boolValue": true
+          },
+          "magscalej": {
+            "numberValue": 1.0
           },
           "minij": {
-            "boolValue": false
+            "boolValue": true
           },
           "routej": {
             "boolValue": false
@@ -1538,7 +1553,7 @@
             "boolValue": true
           },
           "startj": {
-            "varintValue": "1731513600"
+            "varintValue": "1730131200"
           },
           "teleportj": {
             "boolValue": true
@@ -1558,6 +1573,10 @@
     {
       "name": "game_debug_screenshots",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_disable_ant_plus_msg_queue",
       "values": {}
     },
     {
@@ -1675,6 +1694,10 @@
       "values": {}
     },
     {
+      "name": "game_road_graph_in_game",
+      "values": {}
+    },
+    {
       "name": "game_settings_service",
       "value": true,
       "values": {}
@@ -1766,6 +1789,7 @@
     },
     {
       "name": "game_workout_downloader",
+      "value": true,
       "values": {}
     },
     {
@@ -1822,6 +1846,10 @@
     },
     {
       "name": "gn_lights",
+      "values": {}
+    },
+    {
+      "name": "hero_carousel_card_targeting",
       "values": {}
     },
     {
