@@ -1386,6 +1386,7 @@ def api_users_login():
 
 
 @app.route('/relay/session/refresh', methods=['POST'])
+@app.route('/relay/session/renew', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
 def relay_session_refresh():
@@ -1750,16 +1751,14 @@ def update_entitlements(profile):
     e.id = -1
     e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
     if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR) or os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
-        with open('%s/data/entitlements.txt' % SCRIPT_DIR) as f:
-            entitlements = json.load(f)
+        entitlements = list(range(1687, 1846))
         if os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
-            for i in range(1, min([e['id'] for e in entitlements])):
-                entitlements.append({'id': i})
+            entitlements.extend(list(range(1, 1687)))
         for entitlement in entitlements:
-            if not any(e.id == entitlement['id'] for e in profile.entitlements):
+            if not any(e.id == entitlement for e in profile.entitlements):
                 e = profile.entitlements.add()
                 e.type = profile_pb2.ProfileEntitlement.EntitlementType.USE
-                e.id = entitlement['id']
+                e.id = entitlement
                 e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
 
 def do_api_profiles(profile_id, is_json):
