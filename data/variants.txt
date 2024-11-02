@@ -16,6 +16,9 @@
           "goal_unit": {
             "stringValue": "kJ"
           },
+          "is_distance_time_goals_visible": {
+            "boolValue": true
+          },
           "is_fitness_score_visible": {
             "boolValue": true
           }
