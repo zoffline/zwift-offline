@@ -317,6 +317,7 @@ To enable support for multiple users perform the steps below:
 <details><summary>Expand</summary>
 
 * To obtain the official map schedule and update files from Zwift server: create a ``cdn-proxy.txt`` file in the ``storage`` directory. This can only work if you are running zoffline on a different machine than the Zwift client.
+  * If this option is disabled, zoffline will try to proxy using Google public DNS to resolve Zwift host names, this should work even if zoffline is running on the same machine as the Zwift client. To avoid this, create a ``disable_proxy.txt`` file in the ``storage`` directory.
 * To enable the password reset feature when multiplayer is enabled: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to access https://security.google.com/settings/security/apppasswords and create an app password to allow the login from the server.
 * To enable the Discord bridge bot: ``pip3 install discord.py`` and create a ``discord.cfg`` file in the ``storage`` directory containing
   ```
