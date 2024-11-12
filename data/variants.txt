@@ -1,6 +1,16 @@
 {
   "variants": [
     {
+      "name": "bikemodifiercalculator_params",
+      "values": {
+        "fields": {
+          "bUseDriveTrainEfficiency": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
       "name": "costume_overrides_using_workout_triggers",
       "value": true,
       "values": {}
@@ -48,10 +58,6 @@
     {
       "name": "game_1_20_home_screen",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_21_ble_data_guard_v2",
       "values": {}
     },
     {
@@ -138,10 +144,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_29_ble_middleware",
-      "values": {}
     },
     {
       "name": "game_1_29_new_local_trainer_profile",
@@ -356,11 +358,6 @@
       }
     },
     {
-      "name": "game_1_41_show_racing_score",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_42_dca2",
       "value": true,
       "values": {}
@@ -425,6 +422,7 @@
     },
     {
       "name": "game_1_43_3_ble_dll_v2",
+      "value": true,
       "values": {}
     },
     {
@@ -512,11 +510,6 @@
     },
     {
       "name": "game_1_45_0_ble_source_lock",
-      "values": {}
-    },
-    {
-      "name": "game_1_45_0_shifting_hvc_analytic",
-      "value": true,
       "values": {}
     },
     {
@@ -774,11 +767,6 @@
       "values": {}
     },
     {
-      "name": "game_1_51_scored_event_filter",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_51_zc_workout_asset_patch_fix",
       "value": true,
       "values": {}
@@ -916,11 +904,6 @@
     },
     {
       "name": "game_1_58_0_gender_to_event_category",
-      "values": {}
-    },
-    {
-      "name": "game_1_58_delighter_codes",
-      "value": true,
       "values": {}
     },
     {
@@ -1258,11 +1241,6 @@
       "values": {}
     },
     {
-      "name": "game_1_73_sweeper_check",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_73_ui_scheduler",
       "value": true,
       "values": {}
@@ -1290,7 +1268,7 @@
       "values": {
         "fields": {
           "friend_dropped_in_message_enabled": {
-            "boolValue": true
+            "boolValue": false
           },
           "scrolling_hud_messages": {
             "boolValue": true
@@ -1363,6 +1341,7 @@
     },
     {
       "name": "game_1_76_routes_new_tag",
+      "value": true,
       "values": {
         "fields": {
           "days_until_tag_expires": {
@@ -1377,16 +1356,44 @@
     },
     {
       "name": "game_1_76_teleportation_fix",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_77_prevent_teleport_to_player_type",
-      "values": {}
+      "values": {
+        "fields": {
+          "restricted_teleports": {
+            "stringValue": "{}"
+          }
+        }
+      }
     },
     {
       "name": "game_1_77_ttt_team_car_shows_znl_when_fanviewing",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_77_zp_sync_queue",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_78_shifting_gearing_refactor",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_78_sweeper_check",
+      "value": true,
+      "values": {
+        "fields": {
+          "use_only_new_processing": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1550,13 +1557,13 @@
             "boolValue": true
           },
           "routej": {
-            "boolValue": false
+            "boolValue": true
           },
           "screenj": {
             "boolValue": true
           },
           "startj": {
-            "varintValue": "1730131200"
+            "varintValue": "1731427200"
           },
           "teleportj": {
             "boolValue": true
@@ -1656,6 +1663,9 @@
           },
           "calculate_road_position_by_dist_fix": {
             "varintValue": "0"
+          },
+          "climb_graph_sensitivity": {
+            "boolValue": false
           },
           "dark_mode_color_scheme": {
             "boolValue": true

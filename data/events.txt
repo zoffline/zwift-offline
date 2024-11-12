@@ -21,6 +21,13 @@
     "sport": 0
   },
   {
+    "name": "France - Petite Douleur",
+    "route": 4159356920,
+    "distance": 24774.1,
+    "course": 14,
+    "sport": 0
+  },
+  {
     "name": "France Classic Fondo",
     "route": 2136907048,
     "distance": 146423.6,
@@ -94,6 +101,13 @@
     "name": "London 8 Reverse",
     "route": 2165880404,
     "distance": 20465.9,
+    "course": 7,
+    "sport": 0
+  },
+  {
+    "name": "London Flat",
+    "route": 3262665065,
+    "distance": 12378.2,
     "course": 7,
     "sport": 0
   },
@@ -224,20 +238,6 @@
     "sport": 1
   },
   {
-    "name": "Watopia - Coast to Coast",
-    "route": 4199497144,
-    "distance": 26761.9,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Deca Dash",
-    "route": 454871454,
-    "distance": 52575.4,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Flat Route Reverse",
     "route": 3811569265,
     "distance": 10469.6,
@@ -280,13 +280,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Loopin Lava",
-    "route": 1092181131,
-    "distance": 18395.0,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Power to the Portal",
     "route": 3030004732,
     "distance": 18525.6,
@@ -315,23 +308,16 @@
     "sport": 0
   },
   {
-    "name": "Watopia - That's Amore Reverse",
-    "route": 1586193601,
-    "distance": 5954.0,
-    "course": 6,
-    "sport": 1
-  },
-  {
-    "name": "Watopia - The Classic",
-    "route": 2698009951,
-    "distance": 9017.4,
+    "name": "Watopia - Tair Dringfa Fechan",
+    "route": 2062126722,
+    "distance": 32065.4,
     "course": 6,
     "sport": 0
   },
   {
-    "name": "Watopia - The Classic Run",
-    "route": 3068694512,
-    "distance": 9017.3,
+    "name": "Watopia - That's Amore Reverse",
+    "route": 1586193601,
+    "distance": 5954.0,
     "course": 6,
     "sport": 1
   },
@@ -346,13 +332,6 @@
     "name": "Watopia - Three Sisters Reverse",
     "route": 4263172118,
     "distance": 45892.8,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Triple Twist",
-    "route": 2644664789,
-    "distance": 24521.1,
     "course": 6,
     "sport": 0
   },
@@ -374,13 +353,6 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Waisted 8",
-    "route": 3378411990,
-    "distance": 30880.4,
     "course": 6,
     "sport": 0
   },

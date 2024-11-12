@@ -44,6 +44,11 @@
     "road": 26,
     "time": 487179
   },
+  "-135610376": {
+    "name": "France - Petite Douleur",
+    "road": 0,
+    "time": 971365
+  },
   "1776635757": {
     "name": "France - R.G.V.",
     "road": 26,
@@ -173,6 +178,11 @@
     "name": "London - London 8 Reverse",
     "road": 7,
     "time": 809519
+  },
+  "-1032302231": {
+    "name": "London - London Flat",
+    "road": 7,
+    "time": 883587
   },
   "913172163": {
     "name": "London - London Loop",
@@ -634,6 +644,11 @@
     "road": 2,
     "time": 905327
   },
+  "-1468627256": {
+    "name": "Scotland - Outer Scotland",
+    "road": 9,
+    "time": 1001667
+  },
   "46799750": {
     "name": "Scotland - Rolling Highlands",
     "road": 2,
@@ -1028,6 +1043,11 @@
     "name": "Watopia - Surfin' Safari",
     "road": 36,
     "time": 770795
+  },
+  "2062126722": {
+    "name": "Watopia - Tair Dringfa Fechan",
+    "road": 1,
+    "time": 89601
   },
   "-1964332641": {
     "name": "Watopia - Temple Trek",
