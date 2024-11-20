@@ -392,6 +392,14 @@ To enable support for multiple users perform the steps below:
 * To unlock all equipment, create a file ``unlock_all_equipment.txt`` instead.
 </details>
 
+### Intervals.icu
+
+<details><summary>Expand</summary>
+
+* To upload activities to Intervals.icu, use the "Settings - Intervals" button in the launcher window to enter your credentials (if using Android, access https://secure.zwift.com/intervals/zoffline/).
+* Copy "Athlete ID" and "API Key" from https://intervals.icu/settings under "Developer Settings".
+</details>
+
 ## Community Discord server and Strava club
 
 Please join the community supported [Discord](https://discord.gg/GMdn8F8) server and [Strava](https://www.strava.com/clubs/zoffline) club.
