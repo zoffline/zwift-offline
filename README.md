@@ -392,7 +392,7 @@ To enable support for multiple users perform the steps below:
 * To unlock all equipment, create a file ``unlock_all_equipment.txt`` instead.
 </details>
 
-### Intervals.icu
+### Upload activities to Intervals.icu
 
 <details><summary>Expand</summary>
 
