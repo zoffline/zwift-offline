@@ -86,7 +86,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
               - 3025:3025
            restart: unless-stopped    
    ```
-* in the ``volumes`` tag replace ``./storage/`` before the ``:`` with the directory path you want to use as your local zoffline data store.
+  * In the ``volumes`` tag replace ``./storage/`` before the ``:`` with the directory path you want to use as your local zoffline data store.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Start zoffline with:
   ``docker-compose up -d ``
