@@ -1,11 +1,13 @@
 syntax = "proto2";
 
 message UserStorage {
-    optional Attributes attributes = 2;
+    repeated Attributes attributes = 2;
 }
 
 message Attributes {
     optional GameSettings game_settings = 22;
+    optional GarageItemLastSelected garage_last_selected = 23;
+    optional SpecialEventSeen special_event_seen = 25;
 }
 
 message GameSettings {
@@ -15,4 +17,14 @@ message GameSettings {
     optional int32 power_meter_slot1 = 5;
     optional int32 power_meter_slot2 = 6;
     optional int32 power_meter_slot3 = 7;
+}
+
+message GarageItemLastSelected {
+    optional string signature = 1;
+    optional uint64 time = 2;
+}
+
+message SpecialEventSeen {
+    optional string signature = 1;
+    optional uint64 time = 2;
 }

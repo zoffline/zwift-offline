@@ -3697,16 +3697,22 @@ def api_player_profile_user_game_storage_attributes():
     if request.method == 'POST':
         new = user_storage_pb2.UserStorage()
         new.ParseFromString(request.stream.read())
-        user_storage.MergeFrom(new)
+        for n in new.attributes:
+            for f in n.DESCRIPTOR.fields_by_name:
+                if n.HasField(f):
+                    for a in list(user_storage.attributes):
+                        if a.HasField(f) and (not 'signature' in getattr(a, f).DESCRIPTOR.fields_by_name \
+                          or getattr(a, f).signature == getattr(n, f).signature):
+                            user_storage.attributes.remove(a)
+            user_storage.attributes.add().CopyFrom(n)
         with open(user_storage_file, 'wb') as f:
             f.write(user_storage.SerializeToString())
         return '', 202
     ret = user_storage_pb2.UserStorage()
-    n = int(request.args.get('n'))
-    if n in user_storage.attributes.DESCRIPTOR.fields_by_number:
-        field = user_storage.attributes.DESCRIPTOR.fields_by_number[n].name
-        if user_storage.attributes.HasField(field):
-            getattr(ret.attributes, field).CopyFrom(getattr(user_storage.attributes, field))
+    for n in request.args.getlist('n'):
+        for a in user_storage.attributes:
+            if int(n) in a.DESCRIPTOR.fields_by_number and a.HasField(a.DESCRIPTOR.fields_by_number[int(n)].name):
+                ret.attributes.add().CopyFrom(a)
     return ret.SerializeToString(), 200
 
 
