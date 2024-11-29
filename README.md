@@ -354,7 +354,7 @@ To enable support for multiple users perform the steps below:
 
 * Create a file ``enable_bots.txt`` inside the ``storage`` folder to load ghosts as bots, they will keep riding around regardless of the route you are riding.
 * Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
-* Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The scripts ``get_pro_names.py`` and ``get_strava_names.py`` can be used to populate this file.
+* Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The script ``get_pro_names.py`` can be used to populate this file.
 * If you want some random bots, check [this repository](https://github.com/oldnapalm/zoffline-bots).
 
 #### RoboPacers (formerly known as Pace Partners)
