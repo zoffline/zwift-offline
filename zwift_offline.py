@@ -2253,17 +2253,21 @@ def garmin_upload(player_id, activity):
         except Exception as exc:
             logger.warning("Failed to read %s. Skipping Garmin upload attempt: %s" % (garmin_credentials, repr(exc)))
             return
-    garmin_domain = '%s/garmin_domain.txt' % STORAGE_DIR
-    if os.path.exists(garmin_domain):
+    domain = 'garmin.com'
+    domain_file = '%s/garmin_domain.txt' % STORAGE_DIR
+    if os.path.exists(domain_file):
         try:
-            with open(garmin_domain) as f:
-                garth.configure(domain=f.readline().rstrip('\r\n'))
+            with open(domain_file) as f:
+                domain = f.readline().rstrip('\r\n')
+            garth.configure(domain=domain)
         except Exception as exc:
-            logger.warning("Failed to read %s: %s" % (garmin_domain, repr(exc)))
+            logger.warning("Failed to read %s: %s" % (domain_file, repr(exc)))
     tokens_dir = '%s/garth' % profile_dir
     try:
         garth.resume(tokens_dir)
-        garth.client.username
+        if garth.client.oauth2_token.expired:
+            garth.client.refresh_oauth2()
+            garth.save(tokens_dir)
     except:
         try:
             garth.login(username, password)
@@ -2272,7 +2276,9 @@ def garmin_upload(player_id, activity):
             logger.warning("Garmin login failed: %s" % repr(exc))
             return
     try:
-        garth.client.post("connectapi", "/upload-service/upload", api=True, files={"file": (activity.fit_filename, BytesIO(activity.fit))})
+        requests.post('https://connectapi.%s/upload-service/upload' % domain,
+            files={"file": (activity.fit_filename, BytesIO(activity.fit))},
+            headers={'authorization': str(garth.client.oauth2_token)})
     except Exception as exc:
         logger.warning("Garmin upload failed. No internet? %s" % repr(exc))
 
