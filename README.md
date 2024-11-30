@@ -257,6 +257,7 @@ To obtain your current profile:
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
+* If your account has multi-factor authentication, use the script ``garmin_auth.py`` and move the resulting ``garth`` folder (saved in whatever directory you ran ``garmin_auth.py`` in) into the ``storage/1`` directory.
 * If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>

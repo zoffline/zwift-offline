@@ -10,6 +10,11 @@
       {% if uname or passw %}
         <a href="/delete/garmin_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
       {% endif %}
+      {% if token %}
+        <a href="/delete/garth/oauth1_token.json" class="btn btn-sm btn-danger">Remove authorization</a>
+      {% elif uname and passw %}
+        <a href="{{ url_for('garmin_auth') }}" class="btn btn-sm btn-secondary">Authorize</a>
+      {% endif %}
     </div>
   </div>
   <div class="row">
