@@ -257,7 +257,8 @@ To obtain your current profile:
   <password>
   ```
   * Note: this is not secure. Only do this if you are comfortable with your login credentials being stored in a clear text file.
-* If your account has multi-factor authentication, use the script ``garmin_auth.py`` and move the resulting ``garth`` folder (saved in whatever directory you ran ``garmin_auth.py`` in) into the ``storage/1`` directory.
+* If your account has multi-factor authentication, run the script ``garmin_auth.py`` and move the resulting ``garth`` folder (saved in whatever directory you ran ``garmin_auth.py`` in) into the ``storage/1`` directory.
+  * Or, if using the Windows zoffline.exe version without Python installed you can run ``garmin_auth.exe`` obtained from https://github.com/oldnapalm/zoffline-helper/releases/latest instead.
 * If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
@@ -398,7 +399,7 @@ To enable support for multiple users perform the steps below:
 
 <details><summary>Expand</summary>
 
-* To upload activities to Intervals.icu, use the "Settings - Intervals" button in the launcher window to enter your credentials (if using Android, access https://secure.zwift.com/intervals/zoffline/).
+* Use the "Settings - Intervals" button in the launcher window to enter your credentials (if using Android, access ``https://<zoffline_ip>/intervals/zoffline/``).
 * Copy "Athlete ID" and "API Key" from https://intervals.icu/settings under "Developer Settings".
 </details>
 
