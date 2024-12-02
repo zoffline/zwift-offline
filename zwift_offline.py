@@ -2266,20 +2266,11 @@ def garmin_upload(player_id, activity):
             garth.client.refresh_oauth2()
             garth.save(tokens_dir)
     except:
-        garmin_credentials = '%s/%s/garmin_credentials' % (STORAGE_DIR, player_id)
-        if os.path.exists(garmin_credentials + '.bin'):
-            garmin_credentials += '.bin'
-        elif os.path.exists(garmin_credentials + '.txt'):
-            garmin_credentials += '.txt'
-        else:
-            logger.info("garmin_credentials missing, skip Garmin activity update")
+        garmin_credentials = '%s/%s/garmin_credentials.bin' % (STORAGE_DIR, player_id)
+        if not os.path.exists(garmin_credentials):
+            logger.info("garmin_credentials.bin missing, skip Garmin activity update")
             return
-        if garmin_credentials.endswith('.bin'):
-            username, password = decrypt_credentials(garmin_credentials)
-        else:
-            with open(garmin_credentials) as f:
-                username = f.readline().rstrip('\r\n')
-                password = f.readline().rstrip('\r\n')
+        username, password = decrypt_credentials(garmin_credentials)
         try:
             garth.login(username, password)
             garth.save(tokens_dir)
