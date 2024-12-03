@@ -224,6 +224,13 @@
     "sport": 0
   },
   {
+    "name": "Scotland - Outer Scotland",
+    "route": 2826340040,
+    "distance": 11361.5,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Big Loop Reverse",
     "route": 4107844490,
     "distance": 42819.2,

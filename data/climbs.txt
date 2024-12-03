@@ -116,6 +116,10 @@
     "road": "10036"
   },
   {
+    "name": "Norton Summit (8.7 km / 363 m)",
+    "road": "10039"
+  },
+  {
     "name": "Old La Honda (5.6 km / 395 m)",
     "road": "10018"
   },

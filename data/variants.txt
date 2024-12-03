@@ -17,6 +17,7 @@
     },
     {
       "name": "dynamic_ftp_estimation",
+      "value": true,
       "values": {}
     },
     {
@@ -155,7 +156,7 @@
       "values": {
         "fields": {
           "HighlightWorkoutFX": {
-            "boolValue": false
+            "boolValue": true
           },
           "MaxHighlightedFriends": {
             "varintValue": "3"
@@ -743,11 +744,6 @@
       "values": {}
     },
     {
-      "name": "game_1_50_next_up_zui",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_50_onboarding_quest_auto_registration",
       "values": {
         "fields": {
@@ -818,6 +814,7 @@
     },
     {
       "name": "game_1_54_emoji_feature",
+      "value": true,
       "values": {}
     },
     {
@@ -1034,6 +1031,7 @@
     },
     {
       "name": "game_1_66_autosteering_v5",
+      "value": true,
       "values": {
         "fields": {
           "enabledForAllWorlds": {
@@ -1049,16 +1047,10 @@
             "boolValue": false
           },
           "enabledForWatopia": {
-            "boolValue": false
+            "boolValue": true
           },
           "maxDistanceForFavoringCorrectSideInCm": {
             "numberValue": 5.0
-          },
-          "maxLateralDistanceForDraftChasingInCm": {
-            "numberValue": 250.0
-          },
-          "pillDistanceScale": {
-            "numberValue": 0.39
           }
         }
       }
@@ -1103,11 +1095,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_67_donut_fail_safe_v2",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_67_fit_file_timestamps_consistency",
@@ -1311,6 +1298,15 @@
           },
           "EnableLeakPrevention": {
             "boolValue": false
+          },
+          "LoggingRate": {
+            "varintValue": "0"
+          },
+          "bCDAUpdate": {
+            "boolValue": false
+          },
+          "excluded_bikes": {
+            "stringValue": ""
           }
         }
       }
@@ -1387,6 +1383,14 @@
     {
       "name": "game_1_78_sweeper_check",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_78_zp_sh",
+      "values": {}
+    },
+    {
+      "name": "game_1_79_trigger_change",
       "values": {
         "fields": {
           "use_only_new_processing": {
@@ -1394,6 +1398,11 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_79_tts_alp",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1407,8 +1416,17 @@
       }
     },
     {
+      "name": "game_4c",
+      "values": {
+        "fields": {
+          "LoggingRate": {
+            "varintValue": "0"
+          }
+        }
+      }
+    },
+    {
       "name": "game_ClassyJazzFlute",
-      "value": true,
       "values": {}
     },
     {
@@ -1510,6 +1528,10 @@
       "values": {}
     },
     {
+      "name": "game_android_skip_copy_from_apk",
+      "values": {}
+    },
+    {
       "name": "game_barun",
       "values": {}
     },
@@ -1602,7 +1624,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "david.brickhill.20240903071851"
+            "stringValue": "135832"
           },
           "canary_test": {
             "boolValue": true
@@ -1673,6 +1695,9 @@
           "game_minimap_graph_update": {
             "boolValue": true
           },
+          "low_sensitivity_multiplier": {
+            "numberValue": 1.5
+          },
           "minimap_approved_worlds_list": {
             "stringValue": ""
           },
@@ -1723,6 +1748,10 @@
     {
       "name": "game_st3_swap",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_tdz_2025_package",
       "values": {}
     },
     {
@@ -1806,6 +1835,10 @@
       "values": {}
     },
     {
+      "name": "game_would_block_manager",
+      "values": {}
+    },
+    {
       "name": "game_zc_pairing_transfer",
       "values": {}
     },
@@ -1851,10 +1884,12 @@
     },
     {
       "name": "gfx_useemptyshadowmaps",
+      "value": true,
       "values": {}
     },
     {
       "name": "gn_deferred_lighting",
+      "value": true,
       "values": {}
     },
     {
