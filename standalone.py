@@ -25,11 +25,9 @@ if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
     SCRIPT_DIR = sys._MEIPASS
     STORAGE_DIR = "%s/storage" % os.path.dirname(sys.executable)
-    PACE_PARTNERS_DIR = '%s/pace_partners' % os.path.dirname(sys.executable)
 else:
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     STORAGE_DIR = "%s/storage" % SCRIPT_DIR
-    PACE_PARTNERS_DIR = '%s/pace_partners' % SCRIPT_DIR
 
 CDN_DIR = "%s/cdn" % SCRIPT_DIR
 CDN_PROXY = os.path.isfile('%s/cdn-proxy.txt' % STORAGE_DIR)
@@ -61,6 +59,7 @@ if not CDN_PROXY and not os.path.isfile('%s/disable_proxy.txt' % STORAGE_DIR):
     except:
         pass
 
+PACE_PARTNERS_DIR = "%s/robopacers" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
