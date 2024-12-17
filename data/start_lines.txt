@@ -82,37 +82,37 @@
   "-1180363988": {
     "name": "Innsbruck - 2018 Worlds Short Lap",
     "road": 7,
-    "time": 157516
+    "time": 157534
   },
   "-285732192": {
     "name": "Innsbruck - Achterbahn",
     "road": 7,
-    "time": 157520
+    "time": 157534
   },
   "-645620046": {
     "name": "Innsbruck - Innsbruck KOM After Party",
     "road": 7,
-    "time": 157747
+    "time": 157534
   },
   "-1193274130": {
     "name": "Innsbruck - InnsbruckConti",
     "road": 7,
-    "time": 117884
+    "time": 115697
   },
   "-1702939696": {
     "name": "Innsbruck - Innsbruckring",
     "road": 7,
-    "time": 157510
+    "time": 157534
   },
   "156457316": {
     "name": "Innsbruck - Lutscher",
     "road": 7,
-    "time": 573873
+    "time": 573670
   },
   "-493725582": {
     "name": "Innsbruck - Lutscher CCW",
     "road": 7,
-    "time": 573780
+    "time": 573708
   },
   "-1600800906": {
     "name": "London - Classique",
@@ -122,22 +122,22 @@
   "-694994027": {
     "name": "London - Classique Reverse",
     "road": 0,
-    "time": 533131
+    "time": 533987
   },
   "87055383": {
     "name": "London - Greater London 8",
     "road": 7,
-    "time": 829904
+    "time": 809061
   },
   "928793662": {
     "name": "London - Greater London Flat",
     "road": 0,
-    "time": 532457
+    "time": 532858
   },
   "-1018563692": {
     "name": "London - Greater London Loop",
     "road": 7,
-    "time": 829428
+    "time": 809061
   },
   "474781994": {
     "name": "London - Greater London Loop Reverse",
@@ -152,7 +152,7 @@
   "-441312475": {
     "name": "London - Greatest London Loop",
     "road": 7,
-    "time": 825587
+    "time": 809061
   },
   "-318564470": {
     "name": "London - Greatest London Loop Reverse",
@@ -172,7 +172,7 @@
   "-282320817": {
     "name": "London - London 8",
     "road": 7,
-    "time": 855923
+    "time": 809061
   },
   "-2129086892": {
     "name": "London - London 8 Reverse",
@@ -202,22 +202,22 @@
   "163688809": {
     "name": "London - The London Pretzel",
     "road": 7,
-    "time": 830796
+    "time": 809061
   },
   "-2090505677": {
     "name": "London - The PRL Full",
     "road": 7,
-    "time": 829904
+    "time": 809480
   },
   "764532081": {
     "name": "London - The PRL Half",
     "road": 7,
-    "time": 829904
+    "time": 809487
   },
   "-84918359": {
     "name": "London - Triple Loops",
     "road": 7,
-    "time": 829904
+    "time": 809061
   },
   "1760877317": {
     "name": "Makuri Islands - Bridges and Boardwalks",
@@ -412,82 +412,82 @@
   "-1858871695": {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "road": 4,
-    "time": 186243
+    "time": 190280
   },
   "1509089537": {
     "name": "New York - Astoria Line 8",
     "road": 4,
-    "time": 145490
+    "time": 204758
   },
   "1790569309": {
     "name": "New York - Couch To Sky K",
     "road": 3,
-    "time": 633941
+    "time": 619659
   },
   "1327665278": {
     "name": "New York - Everything Bagel",
     "road": 4,
-    "time": 199506
+    "time": 173716
   },
   "711818913": {
     "name": "New York - Flat Irons",
     "road": 3,
-    "time": 880661
+    "time": 912856
   },
   "480315274": {
     "name": "New York - Gotham Grind",
     "road": 4,
-    "time": 171541
+    "time": 173716
   },
   "352245150": {
     "name": "New York - Gotham Grind Reverse",
     "road": 4,
-    "time": 175015
+    "time": 202652
   },
   "-1349154056": {
     "name": "New York - Grand Central Circuit",
     "road": 4,
-    "time": 915169
+    "time": 914800
   },
   "-607715522": {
     "name": "New York - Grand Central Circuit Reverse",
     "road": 4,
-    "time": 914117
+    "time": 914800
   },
   "-629007892": {
     "name": "New York - Hudson Roll",
     "road": 3,
-    "time": 684316
+    "time": 726397
   },
   "-1340600634": {
     "name": "New York - Knickerbocker",
     "road": 4,
-    "time": 146145
+    "time": 187426
   },
   "2001106885": {
     "name": "New York - Knickerbocker Reverse",
     "road": 4,
-    "time": 190641
+    "time": 173759
   },
   "-1872187942": {
     "name": "New York - LaGuardia Loop",
     "road": 4,
-    "time": 915087
+    "time": 914759
   },
   "-520963945": {
     "name": "New York - LaGuardia Loop Reverse",
     "road": 4,
-    "time": 914393
+    "time": 914832
   },
   "5103974": {
     "name": "New York - Lady Liberty",
     "road": 4,
-    "time": 215549
+    "time": 143799
   },
   "-421989162": {
     "name": "New York - Mighty Metropolitan",
     "road": 4,
-    "time": 161900
+    "time": 204302
   },
   "-1922084092": {
     "name": "New York - NYC KOM After Party",
@@ -497,57 +497,57 @@
   "1919980508": {
     "name": "New York - Park Perimeter Loop",
     "road": 4,
-    "time": 157278
+    "time": 203930
   },
   "-2092357466": {
     "name": "New York - Park Perimeter Reverse",
     "road": 4,
-    "time": 173442
+    "time": 159715
   },
   "1378559127": {
     "name": "New York - Park To Peak",
     "road": 3,
-    "time": 632077
+    "time": 619659
   },
   "-1216301327": {
     "name": "New York - Rising Empire",
     "road": 4,
-    "time": 140761
+    "time": 201322
   },
   "-1704397990": {
     "name": "New York - Shuman Trail Loop",
     "road": 3,
-    "time": 643043
+    "time": 565004
   },
   "274775181": {
     "name": "New York - Shuman Trail Reverse",
     "road": 3,
-    "time": 675557
+    "time": 695622
   },
   "-697027596": {
     "name": "New York - The 6 Train",
     "road": 4,
-    "time": 223169
+    "time": 173716
   },
   "274639515": {
     "name": "New York - The 6 Train Reverse",
     "road": 4,
-    "time": 190188
+    "time": 200309
   },
   "1732356505": {
     "name": "New York - The Highline",
     "road": 24,
-    "time": 556294
+    "time": 554285
   },
   "1763213625": {
     "name": "New York - The Highline Reverse",
     "road": 24,
-    "time": 551875
+    "time": 541266
   },
   "-930393161": {
     "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es",
     "road": 0,
-    "time": 486716
+    "time": 485823
   },
   "-1476431023": {
     "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es Run",
@@ -567,12 +567,12 @@
   "-2098947784": {
     "name": "Richmond - 2015 Worlds Course",
     "road": 0,
-    "time": 997233
+    "time": 996995
   },
   "1545087483": {
     "name": "Richmond - Cobbled Climbs",
     "road": 0,
-    "time": 998016
+    "time": 996982
   },
   "-100615025": {
     "name": "Richmond - Cobbled Climbs Reverse",
@@ -602,7 +602,7 @@
   "948831673": {
     "name": "Richmond - Richmond Rollercoaster",
     "road": 0,
-    "time": 209369
+    "time": 208064
   },
   "1638640398": {
     "name": "Richmond - The Fan Flats",
@@ -1242,12 +1242,12 @@
   "2007026433": {
     "name": "Yorkshire - 2019 Worlds Harrogate Circuit",
     "road": 0,
-    "time": 5266
+    "time": 5069
   },
   "1233527301": {
     "name": "Yorkshire - Duchy Estate",
     "road": 0,
-    "time": 720647
+    "time": 718670
   },
   "620436060": {
     "name": "Yorkshire - Harrogate Circuit Reverse",
@@ -1257,12 +1257,12 @@
   "-1287700625": {
     "name": "Yorkshire - Queen's Highway",
     "road": 0,
-    "time": 718245
+    "time": 718733
   },
   "87631443": {
     "name": "Yorkshire - Queen's Highway After Party",
     "road": 0,
-    "time": 717759
+    "time": 707031
   },
   "-416671431": {
     "name": "Yorkshire - Queen's Highway Run",

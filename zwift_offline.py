@@ -1775,7 +1775,7 @@ def update_entitlements(profile):
     e.id = -1
     e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
     if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR) or os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
-        entitlements = list(range(1687, 1853))
+        entitlements = list(range(1687, 1861))
         if os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
             entitlements.extend(list(range(1, 1687)))
         for entitlement in entitlements:

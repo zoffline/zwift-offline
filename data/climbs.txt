@@ -84,6 +84,10 @@
     "road": "10038"
   },
   {
+    "name": "Hardknott Pass (3.6 km / 275 m)",
+    "road": "10040"
+  },
+  {
     "name": "Isola 2000 (18.9 km / 1145 m)",
     "road": "10030"
   },

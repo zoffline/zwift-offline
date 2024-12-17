@@ -54,6 +54,7 @@
     },
     {
       "name": "game_1_18_holiday_mode",
+      "value": true,
       "values": {}
     },
     {
@@ -173,7 +174,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride"
           }
         }
       }
@@ -258,11 +259,6 @@
     },
     {
       "name": "game_1_34_use_a_memory_pool_for_network_bikes",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_39_0_blewin10lib_connection_fix",
       "value": true,
       "values": {}
     },
@@ -1038,10 +1034,10 @@
             "boolValue": false
           },
           "enabledForEvents": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForJapan": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForRaces": {
             "boolValue": false
@@ -1233,10 +1229,6 @@
       "values": {}
     },
     {
-      "name": "game_1_74_0_robopacer_10_year_anniversary",
-      "values": {}
-    },
-    {
       "name": "game_1_74_intersection_level_lock_override_by_route",
       "value": true,
       "values": {}
@@ -1390,6 +1382,15 @@
       "values": {}
     },
     {
+      "name": "game_1_79_category_enforcement_event_join",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_79_ppb",
+      "values": {}
+    },
+    {
       "name": "game_1_79_trigger_change",
       "values": {
         "fields": {
@@ -1401,6 +1402,19 @@
     },
     {
       "name": "game_1_79_tts_alp",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_80_campaign_tabs",
+      "values": {}
+    },
+    {
+      "name": "game_1_80_new_route_time_estimate",
+      "values": {}
+    },
+    {
+      "name": "game_1_80_vesuvius",
       "value": true,
       "values": {}
     },
@@ -1528,7 +1542,12 @@
       "values": {}
     },
     {
+      "name": "game_android_improved_ram_detection",
+      "values": {}
+    },
+    {
       "name": "game_android_skip_copy_from_apk",
+      "value": true,
       "values": {}
     },
     {
@@ -1624,7 +1643,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "135832"
+            "stringValue": "david.brickhill.20241213140846"
           },
           "canary_test": {
             "boolValue": true
@@ -1637,6 +1656,9 @@
           },
           "formatted_api": {
             "stringValue": "api/assetcms/delivery/tenant/{tenant}/static/asset/{asset_type}/{path_root}/{path}"
+          },
+          "gocatgo": {
+            "boolValue": true
           },
           "loose_files": {
             "boolValue": false
@@ -1699,10 +1721,10 @@
             "numberValue": 1.5
           },
           "minimap_approved_worlds_list": {
-            "stringValue": ""
+            "stringValue": "1,2,3,4,5,6,7,8,9,10,11,13"
           },
           "minimap_use_approved_worlds": {
-            "boolValue": false
+            "boolValue": true
           },
           "minimap_use_only_approved_routes": {
             "boolValue": false
@@ -1732,6 +1754,10 @@
       "values": {}
     },
     {
+      "name": "game_rideshare",
+      "values": {}
+    },
+    {
       "name": "game_road_graph_in_game",
       "values": {}
     },
@@ -1752,6 +1778,10 @@
     },
     {
       "name": "game_tdz_2025_package",
+      "values": {}
+    },
+    {
+      "name": "game_tdz_2025_package_fw",
       "values": {}
     },
     {
@@ -1836,6 +1866,10 @@
     },
     {
       "name": "game_would_block_manager",
+      "values": {}
+    },
+    {
+      "name": "game_xert_integration",
       "values": {}
     },
     {

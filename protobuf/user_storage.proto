@@ -17,6 +17,8 @@ message GameSettings {
     optional int32 power_meter_slot1 = 5;
     optional int32 power_meter_slot2 = 6;
     optional int32 power_meter_slot3 = 7;
+    optional int32 f9 = 9;
+    optional float screen_shake_effect = 10;
 }
 
 message GarageItemLastSelected {

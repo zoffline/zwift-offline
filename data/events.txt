@@ -72,35 +72,35 @@
   {
     "name": "London - Greater London Loop Reverse",
     "route": 474781994,
-    "distance": 21153.9,
+    "distance": 21151.1,
     "course": 7,
     "sport": 0
   },
   {
     "name": "London - Greatest London Loop Reverse",
     "route": 3976402826,
-    "distance": 25845.7,
+    "distance": 25842.7,
     "course": 7,
     "sport": 0
   },
   {
     "name": "London - Keith Hill After Party",
     "route": 3569674525,
-    "distance": 36652.6,
+    "distance": 36649.7,
     "course": 7,
     "sport": 0
   },
   {
     "name": "London - Leith Hill After Party",
     "route": 1230300449,
-    "distance": 42007.5,
+    "distance": 42004.8,
     "course": 7,
     "sport": 0
   },
   {
     "name": "London 8 Reverse",
     "route": 2165880404,
-    "distance": 20465.9,
+    "distance": 20463.3,
     "course": 7,
     "sport": 0
   },
@@ -114,7 +114,7 @@
   {
     "name": "London Loop Reverse",
     "route": 1788889233,
-    "distance": 15008.7,
+    "distance": 15006.1,
     "course": 7,
     "sport": 0
   },
@@ -149,21 +149,21 @@
   {
     "name": "New York - Grand Central Circuit Reverse",
     "route": 3687251774,
-    "distance": 9267.6,
+    "distance": 9213.2,
     "course": 8,
     "sport": 0
   },
   {
     "name": "New York - LaGuardia Loop",
     "route": 2422779354,
-    "distance": 4268.7,
+    "distance": 4213.4,
     "course": 8,
     "sport": 0
   },
   {
     "name": "New York - LaGuardia Loop Reverse",
     "route": 3774003351,
-    "distance": 5236.9,
+    "distance": 5146.9,
     "course": 8,
     "sport": 0
   },
