@@ -194,6 +194,11 @@
     "road": 7,
     "time": 866015
   },
+  "-1044062965": {
+    "name": "London - London Uprising",
+    "road": 7,
+    "time": 876327
+  },
   "-587176267": {
     "name": "London - Surrey Hills",
     "road": 7,
@@ -218,6 +223,11 @@
     "name": "London - Triple Loops",
     "road": 7,
     "time": 809061
+  },
+  "938096831": {
+    "name": "London - ZG25 Climb Champs",
+    "road": 7,
+    "time": 877147
   },
   "1760877317": {
     "name": "Makuri Islands - Bridges and Boardwalks",
@@ -303,6 +313,11 @@
     "name": "Makuri Islands - Makuri 40",
     "road": 0,
     "time": 909209
+  },
+  "186601870": {
+    "name": "Makuri Islands - Makuri Madness",
+    "road": 4,
+    "time": 862791
   },
   "-1367316000": {
     "name": "Makuri Islands - Makuri Pretzel",
@@ -654,6 +669,11 @@
     "road": 2,
     "time": 251800
   },
+  "172610229": {
+    "name": "Scotland - Scotland Smash",
+    "road": 9,
+    "time": 1001990
+  },
   "-632261715": {
     "name": "Scotland - The Muckle Yin",
     "road": 9,
@@ -748,6 +768,11 @@
     "name": "Watopia - Deca Dash",
     "road": 192,
     "time": 731769
+  },
+  "1675611962": {
+    "name": "Watopia - Downtown Eruption",
+    "road": 0,
+    "time": 12280
   },
   "5745690": {
     "name": "Watopia - Downtown Titans",
@@ -1203,6 +1228,11 @@
     "name": "Watopia - Whole Lotta Lava",
     "road": 23,
     "time": 791288
+  },
+  "1724903700": {
+    "name": "Watopia - ZG25 Queen",
+    "road": 0,
+    "time": 985893
   },
   "-673805084": {
     "name": "Watopia - Zwift Bambino Fondo",

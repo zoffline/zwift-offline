@@ -21,13 +21,6 @@
     "sport": 0
   },
   {
-    "name": "France - Petite Douleur",
-    "route": 4159356920,
-    "distance": 24774.1,
-    "course": 14,
-    "sport": 0
-  },
-  {
     "name": "France Classic Fondo",
     "route": 2136907048,
     "distance": 146423.6,
@@ -37,14 +30,14 @@
   {
     "name": "Gravel Mountain",
     "route": 3687150686,
-    "distance": 5180.9,
+    "distance": 5360.2,
     "course": 16,
     "sport": 0
   },
   {
     "name": "Gravel Mountain Reverse",
     "route": 2956533021,
-    "distance": 5180.9,
+    "distance": 5220.9,
     "course": 16,
     "sport": 0
   },
@@ -98,16 +91,16 @@
     "sport": 0
   },
   {
-    "name": "London 8 Reverse",
-    "route": 2165880404,
-    "distance": 20463.3,
+    "name": "London - ZG25 Climb Champs",
+    "route": 938096831,
+    "distance": 4994.2,
     "course": 7,
     "sport": 0
   },
   {
-    "name": "London Flat",
-    "route": 3262665065,
-    "distance": 12378.2,
+    "name": "London 8 Reverse",
+    "route": 2165880404,
+    "distance": 20463.3,
     "course": 7,
     "sport": 0
   },
@@ -119,16 +112,23 @@
     "sport": 0
   },
   {
-    "name": "Makuri Islands - Neokyo Crit Course",
-    "route": 1127056801,
-    "distance": 4660.0,
+    "name": "London Uprising",
+    "route": 3250904331,
+    "distance": 20911.7,
+    "course": 7,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Makuri Madness",
+    "route": 186601870,
+    "distance": 16085.9,
     "course": 13,
     "sport": 0
   },
   {
-    "name": "Makuri Islands - Shisa Shakedown",
-    "route": 3330165223,
-    "distance": 53480.8,
+    "name": "Makuri Islands - Neokyo Crit Course",
+    "route": 1127056801,
+    "distance": 4660.0,
     "course": 13,
     "sport": 0
   },
@@ -164,13 +164,6 @@
     "name": "New York - LaGuardia Loop Reverse",
     "route": 3774003351,
     "distance": 5146.9,
-    "course": 8,
-    "sport": 0
-  },
-  {
-    "name": "New York - NYC KOM After Party",
-    "route": 2372883204,
-    "distance": 37003.6,
     "course": 8,
     "sport": 0
   },
@@ -224,9 +217,9 @@
     "sport": 0
   },
   {
-    "name": "Scotland - Outer Scotland",
-    "route": 2826340040,
-    "distance": 11361.5,
+    "name": "Scotland Smash",
+    "route": 172610229,
+    "distance": 18069.2,
     "course": 17,
     "sport": 0
   },
@@ -243,6 +236,13 @@
     "distance": 7501.9,
     "course": 6,
     "sport": 1
+  },
+  {
+    "name": "Watopia - Downtown Eruption",
+    "route": 1675611962,
+    "distance": 19939.5,
+    "course": 6,
+    "sport": 0
   },
   {
     "name": "Watopia - Flat Route Reverse",
@@ -329,13 +329,6 @@
     "sport": 1
   },
   {
-    "name": "Watopia - The Magnificent 8",
-    "route": 2207442179,
-    "distance": 29137.0,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Three Sisters Reverse",
     "route": 4263172118,
     "distance": 45892.8,
@@ -360,6 +353,13 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - ZG25 Queen",
+    "route": 1724903700,
+    "distance": 44803.1,
     "course": 6,
     "sport": 0
   },
@@ -409,13 +409,6 @@
     "name": "Yorkshire - Harrogate Circuit Reverse",
     "route": 620436060,
     "distance": 13855.2,
-    "course": 11,
-    "sport": 0
-  },
-  {
-    "name": "Yorkshire - Queen's Highway After Party",
-    "route": 87631443,
-    "distance": 19912.8,
     "course": 11,
     "sport": 0
   },

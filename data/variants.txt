@@ -63,11 +63,6 @@
       "values": {}
     },
     {
-      "name": "game_1_21_perf_analytics",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_23_workout_auto_pause",
       "values": {
         "fields": {
@@ -89,32 +84,6 @@
     {
       "name": "game_1_26_event_survey",
       "values": {}
-    },
-    {
-      "name": "game_1_27_atv_remote_gestures",
-      "value": true,
-      "values": {
-        "fields": {
-          "ATVFriction": {
-            "numberValue": 0.9
-          },
-          "ATVMoveSensitivity": {
-            "varintValue": "5"
-          },
-          "ATVPopDelay": {
-            "numberValue": 0.15
-          },
-          "ATVPopDist": {
-            "numberValue": 175.0
-          },
-          "ATVPopInitDelay": {
-            "numberValue": 0.22
-          },
-          "ATVPopInitDist": {
-            "numberValue": 250.0
-          }
-        }
-      }
     },
     {
       "name": "game_1_27_dynamic_campaigns_filter",
@@ -174,7 +143,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride,zwiftgames2025"
           }
         }
       }
@@ -215,23 +184,7 @@
       }
     },
     {
-      "name": "game_1_34_bluetooth_device_persistence",
-      "values": {}
-    },
-    {
       "name": "game_1_34_cache_distance_to_camera",
-      "values": {}
-    },
-    {
-      "name": "game_1_34_cached_ble_service_filter",
-      "values": {}
-    },
-    {
-      "name": "game_1_34_ct_auto_pair_check",
-      "values": {}
-    },
-    {
-      "name": "game_1_34_do_not_duplicate_connection_requests",
       "values": {}
     },
     {
@@ -247,11 +200,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_34_monitor_zc_ble_bridge_scanning",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_34_save_device_profiles_on_all_platforms",
@@ -302,11 +250,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_39_tts",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_40_steering_params",
@@ -1034,7 +977,7 @@
             "boolValue": false
           },
           "enabledForEvents": {
-            "boolValue": true
+            "boolValue": false
           },
           "enabledForJapan": {
             "boolValue": true
@@ -1053,11 +996,6 @@
     },
     {
       "name": "game_1_66_change_pause_title_to_menu",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_66_enqueue_next_up",
       "value": true,
       "values": {}
     },
@@ -1123,17 +1061,6 @@
     {
       "name": "game_1_68_ble_discovery_analytics",
       "values": {}
-    },
-    {
-      "name": "game_1_68_challenge_card",
-      "value": true,
-      "values": {
-        "fields": {
-          "assign_default_challenge": {
-            "boolValue": true
-          }
-        }
-      }
     },
     {
       "name": "game_1_69_fix_riding_offset",
@@ -1207,11 +1134,6 @@
     },
     {
       "name": "game_1_71_solid_steering_collision",
-      "values": {}
-    },
-    {
-      "name": "game_1_72_event_expired_modal_zui",
-      "value": true,
       "values": {}
     },
     {
@@ -1407,16 +1329,31 @@
     },
     {
       "name": "game_1_80_campaign_tabs",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_80_new_route_time_estimate",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_80_vesuvius",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_1_81_0_big_spin_2025",
+      "values": {
+        "fields": {
+          "date_end": {
+            "varintValue": "1744009199"
+          },
+          "date_start": {
+            "varintValue": "1741017600"
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1445,7 +1382,6 @@
     },
     {
       "name": "game_ClassyJazzFlute_2",
-      "value": true,
       "values": {}
     },
     {
@@ -1586,7 +1522,7 @@
             "boolValue": true
           },
           "endj": {
-            "varintValue": "1735718399"
+            "varintValue": "4890105860"
           },
           "intj": {
             "boolValue": true
@@ -1762,6 +1698,10 @@
       "values": {}
     },
     {
+      "name": "game_sentry_log_upload",
+      "values": {}
+    },
+    {
       "name": "game_settings_service",
       "value": true,
       "values": {}
@@ -1777,11 +1717,17 @@
       "values": {}
     },
     {
+      "name": "game_tbs_2025_package",
+      "values": {}
+    },
+    {
       "name": "game_tdz_2025_package",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_tdz_2025_package_fw",
+      "value": true,
       "values": {}
     },
     {
