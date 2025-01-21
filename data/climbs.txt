@@ -144,6 +144,10 @@
     "road": "10027"
   },
   {
+    "name": "Poggio (4.3 km / 136 m)",
+    "road": "10041"
+  },
+  {
     "name": "Puy de Dome (13 km / 913 m)",
     "road": "10006"
   },

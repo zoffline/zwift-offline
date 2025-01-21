@@ -973,6 +973,9 @@
       "value": true,
       "values": {
         "fields": {
+          "backRepulsionPercent": {
+            "numberValue": 0.8
+          },
           "enabledForAllWorlds": {
             "boolValue": false
           },
@@ -1157,6 +1160,7 @@
     },
     {
       "name": "game_1_74_sku_enhance",
+      "value": true,
       "values": {}
     },
     {
@@ -1192,6 +1196,7 @@
     },
     {
       "name": "game_1_75_sweeper_check",
+      "value": true,
       "values": {}
     },
     {
@@ -1213,13 +1218,16 @@
           "EnableLeakPrevention": {
             "boolValue": false
           },
+          "EnableMountainBikeOffsetChange": {
+            "boolValue": false
+          },
           "LoggingRate": {
             "varintValue": "0"
           },
           "bCDAUpdate": {
             "boolValue": false
           },
-          "excluded_bikes": {
+          "excluded_accessories": {
             "stringValue": ""
           }
         }

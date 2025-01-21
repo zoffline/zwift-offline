@@ -1775,9 +1775,10 @@ def update_entitlements(profile):
     e.id = -1
     e.status = profile_pb2.ProfileEntitlement.ProfileEntitlementStatus.ACTIVE
     if os.path.isfile('%s/unlock_entitlements.txt' % STORAGE_DIR) or os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
-        entitlements = list(range(1687, 1871))
+        ent = json.load(open('%s/data/entitlements.txt' % SCRIPT_DIR))
+        entitlements = list(range(ent['first'], ent['last'] + 1))
         if os.path.isfile('%s/unlock_all_equipment.txt' % STORAGE_DIR):
-            entitlements.extend(list(range(1, 1687)))
+            entitlements.extend(list(range(1, ent['first'])))
         for entitlement in entitlements:
             if not any(e.id == entitlement for e in profile.entitlements):
                 e = profile.entitlements.add()
