@@ -1,5 +1,5 @@
 body {
-    background-image: url('https://cdn.zwift.com/style/background.jpg');
+    background-image: url('/style/background.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     overflow: hidden;
