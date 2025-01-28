@@ -3592,17 +3592,20 @@ def relay_worlds_leave(server_realm):
     return '{"worldtime":%ld}' % world_time()
 
 
-@app.route('/experimentation/v1/variant', methods=['POST'])
-@app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
-def experimentation_v1_variant():
-    req = variants_pb2.FeatureRequest()
-    req.ParseFromString(request.stream.read())
+def load_variants(file):
+    vs = variants_pb2.FeatureResponse()
+    try:
+        Parse(open(file).read(), vs)
+    except Exception as exc:
+        logging.warning("load_variants: %s" % repr(exc))
     variants = {}
-    with open(os.path.join(SCRIPT_DIR, "data", "variants.txt")) as f:
-        vs = variants_pb2.FeatureResponse()
-        Parse(f.read(), vs)
-        for v in vs.variants:
-            variants[v.name] = v
+    for v in vs.variants:
+        variants[v.name] = v
+    return variants
+
+def create_variants_response(request, variants):
+    req = variants_pb2.FeatureRequest()
+    req.ParseFromString(request)
     response = variants_pb2.FeatureResponse()
     for params in req.params:
         for param in params.param:
@@ -3611,6 +3614,21 @@ def experimentation_v1_variant():
             else:
                 logger.info("Unknown feature: " + param)
     return response.SerializeToString(), 200
+
+@app.route('/experimentation/v1/variant', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def experimentation_v1_variant():
+    variants = load_variants(os.path.join(SCRIPT_DIR, "data", "variants.txt"))
+    override = os.path.join(STORAGE_DIR, str(current_user.player_id), "variants.txt")
+    if os.path.isfile(override):
+        variants.update(load_variants(override))
+    return create_variants_response(request.stream.read(), variants)
+
+@app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
+def experimentation_v1_machine_id_variant():
+    variants = load_variants(os.path.join(SCRIPT_DIR, "data", "variants.txt"))
+    return create_variants_response(request.stream.read(), variants)
 
 def get_profile_saved_game_achiev2_40_bytes():
     profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, current_user.player_id)
