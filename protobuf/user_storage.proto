@@ -12,13 +12,13 @@ message Attributes {
 
 message GameSettings {
     optional float f2 = 2;
-    optional int32 leaderboards = 3;
+    optional int32 minimal_leaderboards = 3;
     optional int32 power_meter_slot0 = 4;
     optional int32 power_meter_slot1 = 5;
     optional int32 power_meter_slot2 = 6;
     optional int32 power_meter_slot3 = 7;
-    optional int32 f9 = 9;
-    optional float screen_shake_effect = 10;
+    optional int32 climb_graph_sensitivity = 9;
+    optional float screen_shake_scale = 10;
 }
 
 message GarageItemLastSelected {

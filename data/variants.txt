@@ -5,7 +5,13 @@
       "values": {
         "fields": {
           "bUseDriveTrainEfficiency": {
-            "boolValue": true
+            "boolValue": false
+          },
+          "bUseHelmetCDA": {
+            "boolValue": false
+          },
+          "bUseSockCDA": {
+            "boolValue": false
           }
         }
       }
@@ -797,29 +803,6 @@
       "values": {}
     },
     {
-      "name": "game_1_56_home_screen_linear_scaling",
-      "value": true,
-      "values": {
-        "fields": {
-          "large_layout_container_min_width": {
-            "varintValue": "1600"
-          },
-          "large_layout_devices": {
-            "stringValue": "Desktop"
-          },
-          "large_layout_scale_factor": {
-            "numberValue": 1.25
-          },
-          "small_layout_scale_factor": {
-            "numberValue": 1.0
-          },
-          "viewbox_width_calculation_mode": {
-            "stringValue": "Device"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_56_push_tutorial_on_home_screen",
       "values": {
         "fields": {
@@ -980,7 +963,7 @@
             "boolValue": false
           },
           "enabledForEvents": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForJapan": {
             "boolValue": true
@@ -1050,16 +1033,7 @@
     },
     {
       "name": "game_1_68_0_tdffaz_alpe_spinner",
-      "values": {
-        "fields": {
-          "date_end": {
-            "varintValue": "1725173999"
-          },
-          "date_start": {
-            "varintValue": "1719435840"
-          }
-        }
-      }
+      "values": {}
     },
     {
       "name": "game_1_68_ble_discovery_analytics",
@@ -1215,19 +1189,46 @@
           "EnableBikeUnlocks": {
             "boolValue": true
           },
+          "EnableCDAUpdate": {
+            "boolValue": false
+          },
+          "EnableHudProgressUpdates": {
+            "boolValue": true
+          },
           "EnableLeakPrevention": {
             "boolValue": false
           },
           "EnableMountainBikeOffsetChange": {
             "boolValue": false
           },
+          "EnableWeightUpdate": {
+            "boolValue": false
+          },
+          "Feet_Interval": {
+            "varintValue": "1000"
+          },
+          "Hours_Interval": {
+            "varintValue": "1"
+          },
+          "Kilometer_Interval": {
+            "varintValue": "25"
+          },
           "LoggingRate": {
             "varintValue": "0"
+          },
+          "Meters_Interval": {
+            "varintValue": "500"
+          },
+          "Miles_Interval": {
+            "varintValue": "25"
           },
           "bCDAUpdate": {
             "boolValue": false
           },
-          "excluded_accessories": {
+          "excluded_cda": {
+            "stringValue": ""
+          },
+          "excluded_weight": {
             "stringValue": ""
           }
         }
@@ -1322,6 +1323,7 @@
     },
     {
       "name": "game_1_79_trigger_change",
+      "value": true,
       "values": {
         "fields": {
           "use_only_new_processing": {
@@ -1343,7 +1345,13 @@
     {
       "name": "game_1_80_new_route_time_estimate",
       "value": true,
-      "values": {}
+      "values": {
+        "fields": {
+          "default_bike_weight_kg": {
+            "numberValue": 7.0
+          }
+        }
+      }
     },
     {
       "name": "game_1_80_vesuvius",
@@ -1359,9 +1367,68 @@
           },
           "date_start": {
             "varintValue": "1741017600"
+          },
+          "the_big_spin_2025_stage_1_end_date": {
+            "varintValue": "1744036200"
+          },
+          "the_big_spin_2025_stage_1_start_date": {
+            "varintValue": "1741017600"
+          },
+          "the_big_spin_2025_stage_2_end_date": {
+            "varintValue": "1744036200"
+          },
+          "the_big_spin_2025_stage_2_start_date": {
+            "varintValue": "1741618800"
+          },
+          "the_big_spin_2025_stage_3_end_date": {
+            "varintValue": "1744036200"
+          },
+          "the_big_spin_2025_stage_3_start_date": {
+            "varintValue": "1742223600"
+          },
+          "the_big_spin_2025_stage_4_end_date": {
+            "varintValue": "1744036200"
+          },
+          "the_big_spin_2025_stage_4_start_date": {
+            "varintValue": "1742828400"
           }
         }
       }
+    },
+    {
+      "name": "game_1_83_climb_portal_for_you",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_83_experiment_bc2",
+      "values": {}
+    },
+    {
+      "name": "game_1_83_streaks_backend_migration",
+      "values": {
+        "fields": {
+          "ContinueToUpdatePlayerProfileWithStreaks": {
+            "boolValue": true
+          },
+          "GetUserStreaksDataFromBackend": {
+            "boolValue": false
+          },
+          "IgnoreNonQualifyingAndDeletedActivities": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_83_training_partner_post_workout_survey",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_83_unsched_tapi_workout",
+      "value": true,
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1380,6 +1447,12 @@
         "fields": {
           "LoggingRate": {
             "varintValue": "0"
+          },
+          "wkg_cap_per_hour": {
+            "numberValue": 4.0
+          },
+          "wkg_cap_per_session": {
+            "numberValue": 15.0
           }
         }
       }
@@ -1477,6 +1550,9 @@
           },
           "UploadTimeout": {
             "varintValue": "20"
+          },
+          "ram_clips": {
+            "boolValue": false
           }
         }
       }
@@ -1576,6 +1652,7 @@
     },
     {
       "name": "game_disable_cached_subgroup_protobuf",
+      "value": true,
       "values": {}
     },
     {
@@ -1653,7 +1730,7 @@
             "varintValue": "0"
           },
           "climb_graph_sensitivity": {
-            "boolValue": false
+            "boolValue": true
           },
           "dark_mode_color_scheme": {
             "boolValue": true
@@ -1686,6 +1763,16 @@
       }
     },
     {
+      "name": "game_hud_phase_2",
+      "values": {
+        "fields": {
+          "cycling_splits": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_lauterbrunnen",
       "values": {}
     },
@@ -1695,10 +1782,6 @@
     },
     {
       "name": "game_nb_world_load",
-      "values": {}
-    },
-    {
-      "name": "game_rideshare",
       "values": {}
     },
     {
@@ -1843,6 +1926,10 @@
     {
       "name": "game_zp_create_full_trainer_on_swap",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_zwiftcast",
       "values": {}
     },
     {
