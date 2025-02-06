@@ -1195,6 +1195,12 @@
           "EnableHudProgressUpdates": {
             "boolValue": true
           },
+          "EnableKeepBankedProgress_UntilEndOfSession": {
+            "boolValue": true
+          },
+          "EnableKeepBankedProgress_UntilNextRide": {
+            "boolValue": true
+          },
           "EnableLeakPrevention": {
             "boolValue": false
           },
@@ -1221,9 +1227,6 @@
           },
           "Miles_Interval": {
             "varintValue": "25"
-          },
-          "bCDAUpdate": {
-            "boolValue": false
           },
           "excluded_cda": {
             "stringValue": ""
