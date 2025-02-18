@@ -155,10 +155,6 @@
       }
     },
     {
-      "name": "game_1_30_enable_scale_setting_for_mobile",
-      "values": {}
-    },
-    {
       "name": "game_1_31_fquery",
       "value": true,
       "values": {}
@@ -891,7 +887,7 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "home_page_hero_carousel"
+            "stringValue": "home_page_hero_carousel_prod"
           }
         }
       }
@@ -1029,10 +1025,6 @@
     {
       "name": "game_1_67_tp_cards",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_68_0_tdffaz_alpe_spinner",
       "values": {}
     },
     {
@@ -1207,6 +1199,9 @@
           "EnableMountainBikeOffsetChange": {
             "boolValue": false
           },
+          "EnableTTCDA": {
+            "boolValue": false
+          },
           "EnableWeightUpdate": {
             "boolValue": false
           },
@@ -1227,6 +1222,9 @@
           },
           "Miles_Interval": {
             "varintValue": "25"
+          },
+          "WheelWeightOffset": {
+            "numberValue": 200.0
           },
           "excluded_cda": {
             "stringValue": ""
@@ -1399,6 +1397,10 @@
       }
     },
     {
+      "name": "game_1_82_event_series_quest_card",
+      "values": {}
+    },
+    {
       "name": "game_1_83_climb_portal_for_you",
       "value": true,
       "values": {}
@@ -1430,6 +1432,15 @@
     },
     {
       "name": "game_1_83_unsched_tapi_workout",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_84_badges_v2",
+      "values": {}
+    },
+    {
+      "name": "game_1_84_garage_badge",
       "value": true,
       "values": {}
     },
@@ -1707,7 +1718,13 @@
     },
     {
       "name": "game_end_game_session",
-      "values": {}
+      "values": {
+        "fields": {
+          "pump_network_rpc_idlewait": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_fireworks",
@@ -1796,6 +1813,10 @@
       "values": {}
     },
     {
+      "name": "game_sentry_tracing",
+      "values": {}
+    },
+    {
       "name": "game_settings_service",
       "value": true,
       "values": {}
@@ -1809,6 +1830,19 @@
       "name": "game_st3_swap",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_structured_events_service",
+      "values": {
+        "fields": {
+          "batch_time_ms": {
+            "varintValue": "1000"
+          },
+          "hardware_info": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_tbs_2025_package",
@@ -1945,10 +1979,6 @@
           }
         }
       }
-    },
-    {
-      "name": "gfx_doflush",
-      "values": {}
     },
     {
       "name": "gfx_drawinstanced",

@@ -84,7 +84,7 @@
     "road": "10038"
   },
   {
-    "name": "Hardknott Pass (3.6 km / 275 m)",
+    "name": "Hardknott Pass (2.7 km / 306 m)",
     "road": "10040"
   },
   {

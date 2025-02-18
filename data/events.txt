@@ -112,20 +112,6 @@
     "sport": 0
   },
   {
-    "name": "London Uprising",
-    "route": 3250904331,
-    "distance": 20911.7,
-    "course": 7,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Makuri Madness",
-    "route": 186601870,
-    "distance": 16085.9,
-    "course": 13,
-    "sport": 0
-  },
-  {
     "name": "Makuri Islands - Neokyo Crit Course",
     "route": 1127056801,
     "distance": 4660.0,
@@ -217,13 +203,6 @@
     "sport": 0
   },
   {
-    "name": "Scotland Smash",
-    "route": 172610229,
-    "distance": 18069.2,
-    "course": 17,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Big Loop Reverse",
     "route": 4107844490,
     "distance": 42819.2,
@@ -236,20 +215,6 @@
     "distance": 7501.9,
     "course": 6,
     "sport": 1
-  },
-  {
-    "name": "Watopia - Danger Noodle",
-    "route": 2888820995,
-    "distance": 32263.5,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Downtown Eruption",
-    "route": 1675611962,
-    "distance": 19939.5,
-    "course": 6,
-    "sport": 0
   },
   {
     "name": "Watopia - Flat Route Reverse",
@@ -271,6 +236,13 @@
     "distance": 10384.1,
     "course": 6,
     "sport": 1
+  },
+  {
+    "name": "Watopia - Hilltop Hustle",
+    "route": 3961473046,
+    "distance": 16303.3,
+    "course": 6,
+    "sport": 0
   },
   {
     "name": "Watopia - Hilly Route Reverse",
@@ -360,13 +332,6 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - ZG25 Queen",
-    "route": 1724903700,
-    "distance": 44803.5,
     "course": 6,
     "sport": 0
   },
