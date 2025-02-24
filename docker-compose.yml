@@ -1,19 +1,18 @@
-version: "3.6"
 services:
     zoffline:
-         image: zoffline/zoffline:latest
-         build:
-             context: .
-             dockerfile: Dockerfile
-         container_name: zoffline
-         environment:
+        image: zoffline/zoffline:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: zoffline
+        environment:
             - TZ=Europe/London
-         volumes:
+        volumes:
             - ./storage/:/usr/src/app/zwift-offline/storage
-         ports:
+        ports:
             - 80:80
             - 443:443
             - 3024:3024/udp
             - 3025:3025
             - 53:53/udp
-         restart: unless-stopped
+        restart: unless-stopped
