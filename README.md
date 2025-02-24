@@ -11,7 +11,7 @@ Additionally, zoffline's launcher allows selecting a specific map to ride on wit
 Setting up zoffline requires two primary steps. First, zoffline must be installed and run on a system before running Zwift (either on the system running Zwift or on another locally networked system).  Second, Zwift must be configured to use zoffline instead of the official Zwift server.
 
 ### Step 1: Install zoffline
-There are three ways with which to install and run zoffline depending on your platform:
+There are four ways with which to install and run zoffline depending on your platform:
 
 <details><summary>Simplest (Windows only)</summary>
 To install zoffline on Windows:
@@ -65,30 +65,28 @@ zoffline can be installed on the same machine as Zwift or another local machine.
 
 
 <details><summary>Using Docker Compose</summary>
- 
+
 * Install docker-compose
 * Either use the ``docker-compose.yml`` file in this repo which will build from the Dockerfile, or use this example compose file:
-   ```
-  version: "3.3"
+  ``` yaml
   services:
       zoffline:
-           image: zoffline/zoffline:latest
-           container_name: zoffline
-           environment:
+          image: zoffline/zoffline:latest
+          container_name: zoffline
+          environment:
               - TZ=Europe/London
-           volumes:
+          volumes:
               - ./storage/:/usr/src/app/zwift-offline/storage
-           ports:
+          ports:
               - 80:80
               - 443:443
               - 3024:3024/udp
               - 3025:3025
-           restart: unless-stopped    
-   ```
+          restart: unless-stopped
+  ```
   * In the ``volumes`` tag replace ``./storage/`` before the ``:`` with the directory path you want to use as your local zoffline data store.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
-* Start zoffline with:
-  ``docker-compose up -d ``
+* Start zoffline with: ``docker-compose up -d``
 </details>
 
 ### Step 2: Configure Zwift client to use zoffline
@@ -142,11 +140,11 @@ to generate your own certificates and do the same.
   * Download and install ``ZofflineObb.apk`` from [here](https://github.com/Argon2000/ZofflineObbAndroid/releases/latest)
   * Download and install ``app-Github-release.apk`` from [here](https://github.com/x-falcon/Virtual-Hosts/releases/latest)
   * Create a `hosts.txt` file to use with the app (you could use a text editor app or create it online with an online tool such as [this](https://passwordsgenerator.net/text-editor/)). The file must look like this (replace ``<zoffline ip>`` with the IP address of the machine running zoffline):
-  ```
-  <zoffline ip> us-or-rly101.zwift.com
-  <zoffline ip> secure.zwift.com
-  <zoffline ip> cdn.zwift.com
-  ```
+    ```
+    <zoffline ip> us-or-rly101.zwift.com
+    <zoffline ip> secure.zwift.com
+    <zoffline ip> cdn.zwift.com
+    ```
   * Turn off "Private DNS" in Android settings
   * Run "Virtual Hosts" and select the created `hosts.txt` file
   * Optionally, instead of using the "Virtual Hosts" app, you can create a ``fake-dns.txt`` file in the ``storage`` directory and set the "DNS 1" of your phone Wi-Fi connection to the IP address of the PC running zoffline
