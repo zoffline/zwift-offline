@@ -3277,7 +3277,7 @@ def relay_worlds_id_players_id(server_realm, player_id):
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
-    return ""
+    return '', 404
 
 
 @app.route('/relay/worlds/hash-seeds', methods=['GET'])
