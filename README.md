@@ -228,7 +228,6 @@ To obtain your current profile:
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``strava_auth.exe`` obtained from https://github.com/oldnapalm/zoffline-helper/releases/latest in place of ``scripts/strava_auth.py``
 * Open http://localhost:8000/ and authorize.
 * Move the resulting ``strava_token.txt`` (saved in whatever directory you ran ``strava_auth.py`` in) into the ``storage/1`` directory.
-* If testing, ride at least 300 meters, shorter activities won't be uploaded.
 * Automatic screenshots upload is not possible, see [#28](https://github.com/zoffline/zwift-offline/issues/28) for details.
 
 </details>
@@ -241,7 +240,6 @@ To obtain your current profile:
 * Use the "Settings - Garmin" button in the launcher window to enter your credentials (if using Android, access ``https://<zoffline_ip>/garmin/zoffline/``).
 * If your account has multi-factor authentication, run the script ``garmin_auth.py`` and move the resulting ``garth`` folder (saved in whatever directory you ran ``garmin_auth.py`` in) into the ``storage/1`` directory.
   * Or, if using the Windows zoffline.exe version without Python installed you can run ``garmin_auth.exe`` obtained from https://github.com/oldnapalm/zoffline-helper/releases/latest instead.
-* If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
 
@@ -249,7 +247,6 @@ To obtain your current profile:
 
 * Use the "Settings - Intervals" button in the launcher window to enter your credentials (if using Android, access ``https://<zoffline_ip>/intervals/zoffline/``).
 * Copy "Athlete ID" and "API Key" from https://intervals.icu/settings under "Developer Settings".
-* If testing, ride at least 300 meters, shorter activities won't be uploaded.
 
 </details>
 

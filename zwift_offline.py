@@ -2421,11 +2421,6 @@ def api_profiles_activities_id(player_id, activity_id):
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
-    if activity.distanceInMeters < 300:
-        Activity.query.filter_by(id=activity_id).delete()
-        db.session.commit()
-        logout_player(player_id)
-        return response, 200
 
     create_power_curve(player_id, BytesIO(activity.fit))
     save_fit(player_id, '%s - %s' % (activity_id, activity.fit_filename), activity.fit)
