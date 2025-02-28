@@ -370,6 +370,7 @@ To enable support for multiple users perform the steps below:
   channel = 
   welcome_message = 
   help_message = 
+  announce_players = 
   ```
 </details>
 

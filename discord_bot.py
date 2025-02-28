@@ -11,11 +11,12 @@ import zwift_offline
 
 
 class DiscordBot(discord.Client):
-    def __init__(self, intents, channel, welcome_msg, help_msg):
+    def __init__(self, intents, channel, welcome_msg, help_msg, announce):
         discord.Client.__init__(self, intents=intents)
         self.channel_id = channel
         self.welcome_msg = welcome_msg
         self.help_msg = help_msg
+        self.announce = announce
 
     async def on_ready(self):
         self.channel = self.get_channel(self.channel_id)
@@ -49,8 +50,9 @@ class DiscordThread(threading.Thread):
         self.token = self.CONFIG.get(SECTION, 'token')
         self.webhook = self.CONFIG.get(SECTION, 'webhook')
         self.channel = self.CONFIG.getint(SECTION, 'channel')
-        self.welcome_msg = self.CONFIG.get(SECTION, 'welcome_message')
-        self.help_msg = self.CONFIG.get(SECTION, 'help_message')
+        self.welcome_msg = self.CONFIG.get(SECTION, 'welcome_message', fallback='')
+        self.help_msg = self.CONFIG.get(SECTION, 'help_message', fallback='')
+        self.announce = self.CONFIG.getboolean(SECTION, 'announce_players', fallback=False)
 
         self.intents = discord.Intents.default()
         self.intents.members = True
@@ -59,7 +61,7 @@ class DiscordThread(threading.Thread):
         self.start()
 
     async def starter(self):
-        self.discord_bot = DiscordBot(self.intents, self.channel, self.welcome_msg, self.help_msg)
+        self.discord_bot = DiscordBot(self.intents, self.channel, self.welcome_msg, self.help_msg, self.announce)
         await self.discord_bot.start(self.token)
 
     def run(self):
