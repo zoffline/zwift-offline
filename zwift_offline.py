@@ -1362,6 +1362,7 @@ def api_users_login():
     req.ParseFromString(request.stream.read())
     player_id = current_user.player_id
     global_relay[player_id] = Relay(req.key)
+    ghosts_enabled[player_id] = current_user.enable_ghosts
 
     response = login_pb2.LoginResponse()
     response.session_state = 'abc'
@@ -3999,13 +4000,10 @@ def auth_realms_zwift_protocol_openid_connect_token():
             else:
                 return '', 401
         else:  # android login
-            current_user.enable_ghosts = user.enable_ghosts
-            ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
             from flask_login import encode_cookie
             # cookie is not set in request since we just logged in so create it.
             return jsonify(fake_jwt_with_session_cookie(encode_cookie(str(session['_user_id'])))), 200
     else:
-        ghosts_enabled[AnonUser.player_id] = AnonUser.enable_ghosts # to work also on Android
         r = make_response(FAKE_JWT)
         r.mimetype = 'application/json'
         return r
@@ -4030,7 +4028,6 @@ def start_zwift():
     if MULTIPLAYER:
         current_user.enable_ghosts = 'enableghosts' in request.form.keys()
         db.session.commit()
-        ghosts_enabled[current_user.player_id] = current_user.enable_ghosts
     else:
         AnonUser.enable_ghosts = 'enableghosts' in request.form.keys()
         save_option(AnonUser.enable_ghosts, ENABLEGHOSTS_FILE)
