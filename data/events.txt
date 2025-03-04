@@ -294,13 +294,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Tair Dringfa Fechan",
-    "route": 2062126722,
-    "distance": 32064.7,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - That's Amore Reverse",
     "route": 1586193601,
     "distance": 5954.0,
