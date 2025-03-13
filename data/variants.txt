@@ -2,6 +2,7 @@
   "variants": [
     {
       "name": "bikemodifiercalculator_params",
+      "value": true,
       "values": {
         "fields": {
           "bUseDriveTrainEfficiency": {
@@ -11,7 +12,7 @@
             "boolValue": false
           },
           "bUseSockCDA": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -38,6 +39,9 @@
           },
           "is_fitness_score_visible": {
             "boolValue": true
+          },
+          "is_light_theme": {
+            "boolValue": false
           }
         }
       }
@@ -936,13 +940,16 @@
             "numberValue": 0.5
           },
           "manualSteeringExtraHardness": {
-            "numberValue": 1.0
+            "numberValue": 0.0
           },
           "maxDistanceForFavoringCorrectSideInCm": {
             "numberValue": 5.0
           },
+          "pillDistanceScale": {
+            "numberValue": 0.45
+          },
           "pillHardness": {
-            "numberValue": 0.65
+            "numberValue": 0.45
           }
         }
       }
@@ -1088,7 +1095,13 @@
     {
       "name": "game_1_73_ui_scheduler",
       "value": true,
-      "values": {}
+      "values": {
+        "fields": {
+          "bGrantSpinWheelRewardEarly": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_1_74_intersection_level_lock_override_by_route",
@@ -1346,7 +1359,7 @@
             "varintValue": "1744036200"
           },
           "the_big_spin_2025_stage_2_start_date": {
-            "varintValue": "1741662000"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_3_end_date": {
             "varintValue": "1744036200"
@@ -1378,6 +1391,7 @@
     },
     {
       "name": "game_1_83_streaks_backend_migration",
+      "value": true,
       "values": {
         "fields": {
           "ContinueToUpdatePlayerProfileWithStreaks": {
@@ -1459,6 +1473,9 @@
         "fields": {
           "LoggingRate": {
             "varintValue": "2243911942421128"
+          },
+          "factoryTourAnimationSpeedPercent": {
+            "numberValue": 0.6
           },
           "wkg_cap_per_hour": {
             "numberValue": 4.0
@@ -1993,10 +2010,6 @@
     {
       "name": "gfx_framebuffer_srgb",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "gfx_opengl3_1",
       "values": {}
     },
     {

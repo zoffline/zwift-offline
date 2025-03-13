@@ -195,6 +195,32 @@ message PlayerProfile {
 	optional ActivityPrivacyType default_activity_privacy = 125;
 	optional bool connected_to_runtastic = 126;
 	repeated PropertyChange property_changes = 127;
+	optional uint32 target_xp = 128;
+	optional uint32 target_run_xp = 129;
+	optional uint32 f130 = 130;
+	optional uint32 cur_streak = 131;
+	optional uint32 max_streak = 132;
+	optional uint64 last_ride = 133;
+	optional uint32 week_ride_count = 134;
+	//optional uint32 cur_streak_distance = 135; // 135-140 no longer updated, replaced by 146-151?
+	//optional uint32 max_streak_distance = 136;
+	//optional uint32 cur_streak_elevation = 137;
+	//optional uint32 max_streak_elevation = 138;
+	//optional uint32 cur_streak_calories = 139;
+	//optional uint32 max_streak_calories = 140;
+	optional uint32 cur_streak_xp = 141;
+	optional uint32 max_streak_xp = 142;
+	optional uint32 cur_streak_drops = 143;
+	optional uint32 max_streak_drops = 144;
+	optional float cur_streak_distance = 146;
+	optional float cur_streak_elevation = 147;
+	optional float cur_streak_calories = 148;
+	optional float max_streak_distance = 149;
+	optional float max_streak_elevation = 150;
+	optional float max_streak_calories = 151;
+	optional uint32 f153 = 153;
+	optional string public_id = 154;
+	optional float power_units = 155; // factory tour challenge
 }
 
 message PlayerProfiles {
@@ -342,4 +368,16 @@ message BestEffortPointMsg {
 message PowerCurveAggregationMsg {
 	map<string, BestEffortPointMsg> watts = 1;
 	map<string, BestEffortPointMsg> watts_per_kg = 2;
+}
+
+message Streaks {
+	optional uint32 cur_streak = 1;
+	optional uint32 cur_streak_distance = 2;
+	optional uint32 cur_streak_elevation = 3;
+	optional uint32 cur_streak_calories = 4;
+	optional uint32 max_streak = 5;
+	optional uint32 max_streak_distance = 6;
+	optional uint32 max_streak_elevation = 7;
+	optional uint32 max_streak_calories = 8;
+	optional uint64 week_end = 9;
 }
