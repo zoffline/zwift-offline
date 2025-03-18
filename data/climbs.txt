@@ -132,6 +132,10 @@
     "road": "10020"
   },
   {
+    "name": "Oude Kwaremont (1.5 km / 63 m)",
+    "road": "10042"
+  },
+  {
     "name": "Pas de Peyrol/Puy Mary (10.3 km / 603 m)",
     "road": "10028"
   },

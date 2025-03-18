@@ -344,6 +344,11 @@
     "road": 4,
     "time": 775312
   },
+  "1367364772": {
+    "name": "Makuri Islands - Neon After Party",
+    "road": 4,
+    "time": 731960
+  },
   "-887604976": {
     "name": "Makuri Islands - Neon Flats",
     "road": 4,
@@ -483,6 +488,11 @@
     "name": "New York - Knickerbocker Reverse",
     "road": 4,
     "time": 173759
+  },
+  "-625345126": {
+    "name": "New York - LaGuardia After Party",
+    "road": 4,
+    "time": 173716
   },
   "-1872187942": {
     "name": "New York - LaGuardia Loop",

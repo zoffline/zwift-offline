@@ -1,6 +1,1 @@
-<Zwift version="1.0.15000"
-	GAME_URL="https://us-or-rly101.zwift.com"
-	manifest="ZwiftAndroid_1.0.33672_manifest.xml"
-	manifest_checksum="-1211053161"
-	mandatory_version="0.0.0"
-	ver_cur_checksum="1238029999"/>
+<Zwift version="1.0.141681" update_by="04.07.25" mandatory_version="1.0.140665" mandatory_update_by="03.24.25"/>

@@ -216,10 +216,6 @@
       "values": {}
     },
     {
-      "name": "game_1_39_detect_specific_trainer_by_model_number",
-      "values": {}
-    },
-    {
       "name": "game_1_39_event_settings",
       "values": {}
     },
@@ -308,11 +304,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_42_haptics_rc1",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_42_onboarding_quest",
@@ -501,11 +492,6 @@
       "values": {}
     },
     {
-      "name": "game_1_48_2_road_access_lock",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_48_conditional_entities",
       "values": {}
     },
@@ -664,16 +650,6 @@
       "name": "game_1_49_pvs",
       "value": true,
       "values": {}
-    },
-    {
-      "name": "game_1_50_onboarding_quest_auto_registration",
-      "values": {
-        "fields": {
-          "activity_count": {
-            "varintValue": "7"
-          }
-        }
-      }
     },
     {
       "name": "game_1_50_zc_rf1",
@@ -942,8 +918,14 @@
           "manualSteeringExtraHardness": {
             "numberValue": 0.0
           },
+          "maxAvoidanceDistanceInCm": {
+            "numberValue": 600.0
+          },
           "maxDistanceForFavoringCorrectSideInCm": {
             "numberValue": 5.0
+          },
+          "minAvoidanceDistanceInCm": {
+            "numberValue": 200.0
           },
           "pillDistanceScale": {
             "numberValue": 0.45
@@ -1151,10 +1133,11 @@
     },
     {
       "name": "game_1_76_bike_leveling",
+      "value": true,
       "values": {
         "fields": {
           "AutoSaveIntervalSeconds": {
-            "varintValue": "1800"
+            "varintValue": "300"
           },
           "ConfigVariant": {
             "stringValue": ""
@@ -1166,7 +1149,7 @@
             "boolValue": true
           },
           "EnableCDAUpdate": {
-            "boolValue": false
+            "boolValue": true
           },
           "EnableHudProgressUpdates": {
             "boolValue": true
@@ -1181,13 +1164,13 @@
             "boolValue": false
           },
           "EnableMountainBikeOffsetChange": {
-            "boolValue": false
+            "boolValue": true
           },
           "EnableTTCDA": {
-            "boolValue": false
+            "boolValue": true
           },
           "EnableWeightUpdate": {
-            "boolValue": false
+            "boolValue": true
           },
           "Feet_Interval": {
             "varintValue": "1000"
@@ -1199,7 +1182,7 @@
             "varintValue": "25"
           },
           "LoggingRate": {
-            "varintValue": "0"
+            "varintValue": "3764771167964206"
           },
           "Meters_Interval": {
             "varintValue": "500"
@@ -1398,7 +1381,7 @@
             "boolValue": true
           },
           "GetUserStreaksDataFromBackend": {
-            "boolValue": false
+            "boolValue": true
           },
           "IgnoreNonQualifyingAndDeletedActivities": {
             "boolValue": true
@@ -1451,7 +1434,72 @@
       }
     },
     {
+      "name": "game_1_85_route_dist_remaining_refactor",
+      "values": {}
+    },
+    {
       "name": "game_1_85_tpf",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_86_0_vt_spin",
+      "values": {}
+    },
+    {
+      "name": "game_1_86_badges_v3",
+      "values": {}
+    },
+    {
+      "name": "game_1_86_fitness-service_goals",
+      "values": {
+        "fields": {
+          "enable_KJ_cal_SP": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_86_shifting_warnings",
+      "values": {}
+    },
+    {
+      "name": "game_1_86_streak_rewards",
+      "values": {
+        "fields": {
+          "end": {
+            "varintValue": "1743577200"
+          },
+          "end_full": {
+            "varintValue": "2685139200"
+          },
+          "flair1thresh": {
+            "varintValue": "4"
+          },
+          "flair2thresh": {
+            "varintValue": "12"
+          },
+          "flair3thresh": {
+            "varintValue": "24"
+          },
+          "key": {
+            "stringValue": "None"
+          },
+          "local_lock": {
+            "boolValue": true
+          },
+          "start": {
+            "varintValue": "1743433200"
+          },
+          "start_full": {
+            "varintValue": "1743606000"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_86_zg_ftp_for_robopacers",
       "value": true,
       "values": {}
     },
@@ -1587,6 +1635,11 @@
       }
     },
     {
+      "name": "game_VideoCaptureDefaultDisable",
+      "value": true,
+      "values": {}
+    },
+    {
       "name": "game_allow_bc1_memfault_reporting",
       "values": {}
     },
@@ -1693,7 +1746,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "141255"
+            "stringValue": "142405"
           },
           "canary_test": {
             "boolValue": true
@@ -1806,6 +1859,15 @@
           },
           "cycling_splits": {
             "boolValue": false
+          },
+          "support_average_speed_widget": {
+            "boolValue": false
+          },
+          "support_average_wkg_widget": {
+            "boolValue": false
+          },
+          "support_rl_balance_widget": {
+            "boolValue": false
           }
         }
       }
@@ -1847,6 +1909,10 @@
     },
     {
       "name": "game_sentry_tracing",
+      "values": {}
+    },
+    {
+      "name": "game_session_data",
       "values": {}
     },
     {

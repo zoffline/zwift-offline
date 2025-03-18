@@ -7,6 +7,7 @@ message UserStorage {
 message Attributes {
     optional GameSettings game_settings = 22;
     optional GarageItemLastSelected garage_last_selected = 23;
+    optional BikeProgress bike_progress = 24;
     optional SpecialEventSeen special_event_seen = 25;
 }
 
@@ -29,4 +30,27 @@ message GarageItemLastSelected {
 message SpecialEventSeen {
     optional string signature = 1;
     optional uint64 time = 2;
+}
+
+message BikeProgress {
+    optional string signature = 1;
+    optional uint32 level = 2;
+    optional float level_distance = 3;
+    optional float total_distance = 4;
+    optional float level_elevation = 5;
+    optional float total_elevation = 6;
+    optional float level_moving_time = 7;
+    optional float total_moving_time = 8;
+    optional uint64 last_upgrade = 10;
+    optional uint64 time = 11;
+    repeated BikeUpgrade bike_upgrades = 12;
+    optional uint32 f14 = 14;
+    optional float percentage = 15;
+    optional uint32 f16 = 16;
+}
+
+message BikeUpgrade {
+    optional uint64 time = 1;
+    optional uint32 level = 2;
+    optional uint32 price = 3;
 }
