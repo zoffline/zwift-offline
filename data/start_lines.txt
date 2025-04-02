@@ -14,6 +14,11 @@
     "road": 0,
     "time": 614865
   },
+  "2143464829": {
+    "name": "France - Bon Voyage",
+    "road": 120,
+    "time": 399330
+  },
   "-375055007": {
     "name": "France - Casse-Pattes",
     "road": 26,
@@ -23,6 +28,11 @@
     "name": "France - Climb Portal - Mont Saint-Michel",
     "road": 26,
     "time": 344976
+  },
+  "1600198346": {
+    "name": "France - Croissant",
+    "road": 120,
+    "time": 399330
   },
   "986252325": {
     "name": "France - Douce France",
@@ -34,10 +44,30 @@
     "road": 26,
     "time": 482571
   },
+  "1538375239": {
+    "name": "France - Gentil 8",
+    "road": 130,
+    "time": 386903
+  },
+  "1793712753": {
+    "name": "France - Hell of the North",
+    "road": 26,
+    "time": 505531
+  },
+  "-320001439": {
+    "name": "France - Knights of the Roundabout",
+    "road": 120,
+    "time": 399330
+  },
   "1433431343": {
     "name": "France - La Reine",
     "road": 26,
     "time": 501055
+  },
+  "573843083": {
+    "name": "France - Macaron",
+    "road": 26,
+    "time": 305075
   },
   "-1442814000": {
     "name": "France - Petit Boucle",
@@ -54,15 +84,40 @@
     "road": 26,
     "time": 487155
   },
+  "1409345545": {
+    "name": "France - Rapide Run",
+    "road": 26,
+    "time": 303010
+  },
   "872351836": {
     "name": "France - Roule Ma Poule",
     "road": 0,
     "time": 971137
   },
+  "136140280": {
+    "name": "France - Sacre Bleu",
+    "road": 130,
+    "time": 386903
+  },
+  "319138658": {
+    "name": "France - Three Musketeers",
+    "road": 130,
+    "time": 386903
+  },
   "-1881526724": {
     "name": "France - Tire-Bouchon",
     "road": 0,
     "time": 971137
+  },
+  "358794394": {
+    "name": "France - Ven-10",
+    "road": 26,
+    "time": 531247
+  },
+  "1975694067": {
+    "name": "France - Ven-10 Run",
+    "road": 26,
+    "time": 531249
   },
   "-1721499149": {
     "name": "France - Ven-Top",

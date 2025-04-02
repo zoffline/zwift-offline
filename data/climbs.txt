@@ -4,6 +4,10 @@
     "road": "10011"
   },
   {
+    "name": "Cauberg (0.8 km / 57 m)",
+    "road": "10043"
+  },
+  {
     "name": "Cheddar Gorge (4.7 km / 171 m)",
     "road": "10021"
   },
@@ -70,6 +74,10 @@
   {
     "name": "Crow Road (7 km / 251 m)",
     "road": "10012"
+  },
+  {
+    "name": "C\u00f4te de la Redoute (1.5 km / 153 m)",
+    "road": "10044"
   },
   {
     "name": "C\u00f4te des Forche (3 km / 148 m)",

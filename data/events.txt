@@ -21,6 +21,13 @@
     "sport": 0
   },
   {
+    "name": "France - Macaron",
+    "route": 573843083,
+    "distance": 2599.4,
+    "course": 14,
+    "sport": 0
+  },
+  {
     "name": "France Classic Fondo",
     "route": 2136907048,
     "distance": 146423.6,
@@ -236,13 +243,6 @@
     "distance": 10384.1,
     "course": 6,
     "sport": 1
-  },
-  {
-    "name": "Watopia - Hilltop Hustle",
-    "route": 3961473046,
-    "distance": 16303.3,
-    "course": 6,
-    "sport": 0
   },
   {
     "name": "Watopia - Hilly Route Reverse",

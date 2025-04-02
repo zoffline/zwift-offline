@@ -1080,7 +1080,7 @@
       "values": {
         "fields": {
           "bGrantSpinWheelRewardEarly": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }
@@ -1369,10 +1369,6 @@
       "values": {}
     },
     {
-      "name": "game_1_83_experiment_bc2",
-      "values": {}
-    },
-    {
       "name": "game_1_83_streaks_backend_migration",
       "value": true,
       "values": {
@@ -1444,10 +1440,12 @@
     },
     {
       "name": "game_1_86_0_vt_spin",
+      "value": true,
       "values": {}
     },
     {
       "name": "game_1_86_badges_v3",
+      "value": true,
       "values": {}
     },
     {
@@ -1466,6 +1464,7 @@
     },
     {
       "name": "game_1_86_streak_rewards",
+      "value": true,
       "values": {
         "fields": {
           "end": {
@@ -1484,7 +1483,7 @@
             "varintValue": "24"
           },
           "key": {
-            "stringValue": "None"
+            "stringValue": "STREAKREWARDZZZZ"
           },
           "local_lock": {
             "boolValue": true
@@ -1501,6 +1500,20 @@
     {
       "name": "game_1_86_zg_ftp_for_robopacers",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_87_reset_workout_target",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_87_timing_arch_hud",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_88_heat_strain_index",
       "values": {}
     },
     {
@@ -1657,6 +1670,10 @@
       "values": {}
     },
     {
+      "name": "game_bc2_ab_test",
+      "values": {}
+    },
+    {
       "name": "game_button_rideon_bomb_prompt_delay",
       "values": {}
     },
@@ -1746,9 +1763,12 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "142405"
+            "stringValue": "143297"
           },
           "canary_test": {
+            "boolValue": true
+          },
+          "chrishoy2025": {
             "boolValue": true
           },
           "direct_download": {
@@ -1857,7 +1877,13 @@
           "complex_segment_summary": {
             "boolValue": false
           },
+          "critical_power_widget": {
+            "boolValue": false
+          },
           "cycling_splits": {
+            "boolValue": false
+          },
+          "support_HSI_widget": {
             "boolValue": false
           },
           "support_average_speed_widget": {
@@ -1866,8 +1892,34 @@
           "support_average_wkg_widget": {
             "boolValue": false
           },
+          "support_body_temp_widget": {
+            "boolValue": false
+          },
+          "support_normalized_power_widget": {
+            "boolValue": false
+          },
           "support_rl_balance_widget": {
             "boolValue": false
+          }
+        }
+      }
+    },
+    {
+      "name": "game_instrumental_rock_bass",
+      "value": true,
+      "values": {
+        "fields": {
+          "end": {
+            "varintValue": "1743519600"
+          },
+          "ints": {
+            "stringValue": "260012,10,1,0 260011,10,0,0 260009,10,3,0 260010,10,1,0 260013,10,1,1 6,10,0,0 7,10,1,0 8,10,0,0 9,10,1,1"
+          },
+          "routes": {
+            "stringValue": "358794394, 1600198346, 319138658, 1538375239, 2143464829, 1793712753, 3974965857, 136140280, 358794394, 1409345545"
+          },
+          "start": {
+            "varintValue": "1742482800"
           }
         }
       }
@@ -1901,7 +1953,14 @@
     },
     {
       "name": "game_routes_package",
-      "values": {}
+      "value": true,
+      "values": {
+        "fields": {
+          "version": {
+            "stringValue": ""
+          }
+        }
+      }
     },
     {
       "name": "game_sentry_log_upload",
@@ -1913,7 +1972,13 @@
     },
     {
       "name": "game_session_data",
-      "values": {}
+      "values": {
+        "fields": {
+          "ride_session_state": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_settings_service",
@@ -2031,10 +2096,6 @@
       "values": {}
     },
     {
-      "name": "game_xert_integration",
-      "values": {}
-    },
-    {
       "name": "game_zc_pairing_transfer",
       "values": {}
     },
@@ -2051,10 +2112,6 @@
     {
       "name": "game_zp_create_full_trainer_on_swap",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_zwiftcast",
       "values": {}
     },
     {

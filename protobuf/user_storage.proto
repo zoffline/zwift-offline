@@ -20,6 +20,7 @@ message GameSettings {
     optional int32 power_meter_slot3 = 7;
     optional int32 climb_graph_sensitivity = 9;
     optional float screen_shake_scale = 10;
+    optional int32 streaks_flair_visuals = 11;
 }
 
 message GarageItemLastSelected {
