@@ -1786,6 +1786,9 @@
           "loose_files": {
             "boolValue": false
           },
+          "parisroubaixfemmes2025": {
+            "boolValue": false
+          },
           "path_root": {
             "stringValue": "zwift/dlc/{build_id}"
           },
@@ -1953,7 +1956,6 @@
     },
     {
       "name": "game_routes_package",
-      "value": true,
       "values": {
         "fields": {
           "version": {
