@@ -153,7 +153,7 @@
       "values": {
         "fields": {
           "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride,zwiftgames2025,zwiftbigspin2025"
+            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride,zwiftgames2025,zwiftbigspin2025,zwiftcampinsideout2025"
           }
         }
       }
@@ -898,19 +898,19 @@
             "numberValue": 0.8
           },
           "enabledForAllWorlds": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForEvents": {
             "boolValue": true
           },
           "enabledForJapan": {
-            "boolValue": true
+            "boolValue": false
           },
           "enabledForRaces": {
             "boolValue": false
           },
           "enabledForWatopia": {
-            "boolValue": true
+            "boolValue": false
           },
           "handCycleExtraHardness": {
             "numberValue": 0.5
@@ -1123,10 +1123,6 @@
       "values": {}
     },
     {
-      "name": "game_1_75_support_core_body_sensor",
-      "values": {}
-    },
-    {
       "name": "game_1_75_sweeper_check",
       "value": true,
       "values": {}
@@ -1190,6 +1186,12 @@
           "Miles_Interval": {
             "varintValue": "25"
           },
+          "PreventBikeProgressOnLargeDeltas": {
+            "boolValue": false
+          },
+          "PreventBikeProgressWhenPlayerCheating": {
+            "boolValue": false
+          },
           "WheelWeightOffset": {
             "numberValue": 200.0
           },
@@ -1221,10 +1223,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_76_normalized_power_field_enabled",
-      "values": {}
     },
     {
       "name": "game_1_76_routes_new_tag",
@@ -1323,7 +1321,6 @@
     },
     {
       "name": "game_1_81_0_big_spin_2025",
-      "value": true,
       "values": {
         "fields": {
           "date_end": {
@@ -1333,28 +1330,28 @@
             "varintValue": "0"
           },
           "the_big_spin_2025_stage_1_end_date": {
-            "varintValue": "1744036200"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_1_start_date": {
-            "varintValue": "1741017600"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_2_end_date": {
-            "varintValue": "1744036200"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_2_start_date": {
             "varintValue": "0"
           },
           "the_big_spin_2025_stage_3_end_date": {
-            "varintValue": "1744036200"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_3_start_date": {
-            "varintValue": "1742223600"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_4_end_date": {
-            "varintValue": "1744036200"
+            "varintValue": "0"
           },
           "the_big_spin_2025_stage_4_start_date": {
-            "varintValue": "1742828400"
+            "varintValue": "0"
           }
         }
       }
@@ -1513,7 +1510,16 @@
       "values": {}
     },
     {
-      "name": "game_1_88_heat_strain_index",
+      "name": "game_1_88_ask_experience_level",
+      "values": {}
+    },
+    {
+      "name": "game_1_88_close_the_gap_v2",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_88_multi_card_hero_carousel",
       "values": {}
     },
     {
@@ -1763,7 +1769,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "143297"
+            "stringValue": "144162"
           },
           "canary_test": {
             "boolValue": true
@@ -1787,7 +1793,7 @@
             "boolValue": false
           },
           "parisroubaixfemmes2025": {
-            "boolValue": false
+            "boolValue": true
           },
           "path_root": {
             "stringValue": "zwift/dlc/{build_id}"
@@ -1806,6 +1812,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_emojis_for_legacy_ui",
+      "values": {}
     },
     {
       "name": "game_end_game_session",
@@ -1909,20 +1919,19 @@
     },
     {
       "name": "game_instrumental_rock_bass",
-      "value": true,
       "values": {
         "fields": {
           "end": {
-            "varintValue": "1743519600"
+            "varintValue": "0"
           },
           "ints": {
-            "stringValue": "260012,10,1,0 260011,10,0,0 260009,10,3,0 260010,10,1,0 260013,10,1,1 6,10,0,0 7,10,1,0 8,10,0,0 9,10,1,1"
+            "stringValue": ""
           },
           "routes": {
-            "stringValue": "358794394, 1600198346, 319138658, 1538375239, 2143464829, 1793712753, 3974965857, 136140280, 358794394, 1409345545"
+            "stringValue": ""
           },
           "start": {
-            "varintValue": "1742482800"
+            "varintValue": "0"
           }
         }
       }
@@ -1955,11 +1964,12 @@
       "values": {}
     },
     {
-      "name": "game_routes_package",
+      "name": "game_routes_delivery",
+      "value": true,
       "values": {
         "fields": {
           "version": {
-            "stringValue": ""
+            "stringValue": "1.88.0"
           }
         }
       }
@@ -1974,6 +1984,7 @@
     },
     {
       "name": "game_session_data",
+      "value": true,
       "values": {
         "fields": {
           "ride_session_state": {
@@ -2161,6 +2172,10 @@
     },
     {
       "name": "log_ble_packets",
+      "values": {}
+    },
+    {
+      "name": "settings_bc2_diagram",
       "values": {}
     },
     {

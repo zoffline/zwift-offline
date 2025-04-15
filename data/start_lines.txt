@@ -707,7 +707,7 @@
   "-943302084": {
     "name": "Scotland - Glasgow Crit Circuit Run",
     "road": 9,
-    "time": 1002106
+    "time": 1001900
   },
   "1258415487": {
     "name": "Scotland - Glasgow Reverse",
