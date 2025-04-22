@@ -1447,6 +1447,7 @@
     },
     {
       "name": "game_1_86_fitness-service_goals",
+      "value": true,
       "values": {
         "fields": {
           "enable_KJ_cal_SP": {

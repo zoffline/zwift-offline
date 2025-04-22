@@ -159,6 +159,15 @@ message PlayerState {
 	optional uint32 ps_f37 = 37; // = f(BikeEntity.field_2a28) BikeEntity::CreateNewPacket
 	optional bool canSteer = 38; // = BikeEntity.m_canSteer
 	optional int32 route = 39;
+	optional int32 pacerBotGroupSize = 40;
+	optional bool activeSteer = 41;
+	optional bool portal = 43;
+	optional int32 portalGradientScale = 44; // 0 = 50%, 1 = 75%, 2 = 100%, 3 = 125%
+	optional int32 portalElevationScale = 45; // 50, 75, 100 or 125
+	optional int32 boostPad = 46;
+	optional int32 hazardPad = 47;
+	optional int32 timeBonus = 48;
+	optional int32 rideonBomb = 49; // always seems to be x5 with value of 9
 }
 
 message ClientToServer {

@@ -90,6 +90,12 @@ message ClubAttribution {
 	optional float value = 2;
 }
 
+message PacePartnerData {
+	optional float wkg = 1;
+	optional float time = 2;
+	optional uint64 player_id = 3;
+}
+
 enum ProfileFollowStatus {
 	PFS_UNKNOWN = 1;
 	PFS_REQUESTS_TO_FOLLOW = 2;
@@ -147,6 +153,14 @@ message Activity {  //where is primaryImageUrl, feedImageThumbnailUrl, activityR
 	optional string club_name = 39;
 	optional int64 movingTimeInMs = 40;
 	//repeated ClubAttribution cas = 41;
+	//optional PacePartnerData pp_data = 42;
+	//optional int64 f43 = 43; // always 0
+	optional float work = 44;
+	optional float tss = 45;
+	optional float normalized_power = 46;
+	//optional int32 f47 = 47; // always -120
+	repeated uint32 power_zones = 48;
+	optional float power_units = 49; // factory tour challenge
 }
 
 message ActivityList {

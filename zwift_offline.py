@@ -58,6 +58,7 @@ import variants_pb2
 import playback_pb2
 import user_storage_pb2
 import online_sync
+import fitness_pb2
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -253,6 +254,11 @@ class Activity(db.Model):
     fitness_privacy = db.Column(db.Integer)
     club_name = db.Column(db.Text)
     movingTimeInMs = db.Column(db.Integer)
+    work = db.Column(db.Float)
+    tss = db.Column(db.Float)
+    normalized_power = db.Column(db.Float)
+    power_zones = db.Column(db.Text)
+    power_units = db.Column(db.Float)
 
 class SegmentResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -323,6 +329,18 @@ class Goal(db.Model):
     status = db.Column(db.Integer)
     timezone = db.Column(db.Text)
 
+class GoalMetrics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
+    weekGoalTSS = db.Column(db.Integer)
+    weekGoalCalories = db.Column(db.Integer)
+    weekGoalKjs = db.Column(db.Integer)
+    weekGoalDistanceKilometers = db.Column(db.Float)
+    weekGoalDistanceMiles = db.Column(db.Float)
+    weekGoalTimeMinutes = db.Column(db.Integer)
+    lastUpdated = db.Column(db.Text)
+    currentGoalSetting = db.Column(db.Text)
+
 class Playback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, nullable=False)
@@ -391,6 +409,7 @@ class PartialProfile:
     male = True
     weight_in_grams = 0
     imageSrc = ''
+    use_metric = True
     time = 0
     def to_json(self):
         return {"countryCode": self.country_code,
@@ -514,6 +533,7 @@ def get_partial_profile(player_id):
         partial_profile.player_type = profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1))
         partial_profile.male = profile.is_male
         partial_profile.weight_in_grams = profile.weight_in_grams
+        partial_profile.use_metric = profile.use_metric
         player_partial_profiles[player_id] = partial_profile
     player_partial_profiles[player_id].time = time.monotonic()
     return player_partial_profiles[player_id]
@@ -1111,11 +1131,14 @@ def logout(username):
     return redirect(url_for('login'))
 
 
-def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
+def insert_protobuf_into_db(table_name, msg, exclude_fields=[], json_fields=[]):
     msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
         if key in msg_dict:
             del msg_dict[key]
+    for key in json_fields:
+        if key in msg_dict:
+            msg_dict[key] = json.dumps(msg_dict[key])
     if 'id' in msg_dict:
         del msg_dict['id']
     row = table_name(**msg_dict)
@@ -1124,11 +1147,14 @@ def insert_protobuf_into_db(table_name, msg, exclude_fields=[]):
     return row.id
 
 
-def update_protobuf_in_db(table_name, msg, id, exclude_fields=[]):
+def update_protobuf_in_db(table_name, msg, id, exclude_fields=[], json_fields=[]):
     msg_dict = MessageToDict(msg, preserving_proto_field_name=True, use_integers_for_enums=True)
     for key in exclude_fields:
         if key in msg_dict:
             del msg_dict[key]
+    for key in json_fields:
+        if key in msg_dict:
+            msg_dict[key] = json.dumps(msg_dict[key])
     table_name.query.filter_by(id=id).update(msg_dict)
     db.session.commit()
 
@@ -1214,6 +1240,7 @@ def select_activities_json(player_id, limit, start_after=None):
     return ret
 
 @app.route('/api/activity-feed/feed/', methods=['GET'])
+@app.route('/api/activity-feed-service-v2/feed/just-me', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_activity_feed():
@@ -1815,7 +1842,7 @@ def do_api_profiles(profile_id, is_json):
 @jwt_to_session_cookie
 @login_required
 def api_profiles_me():
-    if request.headers['Source'] == "zwift-companion":
+    if request.headers['Accept'] == 'application/json':
         return do_api_profiles(current_user.player_id, True)
     else:
         return do_api_profiles(current_user.player_id, False)
@@ -2036,7 +2063,7 @@ def api_profiles_activities(player_id):
             return '', 401
         activity = activity_pb2.Activity()
         activity.ParseFromString(request.stream.read())
-        activity.id = insert_protobuf_into_db(Activity, activity, ['fit'])
+        activity.id = insert_protobuf_into_db(Activity, activity, ['fit'], ['power_zones'])
         return '{"id": %ld}' % activity.id, 200
 
     # request.method == 'GET'
@@ -2044,7 +2071,7 @@ def api_profiles_activities(player_id):
     rows = db.session.execute(sqlalchemy.text("SELECT * FROM activity WHERE player_id = :p AND date > date('now', '-1 month')"), {"p": player_id}).mappings()
     for row in rows:
         activity = activities.activities.add()
-        row_to_protobuf(row, activity, exclude_fields=['fit'])
+        row_to_protobuf(row, activity, exclude_fields=['fit', 'power_zones'])
     return activities.SerializeToString(), 200
 
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>/images', methods=['POST'])
@@ -2118,7 +2145,10 @@ def api_profiles():
                     p.CopyFrom(random_profile(profile))
                     p.id = p_id
                     p.first_name = ''
-                    p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
+                    try:  # profile can be requested after ghost is deleted
+                        p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
+                    except:
+                        p.last_name = 'Ghost'
                     p.country_code = 0
                     if GHOST_PROFILE:
                         for item in ['country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
@@ -2404,10 +2434,16 @@ def api_profiles_activities_id(player_id, activity_id):
     stream = request.stream.read()
     activity = activity_pb2.Activity()
     activity.ParseFromString(stream)
-    update_protobuf_in_db(Activity, activity, activity_id, ['fit'])
+    update_protobuf_in_db(Activity, activity, activity_id, ['fit'], ['power_zones'])
 
     response = '{"id":%s}' % activity_id
     if request.args.get('upload-to-strava') != 'true':
+        return response, 200
+
+    if activity.distanceInMeters == 0: # Zwift saves the current activity when joining events, even if the distance is zero
+        Activity.query.filter_by(id=activity_id).delete()
+        db.session.commit()
+        logout_player(player_id)
         return response, 200
 
     create_power_curve(player_id, BytesIO(activity.fit))
@@ -3782,6 +3818,120 @@ def update_streaks(player_id, activity):
 def api_fitness_streaks():
     return get_streaks(current_user.player_id).SerializeToString(), 200
 
+@app.route('/api/fitness/metrics-and-goals', methods=['GET'])  # TODO: fitnessScore, trainingStatus, numStreakSavers, givenXp, better default goals
+@jwt_to_session_cookie
+@login_required
+def api_fitness_metrics_and_goals():
+    if request.headers['Accept'] == 'application/json':
+        try:
+            date = datetime.datetime.strptime(request.args.get('month') + request.args.get('weekOf') + request.args.get('year'), "%m%d%Y")
+        except:
+            return '', 404
+        fitness = {"fitnessMetrics": []}
+        for i in range(2):
+            start, end = get_week_range(date - datetime.timedelta(days=i * 7))
+            stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
+                FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :s) AND strftime('%s', start_date) <= strftime('%s', :e)""")
+            row = db.session.execute(stmt, {"p": current_user.player_id, "s": start, "e": end}).first()
+            week = {"startOfWeek": start.strftime('%Y-%m-%d'), "fitnessScore": 0, "totalDistanceKilometers": row[0] / 1000 if row[0] else 0,
+                "totalElevationMeters": int(row[1]) if row[1] else 0, "totalDurationMinutes": int(row[2] / 60000) if row[2] else 0,
+                "totalKilojoules": int(row[3]) if row[3] else 0, "totalCalories": int(row[4]) if row[4] else 0,
+                "totalTSS": row[5] if row[5] else 0, "useMetric": get_partial_profile(current_user.player_id).use_metric,
+                "weekStreak": get_streaks(current_user.player_id).cur_streak, "numStreakSavers": 0, "days": {}, "trainingStatus": "FRESH"}
+            for i in range(0, 7):
+                day = start + datetime.timedelta(days=i)
+                stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
+                    FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)""")
+                row = db.session.execute(stmt, {"p": current_user.player_id, "d": day}).first()
+                if row[0]:
+                    d = {"day": day.strftime('%a').lower(), "distanceKilometers": row[0] / 1000, "elevationMeters": int(row[1]) if row[1] else 0,
+                        "durationMinutes": int(row[2] / 60000) if row[2] else 0, "kilojoules": int(row[3]) if row[3] else 0,
+                        "calories": int(row[4]) if row[4] else 0, "tss": row[5] if row[5] else 0,
+                        "powerZonePercentages": {"1": 1, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0}, "givenXp": 0}
+                    zones = [0] * 7
+                    stmt = sqlalchemy.text("SELECT power_zones FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)")
+                    for row in db.session.execute(stmt, {"p": current_user.player_id, "d": day}):
+                        if row.power_zones:
+                            zones = [a + b for a, b in zip(zones, json.loads(row.power_zones))]
+                    total = sum(zones)
+                    if total:
+                        for i in range(0, 7):
+                            d["powerZonePercentages"][str(i + 1)] = zones[i] / total
+                    week["days"][d["day"]] = d
+            fitness["fitnessMetrics"].append(week)
+        end = get_week_range(date)[1].strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'
+        row = GoalMetrics.query.filter(GoalMetrics.player_id == current_user.player_id, GoalMetrics.lastUpdated <= end).order_by(GoalMetrics.lastUpdated.desc()).first()
+        cycling = {"weekGoalTSS": row.weekGoalTSS if row else 200, "weekGoalCalories": row.weekGoalCalories if row else 2000,
+            "weekGoalKjs": row.weekGoalKjs if row else 2000, "weekGoalDistanceKilometers": row.weekGoalDistanceKilometers if row else 100,
+            "weekGoalTimeMinutes": row.weekGoalTimeMinutes if row else 180,
+            "lastUpdated": row.lastUpdated if row else datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'}
+        fitness["goalsMetrics"] = {"all": cycling, "cycling": cycling, "running": None, "currentGoalSetting": row.currentGoalSetting if row else "DISTANCE"}
+        return jsonify(fitness)
+    else:
+        fitness = fitness_pb2.Fitness()
+        fitness.streak = get_streaks(current_user.player_id).cur_streak
+        for i, week in enumerate([fitness.this_week, fitness.last_week]):
+            start, end = get_week_range(datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=i * 7))
+            week.start = start.strftime('%Y-%m-%d')
+            stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
+                FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :s) AND strftime('%s', start_date) <= strftime('%s', :e)""")
+            row = db.session.execute(stmt, {"p": current_user.player_id, "s": start, "e": end}).first()
+            week.fitness_score = 0
+            week.distance = int(row[0]) if row[0] else 0
+            week.elevation = int(row[1]) if row[1] else 0
+            week.moving_time = int(round(row[2], -4)) if row[2] else 0
+            week.work = int(row[3]) if row[3] else 0
+            week.calories = int(row[4]) if row[4] else 0
+            week.tss = row[5] if row[5] else 0
+            week.status = "FRESH"
+            for i in range(0, 7):
+                day = start + datetime.timedelta(days=i)
+                stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
+                    FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)""")
+                row = db.session.execute(stmt, {"p": current_user.player_id, "d": day}).first()
+                if row[0]:
+                    d = week.days.add()
+                    d.day = day.strftime('%a').lower()
+                    d.distance = int(row[0])
+                    d.elevation = int(row[1]) if row[1] else 0
+                    d.moving_time = int(round(row[2], -4)) if row[2] else 0
+                    d.work = int(row[3]) if row[3] else 0
+                    d.calories = int(row[4]) if row[4] else 0
+                    d.tss = row[5] if row[5] else 0
+                    zones = [0] * 7
+                    stmt = sqlalchemy.text("SELECT power_zones FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)")
+                    for row in db.session.execute(stmt, {"p": current_user.player_id, "d": day}):
+                        if row.power_zones:
+                            zones = [a + b for a, b in zip(zones, json.loads(row.power_zones))]
+                    total = sum(zones)
+                    if total:
+                        for i in range(0, 7):
+                            pz = d.power_zones.add()
+                            pz.zone = i + 1
+                            pz.percentage = zones[i] / total
+        row = GoalMetrics.query.filter_by(player_id=current_user.player_id).order_by(GoalMetrics.lastUpdated.desc()).first()
+        for sport in [fitness.goals.all, fitness.goals.cycling]:
+            sport.tss = row.weekGoalTSS if row else 200
+            sport.calories = row.weekGoalCalories if row else 2000
+            sport.work = row.weekGoalKjs if row else 2000
+            sport.distance = (int(row.weekGoalDistanceKilometers) if row else 100) * 1000
+            sport.moving_time = (row.weekGoalTimeMinutes if row else 180) * 60000
+        fitness.goals.current_goal = fitness_pb2.GoalSetting.Value(row.currentGoalSetting + "_GOAL" if row else "DISTANCE_GOAL")
+        last_updated = datetime.datetime.strptime(row.lastUpdated, "%Y-%m-%dT%H:%M:%S.%f%z") if row else datetime.datetime.now(datetime.timezone.utc)
+        fitness.goals.last_updated = int(last_updated.timestamp() * 1000)
+        return fitness.SerializeToString(), 200
+
+@app.route('/api/fitness/fitness-goals/history', methods=['PUT'])
+@jwt_to_session_cookie
+@login_required
+def api_fitness_fitness_goals_history():
+    goals = json.loads(request.stream.read())
+    goals["player_id"] = current_user.player_id
+    goals["lastUpdated"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + 'Z'
+    db.session.add(GoalMetrics(**goals))
+    db.session.commit()
+    return '', 204
+
 
 @app.teardown_request
 def teardown_request(exception):
@@ -3953,6 +4103,7 @@ with app.app_context():
     if db.session.execute(sqlalchemy.text("SELECT COUNT(*) FROM pragma_table_info('user') WHERE name='new_home'")).scalar():
         db.session.execute(sqlalchemy.text("ALTER TABLE user DROP COLUMN new_home"))
         db.session.commit()
+    check_columns(Activity, 'activity')
     if check_columns(Playback, 'playback'):
         update_playback()
     check_columns(RouteResult, 'route_result')

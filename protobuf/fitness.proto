@@ -1,0 +1,62 @@
+syntax = "proto2";
+
+message Fitness {
+    optional uint32 streak = 1;
+    optional WeekMetrics this_week = 2;
+    optional WeekMetrics last_week = 3;
+    optional SportGoals goals = 4;
+    optional uint32 f5 = 5;
+}
+
+message WeekMetrics {
+    optional string start = 1;
+    optional float fitness_score = 2;
+    optional uint32 distance = 3;
+    optional uint32 elevation = 4;
+    optional uint32 moving_time = 5;
+    optional uint32 work = 6;
+    optional uint32 calories = 7;
+    optional float tss = 8;
+    repeated DayMetrics days = 9;
+    optional string status = 10;
+}
+
+message DayMetrics {
+    optional string day = 1;
+    optional uint32 distance = 2;
+    optional uint32 elevation = 3;
+    optional uint32 moving_time = 4;
+    optional uint32 work = 5;
+    optional uint32 calories = 6;
+    optional float tss = 7;
+    repeated PowerZonePercentages power_zones = 8;
+}
+
+message PowerZonePercentages {
+    optional uint32 zone = 1;
+    optional float percentage = 2;
+}
+
+message SportGoals {
+    optional GoalMetrics all = 1;
+    optional GoalMetrics cycling = 2;
+    optional GoalMetrics running = 3;
+    optional GoalSetting current_goal = 4;
+    optional uint64 last_updated = 5;
+}
+
+message GoalMetrics {
+    optional uint32 tss = 1;
+    optional uint32 calories = 2;
+    optional uint32 work = 3;
+    optional uint32 distance = 4;
+    optional uint32 moving_time = 5;
+}
+
+enum GoalSetting { // can't conflict with GoalType from goal.proto
+    TSS_GOAL = 0;
+    KJ_GOAL = 1;
+    CALORIES_GOAL = 2;
+    DISTANCE_GOAL = 3;
+    TIME_GOAL = 4;
+}
