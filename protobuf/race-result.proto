@@ -1,0 +1,91 @@
+syntax = "proto2";
+import "profile.proto";
+import "route-result.proto";
+
+message RaceResultEntrySaveRequest {
+    optional uint64 event_subgroup_id = 1;
+    optional RaceResultEntryActivityData activity_data = 2;
+    optional RaceResultEntryCriticalPData power_data = 3;
+    optional RaceResultEntrySensorData sensor_data = 4;
+    optional uint32 f5 = 5;
+    optional uint32 f14 = 14;
+    optional uint32 f15 = 15;
+    optional uint32 f16 = 16;
+    optional RaceResultDeviceInfo devices = 17;
+}
+
+message RaceResultEntry {
+    optional uint64 player_id = 1;
+    optional uint64 event_subgroup_id = 2;
+    optional uint32 position = 3;
+    optional uint64 event_id = 4;
+    optional RaceResultEntryActivityData activity_data = 5;
+    optional RaceResultEntryCriticalPData power_data = 6;
+    optional RaceResultEntryProfileData profile_data = 7;
+    optional RaceResultEntrySensorData sensor_data = 8;
+    optional uint32 f9 = 9;
+    optional uint32 f12 = 12;
+    optional uint32 f14 = 14;
+    optional uint32 f15 = 15;
+    optional uint32 f16 = 16;
+    optional uint64 time = 17;
+    optional uint32 distance_to_leader = 18;
+}
+
+message RaceResultSummary {
+    repeated RaceResultEntry f1 = 1;
+    repeated RaceResultEntry f2 = 2;
+    optional uint32 total = 3;
+}
+
+message RaceResultEntryActivityData {
+    optional uint32 f1 = 1;
+    optional sint32 f2 = 2;
+    optional Sport sport = 3;
+    optional uint32 distance = 4;
+    optional uint64 elapsed_ms = 5;
+    optional uint32 map_id = 6;
+    optional uint64 world_time = 7;
+    optional uint64 time = 8;
+    optional uint32 f11 = 11;
+    optional uint32 f12 = 12;
+    optional uint32 f13 = 13;
+    optional uint32 f14 = 14;
+}
+
+message RaceResultEntryCriticalPData {
+    optional uint32 fifteen_seconds = 1;
+    optional uint32 one_minute = 2;
+    optional uint32 five_minutes = 3;
+    optional uint32 twenty_minutes = 4;
+}
+
+message RaceResultEntryProfileData {
+    optional uint32 weight_in_grams = 1;
+    optional uint32 height_in_centimeters = 2;
+    optional Gender gender = 3;
+    optional PlayerType player_type = 5;
+    optional string first_name = 6;
+    optional string last_name = 7;
+    optional string avatar_url = 9;
+}
+
+message RaceResultDeviceInfo {
+    optional string hr_monitor = 1;
+    optional string power_meter = 2;
+    optional string controllable = 3;
+    optional string cadence_sensor = 4;
+}
+
+message RaceResultEntrySensorData {
+    optional RaceResultEntryHeartRateData heart_rate = 1;
+    optional uint32 avg_power = 2;
+    optional uint32 f9 = 9;
+    optional float f10 = 10;
+    optional uint32 f11 = 11;
+}
+
+message RaceResultEntryHeartRateData {
+    optional uint32 f1 = 1;
+    optional uint32 avg_hr = 2;
+}

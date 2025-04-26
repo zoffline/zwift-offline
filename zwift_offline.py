@@ -50,6 +50,7 @@ import per_session_info_pb2
 import profile_pb2
 import segment_result_pb2
 import route_result_pb2
+import race_result_pb2
 import world_pb2
 import zfiles_pb2
 import hash_seeds_pb2
@@ -166,6 +167,7 @@ player_partial_profiles = {}
 map_override = {}
 climb_override = {}
 global_bookmarks = {}
+global_race_results = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
@@ -408,6 +410,7 @@ class PartialProfile:
     player_type = 'NORMAL'
     male = True
     weight_in_grams = 0
+    height_in_millimeters = 0
     imageSrc = ''
     use_metric = True
     time = 0
@@ -424,6 +427,10 @@ class PartialProfile:
 class Bookmark:
     name = ''
     state = None
+
+class RaceResults:
+    results = None
+    time = 0
 
 class Online:
     total = 0
@@ -533,6 +540,7 @@ def get_partial_profile(player_id):
         partial_profile.player_type = profile_pb2.PlayerType.Name(jsf(profile, 'player_type', 1))
         partial_profile.male = profile.is_male
         partial_profile.weight_in_grams = profile.weight_in_grams
+        partial_profile.height_in_millimeters = profile.height_in_millimeters
         partial_profile.use_metric = profile.use_metric
         player_partial_profiles[player_id] = partial_profile
     player_partial_profiles[player_id].time = time.monotonic()
@@ -1361,7 +1369,6 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/player-playbacks/player/settings', methods=['GET', 'POST']) # TODO: private = \x08\x01 (1: 1)
 @app.route('/api/scoring/current', methods=['GET'])
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
-@app.route('/api/race-results', methods=['POST'])
 @app.route('/api/workout/progress', methods=['POST'])
 def api_proto_empty():
     return '', 200
@@ -3565,6 +3572,56 @@ def api_route_results_completion_stats_all():
     response = {"response": {"stats": current_page}, "hasPreviousPage": page > 0, "hasNextPage": page < page_count - 1, "pageCount": page_count}
     return jsonify(response)
 
+@app.route('/api/race-results', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def api_race_results():
+    result = race_result_pb2.RaceResultEntrySaveRequest()
+    result.ParseFromString(request.stream.read())
+    if not result.event_subgroup_id in global_race_results:
+        global_race_results[result.event_subgroup_id] = RaceResults()
+        global_race_results[result.event_subgroup_id].results = {}
+    global_race_results[result.event_subgroup_id].results[current_user.player_id] = result
+    global_race_results[result.event_subgroup_id].time = time.monotonic()
+    return '', 202
+
+@app.route('/api/race-results/summary', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_race_results_summary():
+    e_id = int(request.args.get('event_subgroup_id'))
+    results = race_result_pb2.RaceResultSummary()
+    if e_id in global_race_results:
+        sorted_results = sorted(global_race_results[e_id].results.items(), key=lambda item: item[1].activity_data.world_time)
+        for index, (player_id, result) in enumerate(sorted_results):
+            rr = race_result_pb2.RaceResultEntry()
+            rr.player_id = player_id
+            rr.event_subgroup_id = e_id
+            rr.position = index + 1
+            rr.event_id = e_id
+            rr.activity_data.CopyFrom(result.activity_data)
+            rr.activity_data.time = rr.activity_data.world_time + 1414016074397
+            ape = ActualPrivateEvents()
+            if e_id in ape.keys():
+                rr.activity_data.elapsed_ms = rr.activity_data.time - stime_to_timestamp(ape[e_id]['eventStart']) * 1000
+            rr.power_data.CopyFrom(result.power_data)
+            profile = get_partial_profile(player_id)
+            rr.profile_data.weight_in_grams = profile.weight_in_grams
+            rr.profile_data.height_in_centimeters = profile.height_in_millimeters // 10
+            rr.profile_data.gender = 1 if profile.male else 2
+            rr.profile_data.player_type = profile.player_type
+            rr.profile_data.first_name = profile.first_name
+            rr.profile_data.last_name = profile.last_name
+            if profile.imageSrc:
+                rr.profile_data.avatar_url = profile.imageSrc
+            rr.sensor_data.CopyFrom(result.sensor_data)
+            rr.time = rr.activity_data.time
+            rr.distance_to_leader = rr.activity_data.world_time - sorted_results[0][1].activity_data.world_time
+            results.f1.add().CopyFrom(rr)
+            results.f2.add().CopyFrom(rr)
+        results.total = len(results.f1)
+    return results.SerializeToString(), 200
+
 
 def add_segment_results(results, rows):
     for row in rows:
@@ -4093,6 +4150,9 @@ def remove_inactive():
         for p_id in list(player_partial_profiles.keys()):
             if time.monotonic() > player_partial_profiles[p_id].time + 3600:
                 player_partial_profiles.pop(p_id)
+        for e_id in list(global_race_results.keys()):
+            if time.monotonic() > global_race_results[e_id].time + 3600:
+                global_race_results.pop(e_id)
         time.sleep(600)
 
 
