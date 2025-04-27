@@ -1235,7 +1235,7 @@ def activity_row_to_json(activity, details=False):
     return data
 
 def select_activities_json(player_id, limit, start_after=None):
-    filters = [Activity.distanceInMeters > 100]
+    filters = [Activity.distanceInMeters > 1]
     if player_id:
         filters.append(Activity.player_id == player_id)
     if start_after:
@@ -2447,7 +2447,7 @@ def api_profiles_activities_id(player_id, activity_id):
     if request.args.get('upload-to-strava') != 'true':
         return response, 200
 
-    if activity.distanceInMeters == 0: # Zwift saves the current activity when joining events, even if the distance is zero
+    if activity.distanceInMeters < 1: # Zwift saves the current activity when joining events (may have small distance even if didn't move)
         Activity.query.filter_by(id=activity_id).delete()
         db.session.commit()
         logout_player(player_id)
