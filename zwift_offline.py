@@ -1255,11 +1255,11 @@ def api_activity_feed():
     limit = int(request.args.get('limit'))
     feed_type = request.args.get('feedType')
     start_after = request.args.get('start_after_activity_id')
-    if feed_type == 'JUST_ME' or feed_type == 'PREVIEW': #what is the difference here?
+    if feed_type == 'JUST_ME' or request.path.endswith('just-me'):
         profile_id = current_user.player_id
     elif feed_type == 'OTHER_PROFILE':
         profile_id = int(request.args.get('profile_id'))
-    else: # todo: FAVORITES, FOLLOWEES (showing all for now)
+    else: # todo: FAVORITES, FOLLOWEES, PREVIEW (showing all for now)
         profile_id = None
     ret = select_activities_json(profile_id, limit, start_after)
     return jsonify(ret)
@@ -3269,7 +3269,7 @@ def relay_worlds_id_aggregate_mobile(server_realm):
     goals = select_protobuf_goals(current_user.player_id, goalCount)
     json_goals = convert_goals_to_json(goals)
     activityCount = int(request.args.get('activityCount'))
-    json_activities = select_activities_json(current_user.player_id, activityCount)
+    json_activities = select_activities_json(None, activityCount)
     eventCount = int(request.args.get('eventCount'))
     eventSport = request.args.get('eventSport')
     events = get_events(eventCount, eventSport)
