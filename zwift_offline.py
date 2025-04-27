@@ -1234,17 +1234,18 @@ def activity_row_to_json(activity, details=False):
         data.update(extra_data)
     return data
 
-def select_activities_json(player_id, limit, start_after=None):
+def select_activities_json(player_id, limit, start_after=None, in_progress=True):
     filters = [Activity.distanceInMeters > 1]
     if player_id:
         filters.append(Activity.player_id == player_id)
+    if not in_progress:
+        filters.append(Activity.end_date != None)
     if start_after:
         filters.append(Activity.id < int(start_after))
     rows = Activity.query.filter(*filters).order_by(Activity.date.desc()).limit(limit)
     ret = []
     for row in rows:
-        if row.end_date:
-            ret.append(activity_row_to_json(row))
+        ret.append(activity_row_to_json(row))
     return ret
 
 @app.route('/api/activity-feed/feed/', methods=['GET'])
@@ -1255,13 +1256,16 @@ def api_activity_feed():
     limit = int(request.args.get('limit'))
     feed_type = request.args.get('feedType')
     start_after = request.args.get('start_after_activity_id')
+    profile_id = None
+    in_progress = False
     if feed_type == 'JUST_ME' or request.path.endswith('just-me'):
         profile_id = current_user.player_id
     elif feed_type == 'OTHER_PROFILE':
         profile_id = int(request.args.get('profile_id'))
-    else: # todo: FAVORITES, FOLLOWEES, PREVIEW (showing all for now)
-        profile_id = None
-    ret = select_activities_json(profile_id, limit, start_after)
+    elif feed_type == 'PREVIEW':
+        in_progress = True
+    # todo: FAVORITES, FOLLOWEES (showing all for now)
+    ret = select_activities_json(profile_id, limit, start_after, in_progress)
     return jsonify(ret)
 
 def create_activity_file(fit_file, small_file, full_file=None):
