@@ -46,6 +46,9 @@ def main(argv):
     parser.add_argument('-o', '--socks', help='Get socks', default=False)
     parser.add_argument('-g', '--glasses', help='Get glasses', default=False)
     megroup.add_argument('-p', '--paintjob', help='Get paintjob', default=False)
+    parser.add_argument('--run_shirt', help='Get run shirt', default=False)
+    parser.add_argument('--run_shorts', help='Get run shorts', default=False)
+    parser.add_argument('--run_shoes', help='Get run shoes', default=False)
     args = parser.parse_args()
 
     total_data = {}
@@ -70,6 +73,13 @@ def main(argv):
         total_data.update(get_item("./PAINTJOBS/PAINTJOB", args.paintjob, 'bike_frame_colour'))
         total_data['bike_frame_colour'] <<= 32
         total_data.update(get_item("./BIKEFRAMES/BIKEFRAME", total_data['bike_frame_colour_name'].split('-')[0], 'bike_frame'))
+    if args.run_shirt:
+        total_data.update(get_item("./RUNSHIRTS/RUNSHIRT", args.run_shirt, 'run_shirt_type'))
+    if args.run_shorts:
+        total_data.update(get_item("./RUNSHORTS/RUNSHORT", args.run_shorts, 'run_shorts_type'))
+    if args.run_shoes:
+        total_data.update(get_item("./RUNSHOES/RUNSHOE", args.run_shoes, 'run_shoes_type'))
+    total_data['random_body'] = False
 
     data = json.dumps(total_data, indent=2)
     print(data)

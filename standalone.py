@@ -514,7 +514,7 @@ def load_bots():
                         positions = []
                         for n in range(0, multiplier):
                             p = profile_pb2.PlayerProfile()
-                            p.CopyFrom(zo.random_profile(p))
+                            zo.random_equipment(p)
                             p.id = i + 1000000 + n * 10000
                             global_bots[p.id] = BotVariables()
                             bot = global_bots[p.id]
@@ -532,17 +532,11 @@ def load_bots():
                                 loop_riders = get_names()
                                 random.shuffle(loop_riders)
                             rider = loop_riders.pop()
-                            for item in ['first_name', 'last_name', 'is_male', 'country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
+                            for item in ['first_name', 'last_name', 'is_male', 'country_code', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear',
+                              'glasses_type', 'ride_jersey', 'ride_helmet_type', 'ride_shoes_type', 'ride_socks_type', 'run_shirt_type', 'run_shorts_type', 'run_shoes_type']:
                                 if item in rider:
                                     setattr(p, item, rider[item])
-                            p.hair_type = random.choice(zo.GD['hair_types'])
-                            p.hair_colour = random.randrange(5)
-                            if p.is_male:
-                                p.body_type = random.choice(zo.GD['body_types_male'])
-                                p.facial_hair_type = random.choice(zo.GD['facial_hair_types'])
-                                p.facial_hair_colour = random.randrange(5)
-                            else:
-                                p.body_type = random.choice(zo.GD['body_types_female'])
+                            zo.random_body(p)
                             bot.profile = p
                         i += 1
 

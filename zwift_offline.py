@@ -2124,7 +2124,7 @@ def time_since(date):
     if interval > 1: interval_type += 's'
     return '%s %s ago' % (interval, interval_type)
 
-def random_profile(p):
+def random_equipment(p):
     p.ride_helmet_type = random.choice(GD['headgears'])
     p.glasses_type = random.choice(GD['glasses'])
     p.ride_shoes_type = random.choice(GD['bikeshoes'])
@@ -2136,7 +2136,18 @@ def random_profile(p):
     p.run_shirt_type = random.choice(GD['runshirts'])
     p.run_shorts_type = random.choice(GD['runshorts'])
     p.run_shoes_type = random.choice(GD['runshoes'])
-    return p
+
+def random_body(p, random_gender=False):
+    if random_gender:
+        p.is_male = bool(random.getrandbits(1))
+    p.hair_type = random.choice(GD['hair_types'])
+    p.hair_colour = random.randrange(5)
+    if p.is_male:
+        p.body_type = random.choice(GD['body_types_male'])
+        p.facial_hair_type = random.choice(GD['facial_hair_types'])
+        p.facial_hair_colour = random.randrange(5)
+    else:
+        p.body_type = random.choice(GD['body_types_female'])
 
 @app.route('/api/profiles', methods=['GET'])
 def api_profiles():
@@ -2144,27 +2155,29 @@ def api_profiles():
     profiles = profile_pb2.PlayerProfiles()
     for i in args:
         p_id = int(i)
-        profile = profile_pb2.PlayerProfile()
         if p_id > 10000000:
             ghostId = math.floor(p_id / 10000000)
             player_id = p_id - ghostId * 10000000
+            p = profiles.profiles.add()
             profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, player_id)
             if os.path.isfile(profile_file):
                 with open(profile_file, 'rb') as fd:
-                    profile.ParseFromString(fd.read())
-                    p = profiles.profiles.add()
-                    p.CopyFrom(random_profile(profile))
-                    p.id = p_id
-                    p.first_name = ''
-                    try:  # profile can be requested after ghost is deleted
-                        p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
-                    except:
-                        p.last_name = 'Ghost'
-                    p.country_code = 0
-                    if GHOST_PROFILE:
-                        for item in ['country_code', 'ride_jersey', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'ride_helmet_type', 'glasses_type', 'ride_shoes_type', 'ride_socks_type']:
-                            if item in GHOST_PROFILE:
-                                setattr(p, item, GHOST_PROFILE[item])
+                    p.ParseFromString(fd.read())
+            p.id = p_id
+            p.first_name = ''
+            try:  # profile can be requested after ghost is deleted
+                p.last_name = time_since(global_ghosts[player_id].play[ghostId-1].date)
+            except:
+                p.last_name = 'Ghost'
+            p.country_code = 0
+            random_equipment(p)
+            if GHOST_PROFILE:
+                for item in ['is_male', 'country_code', 'bike_frame', 'bike_frame_colour', 'bike_wheel_front', 'bike_wheel_rear', 'glasses_type',
+                  'ride_jersey', 'ride_helmet_type', 'ride_shoes_type', 'ride_socks_type', 'run_shirt_type', 'run_shorts_type', 'run_shoes_type']:
+                    if item in GHOST_PROFILE:
+                        setattr(p, item, GHOST_PROFILE[item])
+                if 'random_body' in GHOST_PROFILE and GHOST_PROFILE['random_body']:
+                    random_body(p, 'is_male' not in GHOST_PROFILE)
         elif p_id > 9000000:
             p = profiles.profiles.add()
             p.id = p_id
@@ -2176,6 +2189,7 @@ def api_profiles():
             elif p_id in global_bots.keys():
                 profile = global_bots[p_id].profile
             else:
+                profile = profile_pb2.PlayerProfile()
                 profile_file = '%s/%s/profile.bin' % (STORAGE_DIR, p_id)
                 if os.path.isfile(profile_file):
                     with open(profile_file, 'rb') as fd:
