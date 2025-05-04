@@ -4142,13 +4142,9 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     host = os.environ.get('ZOFFLINE_API_HOST', '0.0.0.0')
     port = int(os.environ.get('ZOFFLINE_API_PORT', 443))
     use_cert = os.environ.get('ZOFFLINE_API_USE_CERT', 'true').lower() == 'true'
-
-    logger.info("Server running on %s:%d using certificate: %d", host, port, use_cert)
-
-    cert_kwargs = {
-        'certfile': '%s/cert-zwift-com.pem' % SSL_DIR,
-        'keyfile': '%s/key-zwift-com.pem' % SSL_DIR,
-    }
+    if host != '0.0.0.0' or port != 443 or not use_cert:
+        logger.info("Listening on %s:%d using certificate: %s", host, port, use_cert)
+    cert_kwargs = {'certfile': '%s/cert-zwift-com.pem' % SSL_DIR, 'keyfile': '%s/key-zwift-com.pem' % SSL_DIR}
     if not use_cert:
         cert_kwargs = {}
     server = WSGIServer((host, port), app, log=logger, **cert_kwargs)
