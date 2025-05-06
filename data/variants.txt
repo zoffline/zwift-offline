@@ -1428,6 +1428,7 @@
     },
     {
       "name": "game_1_85_route_dist_remaining_refactor",
+      "value": true,
       "values": {}
     },
     {
@@ -1515,6 +1516,17 @@
       "values": {}
     },
     {
+      "name": "game_1_88_auto_start_climb_portal",
+      "value": true,
+      "values": {
+        "fields": {
+          "check_all_checkpoints": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_1_88_close_the_gap_v2",
       "value": true,
       "values": {}
@@ -1522,6 +1534,34 @@
     {
       "name": "game_1_88_multi_card_hero_carousel",
       "values": {}
+    },
+    {
+      "name": "game_1_88_timingarch_experiment_1",
+      "values": {}
+    },
+    {
+      "name": "game_1_89_action_bar_hint",
+      "values": {}
+    },
+    {
+      "name": "game_1_89_trainer_firmware_outdated_warning",
+      "values": {}
+    },
+    {
+      "name": "game_1_90_event_after_party",
+      "values": {
+        "fields": {
+          "bAlwaysOn": {
+            "boolValue": false
+          },
+          "default_duration_seconds": {
+            "numberValue": 300.0
+          },
+          "results_refresh_seconds": {
+            "numberValue": 10.0
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1770,7 +1810,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "144162"
+            "stringValue": "145773"
           },
           "canary_test": {
             "boolValue": true
@@ -1787,8 +1827,11 @@
           "formatted_api": {
             "stringValue": "api/assetcms/delivery/tenant/{tenant}/static/asset/{asset_type}/{path_root}/{path}"
           },
-          "gocatgo": {
+          "goandigo": {
             "boolValue": true
+          },
+          "gocatgo": {
+            "boolValue": false
           },
           "loose_files": {
             "boolValue": false
@@ -1815,8 +1858,7 @@
       }
     },
     {
-      "name": "game_emojis_for_legacy_ui",
-      "values": {}
+      "name": "game_emojis_for_legacy_ui"
     },
     {
       "name": "game_end_game_session",
@@ -1961,6 +2003,10 @@
       "values": {}
     },
     {
+      "name": "game_off_route_path_prediction",
+      "values": {}
+    },
+    {
       "name": "game_road_graph_in_game",
       "values": {}
     },
@@ -1970,7 +2016,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.88.0"
+            "stringValue": "1.89.0"
           }
         }
       }
@@ -2106,6 +2152,23 @@
       "values": {}
     },
     {
+      "name": "game_world_deco_packages",
+      "value": true,
+      "values": {
+        "fields": {
+          "goandigo": {
+            "boolValue": false
+          },
+          "tdf2025": {
+            "boolValue": false
+          },
+          "tdffaz2025": {
+            "boolValue": false
+          }
+        }
+      }
+    },
+    {
       "name": "game_would_block_manager",
       "values": {}
     },
@@ -2126,6 +2189,10 @@
     {
       "name": "game_zp_create_full_trainer_on_swap",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_zp_user_input_binding",
       "values": {}
     },
     {
@@ -2157,7 +2224,13 @@
     {
       "name": "gn_deferred_lighting",
       "value": true,
-      "values": {}
+      "values": {
+        "fields": {
+          "deferred_preview": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "gn_lights",

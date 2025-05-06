@@ -14,7 +14,7 @@ with open("../data/variants.txt") as f:
     vs = [d for d in json.load(f)['variants'] if any(d['name'].startswith(s) for s in keep)]
 
 for v in MessageToDict(variants)['variants']:
-    if 'fields' in v['values']:
+    if 'values' in v and 'fields' in v['values']:
         v['values']['fields'] = dict(sorted(v['values']['fields'].items()))
     vs.append(v)
 

@@ -32,6 +32,14 @@
     "road": "10025"
   },
   {
+    "name": "Col de la Croix Saint-Robert (5.7 km / 345 m)",
+    "road": "10047"
+  },
+  {
+    "name": "Col de la Madeleine (14.3 km / 1110 m)",
+    "road": "10048"
+  },
+  {
     "name": "Col de la Madone (15.9 km / 898 m)",
     "road": "10015"
   },
@@ -96,6 +104,10 @@
     "road": "10040"
   },
   {
+    "name": "Hautacam (12.7 km / 1023 m)",
+    "road": "10046"
+  },
+  {
     "name": "Isola 2000 (18.9 km / 1145 m)",
     "road": "10030"
   },
@@ -126,6 +138,10 @@
   {
     "name": "Mt. Hamilton (31.3 km / 1259 m)",
     "road": "10036"
+  },
+  {
+    "name": "M\u00fbr De Bretagne (2 km / 128 m)",
+    "road": "10045"
   },
   {
     "name": "Norton Summit (8.7 km / 363 m)",
