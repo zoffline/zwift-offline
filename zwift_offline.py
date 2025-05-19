@@ -97,6 +97,7 @@ ZWIFT_VER_CUR = ET.parse('%s/cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
+FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 if os.path.exists(SERVER_IP_FILE):
     with open(SERVER_IP_FILE, 'r') as f:
         server_ip = f.read().rstrip('\r\n')
@@ -686,7 +687,10 @@ def send_mail(username, token):
             message['From'] = sender_email
             message['To'] = username
             message['Subject'] = "Password reset"
-            content = "https://secure.zwift.com/login/?token=%s" % (token)
+            if os.path.exists(FAKE_DNS_FILE):
+            	content = "https://secure.zwift.com/login/?token=%s" % (token)
+            else:
+            	content = "https://%s/login/?token=%s" % (server_ip, token)
             message.attach(MIMEText(content, 'plain'))
             server.sendmail(sender_email, username, message.as_string())
             server.close()
