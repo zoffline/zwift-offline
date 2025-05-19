@@ -299,7 +299,9 @@ To enable support for multiple users perform the steps below:
   * TCP ports 80, 443, 3025 and UDP port 3024 will need to be open on the PC running zoffline if it's running remotely.
 * Start Zwift and create an account.
   * This account will only exist on your zoffline server and has no relation with your actual Zwift account.
-* To enable the password reset feature: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account. You need to access https://security.google.com/settings/security/apppasswords and create an app password to allow the login from the server.
+* To enable the password reset feature: create a ``gmail_credentials.txt`` file in the ``storage`` directory containing the login credentials of a Gmail account.
+  * You need to access https://security.google.com/settings/security/apppasswords and create an app password to allow the login from the server.
+  * Optionally, the third line can contain the host for the recovery URL (server IP will be used by default).
 
 </details>
 

@@ -680,13 +680,14 @@ def send_mail(username, token):
         with open('%s/gmail_credentials.txt' % STORAGE_DIR) as f:
             sender_email = f.readline().rstrip('\r\n')
             password = f.readline().rstrip('\r\n')
+            host = f.readline().rstrip('\r\n')
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
             server.login(sender_email, password)
             message = MIMEMultipart()
             message['From'] = sender_email
             message['To'] = username
             message['Subject'] = "Password reset"
-            content = "https://%s/login/?token=%s" % (server_ip, token)
+            content = "https://%s/login/?token=%s" % (host if host else server_ip, token)
             message.attach(MIMEText(content, 'plain'))
             server.sendmail(sender_email, username, message.as_string())
             server.close()
