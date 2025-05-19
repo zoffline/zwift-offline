@@ -686,7 +686,7 @@ def send_mail(username, token):
             message['From'] = sender_email
             message['To'] = username
             message['Subject'] = "Password reset"
-            content = "https://%s/login/?token=%s" % (server_ip, token)
+            content = "https://secure.zwift.com/login/?token=%s" % (token)
             message.attach(MIMEText(content, 'plain'))
             server.sendmail(sender_email, username, message.as_string())
             server.close()
