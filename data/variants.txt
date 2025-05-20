@@ -814,11 +814,6 @@
       "values": {}
     },
     {
-      "name": "game_1_63_roadmarkertexturescale",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_64_climbportalevent_endattoptag",
       "value": true,
       "values": {}
@@ -1545,6 +1540,7 @@
     },
     {
       "name": "game_1_89_trainer_firmware_outdated_warning",
+      "value": true,
       "values": {}
     },
     {
@@ -1554,6 +1550,12 @@
           "bAlwaysOn": {
             "boolValue": false
           },
+          "bDisableScreenshots": {
+            "boolValue": true
+          },
+          "bFixExtractRules": {
+            "boolValue": true
+          },
           "default_duration_seconds": {
             "numberValue": 300.0
           },
@@ -1562,6 +1564,13 @@
           }
         }
       }
+    },
+    {
+      "name": "game_1_90_use_web_onboarding_skill_level"
+    },
+    {
+      "name": "game_1_91_zp_auth",
+      "values": {}
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1708,16 +1717,16 @@
       "values": {}
     },
     {
+      "name": "game_android_perf_testing",
+      "values": {}
+    },
+    {
       "name": "game_android_skip_copy_from_apk",
       "value": true,
       "values": {}
     },
     {
       "name": "game_barun",
-      "values": {}
-    },
-    {
-      "name": "game_bc2_ab_test",
       "values": {}
     },
     {
@@ -1810,7 +1819,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "145773"
+            "stringValue": "146089"
           },
           "canary_test": {
             "boolValue": true
@@ -1875,6 +1884,9 @@
       "values": {}
     },
     {
+      "name": "game_for_you_tooltips"
+    },
+    {
       "name": "game_garage_gearing",
       "values": {}
     },
@@ -1928,6 +1940,7 @@
     },
     {
       "name": "game_hud_phase_2",
+      "value": true,
       "values": {
         "fields": {
           "complex_segment_summary": {
@@ -1937,7 +1950,7 @@
             "boolValue": false
           },
           "cycling_splits": {
-            "boolValue": false
+            "boolValue": true
           },
           "support_HSI_widget": {
             "boolValue": false
@@ -2016,7 +2029,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.89.0"
+            "stringValue": "1.90.0"
           }
         }
       }
@@ -2234,6 +2247,7 @@
     },
     {
       "name": "gn_lights",
+      "value": true,
       "values": {}
     },
     {
