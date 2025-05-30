@@ -14,11 +14,12 @@ a = Analysis(['standalone.py'],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
+             excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter', 'pkg_resources'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+a.binaries = [x for x in a.binaries if not 'Java_Temurin' in x[1]]
 a.datas += Tree('cdn', prefix='cdn')
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
@@ -33,7 +34,7 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          upx_exclude=['greenlet\\*.pyd', '_uuid.pyd', 'python3.dll', 'api-ms-win-*.dll'],
+          upx_exclude=['greenlet\\*.pyd', '_uuid.pyd', 'python3.dll'],
           runtime_tmpdir=None,
           console=True )
 
