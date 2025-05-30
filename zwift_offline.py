@@ -1057,34 +1057,31 @@ def reload_bots():
 @app.route("/settings/<username>/", methods=["GET", "POST"])
 @login_required
 def settings(username):
+    allowed_files = ['profile.bin', 'achievements.bin', 'user_storage.bin', 'streaks.bin', 'economy_config.txt']
     profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        if uploaded_file.filename in ['profile.bin', 'achievements.bin']:
+        if uploaded_file.filename in allowed_files:
             file_path = os.path.join(profile_dir, uploaded_file.filename)
             backup_file(file_path)
             uploaded_file.save(file_path)
         else:
             flash("Invalid file name.")
-    profile = None
-    profile_file = os.path.join(profile_dir, 'profile.bin')
-    if os.path.isfile(profile_file):
-        stat = os.stat(profile_file)
-        profile = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-    achievements = None
-    achievements_file = os.path.join(profile_dir, 'achievements.bin')
-    if os.path.isfile(achievements_file):
-        stat = os.stat(achievements_file)
-        achievements = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))
-    return render_template("settings.html", username=current_user.username, profile=profile, achievements=achievements)
+    files = []
+    for file in allowed_files:
+        file_path = os.path.join(profile_dir, file)
+        if os.path.isfile(file_path):
+            stat = os.stat(file_path)
+            files.append((file, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat.st_mtime))))
+    return render_template("settings.html", username=current_user.username, files=files)
 
 
-@app.route("/download/<filename>", methods=["GET"])
+@app.route("/download", methods=["POST"])
 @login_required
-def download(filename):
-    file = os.path.join(STORAGE_DIR, str(current_user.player_id), filename)
+def download():
+    file = os.path.join(STORAGE_DIR, str(current_user.player_id), request.form['filename'])
     if os.path.isfile(file):
-        return send_file(file)
+        return send_file(file, as_attachment=True)
 
 @app.route("/download/<int:player_id>/avatarLarge.jpg", methods=["GET"])
 def download_avatarLarge(player_id):
@@ -1100,7 +1097,7 @@ def delete(filename):
     credentials = ['zwift_credentials.bin', 'intervals_credentials.bin']
     strava = ['strava_api.bin', 'strava_token.txt']
     garmin = ['garmin_credentials.bin', 'garth/oauth1_token.json']
-    if filename not in ['profile.bin', 'achievements.bin'] + credentials + strava + garmin:
+    if filename not in credentials + strava + garmin:
         return '', 403
     delete_file = os.path.join(STORAGE_DIR, str(current_user.player_id), filename)
     if os.path.isfile(delete_file):

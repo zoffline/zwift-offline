@@ -17,40 +17,31 @@
       <a href="{{ url_for('intervals', username=username) }}" class="btn btn-sm btn-secondary">Intervals</a>
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm-8 col-md-8 top-buffer">
-      <ul class="list-group">
-        {% if profile %}
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col-md-12">
-                <table width="100%"><td width="30%"><label class="text-shadow">profile.bin</label></td>
-                <td width="35%"><label class="text-shadow">{{ profile }}</label></td>
-                <td align="right"><a href="/download/profile.bin"><div class="btn btn-sm btn-light">Download</div></a>
-                <a href="/delete/profile.bin"><div class="btn btn-sm btn-danger">Delete</div></a></td></table>
-              </div>
+  {% if files %}
+    <div class="row">
+      <div class="col-sm-8 col-md-6">
+        <form method="POST" action="/download" class="top-buffer">
+          <div class="row">
+            <div class="col-md-12">
+              <select name="filename" class="form-control form-control-sm">
+              {% for file in files %}
+                <option value="{{ file[0] }}">{{ file[0] }} ({{ file[1] }})</option>
+              {% endfor %}
+              </select>
             </div>
-          </li>
-        {% endif %}
-        {% if achievements %}
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col-md-12">
-                <table width="100%"><td width="30%"><label class="text-shadow">achievements.bin</label></td>
-                <td width="35%"><label class="text-shadow">{{ achievements }}</label></td>
-                <td align="right"><a href="/download/achievements.bin"><div class="btn btn-sm btn-light">Download</div></a>
-                <a href="/delete/achievements.bin"><div class="btn btn-sm btn-danger">Delete</div></a></td></table>
-              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 top-buffer">
+              <input type="submit" value="Download" class="btn btn-sm btn-light">
             </div>
-          </li>
-        {% endif %}
-      </ul>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm-8 col-md-6">
       <form method="POST" action="/settings/{{ username }}/" enctype="multipart/form-data" class="top-buffer">
-        <h5 class="text-shadow">Upload profile / achievements</h5>
         <div class="row">
           <div class="col-md-12">
             <input type="file" name="file" class="form-control-file text-shadow" />
