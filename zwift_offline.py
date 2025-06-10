@@ -1193,13 +1193,10 @@ def api_eventfeed():
         json_data.append({"event": e})
     return jsonify({"data":json_data,"cursor":None})
 
-@app.route('/api/recommendations/recommendation', methods=['GET'])
-def api_recommendations_recommendation():
-    return jsonify([{"type": "EVENT"}, {"type": "RIDE_WITH"}])
-
 @app.route('/api/campaign/profile/campaigns', methods=['GET'])
 @app.route('/api/announcements/active', methods=['GET'])
 @app.route('/api/recommendation/profile', methods=['GET'])
+@app.route('/api/recommendations/recommendation', methods=['GET'])
 @app.route('/api/subscription/plan', methods=['GET'])
 @app.route('/api/quest/quests/all-quests', methods=['GET'])
 @app.route('/api/quest/quests/my-quests', methods=['GET'])
@@ -1729,7 +1726,8 @@ def api_telemetry_config():
     return jsonify({"analyticsEvents": True, "batchInterval": 120, "innermostCullingRadius": 1500, "isEnabled": True,
         "key": "aXBSdlpza3p1aVlNOENrMTBQSzZEZ004Z2pwRm8zZUE6", "remoteLogLevel": 3, "sampleInterval": 60,
         "url": "https://us-or-rly101.zwift.com/v1/track", # used if no urlBatch (https://api.segment.io/v1/track)
-        "urlBatch": "https://us-or-rly101.zwift.com/hvc-ingestion-service/batch"})
+        "urlBatch": "https://us-or-rly101.zwift.com/hvc-ingestion-service/batch", "telemetryEvents": True, "gzip": False,
+        "structuredEventsUrl": "https://us-or-rly101.zwift.com/api/actions-service/structured-events/batch"})
 
 @app.route('/v1/track', methods=['POST'])
 @app.route('/hvc-ingestion-service/batch', methods=['POST'])
@@ -1737,6 +1735,10 @@ def api_telemetry_config():
 def hvc_ingestion_service_batch():
     #print(json.dumps(request.json, indent=4))
     return jsonify({"success": True})
+
+@app.route('/api/actions-service/structured-events/batch', methods=['POST'])
+def api_actions_service_structured_events_batch():
+    return '', 202
 
 
 def age(dob):

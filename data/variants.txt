@@ -291,7 +291,6 @@
     },
     {
       "name": "game_1_42_dca2",
-      "value": true,
       "values": {}
     },
     {
@@ -1383,11 +1382,6 @@
       "values": {}
     },
     {
-      "name": "game_1_83_unsched_tapi_workout",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_84_badges_v2",
       "value": true,
       "values": {}
@@ -1535,8 +1529,7 @@
       "values": {}
     },
     {
-      "name": "game_1_89_action_bar_hint",
-      "values": {}
+      "name": "game_1_89_action_bar_hint"
     },
     {
       "name": "game_1_89_trainer_firmware_outdated_warning",
@@ -1545,13 +1538,14 @@
     },
     {
       "name": "game_1_90_event_after_party",
+      "value": true,
       "values": {
         "fields": {
           "bAlwaysOn": {
             "boolValue": false
           },
           "bDisableScreenshots": {
-            "boolValue": true
+            "boolValue": false
           },
           "bFixExtractRules": {
             "boolValue": true
@@ -1566,11 +1560,30 @@
       }
     },
     {
+      "name": "game_1_90_ios_link_to_web_payment_provider"
+    },
+    {
       "name": "game_1_90_use_web_onboarding_skill_level"
     },
     {
-      "name": "game_1_91_zp_auth",
+      "name": "game_1_91_abandon_segment_portal_end_behavior",
+      "value": true
+    },
+    {
+      "name": "game_1_91_activity_cards",
       "values": {}
+    },
+    {
+      "name": "game_1_91_center_hud_onroute_update",
+      "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_1_91_publish_climb_portal_complete",
+      "value": true
+    },
+    {
+      "name": "game_1_91_zp_auth"
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1709,6 +1722,10 @@
       "values": {}
     },
     {
+      "name": "game_accessory_visibility",
+      "values": {}
+    },
+    {
       "name": "game_allow_bc1_memfault_reporting",
       "values": {}
     },
@@ -1819,7 +1836,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "146089"
+            "stringValue": "147680"
           },
           "canary_test": {
             "boolValue": true
@@ -1946,6 +1963,9 @@
           "complex_segment_summary": {
             "boolValue": false
           },
+          "cp_data_update_pause": {
+            "boolValue": false
+          },
           "critical_power_widget": {
             "boolValue": false
           },
@@ -2017,7 +2037,16 @@
     },
     {
       "name": "game_off_route_path_prediction",
-      "values": {}
+      "values": {
+        "fields": {
+          "center": {
+            "boolValue": false
+          },
+          "minimap": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "game_road_graph_in_game",
@@ -2025,11 +2054,10 @@
     },
     {
       "name": "game_routes_delivery",
-      "value": true,
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.90.0"
+            "stringValue": ""
           }
         }
       }
@@ -2177,6 +2205,9 @@
           },
           "tdffaz2025": {
             "boolValue": false
+          },
+          "zracingjune": {
+            "boolValue": true
           }
         }
       }
