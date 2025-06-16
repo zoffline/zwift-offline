@@ -58,8 +58,10 @@ import events_pb2
 import variants_pb2
 import playback_pb2
 import user_storage_pb2
-import online_sync
 import fitness_pb2
+import structured_events_pb2
+
+import online_sync
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -1738,7 +1740,15 @@ def hvc_ingestion_service_batch():
 
 @app.route('/api/actions-service/structured-events/batch', methods=['POST'])
 def api_actions_service_structured_events_batch():
-    return '', 202
+    stream = request.stream.read()
+    #import blackboxprotobuf
+    #message, typedef = blackboxprotobuf.protobuf_to_json(stream)
+    #print(json.dumps(json.loads(message), indent=2))
+    req = structured_events_pb2.SaveStructuredEventRequest()
+    req.ParseFromString(stream)
+    res = structured_events_pb2.SaveStructuredEventResponse()
+    res.sequenceNumber = req.sequenceNumber
+    return res.SerializeToString(), 202
 
 
 def age(dob):

@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+message SaveStructuredEventRequest {
+	optional uint32 sequenceNumber = 1;
+}
+
+message SaveStructuredEventResponse {
+	optional uint32 sequenceNumber = 1;
+}
