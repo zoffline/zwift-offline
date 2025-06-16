@@ -444,14 +444,11 @@ def regroup_ghosts(player_id):
     if not ghosts.started and ghosts.play:
         ghosts.started = True
     for g in ghosts.play:
-        states = [(s.roadTime, s.distance) for s in g.route.states if zo.road_id(s) == zo.road_id(p) and zo.is_forward(s) == zo.is_forward(p)]
-        if states:
-            c = min(states, key=lambda x: sum(abs(r - d) for r, d in zip((p.roadTime, p.distance), x)))
-            g.position = 0
-            while g.route.states[g.position].roadTime != c[0] or g.route.states[g.position].distance != c[1]:
-                g.position += 1
-            if is_ahead(p, g.route.states[g.position].roadTime):
-                g.position += 1
+        n = zo.nearest(p, g)
+        if n != None:
+            if is_ahead(p, g.route.states[n].roadTime):
+                n += 1
+            g.position = n
     ghosts.last_play = 0
 
 def load_pace_partners():

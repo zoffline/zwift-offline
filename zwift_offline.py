@@ -3354,6 +3354,16 @@ def save_bookmark(state, name):
     with open(os.path.join(bookmarks_dir, name + '.bin'), 'wb') as f:
         f.write(state.SerializeToString())
 
+def nearest(p, b):
+    i = None
+    states = [(s.roadTime, s.distance) for s in b.route.states if road_id(s) == road_id(p) and is_forward(s) == is_forward(p)]
+    if states:
+        i = 0
+        n = min(states, key=lambda x: sum(abs(r - d) for r, d in zip((p.roadTime, p.distance), x)))
+        while b.route.states[i].roadTime != n[0] or b.route.states[i].distance != n[1]:
+            i += 1
+    return i
+
 @app.route('/relay/worlds/attributes', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -3373,6 +3383,15 @@ def relay_worlds_attributes():
                 command = chat_message.message[1:]
                 if command == 'regroup':
                     regroup_ghosts(chat_message.player_id)
+                elif command == 'groupbots':
+                    if not MULTIPLAYER or chat_message.player_id == 1 or current_user.is_admin:
+                        for bot in global_bots.keys():
+                            if bot % 1000000 < 10000:  # not a duplicate
+                                n = nearest(state, global_bots[bot])
+                                if n != None:
+                                    global_bots[bot].position = n
+                    else:
+                        send_message('Permission denied', recipients=[chat_message.player_id])
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:
