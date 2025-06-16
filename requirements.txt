@@ -2,7 +2,7 @@ flask==2.3.2
 flask-login==0.6.3
 flask_sqlalchemy==3.0.3
 gevent==24.2.1
-protobuf==4.21.12
+protobuf==4.25.8
 pycryptodome==3.19.1
 pyjwt==2.6.0
 stravalib==1.1.0
