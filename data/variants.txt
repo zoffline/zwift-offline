@@ -2317,6 +2317,9 @@
       "values": {}
     },
     {
+      "name": "zwift_launcher_osx_config"
+    },
+    {
       "name": "zwift_launcher_osx_metal",
       "value": true,
       "values": {}
@@ -2335,6 +2338,20 @@
       "name": "zwift_launcher_osx_silicon",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "zwift_launcher_update_interval",
+      "value": true,
+      "values": {
+        "fields": {
+          "hours": {
+            "varintValue": "24"
+          }
+        }
+      }
+    },
+    {
+      "name": "zwift_launcher_win_config"
     },
     {
       "name": "zwift_launcher_win_rollout",
