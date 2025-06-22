@@ -317,6 +317,7 @@ To enable support for multiple users perform the steps below:
 
 <details><summary>Bots</summary>
 
+* Create a file ``server-ip.txt`` inside the ``storage`` folder and set it to the IP of the machine running the server. If it's the machine running Zwift use ``127.0.0.1``. If you're using Docker and not exposing the ports on localhost (the ``-p`` flag or ``ports`` in ``docker-compose.yaml`` use the IP of the docker container. 
 * Create a file ``enable_bots.txt`` inside the ``storage`` folder to load ghosts as bots, they will keep riding around regardless of the route you are riding.
 * Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
 * Type ``.groupbots`` in chat to group the bots.
