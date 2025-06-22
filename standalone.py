@@ -271,12 +271,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
         details1 = msg.udp_config.relay_addresses.add()
         details1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         details1.lb_course = 6 # watopia crowd
-        details1.ip = zo.server_ip
+        details1.ip = '127.0.0.1' if self.request.getpeername()[0] == '127.0.0.1' else zo.server_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
         details2.lb_realm = 0 #generic load balancing realm
         details2.lb_course = 0 #generic load balancing course
-        details2.ip = zo.server_ip
+        details2.ip = '127.0.0.1' if self.request.getpeername()[0] == '127.0.0.1' else zo.server_ip
         details2.port = 3022
         msg.udp_config.uc_f2 = 10
         msg.udp_config.uc_f3 = 30
