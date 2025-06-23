@@ -1713,6 +1713,12 @@ def custom_style(filename):
 def static_web_launcher(filename):
     return send_from_directory('%s/cdn/static/web/launcher' % SCRIPT_DIR, filename)
 
+# Android uses https for schedules, redirect to http to enable proxy
+@app.route('/gameassets/MapSchedule_v2.xml')
+@app.route('/gameassets/PortalRoadSchedule_v1.xml')
+def gameassets_schedule():
+    return redirect('http://cdn.zwift.com%s' % request.path)
+
 
 @app.route('/api/telemetry/config', methods=['GET'])
 def api_telemetry_config():
