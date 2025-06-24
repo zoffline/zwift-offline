@@ -1,6 +1,9 @@
 {
   "variants": [
     {
+      "name": "bc2_prerelease_flags"
+    },
+    {
       "name": "bikemodifiercalculator_params",
       "value": true,
       "values": {
@@ -768,23 +771,6 @@
       "values": {}
     },
     {
-      "name": "game_1_58_support_zp_user_inputs",
-      "value": true,
-      "values": {
-        "fields": {
-          "enable_paintscheme_entitlement_grant": {
-            "boolValue": true
-          },
-          "enable_settings_ui": {
-            "boolValue": true
-          },
-          "show_hardware_tab": {
-            "boolValue": true
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_59_queued_recommendations",
       "value": true,
       "values": {}
@@ -1036,15 +1022,7 @@
       "values": {}
     },
     {
-      "name": "game_1_71_challenge_carousel",
-      "value": true,
-      "values": {
-        "fields": {
-          "challenge_carousel_id": {
-            "stringValue": "prod_home_challenge_carousel"
-          }
-        }
-      }
+      "name": "game_1_71_challenge_carousel"
     },
     {
       "name": "game_1_71_csos",
@@ -1372,6 +1350,9 @@
           },
           "IgnoreNonQualifyingAndDeletedActivities": {
             "boolValue": true
+          },
+          "ShouldApplyBonusXPFromExternalActivity": {
+            "boolValue": true
           }
         }
       }
@@ -1570,8 +1551,7 @@
       "value": true
     },
     {
-      "name": "game_1_91_activity_cards",
-      "values": {}
+      "name": "game_1_91_activity_cards"
     },
     {
       "name": "game_1_91_center_hud_onroute_update",
@@ -1579,11 +1559,37 @@
       "values": {}
     },
     {
+      "name": "game_1_91_nav_bar_social_tab"
+    },
+    {
       "name": "game_1_91_publish_climb_portal_complete",
       "value": true
     },
     {
       "name": "game_1_91_zp_auth"
+    },
+    {
+      "name": "game_1_92_climb_portal_xp_exploit"
+    },
+    {
+      "name": "game_1_92_for_you_recommendations_bff"
+    },
+    {
+      "name": "game_1_92_robo_pacer_custom_skin",
+      "value": true,
+      "values": {
+        "fields": {
+          "BodyTextureName": {
+            "stringValue": "RPBodyTourFever_DM.tga"
+          },
+          "GlowTextureName": {
+            "stringValue": "Glow_TourFever.tga"
+          },
+          "LimbsTextureName": {
+            "stringValue": "RPLimbsTourFever_DM.tga"
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1972,6 +1978,9 @@
           "cycling_splits": {
             "boolValue": true
           },
+          "minimap_route_badge": {
+            "boolValue": false
+          },
           "support_HSI_widget": {
             "boolValue": false
           },
@@ -2054,10 +2063,11 @@
     },
     {
       "name": "game_routes_delivery",
+      "value": true,
       "values": {
         "fields": {
           "version": {
-            "stringValue": ""
+            "stringValue": "1.92.0"
           }
         }
       }
@@ -2093,6 +2103,7 @@
     },
     {
       "name": "game_structured_events_service",
+      "value": true,
       "values": {
         "fields": {
           "batch_time_ms": {
@@ -2115,6 +2126,10 @@
     {
       "name": "game_tdz_2025_package_fw",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_tenpeaks",
       "values": {}
     },
     {
@@ -2291,10 +2306,6 @@
     },
     {
       "name": "log_ble_packets",
-      "values": {}
-    },
-    {
-      "name": "settings_bc2_diagram",
       "values": {}
     },
     {
