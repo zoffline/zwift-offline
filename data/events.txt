@@ -126,6 +126,13 @@
     "sport": 0
   },
   {
+    "name": "Makuri Islands - Red Zone Repeats",
+    "route": 2892858917,
+    "distance": 19594.8,
+    "course": 13,
+    "sport": 0
+  },
+  {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54963.3,
@@ -224,6 +231,20 @@
     "sport": 1
   },
   {
+    "name": "Watopia - Climb Control",
+    "route": 1464561389,
+    "distance": 23973.2,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Flat Out Fast",
+    "route": 1258526800,
+    "distance": 22331.2,
+    "course": 6,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Flat Route Reverse",
     "route": 3811569265,
     "distance": 10469.6,
@@ -262,6 +283,13 @@
     "name": "Watopia - Jungle Circuit Reverse",
     "route": 2839057126,
     "distance": 14150.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Power Punches",
+    "route": 1201172818,
+    "distance": 23670.0,
     "course": 6,
     "sport": 0
   },

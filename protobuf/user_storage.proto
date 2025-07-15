@@ -21,6 +21,8 @@ message GameSettings {
     optional int32 climb_graph_sensitivity = 9;
     optional float screen_shake_scale = 10;
     optional int32 streaks_flair_visuals = 11;
+    optional int32 ride_stats_slot0 = 13;
+    optional int32 ride_stats_slot1 = 14;
 }
 
 message GarageItemLastSelected {

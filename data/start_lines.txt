@@ -414,6 +414,11 @@
     "road": 19,
     "time": 771259
   },
+  "-1402108379": {
+    "name": "Makuri Islands - Red Zone Repeats",
+    "road": 0,
+    "time": 880575
+  },
   "-729536506": {
     "name": "Makuri Islands - Rooftop Rendezvous",
     "road": 70,
@@ -804,6 +809,11 @@
     "road": 47,
     "time": 474571
   },
+  "1464561389": {
+    "name": "Watopia - Climb Control",
+    "road": 149,
+    "time": 399235
+  },
   "-1613077956": {
     "name": "Watopia - Climb Portal - Volcano",
     "road": 23,
@@ -878,6 +888,11 @@
     "name": "Watopia - Figure 8 Reverse",
     "road": 0,
     "time": 987941
+  },
+  "1258526800": {
+    "name": "Watopia - Flat Out Fast",
+    "road": 1,
+    "time": 90003
   },
   "-899269028": {
     "name": "Watopia - Flat Route",
@@ -1053,6 +1068,11 @@
     "name": "Watopia - Peak Performance",
     "road": 1,
     "time": 90000
+  },
+  "1201172818": {
+    "name": "Watopia - Power Punches",
+    "road": 0,
+    "time": 988114
   },
   "-1264962564": {
     "name": "Watopia - Power to the Portal",
