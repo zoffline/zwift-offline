@@ -892,6 +892,9 @@
           "enabledForRaces": {
             "boolValue": false
           },
+          "enabledForTT": {
+            "boolValue": false
+          },
           "enabledForWatopia": {
             "boolValue": false
           },
@@ -1597,13 +1600,13 @@
       "values": {
         "fields": {
           "BodyTextureName": {
-            "stringValue": "RPBodyTourFever_DM.tga"
+            "stringValue": "RPBodyTDFFAZ_DM.tga"
           },
           "GlowTextureName": {
             "stringValue": "Glow_TourFever.tga"
           },
           "LimbsTextureName": {
-            "stringValue": "RPLimbsTourFever_DM.tga"
+            "stringValue": "RPLimbsTDFFAZ_DM.tga"
           }
         }
       }
@@ -1998,7 +2001,7 @@
       "values": {
         "fields": {
           "complex_segment_summary": {
-            "boolValue": true
+            "boolValue": false
           },
           "cp_data_update_pause": {
             "boolValue": true
@@ -2080,12 +2083,10 @@
       "values": {}
     },
     {
-      "name": "game_off_route_path_prediction",
-      "values": {}
+      "name": "game_off_route_path_prediction"
     },
     {
-      "name": "game_road_graph_in_game",
-      "values": {}
+      "name": "game_road_graph_in_game"
     },
     {
       "name": "game_routes_delivery",
