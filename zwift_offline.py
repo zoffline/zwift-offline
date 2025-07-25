@@ -164,6 +164,7 @@ global_race_results = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
+auto_group = {'id': None, 'road_id': None, 'is_forward': None, 'all': False, 'thread': None}
 
 with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
     CLIMBS = json.load(f)
@@ -3361,6 +3362,29 @@ def nearest(p, b):
             i += 1
     return i
 
+def group_bots(state, including_duplicates):
+    for bot in global_bots.keys():
+        if bot % 1000000 < 10000 or including_duplicates:
+            n = nearest(state, global_bots[bot])
+            if n != None:
+                if including_duplicates:
+                    n += bot % 1000000 // 10000
+                    if n >= len(global_bots[bot].route.states):
+                        n -= len(global_bots[bot].route.states)
+                global_bots[bot].position = n
+
+def auto_group_bots():
+    while True:
+        if auto_group['id'] in online:
+            state = online[auto_group['id']]
+            if road_id(state) != auto_group['road_id'] or is_forward(state) != auto_group['is_forward']:
+                auto_group.update({'road_id': road_id(state), 'is_forward': is_forward(state)})
+                group_bots(state, auto_group['all'])
+        time.sleep(3)
+
+def is_admin(user):
+    return True if not MULTIPLAYER or user.player_id == 1 or user.is_admin else False
+
 @app.route('/relay/worlds/attributes', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -3380,15 +3404,18 @@ def relay_worlds_attributes():
                 command = chat_message.message[1:]
                 if command == 'regroup':
                     regroup_ghosts(chat_message.player_id)
-                elif command == 'groupbots':
-                    if not MULTIPLAYER or chat_message.player_id == 1 or current_user.is_admin:
+                elif command in ['group', 'groupall'] and is_admin(current_user):
+                    group_bots(state, command == 'groupall')
+                elif command in ['autogroup', 'autogroupall'] and is_admin(current_user):
+                    auto_group.update({'id': chat_message.player_id, 'road_id': None, 'is_forward': None, 'all': command == 'autogroupall'})
+                    if auto_group['thread'] is None:
+                        auto_group['thread'] = threading.Thread(target=auto_group_bots)
+                        auto_group['thread'].start()
+                elif command in ['stopautogroup', 'disperse'] and is_admin(current_user):
+                    auto_group['id'] = None
+                    if command == 'disperse':
                         for bot in global_bots.keys():
-                            if bot % 1000000 < 10000:  # not a duplicate
-                                n = nearest(state, global_bots[bot])
-                                if n != None:
-                                    global_bots[bot].position = n
-                    else:
-                        send_message('Permission denied', recipients=[chat_message.player_id])
+                            global_bots[bot].position = random.randrange(len(global_bots[bot].route.states))
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:

@@ -319,7 +319,7 @@ To enable support for multiple users perform the steps below:
 
 * Create a file ``enable_bots.txt`` inside the ``storage`` folder to load ghosts as bots, they will keep riding around regardless of the route you are riding.
 * Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
-* Type ``.groupbots`` in chat to group the bots.
+* Type ``.group`` in chat to group the bots, or ``.groupall`` to include duplicates (if using multiplier). Type ``.autogroup`` or ``.autogroupall`` to automatically group whenever you change roads. Type ``.stopautogroup`` to stop automatic grouping, or ``.disperse`` to randomize positions.
 * Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The script ``get_pro_names.py`` can be used to populate this file.
 * If you want some random bots, check [this repository](https://github.com/oldnapalm/zoffline-bots).
 </details>
