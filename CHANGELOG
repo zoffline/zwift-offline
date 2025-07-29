@@ -1,5 +1,10 @@
 # Only breaking changes in releases will be documented here.
 
+Update to Zwift_1.0.150097:
+  * This update requires Zwift Launcher 1.1.14 which replaces Zwift's cacert.pem. You will need
+    to re-append cert-zwift-com.pem to Zwift's cacert.pem.
+
+
 Update to Zwift_1.0.100317:
   * The Windows client launcher now uses Edge instead of Internet Explorer and the zoffline SSL
     certificate is no longer accepted. The certificate has been replaced and as a consequence

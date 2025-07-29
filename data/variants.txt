@@ -53,6 +53,9 @@
       }
     },
     {
+      "name": "friend_is_zwifting_message"
+    },
+    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -294,10 +297,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_42_dca2",
-      "values": {}
     },
     {
       "name": "game_1_42_filter_workouts_from_recommendations",
@@ -812,7 +811,7 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "tourdefrancechallenge2025"
+            "stringValue": "tdffaz"
           }
         }
       }
@@ -887,16 +886,16 @@
             "boolValue": true
           },
           "enabledForJapan": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForRaces": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForTT": {
-            "boolValue": false
+            "boolValue": true
           },
           "enabledForWatopia": {
-            "boolValue": false
+            "boolValue": true
           },
           "handCycleExtraHardness": {
             "numberValue": 0.5
@@ -1086,8 +1085,7 @@
       "values": {}
     },
     {
-      "name": "game_1_75_bypass_zpe",
-      "values": {}
+      "name": "game_1_75_bypass_zpe"
     },
     {
       "name": "game_1_75_fix_pause_button_position",
@@ -1398,11 +1396,6 @@
       }
     },
     {
-      "name": "game_1_85_route_dist_remaining_refactor",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_85_tpf",
       "value": true,
       "values": {}
@@ -1536,7 +1529,7 @@
             "boolValue": false
           },
           "bDisableRaceRank": {
-            "boolValue": false
+            "boolValue": true
           },
           "bDisableScreenshots": {
             "boolValue": false
@@ -1763,6 +1756,10 @@
       }
     },
     {
+      "name": "game_aeroribbon",
+      "values": {}
+    },
+    {
       "name": "game_allow_bc1_memfault_reporting",
       "values": {}
     },
@@ -1851,6 +1848,9 @@
       "values": {}
     },
     {
+      "name": "game_cp_best_analytic"
+    },
+    {
       "name": "game_danum",
       "values": {}
     },
@@ -1877,7 +1877,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "149443"
+            "stringValue": "150129"
           },
           "canary_test": {
             "boolValue": true
@@ -2022,7 +2022,7 @@
             "boolValue": true
           },
           "support_average_wkg_widget": {
-            "boolValue": false
+            "boolValue": true
           },
           "support_body_temp_widget": {
             "boolValue": true
@@ -2064,6 +2064,10 @@
       "values": {}
     },
     {
+      "name": "game_levelup_vfx",
+      "value": true
+    },
+    {
       "name": "game_lightningsocks",
       "value": true,
       "values": {
@@ -2094,7 +2098,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.93.0"
+            "stringValue": "1.94.0"
           }
         }
       }
@@ -2102,6 +2106,9 @@
     {
       "name": "game_sentry_log_upload",
       "values": {}
+    },
+    {
+      "name": "game_sentry_screenshot_capture"
     },
     {
       "name": "game_sentry_tracing",
@@ -2126,6 +2133,10 @@
     {
       "name": "game_show_about_menu",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_staged_quest_rewards_ui",
       "values": {}
     },
     {
@@ -2230,6 +2241,9 @@
       "values": {}
     },
     {
+      "name": "game_wd1_data_acq"
+    },
+    {
       "name": "game_workout_detail_screen",
       "value": true,
       "values": {}
@@ -2240,6 +2254,9 @@
       "values": {
         "fields": {
           "2025_tdf_ambassador_art": {
+            "boolValue": false
+          },
+          "2025_tdffaz_ambassador_art": {
             "boolValue": true
           },
           "goandigo": {
