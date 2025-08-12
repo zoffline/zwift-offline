@@ -112,10 +112,31 @@
     "sport": 0
   },
   {
+    "name": "London Calling",
+    "route": 2836167073,
+    "distance": 31690.2,
+    "course": 7,
+    "sport": 0
+  },
+  {
     "name": "London Loop Reverse",
     "route": 1788889233,
     "distance": 15006.1,
     "course": 7,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Electric Break",
+    "route": 65777922,
+    "distance": 19598.9,
+    "course": 13,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Liminal Loop",
+    "route": 334944296,
+    "distance": 23911.6,
+    "course": 13,
     "sport": 0
   },
   {
@@ -131,6 +152,20 @@
     "distance": 19594.8,
     "course": 13,
     "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Tropic Rush",
+    "route": 3636436865,
+    "distance": 42872.5,
+    "course": 13,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Yoru Run",
+    "route": 152965568,
+    "distance": 8013.6,
+    "course": 13,
+    "sport": 1
   },
   {
     "name": "New York - 2022 Cycling Esports World Championships Route",
@@ -210,6 +245,13 @@
     "sport": 0
   },
   {
+    "name": "Scotland - D\u00c3\u00b9n Dash",
+    "route": 2312882507,
+    "distance": 12466.4,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
@@ -217,9 +259,23 @@
     "sport": 0
   },
   {
+    "name": "Scotland - Highland Run",
+    "route": 2773927650,
+    "distance": 6866.7,
+    "course": 17,
+    "sport": 1
+  },
+  {
+    "name": "Scotland After Party",
+    "route": 4227232797,
+    "distance": 14772.7,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Watopia - Big Loop Reverse",
     "route": 4107844490,
-    "distance": 42819.2,
+    "distance": 42812.3,
     "course": 6,
     "sport": 0
   },
@@ -336,6 +392,13 @@
     "sport": 0
   },
   {
+    "name": "Watopia - Track Meet",
+    "route": 3871332877,
+    "distance": 6534.9,
+    "course": 6,
+    "sport": 1
+  },
+  {
     "name": "Watopia - Volcano Climb After Party",
     "route": 387309391,
     "distance": 40319.8,
@@ -353,6 +416,13 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Watts of the Wild",
+    "route": 979250573,
+    "distance": 42217.3,
     "course": 6,
     "sport": 0
   },

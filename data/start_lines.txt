@@ -234,6 +234,11 @@
     "road": 7,
     "time": 866015
   },
+  "-1458800223": {
+    "name": "London - London Calling",
+    "road": 7,
+    "time": 809061
+  },
   "-1032302231": {
     "name": "London - London Flat",
     "road": 7,
@@ -324,6 +329,11 @@
     "road": 0,
     "time": 880598
   },
+  "65777922": {
+    "name": "Makuri Islands - Electric Break",
+    "road": 18,
+    "time": 690576
+  },
   "910684583": {
     "name": "Makuri Islands - Electric Loop",
     "road": 4,
@@ -363,6 +373,11 @@
     "name": "Makuri Islands - Kappa Quest Reverse",
     "road": 41,
     "time": 481924
+  },
+  "334944296": {
+    "name": "Makuri Islands - Liminal Loop",
+    "road": 134,
+    "time": 172700
   },
   "890800649": {
     "name": "Makuri Islands - Makuri 40",
@@ -464,6 +479,11 @@
     "road": 0,
     "time": 497407
   },
+  "-658530431": {
+    "name": "Makuri Islands - Tropic Rush",
+    "road": 6,
+    "time": 218046
+  },
   "-36023909": {
     "name": "Makuri Islands - Turf N Surf",
     "road": 4,
@@ -488,6 +508,11 @@
     "name": "Makuri Islands - Wandering Flats",
     "road": 0,
     "time": 297800
+  },
+  "152965568": {
+    "name": "Makuri Islands - Yoru Run",
+    "road": 4,
+    "time": 731960
   },
   "-1858871695": {
     "name": "New York - 2022 Cycling Esports World Championships Route",
@@ -704,6 +729,11 @@
     "road": 3,
     "time": 365803
   },
+  "-1982084789": {
+    "name": "Scotland - D\u00c3\u00b9n Dash",
+    "road": 2,
+    "time": 905030
+  },
   "-529627940": {
     "name": "Scotland - Glasgow Crit Circuit",
     "road": 9,
@@ -718,6 +748,11 @@
     "name": "Scotland - Glasgow Reverse",
     "road": 9,
     "time": 992662
+  },
+  "-1521039646": {
+    "name": "Scotland - Highland Run",
+    "road": 9,
+    "time": 1001900
   },
   "742057576": {
     "name": "Scotland - Loch Loop",
@@ -738,6 +773,11 @@
     "name": "Scotland - Rolling Highlands",
     "road": 2,
     "time": 251800
+  },
+  "-67734499": {
+    "name": "Scotland - Scotland After Party",
+    "road": 9,
+    "time": 1001900
   },
   "172610229": {
     "name": "Scotland - Scotland Smash",
@@ -1259,6 +1299,11 @@
     "road": 23,
     "time": 791178
   },
+  "-423634419": {
+    "name": "Watopia - Track Meet",
+    "road": 47,
+    "time": 573555
+  },
   "-841773096": {
     "name": "Watopia - Triple Flat Loops",
     "road": 81,
@@ -1318,6 +1363,11 @@
     "name": "Watopia - Watopia's Waistband",
     "road": 81,
     "time": 30600
+  },
+  "979250573": {
+    "name": "Watopia - Watts of the Wild",
+    "road": 0,
+    "time": 987894
   },
   "982239385": {
     "name": "Watopia - Whole Lotta Lava",
