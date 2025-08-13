@@ -1238,7 +1238,6 @@ def select_activities_json(player_id, limit, start_after=None, in_progress=True)
     return ret
 
 @app.route('/api/activity-feed/feed/', methods=['GET'])
-@app.route('/api/activity-feed-service-v2/feed/just-me', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
 def api_activity_feed():
@@ -1246,14 +1245,26 @@ def api_activity_feed():
     feed_type = request.args.get('feedType')
     start_after = request.args.get('start_after_activity_id')
     profile_id = None
-    in_progress = False
-    if feed_type == 'JUST_ME' or request.path.endswith('just-me'):
+    in_progress = feed_type == 'PREVIEW'
+    if feed_type == 'JUST_ME':
         profile_id = current_user.player_id
     elif feed_type == 'OTHER_PROFILE':
         profile_id = int(request.args.get('profile_id'))
-    elif feed_type == 'PREVIEW':
-        in_progress = True
     # todo: FAVORITES, FOLLOWEES (showing all for now)
+    ret = select_activities_json(profile_id, limit, start_after, in_progress)
+    return jsonify(ret)
+
+@app.route('/api/activity-feed-service-v2/feed/<feed_type>', methods=['GET'])
+@app.route('/api/activity-feed-service-v2/feed/<feed_type>/<int:profile_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_activity_feed_service_v2(feed_type, profile_id=None):
+    limit = int(request.args.get('limit'))
+    start_after = request.args.get('start_after_activity_id')
+    in_progress = feed_type == 'preview'
+    if feed_type == 'just-me':
+        profile_id = current_user.player_id
+    # todo: favorites, followees (showing all for now)
     ret = select_activities_json(profile_id, limit, start_after, in_progress)
     return jsonify(ret)
 
