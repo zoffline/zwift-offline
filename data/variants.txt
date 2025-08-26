@@ -214,10 +214,6 @@
       }
     },
     {
-      "name": "game_1_34_cache_distance_to_camera",
-      "values": {}
-    },
-    {
       "name": "game_1_34_hw_restrictions_forbidden_hw",
       "value": true,
       "values": {
@@ -233,10 +229,6 @@
     },
     {
       "name": "game_1_34_save_device_profiles_on_all_platforms",
-      "values": {}
-    },
-    {
-      "name": "game_1_39_0_optimize_createbikematrix",
       "values": {}
     },
     {
@@ -444,32 +436,12 @@
       "values": {}
     },
     {
-      "name": "game_1_44_ble_queue",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_44_steering_survey",
-      "value": true,
-      "values": {
-        "fields": {
-          "surveyChance": {
-            "varintValue": "10"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_45_0_ble_source_lock",
       "values": {}
     },
     {
       "name": "game_1_45_climb_portal_achievements",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_46_0_sandbagger_expiration",
       "values": {}
     },
     {
@@ -808,7 +780,7 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "home_page_hero_carousel_prod"
+            "stringValue": "content_vs_feature_test_a"
           }
         }
       }
@@ -1212,8 +1184,7 @@
       "values": {}
     },
     {
-      "name": "game_1_78_zp_sh",
-      "values": {}
+      "name": "game_1_78_zp_sh"
     },
     {
       "name": "game_1_79_category_enforcement_event_join",
@@ -1303,7 +1274,7 @@
     },
     {
       "name": "game_1_84_zp_over_ip",
-      "values": {}
+      "value": true
     },
     {
       "name": "game_1_85_challenge_cone",
@@ -1451,10 +1422,10 @@
       "values": {
         "fields": {
           "bAlwaysOn": {
-            "boolValue": false
+            "boolValue": true
           },
           "bDisableRaceRank": {
-            "boolValue": true
+            "boolValue": false
           },
           "bDisableScreenshots": {
             "boolValue": false
@@ -1548,26 +1519,6 @@
         "fields": {
           "timeGapMS": {
             "varintValue": "1000"
-          }
-        }
-      }
-    },
-    {
-      "name": "game_4c",
-      "value": true,
-      "values": {
-        "fields": {
-          "LoggingRate": {
-            "varintValue": "2243911942421128"
-          },
-          "factoryTourAnimationSpeedPercent": {
-            "numberValue": 0.6
-          },
-          "wkg_cap_per_hour": {
-            "numberValue": 4.0
-          },
-          "wkg_cap_per_session": {
-            "numberValue": 15.0
           }
         }
       }
@@ -1784,6 +1735,10 @@
       "name": "game_cp_best_analytic"
     },
     {
+      "name": "game_crash_recovery",
+      "values": {}
+    },
+    {
       "name": "game_danum",
       "values": {}
     },
@@ -1810,7 +1765,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "150384"
+            "stringValue": "150851"
           },
           "canary_test": {
             "boolValue": true
@@ -1997,8 +1952,7 @@
       "values": {}
     },
     {
-      "name": "game_levelup_vfx",
-      "value": true
+      "name": "game_levelup_vfx"
     },
     {
       "name": "game_lightningsocks",
@@ -2034,7 +1988,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.95.0"
+            "stringValue": "1.96.0"
           }
         }
       }
@@ -2180,11 +2134,6 @@
       "name": "game_wd1_data_acq"
     },
     {
-      "name": "game_workout_detail_screen",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_world_deco_packages",
       "value": true,
       "values": {
@@ -2193,7 +2142,7 @@
             "boolValue": false
           },
           "2025_tdffaz_ambassador_art": {
-            "boolValue": true
+            "boolValue": false
           },
           "goandigo": {
             "boolValue": false
@@ -2230,11 +2179,6 @@
     },
     {
       "name": "game_zp_create_full_trainer_on_swap",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_zp_user_input_binding",
       "value": true,
       "values": {}
     },
@@ -2293,6 +2237,10 @@
       "values": {}
     },
     {
+      "name": "progress_report",
+      "values": {}
+    },
+    {
       "name": "visual_lean_v2",
       "value": true,
       "values": {
@@ -2305,11 +2253,6 @@
           }
         }
       }
-    },
-    {
-      "name": "workout_training_v2_release",
-      "value": true,
-      "values": {}
     },
     {
       "name": "zwift_launcher_osx_config"
