@@ -977,12 +977,12 @@
   "-1557483915": {
     "name": "Watopia - Hilly Route",
     "road": 0,
-    "time": 9758
+    "time": 12500
   },
   "107363867": {
     "name": "Watopia - Hilly Route Reverse",
     "road": 0,
-    "time": 986103
+    "time": 986705
   },
   "1696938496": {
     "name": "Watopia - Hilly Route Reverse Run",
@@ -1003,6 +1003,11 @@
     "name": "Watopia - Itza Party",
     "road": 0,
     "time": 12149
+  },
+  "-1633920001": {
+    "name": "Watopia - Jarvis Seaside Sprint",
+    "road": 0,
+    "time": 609298
   },
   "136957568": {
     "name": "Watopia - Jon's Route",
@@ -1183,6 +1188,11 @@
     "name": "Watopia - Snowman",
     "road": 0,
     "time": 987894
+  },
+  "-614473817": {
+    "name": "Watopia - Southern Coast Cruise",
+    "road": 149,
+    "time": 587992
   },
   "-1033799550": {
     "name": "Watopia - Spiral into the Volcano",

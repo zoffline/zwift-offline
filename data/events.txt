@@ -324,7 +324,7 @@
   {
     "name": "Watopia - Hilly Route Reverse",
     "route": 107363867,
-    "distance": 9423.0,
+    "distance": 9406.9,
     "course": 6,
     "sport": 0
   },
@@ -334,6 +334,13 @@
     "distance": 4342.4,
     "course": 6,
     "sport": 1
+  },
+  {
+    "name": "Watopia - Jarvis Seaside Sprint",
+    "route": 2661047295,
+    "distance": 15331.8,
+    "course": 6,
+    "sport": 0
   },
   {
     "name": "Watopia - Jungle Circuit Reverse",
@@ -374,6 +381,13 @@
     "name": "Watopia - Seaside Sprint",
     "route": 3454338139,
     "distance": 9253.1,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Southern Coast Cruise",
+    "route": 3680493479,
+    "distance": 26291.8,
     "course": 6,
     "sport": 0
   },

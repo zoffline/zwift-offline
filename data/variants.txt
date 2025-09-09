@@ -1,7 +1,33 @@
 {
   "variants": [
     {
-      "name": "bc2_prerelease_flags"
+      "name": "bc2_prerelease_flags",
+      "value": true,
+      "values": {
+        "fields": {
+          "bc2_settings_diagram": {
+            "boolValue": true
+          },
+          "bc2_tutorial_when_first_paired": {
+            "boolValue": true
+          },
+          "focusable_route_selection": {
+            "boolValue": true
+          },
+          "leak_protection": {
+            "boolValue": false
+          },
+          "logging_rate": {
+            "varintValue": "215563211446168"
+          },
+          "show_orientation_page": {
+            "boolValue": false
+          },
+          "show_rideon_bomb_page": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "bike_upgrades_exploit_tracker",
@@ -33,11 +59,6 @@
           }
         }
       }
-    },
-    {
-      "name": "costume_overrides_using_workout_triggers",
-      "value": true,
-      "values": {}
     },
     {
       "name": "experiment_hero_section"
@@ -1184,7 +1205,8 @@
       "values": {}
     },
     {
-      "name": "game_1_78_zp_sh"
+      "name": "game_1_78_zp_sh",
+      "value": true
     },
     {
       "name": "game_1_79_category_enforcement_event_join",
@@ -1486,31 +1508,52 @@
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
-      "value": true,
       "values": {
         "fields": {
           "BodyTextureName": {
-            "stringValue": "RPBodyTDFFAZ_DM.tga"
+            "stringValue": "RPBodyTourFever_DM.tga"
           },
           "GlowTextureName": {
             "stringValue": "Glow_TourFever.tga"
           },
           "LimbsTextureName": {
-            "stringValue": "RPLimbsTDFFAZ_DM.tga"
+            "stringValue": "RPLimbsTourFever_DM.tga"
           }
         }
       }
     },
     {
-      "name": "game_1_93_ns_device_list"
+      "name": "game_1_93_ns_device_list",
+      "value": true
     },
     {
       "name": "game_1_95_allow_zc_unpairing_devices_in_connecting_state",
       "value": true
     },
     {
+      "name": "game_1_95_post_recommended_activity_survey"
+    },
+    {
       "name": "game_1_95_prevent_pairing_of_already_paired_ble_devices",
       "value": true
+    },
+    {
+      "name": "game_1_96_info_highlight"
+    },
+    {
+      "name": "game_1_96_roaddecal_tags",
+      "value": true
+    },
+    {
+      "name": "game_1_97_delay_device_assignment_completed_event",
+      "value": true,
+      "values": {
+        "fields": {
+          "delay_seconds": {
+            "varintValue": "20"
+          }
+        }
+      }
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1641,7 +1684,7 @@
     },
     {
       "name": "game_aeroribbon",
-      "values": {}
+      "value": true
     },
     {
       "name": "game_allow_bc1_memfault_reporting",
@@ -1669,23 +1712,7 @@
       "values": {}
     },
     {
-      "name": "game_check_for_video_updates",
-      "values": {
-        "fields": {
-          "NUIT_filename": {
-            "stringValue": "ZED_Attract_Cycling_16x9_v1.bik"
-          },
-          "ZED_filename": {
-            "stringValue": "ZED_Attract_Video_Cycling_16x9_2023_REMAKE_FINAL.bik"
-          },
-          "ZED_idleSeconds": {
-            "varintValue": "30"
-          },
-          "serverURL": {
-            "stringValue": "https://cdn.zwift.com/gameassets/Videos/"
-          }
-        }
-      }
+      "name": "game_check_for_video_updates"
     },
     {
       "name": "game_cheerful_polka_accordion2",
@@ -1765,7 +1792,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "150851"
+            "stringValue": "151449"
           },
           "canary_test": {
             "boolValue": true
@@ -1977,6 +2004,10 @@
       "name": "game_off_route_path_prediction"
     },
     {
+      "name": "game_quit_button_text_change_delay",
+      "values": {}
+    },
+    {
       "name": "game_return_to_home"
     },
     {
@@ -1988,7 +2019,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.96.0"
+            "stringValue": "1.97.0"
           }
         }
       }
@@ -2026,8 +2057,7 @@
       "values": {}
     },
     {
-      "name": "game_staged_quest_rewards_ui",
-      "value": true
+      "name": "game_staged_quest_rewards_ui"
     },
     {
       "name": "game_structured_events_service",
@@ -2237,8 +2267,7 @@
       "values": {}
     },
     {
-      "name": "progress_report",
-      "values": {}
+      "name": "progress_report"
     },
     {
       "name": "visual_lean_v2",
