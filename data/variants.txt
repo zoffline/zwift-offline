@@ -801,7 +801,7 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "content_vs_feature_test_a"
+            "stringValue": "home_page_hero_carousel_prod"
           }
         }
       }
@@ -1205,8 +1205,7 @@
       "values": {}
     },
     {
-      "name": "game_1_78_zp_sh",
-      "value": true
+      "name": "game_1_78_zp_sh"
     },
     {
       "name": "game_1_79_category_enforcement_event_join",
@@ -1252,6 +1251,7 @@
     },
     {
       "name": "game_1_82_event_series_quest_card",
+      "value": true,
       "values": {}
     },
     {
@@ -1396,7 +1396,7 @@
     },
     {
       "name": "game_1_88_ask_experience_level",
-      "values": {}
+      "value": true
     },
     {
       "name": "game_1_88_auto_start_climb_portal",
@@ -1792,7 +1792,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "151449"
+            "stringValue": "152111"
           },
           "canary_test": {
             "boolValue": true
@@ -1956,23 +1956,7 @@
       "values": {}
     },
     {
-      "name": "game_instrumental_rock_bass",
-      "values": {
-        "fields": {
-          "end": {
-            "varintValue": "0"
-          },
-          "ints": {
-            "stringValue": ""
-          },
-          "routes": {
-            "stringValue": ""
-          },
-          "start": {
-            "varintValue": "0"
-          }
-        }
-      }
+      "name": "game_instrumental_rock_bass"
     },
     {
       "name": "game_lauterbrunnen",
@@ -2005,7 +1989,7 @@
     },
     {
       "name": "game_quit_button_text_change_delay",
-      "values": {}
+      "value": true
     },
     {
       "name": "game_return_to_home"
@@ -2057,7 +2041,8 @@
       "values": {}
     },
     {
-      "name": "game_staged_quest_rewards_ui"
+      "name": "game_staged_quest_rewards_ui",
+      "value": true
     },
     {
       "name": "game_structured_events_service",
