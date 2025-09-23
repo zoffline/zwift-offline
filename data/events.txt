@@ -252,6 +252,13 @@
     "sport": 0
   },
   {
+    "name": "Scotland - Glasgow Crit Six",
+    "route": 79243399,
+    "distance": 18321.0,
+    "course": 17,
+    "sport": 0
+  },
+  {
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
@@ -325,6 +332,13 @@
     "name": "Watopia - Hilly Route Reverse",
     "route": 107363867,
     "distance": 9406.9,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Hot Laps",
+    "route": 2251715424,
+    "distance": 23473.8,
     "course": 6,
     "sport": 0
   },

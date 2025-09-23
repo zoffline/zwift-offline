@@ -744,6 +744,11 @@
     "road": 9,
     "time": 1001900
   },
+  "79243399": {
+    "name": "Scotland - Glasgow Crit Six",
+    "road": 9,
+    "time": 1001900
+  },
   "1258415487": {
     "name": "Scotland - Glasgow Reverse",
     "road": 9,
@@ -986,6 +991,11 @@
   },
   "1696938496": {
     "name": "Watopia - Hilly Route Reverse Run",
+    "road": 0,
+    "time": 987894
+  },
+  "-2043251872": {
+    "name": "Watopia - Hot Laps",
     "road": 0,
     "time": 987894
   },
