@@ -170,7 +170,7 @@
   {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
-    "distance": 54963.3,
+    "distance": 54964.1,
     "course": 8,
     "sport": 0
   },
@@ -191,14 +191,14 @@
   {
     "name": "New York - LaGuardia Loop",
     "route": 2422779354,
-    "distance": 4213.4,
+    "distance": 4213.3,
     "course": 8,
     "sport": 0
   },
   {
     "name": "New York - LaGuardia Loop Reverse",
     "route": 3774003351,
-    "distance": 5146.9,
+    "distance": 5146.1,
     "course": 8,
     "sport": 0
   },
@@ -254,7 +254,7 @@
   {
     "name": "Scotland - Glasgow Crit Six",
     "route": 79243399,
-    "distance": 18321.0,
+    "distance": 18318.8,
     "course": 17,
     "sport": 0
   },

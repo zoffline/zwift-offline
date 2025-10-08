@@ -61,6 +61,14 @@
       }
     },
     {
+      "name": "disable_pre_destruct_player_session_state",
+      "values": {}
+    },
+    {
+      "name": "download_entitlements_from_asset_cms",
+      "values": {}
+    },
+    {
       "name": "experiment_hero_section"
     },
     {
@@ -114,7 +122,6 @@
     },
     {
       "name": "game_1_18_holiday_mode",
-      "value": true,
       "values": {}
     },
     {
@@ -405,11 +412,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_44_0_zml_track",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_44_1dc_fix_1",
@@ -728,10 +730,6 @@
     {
       "name": "game_1_55_0_workout_detail_screen_tooltips_running",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_56_draft_indicator",
       "values": {}
     },
     {
@@ -1185,7 +1183,8 @@
       "values": {}
     },
     {
-      "name": "game_1_78_zp_sh"
+      "name": "game_1_78_zp_sh",
+      "value": true
     },
     {
       "name": "game_1_79_category_enforcement_event_join",
@@ -1294,11 +1293,6 @@
       }
     },
     {
-      "name": "game_1_85_tpf",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_86_0_vt_spin",
       "value": true,
       "values": {}
@@ -1361,11 +1355,6 @@
     },
     {
       "name": "game_1_86_zg_ftp_for_robopacers",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_87_reset_workout_target",
       "value": true,
       "values": {}
     },
@@ -1539,8 +1528,26 @@
       "value": true
     },
     {
+      "name": "game_1_98_soft_delete_activity"
+    },
+    {
       "name": "game_1_98_swap_power_and_smart_trainer",
       "values": {}
+    },
+    {
+      "name": "game_1_98_zp_ip_hides_wftnp",
+      "value": true
+    },
+    {
+      "name": "game_1_99_draft_indicator",
+      "values": {}
+    },
+    {
+      "name": "game_1_99_power_segment_arch"
+    },
+    {
+      "name": "game_1_99_use_first_decision",
+      "value": true
     },
     {
       "name": "game_3second_power_average_smoothing",
@@ -1953,7 +1960,23 @@
       "values": {}
     },
     {
-      "name": "game_instrumental_rock_bass"
+      "name": "game_instrumental_rock_bass",
+      "values": {
+        "fields": {
+          "end": {
+            "varintValue": "33313218958"
+          },
+          "ints": {
+            "stringValue": "40012,4,0,1 40011,4,3,1"
+          },
+          "routes": {
+            "stringValue": "2898229208, 1942591558, 1099226581, 22757204, 1178708985, 104170948, 2101060245, 3079921742, 3678866163, 3314406972, 1552189318, 730052368, 3051823795, 4232620535, 975408707, 112312944, 3835625237, 2949228237, 1472166107, 494933300"
+          },
+          "start": {
+            "varintValue": "1756310158"
+          }
+        }
+      }
     },
     {
       "name": "game_lauterbrunnen",
@@ -2004,7 +2027,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.98.0"
+            "stringValue": "1.99.0"
           }
         }
       }
@@ -2142,8 +2165,7 @@
       }
     },
     {
-      "name": "game_uiupdateinupdate",
-      "values": {}
+      "name": "game_uiupdateinupdate"
     },
     {
       "name": "game_user_storage_service",

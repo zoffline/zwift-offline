@@ -517,17 +517,37 @@
   "-1858871695": {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "road": 4,
-    "time": 190280
+    "time": 190276
   },
   "1509089537": {
     "name": "New York - Astoria Line 8",
     "road": 4,
     "time": 204758
   },
+  "975408707": {
+    "name": "New York - Avon Flyer",
+    "road": 346,
+    "time": 555000
+  },
+  "494933300": {
+    "name": "New York - Avon Flyer Run",
+    "road": 346,
+    "time": 555000
+  },
   "1790569309": {
     "name": "New York - Couch To Sky K",
     "road": 3,
     "time": 619659
+  },
+  "2101060245": {
+    "name": "New York - Double Parked",
+    "road": 215,
+    "time": 125000
+  },
+  "1099226581": {
+    "name": "New York - Double Span Spin",
+    "road": 220,
+    "time": 443000
   },
   "1327665278": {
     "name": "New York - Everything Bagel",
@@ -538,6 +558,11 @@
     "name": "New York - Flat Irons",
     "road": 3,
     "time": 912856
+  },
+  "-616101133": {
+    "name": "New York - Fuhgeddaboudit",
+    "road": 215,
+    "time": 125000
   },
   "480315274": {
     "name": "New York - Gotham Grind",
@@ -559,10 +584,20 @@
     "road": 4,
     "time": 914800
   },
+  "1178708985": {
+    "name": "New York - Green to Screen",
+    "road": 215,
+    "time": 125000
+  },
   "-629007892": {
     "name": "New York - Hudson Roll",
     "road": 3,
     "time": 726397
+  },
+  "112312944": {
+    "name": "New York - Issendorf Express",
+    "road": 215,
+    "time": 125000
   },
   "-1340600634": {
     "name": "New York - Knickerbocker",
@@ -604,6 +639,11 @@
     "road": 4,
     "time": 200810
   },
+  "104170948": {
+    "name": "New York - No Sleep Till Brooklyn",
+    "road": 230,
+    "time": 505000
+  },
   "1919980508": {
     "name": "New York - Park Perimeter Loop",
     "road": 4,
@@ -618,6 +658,16 @@
     "name": "New York - Park To Peak",
     "road": 3,
     "time": 619659
+  },
+  "22757204": {
+    "name": "New York - Prospect Park Loop",
+    "road": 215,
+    "time": 125000
+  },
+  "-459342059": {
+    "name": "New York - Prospect Park Loop Run",
+    "road": 215,
+    "time": 125000
   },
   "-1216301327": {
     "name": "New York - Rising Empire",
@@ -634,6 +684,21 @@
     "road": 3,
     "time": 695622
   },
+  "-980560324": {
+    "name": "New York - Spinfinity",
+    "road": 230,
+    "time": 505000
+  },
+  "730052368": {
+    "name": "New York - Spinfinity Ultra",
+    "road": 230,
+    "time": 505000
+  },
+  "-1215045554": {
+    "name": "New York - Stay Puft Pursuit",
+    "road": 230,
+    "time": 505000
+  },
   "-697027596": {
     "name": "New York - The 6 Train",
     "road": 4,
@@ -644,6 +709,16 @@
     "road": 4,
     "time": 200309
   },
+  "1552189318": {
+    "name": "New York - The Double Borough",
+    "road": 4,
+    "time": 173716
+  },
+  "-1243143501": {
+    "name": "New York - The Greenway",
+    "road": 215,
+    "time": 940611
+  },
   "1732356505": {
     "name": "New York - The Highline",
     "road": 24,
@@ -653,6 +728,31 @@
     "name": "New York - The Highline Reverse",
     "road": 24,
     "time": 541266
+  },
+  "1942591558": {
+    "name": "New York - Times Square Circuit",
+    "road": 230,
+    "time": 505000
+  },
+  "-1345739059": {
+    "name": "New York - Times Square Circuit Run",
+    "road": 230,
+    "time": 505000
+  },
+  "-62346761": {
+    "name": "New York - Toefield Tornado",
+    "road": 215,
+    "time": 125000
+  },
+  "1472166107": {
+    "name": "New York - Toefield Tornado Run",
+    "road": 215,
+    "time": 125000
+  },
+  "-1396738088": {
+    "name": "New York - Watts the Limit",
+    "road": 4,
+    "time": 914800
   },
   "-930393161": {
     "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es",
