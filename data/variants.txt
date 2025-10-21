@@ -105,6 +105,31 @@
       }
     },
     {
+      "name": "game_1_100_adding_to_fitness_device_manager"
+    },
+    {
+      "name": "game_1_100_helicam_world_setting",
+      "value": true
+    },
+    {
+      "name": "game_1_100_improved_minimap_scaling",
+      "value": true,
+      "values": {
+        "fields": {
+          "min_camera_height": {
+            "stringValue": "60000"
+          },
+          "worlds": {
+            "stringValue": "4"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_100_pairing_screen_connection_status",
+      "value": true
+    },
+    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -414,27 +439,7 @@
       }
     },
     {
-      "name": "game_1_44_1dc_fix_1",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_44_1dc_fix_2",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_44_1dc_fix_3",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_44_1dc_fix_4",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_44_1dc_fix_5",
       "value": true,
       "values": {}
     },
@@ -1539,11 +1544,29 @@
       "value": true
     },
     {
-      "name": "game_1_99_draft_indicator",
-      "values": {}
+      "name": "game_1_99_branchselectoranalytics",
+      "value": true,
+      "values": {
+        "fields": {
+          "sendStayOnCourseAnalytics": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
-      "name": "game_1_99_power_segment_arch"
+      "name": "game_1_99_draft_indicator"
+    },
+    {
+      "name": "game_1_99_power_segment_arch",
+      "value": true,
+      "values": {
+        "fields": {
+          "lightning_effect": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_1_99_use_first_decision",
@@ -1786,7 +1809,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "152773"
+            "stringValue": "153844"
           },
           "canary_test": {
             "boolValue": true
@@ -2005,7 +2028,18 @@
       "values": {}
     },
     {
-      "name": "game_off_route_path_prediction"
+      "name": "game_off_route_path_prediction",
+      "value": true,
+      "values": {
+        "fields": {
+          "center": {
+            "boolValue": true
+          },
+          "minimap": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_quit_button_text_change_delay",
@@ -2015,7 +2049,8 @@
       "name": "game_return_to_home"
     },
     {
-      "name": "game_road_graph_in_game"
+      "name": "game_road_graph_in_game",
+      "value": true
     },
     {
       "name": "game_road_graph_on_route_in_game",
@@ -2027,7 +2062,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.99.0"
+            "stringValue": "1.100.0"
           }
         }
       }
@@ -2115,6 +2150,9 @@
           },
           "tow_start": {
             "varintValue": "1759507200"
+          },
+          "zwift_Automation_AB_route": {
+            "varintValue": "686828068"
           },
           "zwift_tow_cycling_route_01": {
             "varintValue": "979250573"
@@ -2280,6 +2318,10 @@
     },
     {
       "name": "progress_report"
+    },
+    {
+      "name": "unload_homescreen_before_game_load",
+      "value": true
     },
     {
       "name": "visual_lean_v2",

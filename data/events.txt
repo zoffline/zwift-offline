@@ -112,24 +112,10 @@
     "sport": 0
   },
   {
-    "name": "London Calling",
-    "route": 2836167073,
-    "distance": 31690.2,
-    "course": 7,
-    "sport": 0
-  },
-  {
     "name": "London Loop Reverse",
     "route": 1788889233,
     "distance": 15006.1,
     "course": 7,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Electric Break",
-    "route": 65777922,
-    "distance": 19598.9,
-    "course": 13,
     "sport": 0
   },
   {
@@ -145,27 +131,6 @@
     "distance": 4660.0,
     "course": 13,
     "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Red Zone Repeats",
-    "route": 2892858917,
-    "distance": 19594.8,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Tropic Rush",
-    "route": 3636436865,
-    "distance": 42872.5,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Yoru Run",
-    "route": 152965568,
-    "distance": 8013.6,
-    "course": 13,
-    "sport": 1
   },
   {
     "name": "New York - 2022 Cycling Esports World Championships Route",
@@ -203,6 +168,13 @@
     "sport": 0
   },
   {
+    "name": "New York - No Sleep Till Brooklyn",
+    "route": 104170948,
+    "distance": 31809.4,
+    "course": 8,
+    "sport": 0
+  },
+  {
     "name": "New York - Park Perimeter Reverse",
     "route": 2202609830,
     "distance": 9915.9,
@@ -217,9 +189,23 @@
     "sport": 1
   },
   {
+    "name": "New York - Stay Puft Pursuit",
+    "route": 3079921742,
+    "distance": 31203.7,
+    "course": 8,
+    "sport": 0
+  },
+  {
     "name": "New York - The 6 Train Reverse",
     "route": 274639515,
     "distance": 6843.0,
+    "course": 8,
+    "sport": 0
+  },
+  {
+    "name": "New York - The Double Borough",
+    "route": 1552189318,
+    "distance": 17859.9,
     "course": 8,
     "sport": 0
   },
@@ -229,6 +215,20 @@
     "distance": 21010.9,
     "course": 8,
     "sport": 0
+  },
+  {
+    "name": "New York - Times Square Circuit",
+    "route": 1942591558,
+    "distance": 3523.3,
+    "course": 8,
+    "sport": 0
+  },
+  {
+    "name": "New York - Times Square Circuit Run",
+    "route": 2949228237,
+    "distance": 3523.3,
+    "course": 8,
+    "sport": 1
   },
   {
     "name": "Richmond - Cobbled Climbs Reverse",
@@ -242,13 +242,6 @@
     "route": 948831673,
     "distance": 17203.8,
     "course": 2,
-    "sport": 0
-  },
-  {
-    "name": "Scotland - D\u00c3\u00b9n Dash",
-    "route": 2312882507,
-    "distance": 12466.4,
-    "course": 17,
     "sport": 0
   },
   {
@@ -266,20 +259,6 @@
     "sport": 0
   },
   {
-    "name": "Scotland - Highland Run",
-    "route": 2773927650,
-    "distance": 6866.7,
-    "course": 17,
-    "sport": 1
-  },
-  {
-    "name": "Scotland After Party",
-    "route": 4227232797,
-    "distance": 14772.7,
-    "course": 17,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Big Loop Reverse",
     "route": 4107844490,
     "distance": 42812.3,
@@ -292,20 +271,6 @@
     "distance": 7501.9,
     "course": 6,
     "sport": 1
-  },
-  {
-    "name": "Watopia - Climb Control",
-    "route": 1464561389,
-    "distance": 23973.2,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Flat Out Fast",
-    "route": 1258526800,
-    "distance": 22331.2,
-    "course": 6,
-    "sport": 0
   },
   {
     "name": "Watopia - Flat Route Reverse",
@@ -364,13 +329,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Power Punches",
-    "route": 1201172818,
-    "distance": 23670.0,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Power to the Portal",
     "route": 3030004732,
     "distance": 18525.6,
@@ -420,13 +378,6 @@
     "sport": 0
   },
   {
-    "name": "Watopia - Track Meet",
-    "route": 3871332877,
-    "distance": 6534.9,
-    "course": 6,
-    "sport": 1
-  },
-  {
     "name": "Watopia - Volcano Climb After Party",
     "route": 387309391,
     "distance": 40319.8,
@@ -444,13 +395,6 @@
     "name": "Watopia - WBR Climbing Series",
     "route": 2218409282,
     "distance": 43674.4,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Watts of the Wild",
-    "route": 979250573,
-    "distance": 42217.3,
     "course": 6,
     "sport": 0
   },

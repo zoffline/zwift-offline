@@ -1374,6 +1374,7 @@ def api_clubs_club_my_clubs_summary():
 @app.route('/api/scoring/current', methods=['GET'])
 @app.route('/api/game-asset-patching-service/manifest', methods=['GET'])
 @app.route('/api/workout/progress', methods=['POST'])
+@app.route('/api/power-curve/power-profile/proto', methods=['GET'])
 def api_proto_empty():
     return '', 200
 
@@ -3179,8 +3180,12 @@ def load_bookmarks(player_id):
             for file in files:
                 if file.endswith('.bin'):
                     state = udp_node_msgs_pb2.PlayerState()
-                    with open(os.path.join(root, file), 'rb') as f:
-                        state.ParseFromString(f.read())
+                    try:
+                        with open(os.path.join(root, file), 'rb') as f:
+                            state.ParseFromString(f.read())
+                    except Exception as exc:
+                        logger.warning("load_bookmarks: %s" % repr(exc))
+                        continue
                     state.id = i + 9000000 + player_id % 1000 * 1000
                     bookmark = Bookmark()
                     bookmark.name = file[:-4]
@@ -3764,7 +3769,7 @@ def load_variants(file):
     try:
         Parse(open(file).read(), vs)
     except Exception as exc:
-        logging.warning("load_variants: %s" % repr(exc))
+        logger.warning("load_variants: %s" % repr(exc))
     variants = {}
     for v in vs.variants:
         variants[v.name] = v
