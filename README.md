@@ -312,7 +312,7 @@ To enable support for multiple users perform the steps below:
 To enable support for ipv6 the steps below:
 * Open cmd and enter the following command
 ```
-set SERVER_HOST=::1
+cmd.exe /c run_ipv6.bat
 ```
 </details>
 
