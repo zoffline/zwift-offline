@@ -10,6 +10,7 @@ import json
 import math
 import random
 import itertools
+import socket
 import socketserver
 from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
@@ -788,7 +789,14 @@ if os.path.isfile(ENABLE_BOTS_FILE):
     bot = threading.Thread(target=play_bots)
     bot.start()
 
+useIPV6 = os.environ.get('USE_IPV6', '0')
+if(useIPV6 == '1'):
+    socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
+    socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
+socketserver.ThreadingUDPServer.allow_reuse_address = True
+
 cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', '')
 cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
 httpd = socketserver.ThreadingTCPServer((cdn_host, cdn_port), CDNHandler)
@@ -803,7 +811,6 @@ tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
 tcpserver_thread.start()
 
-socketserver.ThreadingUDPServer.allow_reuse_address = True
 udp_host = os.environ.get('ZOFFLINE_UDP_HOST', '')
 udp_port = int(os.environ.get('ZOFFLINE_UDP_PORT', 3024))
 udpserver = socketserver.ThreadingUDPServer((udp_host, udp_port), UDPHandler)

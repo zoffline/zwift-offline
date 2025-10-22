@@ -1,0 +1,6 @@
+set USE_IPV6=1
+set ZOFFLINE_CDN_HOST=::1
+set ZOFFLINE_TCP_HOST=::1
+set ZOFFLINE_UDP_HOST=::1
+set ZOFFLINE_API_HOST=::1
+python standalone.py

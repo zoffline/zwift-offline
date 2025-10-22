@@ -1,5 +1,7 @@
 import dns.resolver
 import socketserver
+import socket
+import os
 
 class DNSQuery:
     def __init__(self, data):
@@ -57,6 +59,9 @@ class DNSServer:
     def start(self):
         HOST, PORT = "0.0.0.0", self.port
         socketserver.ThreadingUDPServer.allow_reuse_address = True
+        useIPV6 = os.environ.get('USE_IPV6', '0')
+        if(useIPV6 == '1'):
+            socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
         server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
 
