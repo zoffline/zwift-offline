@@ -10,7 +10,6 @@ import json
 import math
 import random
 import itertools
-import socket
 import socketserver
 from urllib3 import PoolManager
 from http.server import SimpleHTTPRequestHandler
@@ -790,10 +789,12 @@ if os.path.isfile(ENABLE_BOTS_FILE):
     bot.start()
 
 SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '')
+if SERVER_HOST.find(':') != -1:
+    import socket
+    socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
+    socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
 socketserver.ThreadingTCPServer.allow_reuse_address = True
 cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', SERVER_HOST)
-if cdn_host.find(':') != -1:
-    socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
 cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
 httpd = socketserver.ThreadingTCPServer((cdn_host, cdn_port), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
@@ -809,8 +810,6 @@ tcpserver_thread.start()
 
 socketserver.ThreadingUDPServer.allow_reuse_address = True
 udp_host = os.environ.get('ZOFFLINE_UDP_HOST', SERVER_HOST)
-if udp_host.find(':') != -1:
-    socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
 udp_port = int(os.environ.get('ZOFFLINE_UDP_PORT', 3024))
 udpserver = socketserver.ThreadingUDPServer((udp_host, udp_port), UDPHandler)
 udpserver_thread = threading.Thread(target=udpserver.serve_forever)
