@@ -305,16 +305,9 @@ To enable support for multiple users perform the steps below:
 
 </details>
 
-### Step 7 [OPTIONAL]: Enable IPV6
+### Step 7 [OPTIONAL]: Enable IPv6
 
-<details><summary>Expand</summary>
-
-To enable support for ipv6 the steps below:
-* Open cmd and enter the following command
-```
-cmd.exe /c ./script/run_ipv6.bat
-```
-</details>
+To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST`` or use the script ``run_ipv6.bat``.
 
 ### Extra features
 

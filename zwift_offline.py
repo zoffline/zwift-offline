@@ -91,8 +91,6 @@ def make_dir(name):
 if not make_dir(STORAGE_DIR):
     sys.exit(1)
 
-#default host
-SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST','127.0.0.1')
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 3
@@ -105,7 +103,7 @@ if os.path.exists(SERVER_IP_FILE):
     with open(SERVER_IP_FILE, 'r') as f:
         server_ip = f.read().rstrip('\r\n')
 else:
-    server_ip = SERVER_HOST
+    server_ip = '127.0.0.1'
 SECRET_KEY_FILE = "%s/secret-key.txt" % STORAGE_DIR
 ENABLEGHOSTS_FILE = "%s/enable_ghosts.txt" % STORAGE_DIR
 GHOST_PROFILE = None
@@ -1404,7 +1402,6 @@ def api_users_login():
     player_id = current_user.player_id
     global_relay[player_id] = Relay(req.key)
     ghosts_enabled[player_id] = current_user.enable_ghosts
-    local_ip = "127.0.0.1" if server_ip.find(':') == -1 else "::1"
 
     response = login_pb2.LoginResponse()
     response.session_state = 'abc'
@@ -1413,7 +1410,7 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(time.time())
     udp_node = response.info.nodes.nodes.add()
-    udp_node.ip = local_ip if request.remote_addr == SERVER_HOST else server_ip  # TCP telemetry server
+    udp_node.ip = request.remote_addr if request.remote_addr in ['127.0.0.1', '::1'] else server_ip  # TCP telemetry server
     udp_node.port = 3023
     response.relay_session_id = player_id
     response.expiration = 70
@@ -3074,10 +3071,9 @@ def api_profiles_goals_id(player_id, goal_id):
 @app.route('/api/tcp-config', methods=['GET'])
 @app.route('/relay/tcp-config', methods=['GET'])
 def api_tcp_config():
-    local_ip = "127.0.0.1" if server_ip.find(':') == -1 else "::1"
     infos = per_session_info_pb2.TcpConfig()
     info = infos.nodes.add()
-    info.ip = local_ip if request.remote_addr == SERVER_HOST else server_ip
+    info.ip = request.remote_addr if request.remote_addr in ['127.0.0.1', '::1'] else server_ip
     info.port = 3023
     return infos.SerializeToString(), 200
 
@@ -4441,6 +4437,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     remove_inactive_thread = threading.Thread(target=remove_inactive)
     remove_inactive_thread.start()
     logger.info("Server version %s is running." % ZWIFT_VER_CUR)
+    SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '0.0.0.0')
     host = os.environ.get('ZOFFLINE_API_HOST', SERVER_HOST)
     port = int(os.environ.get('ZOFFLINE_API_PORT', 443))
     use_cert = os.environ.get('ZOFFLINE_API_USE_CERT', 'true').lower() == 'true'
@@ -4452,8 +4449,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     server = WSGIServer((host, port), app, log=logger, **cert_kwargs)
     server.serve_forever()
 
-#   local_ip = '0.0.0.0' if host.find(':') == -1 else '::1'
-#   app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host=local_ip) # debug=True, use_reload=False)
+#    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host=SERVER_HOST) # debug=True, use_reload=False)
 
 
 if __name__ == "__main__":

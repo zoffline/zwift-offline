@@ -1,5 +1,3 @@
-set ZOFFLINE_SERVER_HOST=::1
-set ZOFFLINE_CDN_HOST=::1
-set ZOFFLINE_TCP_HOST=::1
-set ZOFFLINE_UDP_HOST=::1
-python standalone.py
+@ECHO OFF
+SET ZOFFLINE_SERVER_HOST=::
+python ..\standalone.py

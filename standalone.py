@@ -60,7 +60,6 @@ if not CDN_PROXY and not os.path.isfile('%s/disable_proxy.txt' % STORAGE_DIR):
     except:
         pass
 
-#default host
 PACE_PARTNERS_DIR = "%s/robopacers" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
@@ -76,7 +75,6 @@ else:
             pass
         announce = False
     discord = DummyDiscord()
-
 
 bot_update_freq = 3
 pacer_update_freq = 1
@@ -267,21 +265,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
         except Exception as exc:
             print('TCPHandler ParseFromString exception: %s' % repr(exc))
             return
-        # define local ip by zo.serverip
-        local_ip = "127.0.0.1" if zo.server_ip.find(':') == -1 else "::1"
-        # send packet containing UDP server (127.0.0.1 or ::1)
+        # send packet containing UDP server (127.0.0.1)
         msg = udp_node_msgs_pb2.ServerToClient()
         msg.player_id = hello.player_id
         msg.world_time = 0
         details1 = msg.udp_config.relay_addresses.add()
         details1.lb_realm = udp_node_msgs_pb2.ZofflineConstants.RealmID
         details1.lb_course = 6 # watopia crowd
-        details1.ip = local_ip if self.request.getpeername()[0] == local_ip else zo.server_ip
+        details1.ip = self.request.getpeername()[0] if self.request.getpeername()[0] in ['127.0.0.1', '::1'] else zo.server_ip
         details1.port = 3022
         details2 = msg.udp_config.relay_addresses.add()
         details2.lb_realm = 0 #generic load balancing realm
         details2.lb_course = 0 #generic load balancing course
-        details2.ip = local_ip if self.request.getpeername()[0] == local_ip else zo.server_ip
+        details2.ip = self.request.getpeername()[0] if self.request.getpeername()[0] in ['127.0.0.1', '::1'] else zo.server_ip
         details2.port = 3022
         msg.udp_config.uc_f2 = 10
         msg.udp_config.uc_f3 = 30
@@ -793,30 +789,29 @@ if os.path.isfile(ENABLE_BOTS_FILE):
     bot = threading.Thread(target=play_bots)
     bot.start()
 
+SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '')
 socketserver.ThreadingTCPServer.allow_reuse_address = True
-cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', '127.0.0.1')
-cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
+cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', SERVER_HOST)
 if cdn_host.find(':') != -1:
     socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
+cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
 httpd = socketserver.ThreadingTCPServer((cdn_host, cdn_port), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True
 zoffline_thread.start()
 
-tcp_host = os.environ.get('ZOFFLINE_TCP_HOST', '127.0.0.1')
+tcp_host = os.environ.get('ZOFFLINE_TCP_HOST', SERVER_HOST)
 tcp_port = int(os.environ.get('ZOFFLINE_TCP_PORT', 3025))
-if tcp_host.find(':') != -1:
-    socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
 tcpserver = socketserver.ThreadingTCPServer((tcp_host, tcp_port), TCPHandler)
 tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
 tcpserver_thread.start()
 
 socketserver.ThreadingUDPServer.allow_reuse_address = True
-udp_host = os.environ.get('ZOFFLINE_UDP_HOST', '127.0.0.1')
-udp_port = int(os.environ.get('ZOFFLINE_UDP_PORT', 3024))
+udp_host = os.environ.get('ZOFFLINE_UDP_HOST', SERVER_HOST)
 if udp_host.find(':') != -1:
     socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
+udp_port = int(os.environ.get('ZOFFLINE_UDP_PORT', 3024))
 udpserver = socketserver.ThreadingUDPServer((udp_host, udp_port), UDPHandler)
 udpserver_thread = threading.Thread(target=udpserver.serve_forever)
 udpserver_thread.daemon = True
