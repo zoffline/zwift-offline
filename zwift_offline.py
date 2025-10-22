@@ -92,7 +92,7 @@ if not make_dir(STORAGE_DIR):
     sys.exit(1)
 
 #default host
-SERVER_HOST = os.environ.get('SERVER_HOST','127.0.0.1')
+SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST','127.0.0.1')
 SSL_DIR = "%s/ssl" % SCRIPT_DIR
 DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 3
@@ -1404,6 +1404,7 @@ def api_users_login():
     player_id = current_user.player_id
     global_relay[player_id] = Relay(req.key)
     ghosts_enabled[player_id] = current_user.enable_ghosts
+    local_ip = "127.0.0.1" if server_ip.find(':') == -1 else "::1"
 
     response = login_pb2.LoginResponse()
     response.session_state = 'abc'
@@ -1412,7 +1413,7 @@ def api_users_login():
     response.info.apis.trainingpeaks_url = "https://api.trainingpeaks.com"
     response.info.time = int(time.time())
     udp_node = response.info.nodes.nodes.add()
-    udp_node.ip = SERVER_HOST if request.remote_addr == SERVER_HOST else server_ip  # TCP telemetry server
+    udp_node.ip = local_ip if request.remote_addr == SERVER_HOST else server_ip  # TCP telemetry server
     udp_node.port = 3023
     response.relay_session_id = player_id
     response.expiration = 70
@@ -3073,9 +3074,10 @@ def api_profiles_goals_id(player_id, goal_id):
 @app.route('/api/tcp-config', methods=['GET'])
 @app.route('/relay/tcp-config', methods=['GET'])
 def api_tcp_config():
+    local_ip = "127.0.0.1" if server_ip.find(':') == -1 else "::1"
     infos = per_session_info_pb2.TcpConfig()
     info = infos.nodes.add()
-    info.ip = SERVER_HOST if request.remote_addr == SERVER_HOST else server_ip
+    info.ip = local_ip if request.remote_addr == SERVER_HOST else server_ip
     info.port = 3023
     return infos.SerializeToString(), 200
 
@@ -4450,7 +4452,8 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     server = WSGIServer((host, port), app, log=logger, **cert_kwargs)
     server.serve_forever()
 
-#    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host=SERVER_HOST) # debug=True, use_reload=False)
+#   local_ip = '0.0.0.0' if host.find(':') == -1 else '::1'
+#   app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host=local_ip) # debug=True, use_reload=False)
 
 
 if __name__ == "__main__":

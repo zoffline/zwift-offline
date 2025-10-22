@@ -1,6 +1,5 @@
 import dns.resolver
 import socketserver
-import socket
 import os
 
 class DNSQuery:
@@ -59,8 +58,8 @@ class DNSServer:
     def start(self):
         HOST, PORT = "0.0.0.0", self.port
         socketserver.ThreadingUDPServer.allow_reuse_address = True
-        useIPV6 = os.environ.get('SERVER_HOST','127.0.0.1').find(':')
-        if(useIPV6 != -1):
+        isIPv6 = os.environ.get('ZOFFLINE_TCP_HOST','127.0.0.1').find(':') != -1
+        if(isIPv6):
             HOST, PORT = "::", self.port
         server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
