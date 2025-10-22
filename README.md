@@ -312,11 +312,7 @@ To enable support for multiple users perform the steps below:
 To enable support for ipv6 the steps below:
 * Open cmd and enter the following command
 ```
-set USE_IPV6=1
-set ZOFFLINE_CDN_HOST=::1
-set ZOFFLINE_TCP_HOST=::1
-set ZOFFLINE_UDP_HOST=::1
-set ZOFFLINE_API_HOST=::1
+set SERVER_HOST=::1
 ```
 </details>
 
