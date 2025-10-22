@@ -59,9 +59,9 @@ class DNSServer:
     def start(self):
         HOST, PORT = "0.0.0.0", self.port
         socketserver.ThreadingUDPServer.allow_reuse_address = True
-        useIPV6 = os.environ.get('USE_IPV6', '0')
-        if(useIPV6 == '1'):
-            socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
+        useIPV6 = os.environ.get('SERVER_HOST','127.0.0.1').find(':')
+        if(useIPV6 != -1):
+            HOST, PORT = "::", self.port
         server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
 
