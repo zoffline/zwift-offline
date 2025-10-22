@@ -789,7 +789,7 @@ if os.path.isfile(ENABLE_BOTS_FILE):
     bot.start()
 
 SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '')
-if SERVER_HOST.find(':') != -1:
+if ':' in SERVER_HOST:
     import socket
     socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
     socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
