@@ -305,6 +305,10 @@ To enable support for multiple users perform the steps below:
 
 </details>
 
+### Step 7 [OPTIONAL]: Enable IPv6
+
+To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST`` or use the script ``run_ipv6.bat``.
+
 ### Extra features
 
 <details><summary>Ghosts</summary>

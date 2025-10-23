@@ -1,5 +1,6 @@
 import dns.resolver
 import socketserver
+import os
 
 class DNSQuery:
     def __init__(self, data):
@@ -55,8 +56,8 @@ class DNSServer:
     def addname(self, name, ip):
         DNSServer.namemap[name] = ip
     def start(self):
-        HOST, PORT = "0.0.0.0", self.port
-        socketserver.ThreadingUDPServer.allow_reuse_address = True
+        HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '')
+        PORT = self.port
         server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
 
