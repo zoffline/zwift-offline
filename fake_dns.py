@@ -56,9 +56,8 @@ class DNSServer:
     def addname(self, name, ip):
         DNSServer.namemap[name] = ip
     def start(self):
-        HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '0.0.0.0')
+        HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '')
         PORT = self.port
-        socketserver.ThreadingUDPServer.allow_reuse_address = True
         server = socketserver.ThreadingUDPServer((HOST, PORT), DNSUDPHandler)
         server.serve_forever()
 

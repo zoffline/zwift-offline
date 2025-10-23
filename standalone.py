@@ -793,7 +793,10 @@ if ':' in SERVER_HOST:
     import socket
     socketserver.ThreadingTCPServer.address_family = socket.AF_INET6
     socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
+
 socketserver.ThreadingTCPServer.allow_reuse_address = True
+socketserver.ThreadingUDPServer.allow_reuse_address = True
+
 cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', SERVER_HOST)
 cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
 httpd = socketserver.ThreadingTCPServer((cdn_host, cdn_port), CDNHandler)
@@ -808,7 +811,6 @@ tcpserver_thread = threading.Thread(target=tcpserver.serve_forever)
 tcpserver_thread.daemon = True
 tcpserver_thread.start()
 
-socketserver.ThreadingUDPServer.allow_reuse_address = True
 udp_host = os.environ.get('ZOFFLINE_UDP_HOST', SERVER_HOST)
 udp_port = int(os.environ.get('ZOFFLINE_UDP_PORT', 3024))
 udpserver = socketserver.ThreadingUDPServer((udp_host, udp_port), UDPHandler)
