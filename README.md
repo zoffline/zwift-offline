@@ -305,6 +305,33 @@ To enable support for multiple users perform the steps below:
 
 </details>
 
+<details><summary>80,443 port ban solutions</summary>
+
+To redirect zwiftapp.exe to other address&port perform the steps below:
+```
+# example:
+# zoffline server at 192.168.0.100, 80 port reset to 680,443 port reset to 6443
+# so we set listenaddress to 127.0.0.1 and listenport to 80,443
+# then we set connectaddress to 192.168.0.100 and listenport to 680,6443
+netsh interface portproxy add v4tov4 listenaddress=127.0.0.1 listenport=80 connectaddress=192.168.0.100 connectport=680
+netsh advfirewall firewall add rule name="Redirect_ZWIFT_80" dir=in action=allow protocol=TCP localip=127.0.0.1 localport=80
+netsh interface portproxy add v4tov4 listenaddress=127.0.0.1 listenport=443 connectaddress=192.168.0.100 connectport=6443
+netsh advfirewall firewall add rule name="Redirect_ZWIFT_443" dir=in action=allow protocol=TCP localip=127.0.0.1 localport=443
+#check listen info
+netstat -ano | findstr "127.0.0.1:80"
+netstat -ano | findstr "127.0.0.1:443"
+# delete  tcp proxy
+netsh interface portproxy delete v4tov4 listenaddress=127.0.0.1 listenport=80
+netsh interface portproxy delete v4tov4 listenaddress=127.0.0.1 listenport=443
+# start iphlpsvc service
+sc start iphlpsvc
+```
+# if you're using ipv6 then set v4tov4 to v6tov6 and change the address 127.0.0.1 to ::1.
+
+you also can find a software to redirect tcp to zoffline server
+
+</details>
+
 ### Step 7 [OPTIONAL]: Enable IPv6
 
 To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST`` or use the script ``run_ipv6.bat``.
