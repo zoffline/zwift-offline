@@ -1,5 +1,7 @@
 import dns.message
 import dns.rdata
+import dns.rdataclass
+import dns.rdatatype
 import dns.resolver
 import socketserver
 import os
@@ -8,26 +10,30 @@ class DNSUDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
         socket = self.request[1]
-        try:
-            query = dns.message.from_wire(data)
-            response = dns.message.make_response(query)
-            for question in query.question:
-                name = question.name.to_text()
-                if name in DNSServer.namemap and question.rdtype == 1:
-                    ip = DNSServer.namemap[name]
-                else:
-                    answer = DNSServer.resolver.cache.data.get((name, 1, 1))
+        query = dns.message.from_wire(data)
+        response = dns.message.make_response(query)
+        for question in query.question:
+            rdtype = question.rdtype
+            if not rdtype in [dns.rdatatype.A, dns.rdatatype.AAAA]:
+                continue
+            name = question.name.to_text()
+            if name in DNSServer.namemap:
+                ip = DNSServer.namemap[name]
+                if (rdtype == dns.rdatatype.A and not '.' in ip) or (rdtype == dns.rdatatype.AAAA and not ':' in ip):
+                    continue
+            else:
+                try:
+                    answer = DNSServer.resolver.cache.data.get((name, rdtype, dns.rdataclass.IN))
                     if not answer:
-                        answer = DNSServer.resolver.resolve(name)
-                        DNSServer.resolver.cache.put((name, 1, 1), answer)
+                        answer = DNSServer.resolver.resolve(name, rdtype)
+                        DNSServer.resolver.cache.put((name, rdtype, dns.rdataclass.IN), answer)
                     ip = answer[0].to_text()
-                rdata = dns.rdata.from_text(1, 1, ip)
-                rrset = dns.rrset.RRset(question.name, 1, 1)
-                rrset.add(rdata)
-                response.answer.append(rrset)
-            socket.sendto(response.to_wire(), self.client_address)
-        except Exception as e:
-            print('fake_dns: %s' % repr(e))
+                except:
+                    continue
+            rdata = dns.rdata.from_text(dns.rdataclass.IN, rdtype, ip)
+            rrset = dns.rrset.from_rdata(name, 3600, rdata)
+            response.answer.append(rrset)
+        socket.sendto(response.to_wire(), self.client_address)
 
 class DNSServer:
     def __init__(self, port=53):
