@@ -21,11 +21,11 @@ base_url = "https://www.procyclingstats.com/rankings.php?filter=Filter"
 cc = coco.CountryConverter()
 
 teams = {
-  "UAE Team Emirates": {
+  "UAE Team Emirates - XRG": {
     "abv": "UAD",
     "jersey_name": "UAE",
     "jersey_signature": 1751349769,
-    "bike_name": "Colnago Colnago V3RS",
+    "bike_name": "Colnago V3RS",
     "bike_signature": 3628259811,
     "front_wheel_name": "Enve SES 3.4",
     "front_wheel_signature": 2223270801,
@@ -101,8 +101,8 @@ teams = {
     "helmet_name": "ABUS GameChanger Movistar Team",
     "helmet_signature": 4241132751
   },
-  "Lotto Dstny": {
-    "abv": "LTD",
+  "Lotto": {
+    "abv": "LOT",
     "jersey_name": "Lotto Dstny 2023",
     "jersey_signature": 712380058,
     "bike_name": "Ridley Noah Fast 2019",
@@ -166,8 +166,8 @@ teams = {
     "bike_name": "Merida Scultura",
     "bike_signature": 3033010663
   },
-  "Team dsm-firmenich PostNL": {
-    "abv": "DSM",
+  "Team Picnic PostNL": {
+    "abv": "TPP",
     "jersey_name": "Team ODZ",
     "jersey_signature": 2695025247,
     "bike_name": "Scott Foil",
@@ -255,8 +255,8 @@ teams = {
     "rear_wheel_name": "Campagnolo Bora Ultra 35",
     "rear_wheel_signature": 1614586487
   },
-  "Astana Qazaqstan Team": {
-    "abv": "AST",
+  "XDS Astana Team": {
+    "abv": "XAT",
     "jersey_name": "ASTANA PRO TEAM",
     "jersey_signature": 1969335676,
     "bike_name": "Zwift Carbon",
@@ -277,7 +277,7 @@ teams = {
     "bike_name": "Factor One",
     "bike_signature": 3469325930
   },
-  "TotalEnergies": {
+  "Team TotalEnergies": {
     "abv": "TEN",
     "bike_name": "Zwift Carbon",
     "bike_signature": 2106340733,
@@ -289,6 +289,19 @@ teams = {
     "front_wheel_signature": 1742598126,
     "rear_wheel_name": "Shimano C50",
     "rear_wheel_signature": 3725678091
+  },
+  "Q36.5 Pro Cycling Team": {
+    "abv": "Q36",
+    "bike_name": "Scott Addict RC",
+    "bike_signature": 4100131524,
+    "bike_frame_colour_name": "Scott ScottAddict2021-2022",
+    "bike_frame_colour_signature": 2522283696,
+    "jersey_name": "Q36.5 Pro Team",
+    "jersey_signature": 1185917078,
+    "front_wheel_name": "Zipp 454",
+    "front_wheel_signature": 667389725,
+    "rear_wheel_name": "Zipp 454",
+    "rear_wheel_signature": 461030369,
   },
   "Team SD Worx - Protime": {
     "abv": "SDW",
@@ -330,8 +343,8 @@ teams = {
     "rear_wheel_name": "Shimano C50",
     "rear_wheel_signature": 3725678091
   },
-  "Canyon//SRAM Racing": {
-    "abv": "CSR",
+  "CANYON//SRAM zondacrypto": {
+    "abv": "CSZ",
     "jersey_name": "CANYON//SRAM Racing",
     "jersey_signature": 3970245639,
     "bike_name": "Canyon AeroadSRAM2024",
@@ -343,8 +356,8 @@ teams = {
     "helmet_name": "Giro Eclipse Canyon SRAM",
     "helmet_signature": 3346861673
   },
-  "Canyon//SRAM Generation": {
-    "abv": "CSR",
+  "CANYON//SRAM zondacrypto Generation": {
+    "abv": "CSG",
     "jersey_name": "Canyon//SRAM Generation",
     "jersey_signature": 189587516,
     "bike_name": "Canyon AeroadSRAM2024",
@@ -356,7 +369,7 @@ teams = {
     "helmet_name": "Giro Eclipse Canyon SRAM",
     "helmet_signature": 3346861673
   },
-  "AG Insurance - Soudal Quick-Step": {
+  "AG Insurance - Soudal Team": {
     "abv": "AGS",
     "jersey_name": "Lotto-Soudal",
     "jersey_signature": 3103938066,
@@ -379,10 +392,10 @@ teams = {
     "bike_name": "Liv Langma Advanced SL",
     "bike_signature": 3495124341
   },
-  "Israel Premier Tech Roland": {
+  "Roland Le Dévoluy": {
     "abv": "CGS",
-    "jersey_name": "Israel Premier-Tech",
-    "jersey_signature": 552170906,
+    "jersey_name": "Team Roland Cogeas Edelweiss",
+    "jersey_signature": 3398931495,
     "bike_name": "Factor One",
     "bike_signature": 3469325930,
     "bike_frame_colour_name": "Factor One-One Israel",
@@ -390,31 +403,22 @@ teams = {
     "helmet_name": "Limar Air Speed TWENTY24",
     "helmet_signature": 9439966
   },
-  "EF Education-TIBCO-SVB": {
-    "abv": "TIB",
-    "jersey_name": "Team EF Education-TIBCO-SVB",
-    "jersey_signature": 2795352821,
-    "bike_name": "Cannondale System Six",
-    "bike_signature": 2005280203,
-    "helmet_name": "POC Ventral Air EF",
-    "helmet_signature": 3707571564
-  },
   "Fenix-Deceuninck": {
-    "abv": "FED",
+    "abv": "FDC",
     "jersey_name": "Fenix Deceuninck 2023",
     "jersey_signature": 3290712389,
     "bike_name": "Canyon Aeroad2024",
     "bike_signature": 2629993294
   },
-  "Fenix-Deceuninck Continental": {
+  "Fenix-Deceuninck Development Team": {
     "abv": "FDD",
     "bike_name": "Canyon Aeroad2024",
     "bike_signature": 2629993294,
     "jersey_name": "Fenix Deceuninck 2023",
     "jersey_signature": 3290712389
   },
-  "Ceratizit-WNT": {
-    "abv": "WNT",
+  "CERATIZIT Pro Cycling Team": {
+    "abv": "CTC",
     "bike_name": "Zwift Carbon",
     "bike_signature": 2106340733,
     "bike_frame_colour_name": "Zwift Carbon-Orbea Orca",
@@ -422,7 +426,7 @@ teams = {
     "jersey_name": "Ceratizit-WNT",
     "jersey_signature": 97975537
   },
-  "St Michel - Mavic - Auber93 WE": {
+  "St Michel - Preference Home - Auber93 WE": {
     "abv": "AUB",
     "jersey_name": "South Africa Elite",
     "jersey_signature": 3305515323,
@@ -433,15 +437,8 @@ teams = {
     "rear_wheel_name": "Mavic Comete Pro Carbon SL UST",
     "rear_wheel_signature": 4001596344
   },
-  "Lifeplus Wahoo": {
-    "abv": "DRP",
-    "bike_name": "Ribble Endurance",
-    "bike_signature": 3247466139,
-    "jersey_name": "Wahoo",
-    "jersey_signature": 3553917933
-  },
   "Cofidis Women Team": {
-    "abv": "COF",
+    "abv": "CWT",
     "bike_name": "Zwift Carbon",
     "bike_signature": 2106340733,
     "bike_frame_colour_name": "Zwift Carbon-Cofidis De Rosa",
@@ -449,13 +446,13 @@ teams = {
     "jersey_name": "Cofidis",
     "jersey_signature": 4191972189
   },
-  "Arkéa Pro Cycling Team": {
+  "Arkéa - B&B Hotels Women": {
     "abv": "ARK",
     "jersey_name": "Arkea",
     "jersey_signature": 1128201030
   },
   "MAT Atom Deweloper Wrocław": {
-    "abv": "MAW",
+    "abv": "MAT",
     "bike_name": "Ridley Noah Fast 2019",
     "bike_signature": 4288910569,
     "jersey_name": "Atom Racing Team",
@@ -468,8 +465,8 @@ teams = {
     "jersey_name": "Clash Of Clubs Blue",
     "jersey_signature": 520081294
   },
-  "EOLO-Kometa": {
-    "abv": "EOK",
+  "Team Polti VisitMalta": {
+    "abv": "PTV",
     "jersey_name": "Eolo Kometa",
     "jersey_signature": 2422819298,
     "front_wheel_name": "Enve SES 3.4",
@@ -477,8 +474,8 @@ teams = {
     "rear_wheel_name": "Enve SES 3.4",
     "rear_wheel_signature": 3835575171
   },
-  "Green Project-Bardiani CSF-Faizanè": {
-    "abv": "GBF",
+  "VF Group - Bardiani CSF - Faizanè": {
+    "abv": "VBF",
     "jersey_name": "Bardiani 2019",
     "jersey_signature": 3503002798,
     "front_wheel_name": "Campagnolo Bora Ultra 35",
@@ -493,8 +490,8 @@ teams = {
     "jersey_name": "L39ION of LA 2022",
     "jersey_signature": 2330819669
   },
-  "Lotto Dstny Ladies": {
-    "abv": "LDL",
+  "Lotto Ladies": {
+    "abv": "LOL",
     "jersey_name": "Lotto Dstny 2023",
     "jersey_signature": 712380058
   },
@@ -507,17 +504,19 @@ teams = {
   },
   "Tudor Pro Cycling Team": {
     "abv": "TUD",
-    "bike_name": "BMC BmcTeamMachine2022",
+    "jersey_name": "Assos Superleger",
+    "jersey_signature": 142676981,
+    "bike_name": "BMC TeamMachine",
     "bike_signature": 3868468027,
-    "helmet_name": "ABUS GameChanger",
-    "helmet_signature": 1387973863,
-    "front_wheel_name": "DTSwiss ARC 1100 DICUT 62",
-    "front_wheel_signature": 346409677,
-    "rear_wheel_name": "DTSwiss ARC 1100 DICUT 62",
-    "rear_wheel_signature": 2049111692
+    "bike_frame_colour_name": "BMC Timemachine01-BMC Timemachine01 Black",
+    "bike_frame_colour_signature": 2850354759,
+    "front_wheel_name": "DTSwiss ARC 1100 DICUT 85/Disc",
+    "front_wheel_signature": 1213183664,
+    "rear_wheel_name": "DTSwiss ARC 1100 DICUT 85/Disc",
+    "rear_wheel_signature": 590647095,
   },
-  "EF-Oatly-Cannondale": {
-    "abv": "EOC",
+  "EF Education-Oatly": {
+    "abv": "EFO",
     "jersey_name": "EF Education First",
     "jersey_signature": 2349035663,
     "bike_name": "Cannondale System Six",
