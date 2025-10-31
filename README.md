@@ -426,10 +426,9 @@ Note: there is no guarantee that an untested Zwift update will work with zofflin
 Alternatively, [this script](https://gist.github.com/oldnapalm/556c58448a6ee09438b39e1c1c9ce3d0) can be used to downgrade Zwift to the version supported by zoffline.
 </details>
 
-<details><summary>Zwift phased updates</summary>
+<details><summary>Update failed during patching</summary>
 
-If you install Zwift during a phased update period, when you enable zoffline it's possible that Zwift attempts to update again and fails.
-To workaround this situation, rename the file ``Zwift_ver_cur.<version>.xml`` in Zwift directory to ``Zwift_ver_cur.xml`` and edit the file ``Zwift_ver_cur_filename.txt`` accordingly.
+If you get this error even though zoffline is up to date, rename the file ``Zwift_ver_cur.<version>.xml`` in Zwift directory to ``Zwift_ver_cur.xml`` and edit the file ``Zwift_ver_cur_filename.txt`` accordingly.
 </details>
 
 
