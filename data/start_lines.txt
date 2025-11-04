@@ -549,6 +549,11 @@
     "road": 220,
     "time": 443000
   },
+  "1671282746": {
+    "name": "New York - Empire Elevation",
+    "road": 346,
+    "time": 555228
+  },
   "1327665278": {
     "name": "New York - Everything Bagel",
     "road": 4,

@@ -65,7 +65,15 @@
       "values": {}
     },
     {
+      "name": "disable_structured_event_proto_validation",
+      "values": {}
+    },
+    {
       "name": "download_entitlements_from_asset_cms",
+      "values": {}
+    },
+    {
+      "name": "enable_structured_event_proto_validation_debug_asserts",
       "values": {}
     },
     {
@@ -105,7 +113,11 @@
       }
     },
     {
-      "name": "game_1_100_adding_to_fitness_device_manager"
+      "name": "game_101_hud_ncgb"
+    },
+    {
+      "name": "game_1_100_adding_to_fitness_device_manager",
+      "value": true
     },
     {
       "name": "game_1_100_helicam_world_setting",
@@ -130,6 +142,43 @@
       "value": true
     },
     {
+      "name": "game_1_100_retry_on_corrupt_image",
+      "value": true,
+      "values": {
+        "fields": {
+          "new_mutex_behavior": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_100_structured_event_pace_partner_joined_left",
+      "value": true
+    },
+    {
+      "name": "game_1_101_distance_between_sample_points",
+      "value": true,
+      "values": {
+        "fields": {
+          "sample_point_distance": {
+            "stringValue": "2000"
+          }
+        }
+      }
+    },
+    {
+      "name": "game_1_101_enable_task_rewards_section",
+      "values": {}
+    },
+    {
+      "name": "game_1_101_robopacer_timer_ui"
+    },
+    {
+      "name": "game_1_101_zp_request_full_response",
+      "values": {}
+    },
+    {
       "name": "game_1_15_assert_disable_abort",
       "value": true,
       "values": {}
@@ -146,8 +195,7 @@
       }
     },
     {
-      "name": "game_1_18_holiday_mode",
-      "values": {}
+      "name": "game_1_18_holiday_mode"
     },
     {
       "name": "game_1_20_home_screen",
@@ -1158,14 +1206,7 @@
       "values": {}
     },
     {
-      "name": "game_1_77_prevent_teleport_to_player_type",
-      "values": {
-        "fields": {
-          "restricted_teleports": {
-            "stringValue": "{}"
-          }
-        }
-      }
+      "name": "game_1_77_prevent_teleport_to_player_type"
     },
     {
       "name": "game_1_77_ttt_team_car_shows_znl_when_fanviewing",
@@ -1473,7 +1514,8 @@
       }
     },
     {
-      "name": "game_1_92_for_you_recommendations_bff"
+      "name": "game_1_92_for_you_recommendations_bff",
+      "values": {}
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
@@ -1536,8 +1578,7 @@
       "name": "game_1_98_soft_delete_activity"
     },
     {
-      "name": "game_1_98_swap_power_and_smart_trainer",
-      "values": {}
+      "name": "game_1_98_swap_power_and_smart_trainer"
     },
     {
       "name": "game_1_98_zp_ip_hides_wftnp",
@@ -1729,6 +1770,10 @@
       "values": {}
     },
     {
+      "name": "game_camera_spill",
+      "values": {}
+    },
+    {
       "name": "game_check_for_video_updates"
     },
     {
@@ -1776,7 +1821,8 @@
       "values": {}
     },
     {
-      "name": "game_cp_best_analytic"
+      "name": "game_cp_best_analytic",
+      "value": true
     },
     {
       "name": "game_crash_recovery",
@@ -1809,7 +1855,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "153844"
+            "stringValue": "154180"
           },
           "canary_test": {
             "boolValue": true
@@ -1882,6 +1928,10 @@
           }
         }
       }
+    },
+    {
+      "name": "game_fence_upload",
+      "value": true
     },
     {
       "name": "game_fireworks",
@@ -1984,16 +2034,17 @@
     },
     {
       "name": "game_instrumental_rock_bass",
+      "value": true,
       "values": {
         "fields": {
           "end": {
             "varintValue": "33313218958"
           },
           "ints": {
-            "stringValue": "40012,4,0,1 40011,4,3,1"
+            "stringValue": ""
           },
           "routes": {
-            "stringValue": "2898229208, 1942591558, 1099226581, 22757204, 1178708985, 104170948, 2101060245, 3079921742, 3678866163, 3314406972, 1552189318, 730052368, 3051823795, 4232620535, 975408707, 112312944, 3835625237, 2949228237, 1472166107, 494933300"
+            "stringValue": "1942591558, 2949228237, 104170948"
           },
           "start": {
             "varintValue": "1756310158"
@@ -2062,7 +2113,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.100.0"
+            "stringValue": "1.101.0"
           }
         }
       }
@@ -2294,7 +2345,7 @@
       "values": {
         "fields": {
           "deferred_preview": {
-            "boolValue": false
+            "boolValue": true
           }
         }
       }

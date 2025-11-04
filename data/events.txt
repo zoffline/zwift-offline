@@ -51,7 +51,7 @@
   {
     "name": "Innsbruck KOM After Party",
     "route": 3649347250,
-    "distance": 37196.9,
+    "distance": 37192.8,
     "course": 9,
     "sport": 0
   },
@@ -140,6 +140,13 @@
     "sport": 0
   },
   {
+    "name": "New York - Empire Elevation",
+    "route": 1671282746,
+    "distance": 25978.3,
+    "course": 8,
+    "sport": 0
+  },
+  {
     "name": "New York - Gotham Grind Reverse",
     "route": 352245150,
     "distance": 9649.7,
@@ -189,23 +196,9 @@
     "sport": 1
   },
   {
-    "name": "New York - Stay Puft Pursuit",
-    "route": 3079921742,
-    "distance": 31203.7,
-    "course": 8,
-    "sport": 0
-  },
-  {
     "name": "New York - The 6 Train Reverse",
     "route": 274639515,
     "distance": 6843.0,
-    "course": 8,
-    "sport": 0
-  },
-  {
-    "name": "New York - The Double Borough",
-    "route": 1552189318,
-    "distance": 17859.9,
     "course": 8,
     "sport": 0
   },
@@ -240,7 +233,7 @@
   {
     "name": "Richmond Rollercoaster",
     "route": 948831673,
-    "distance": 17203.8,
+    "distance": 17205.2,
     "course": 2,
     "sport": 0
   },
