@@ -309,6 +309,42 @@ To enable support for multiple users perform the steps below:
 
 To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST`` or use the script ``run_ipv6.bat``.
 
+### Step 8 [OPTIONAL]: Port Ban Solutions
+
+<details><summary>Expand</summary>
+
+  To redirect client to other address & port perform the steps below:
+
+  * if zoffline server run at ``192.168.0.100`` and port reset ``[80,443]`` to ``[680,6443]``
+    * so we set ``listenaddress`` to ``127.0.0.1`` and ``listenport`` to ``80,443``
+    * then we set ``connectaddress`` to ``192.168.0.100`` and ``listenport`` to ``680,6443``
+    ``` shell
+      netsh interface portproxy add v4tov4 listenaddress=127.0.0.1 listenport=80 connectaddress=192.168.0.100 connectport=680
+      netsh advfirewall firewall add rule name="Redirect_ZWIFT_80" dir=in action=allow protocol=TCP localip=127.0.0.1 localport=80
+      
+      netsh interface portproxy add v4tov4 listenaddress=127.0.0.1 listenport=443 connectaddress=192.168.0.100 connectport=6443
+      netsh advfirewall firewall add rule name="Redirect_ZWIFT_443" dir=in action=allow protocol=TCP localip=127.0.0.1 localport=443
+
+      // check listen info
+      netstat -ano | findstr "127.0.0.1:80"
+      netstat -ano | findstr "127.0.0.1:443"
+
+      // delete  tcp proxy
+      netsh interface portproxy delete v4tov4 listenaddress=127.0.0.1 listenport=80
+      netsh interface portproxy delete v4tov4 listenaddress=127.0.0.1 listenport=443
+
+      // delete firewall rules
+      netsh advfirewall firewall delete rule name="Redirect_ZWIFT_80"
+      netsh advfirewall firewall delete rule name="Redirect_ZWIFT_443"
+      
+      // start iphlpsvc service
+      sc start iphlpsvc
+    ```
+* if you're using IPv6 then change ``v4tov4`` to ``v6tov6`` and change the address ``127.0.0.1`` to ``::1``.
+* __NOTE__: those command only can proxy TCP
+* you also can find a software to redirect tcp to zoffline server
+</details>
+
 ### Extra features
 
 <details><summary>Ghosts</summary>
