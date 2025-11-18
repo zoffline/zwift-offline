@@ -56,24 +56,15 @@
           },
           "bUseSockCDA": {
             "boolValue": true
+          },
+          "maxSlopeRateOfChange": {
+            "numberValue": 0.05
           }
         }
       }
     },
     {
-      "name": "disable_pre_destruct_player_session_state",
-      "values": {}
-    },
-    {
-      "name": "disable_structured_event_proto_validation",
-      "values": {}
-    },
-    {
       "name": "download_entitlements_from_asset_cms",
-      "values": {}
-    },
-    {
-      "name": "enable_structured_event_proto_validation_debug_asserts",
       "values": {}
     },
     {
@@ -99,6 +90,10 @@
       }
     },
     {
+      "name": "free_trial_update",
+      "values": {}
+    },
+    {
       "name": "friend_is_zwifting_message",
       "value": true,
       "values": {
@@ -111,6 +106,9 @@
           }
         }
       }
+    },
+    {
+      "name": "ftp_estimate_v2"
     },
     {
       "name": "game_101_hud_ncgb"
@@ -172,11 +170,26 @@
       "values": {}
     },
     {
-      "name": "game_1_101_robopacer_timer_ui"
+      "name": "game_1_101_robopacer_timer_ui",
+      "value": true
     },
     {
       "name": "game_1_101_zp_request_full_response",
       "values": {}
+    },
+    {
+      "name": "game_1_102_draft_slope_fix"
+    },
+    {
+      "name": "game_1_102_split_zp_set_messages",
+      "value": true
+    },
+    {
+      "name": "game_1_102_unpair_all_devices",
+      "value": true
+    },
+    {
+      "name": "game_1_103_new_achievements_screen"
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -314,11 +327,6 @@
     },
     {
       "name": "game_1_34_save_device_profiles_on_all_platforms",
-      "values": {}
-    },
-    {
-      "name": "game_1_39_atv_connection_limit_check",
-      "value": true,
       "values": {}
     },
     {
@@ -489,10 +497,6 @@
     {
       "name": "game_1_44_1dc_fix_2",
       "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_45_0_ble_source_lock",
       "values": {}
     },
     {
@@ -1365,41 +1369,6 @@
       "values": {}
     },
     {
-      "name": "game_1_86_streak_rewards",
-      "value": true,
-      "values": {
-        "fields": {
-          "end": {
-            "varintValue": "1743577200"
-          },
-          "end_full": {
-            "varintValue": "2685139200"
-          },
-          "flair1thresh": {
-            "varintValue": "4"
-          },
-          "flair2thresh": {
-            "varintValue": "12"
-          },
-          "flair3thresh": {
-            "varintValue": "24"
-          },
-          "key": {
-            "stringValue": "STREAKREWARDZZZZ"
-          },
-          "local_lock": {
-            "boolValue": true
-          },
-          "start": {
-            "varintValue": "1743433200"
-          },
-          "start_full": {
-            "varintValue": "1743606000"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_86_zg_ftp_for_robopacers",
       "value": true,
       "values": {}
@@ -1485,14 +1454,16 @@
       "value": true
     },
     {
-      "name": "game_1_91_activity_cards"
+      "name": "game_1_91_activity_cards",
+      "value": true
     },
     {
       "name": "game_1_91_center_hud_onroute_update",
       "value": true
     },
     {
-      "name": "game_1_91_nav_bar_social_tab"
+      "name": "game_1_91_nav_bar_social_tab",
+      "value": true
     },
     {
       "name": "game_1_91_publish_climb_portal_complete",
@@ -1514,8 +1485,7 @@
       }
     },
     {
-      "name": "game_1_92_for_you_recommendations_bff",
-      "values": {}
+      "name": "game_1_92_for_you_recommendations_bff"
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
@@ -1542,7 +1512,8 @@
       "value": true
     },
     {
-      "name": "game_1_95_post_recommended_activity_survey"
+      "name": "game_1_95_post_recommended_activity_survey",
+      "value": true
     },
     {
       "name": "game_1_95_prevent_pairing_of_already_paired_ble_devices",
@@ -1762,6 +1733,17 @@
       "values": {}
     },
     {
+      "name": "game_aup_branch",
+      "value": true,
+      "values": {
+        "fields": {
+          "branch_prefix": {
+            "stringValue": "art/"
+          }
+        }
+      }
+    },
+    {
       "name": "game_barun",
       "values": {}
     },
@@ -1847,6 +1829,18 @@
       "values": {}
     },
     {
+      "name": "game_disable_end_ride_streak_fix",
+      "values": {}
+    },
+    {
+      "name": "game_disable_pre_destruct_player_session_state",
+      "values": {}
+    },
+    {
+      "name": "game_disable_structured_event_proto_validation",
+      "values": {}
+    },
+    {
       "name": "game_dlc",
       "value": true,
       "values": {
@@ -1855,7 +1849,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "154180"
+            "stringValue": "154978"
           },
           "canary_test": {
             "boolValue": true
@@ -1920,6 +1914,10 @@
       }
     },
     {
+      "name": "game_enable_structured_event_proto_validation_debug_asserts",
+      "values": {}
+    },
+    {
       "name": "game_end_game_session",
       "values": {
         "fields": {
@@ -1939,6 +1937,9 @@
     },
     {
       "name": "game_for_you_tooltips"
+    },
+    {
+      "name": "game_force_show_all_graphics_settings"
     },
     {
       "name": "game_hrm_hrv"
@@ -2044,7 +2045,7 @@
             "stringValue": ""
           },
           "routes": {
-            "stringValue": "1942591558, 2949228237, 104170948"
+            "stringValue": "104170948"
           },
           "start": {
             "varintValue": "1756310158"
@@ -2113,7 +2114,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.101.0"
+            "stringValue": "1.102.0"
           }
         }
       }
@@ -2179,6 +2180,10 @@
     {
       "name": "game_tdz_2025_package_fw",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_templated_event_decor",
       "values": {}
     },
     {
@@ -2340,6 +2345,10 @@
       "values": {}
     },
     {
+      "name": "gfx_waipio",
+      "value": true
+    },
+    {
       "name": "gn_deferred_lighting",
       "value": true,
       "values": {
@@ -2368,7 +2377,22 @@
       "values": {}
     },
     {
+      "name": "manual_activity_start",
+      "value": true
+    },
+    {
+      "name": "noesis_compressed_textures"
+    },
+    {
+      "name": "noesis_dlc",
+      "value": true
+    },
+    {
       "name": "progress_report"
+    },
+    {
+      "name": "quest_service_awards_xp",
+      "values": {}
     },
     {
       "name": "unload_homescreen_before_game_load",

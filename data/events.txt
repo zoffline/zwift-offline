@@ -177,7 +177,7 @@
   {
     "name": "New York - No Sleep Till Brooklyn",
     "route": 104170948,
-    "distance": 31809.4,
+    "distance": 32401.8,
     "course": 8,
     "sport": 0
   },
@@ -210,20 +210,6 @@
     "sport": 0
   },
   {
-    "name": "New York - Times Square Circuit",
-    "route": 1942591558,
-    "distance": 3523.3,
-    "course": 8,
-    "sport": 0
-  },
-  {
-    "name": "New York - Times Square Circuit Run",
-    "route": 2949228237,
-    "distance": 3523.3,
-    "course": 8,
-    "sport": 1
-  },
-  {
     "name": "Richmond - Cobbled Climbs Reverse",
     "route": 4194352271,
     "distance": 9277.1,
@@ -233,7 +219,7 @@
   {
     "name": "Richmond Rollercoaster",
     "route": 948831673,
-    "distance": 17205.2,
+    "distance": 17120.2,
     "course": 2,
     "sport": 0
   },
