@@ -28,6 +28,13 @@
     "sport": 0
   },
   {
+    "name": "France - Peaky Pav\u00c3\u00a9",
+    "route": 941280950,
+    "distance": 30809.2,
+    "course": 14,
+    "sport": 0
+  },
+  {
     "name": "France Classic Fondo",
     "route": 2136907048,
     "distance": 146423.6,
@@ -37,14 +44,14 @@
   {
     "name": "Gravel Mountain",
     "route": 3687150686,
-    "distance": 5360.2,
+    "distance": 5368.2,
     "course": 16,
     "sport": 0
   },
   {
     "name": "Gravel Mountain Reverse",
     "route": 2956533021,
-    "distance": 5220.9,
+    "distance": 5199.3,
     "course": 16,
     "sport": 0
   },
@@ -119,6 +126,13 @@
     "sport": 0
   },
   {
+    "name": "Makuri Islands - Kaze Kicker",
+    "route": 2833089100,
+    "distance": 17279.4,
+    "course": 13,
+    "sport": 0
+  },
+  {
     "name": "Makuri Islands - Liminal Loop",
     "route": 334944296,
     "distance": 23911.6,
@@ -157,6 +171,13 @@
     "name": "New York - Grand Central Circuit Reverse",
     "route": 3687251774,
     "distance": 9213.2,
+    "course": 8,
+    "sport": 0
+  },
+  {
+    "name": "New York - Hudson Hustle",
+    "route": 750613981,
+    "distance": 20374.8,
     "course": 8,
     "sport": 0
   },
@@ -217,6 +238,13 @@
     "sport": 0
   },
   {
+    "name": "Richmond - Cobbled Crown",
+    "route": 2244765560,
+    "distance": 24305.3,
+    "course": 2,
+    "sport": 0
+  },
+  {
     "name": "Richmond Rollercoaster",
     "route": 948831673,
     "distance": 17120.2,
@@ -234,6 +262,13 @@
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
+    "course": 17,
+    "sport": 0
+  },
+  {
+    "name": "Scotland - The Epiloch",
+    "route": 3486338362,
+    "distance": 11104.8,
     "course": 17,
     "sport": 0
   },
@@ -353,6 +388,13 @@
     "name": "Watopia - Three Sisters Reverse",
     "route": 4263172118,
     "distance": 45892.8,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Three Step Sisters",
+    "route": 3536020075,
+    "distance": 38053.1,
     "course": 6,
     "sport": 0
   },

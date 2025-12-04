@@ -57,8 +57,8 @@
           "bUseSockCDA": {
             "boolValue": true
           },
-          "maxSlopeRateOfChange": {
-            "numberValue": 0.05
+          "bUseTrainerSlopeScale": {
+            "boolValue": true
           }
         }
       }
@@ -166,10 +166,6 @@
       }
     },
     {
-      "name": "game_1_101_enable_task_rewards_section",
-      "values": {}
-    },
-    {
       "name": "game_1_101_robopacer_timer_ui",
       "value": true
     },
@@ -178,14 +174,18 @@
       "values": {}
     },
     {
-      "name": "game_1_102_draft_slope_fix"
+      "name": "game_1_102_draft_slope_fix",
+      "value": true
     },
     {
       "name": "game_1_102_split_zp_set_messages",
       "value": true
     },
     {
-      "name": "game_1_102_unpair_all_devices",
+      "name": "game_1_102_unpair_all_devices"
+    },
+    {
+      "name": "game_1_103_custom_loop_point",
       "value": true
     },
     {
@@ -208,7 +208,8 @@
       }
     },
     {
-      "name": "game_1_18_holiday_mode"
+      "name": "game_1_18_holiday_mode",
+      "value": true
     },
     {
       "name": "game_1_20_home_screen",
@@ -335,11 +336,6 @@
     },
     {
       "name": "game_1_39_movement_recorder",
-      "values": {}
-    },
-    {
-      "name": "game_1_39_repack_rampage_steering_route_list",
-      "value": true,
       "values": {}
     },
     {
@@ -1520,7 +1516,15 @@
       "value": true
     },
     {
-      "name": "game_1_96_info_highlight"
+      "name": "game_1_96_info_highlight",
+      "value": true,
+      "values": {
+        "fields": {
+          "week_streak": {
+            "stringValue": "week_streak"
+          }
+        }
+      }
     },
     {
       "name": "game_1_96_roaddecal_tags",
@@ -1724,6 +1728,9 @@
       "values": {}
     },
     {
+      "name": "game_android_local_data_path_direct"
+    },
+    {
       "name": "game_android_perf_testing",
       "values": {}
     },
@@ -1849,7 +1856,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "154978"
+            "stringValue": "155754"
           },
           "canary_test": {
             "boolValue": true
@@ -2058,7 +2065,8 @@
       "values": {}
     },
     {
-      "name": "game_levelup_vfx"
+      "name": "game_levelup_vfx",
+      "value": true
     },
     {
       "name": "game_lightningsocks",
@@ -2078,6 +2086,9 @@
     {
       "name": "game_nb_world_load",
       "values": {}
+    },
+    {
+      "name": "game_nubra"
     },
     {
       "name": "game_off_route_path_prediction",
@@ -2114,7 +2125,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.102.0"
+            "stringValue": "1.103.0"
           }
         }
       }
@@ -2379,6 +2390,10 @@
     {
       "name": "manual_activity_start",
       "value": true
+    },
+    {
+      "name": "mobile_cp_curve_fix",
+      "values": {}
     },
     {
       "name": "noesis_compressed_textures"

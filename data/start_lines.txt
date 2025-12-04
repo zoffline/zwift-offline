@@ -69,6 +69,11 @@
     "road": 26,
     "time": 305075
   },
+  "941280950": {
+    "name": "France - Peaky Pav\u00c3\u00a9",
+    "road": 26,
+    "time": 296827
+  },
   "-1442814000": {
     "name": "France - Petit Boucle",
     "road": 26,
@@ -127,12 +132,12 @@
   "-607816610": {
     "name": "Gravel Mountain - Gravel Mountain",
     "road": 0,
-    "time": 652593
+    "time": 655000
   },
   "-1338434275": {
     "name": "Gravel Mountain - Gravel Mountain Reverse",
-    "road": 0,
-    "time": 548908
+    "road": 3,
+    "time": 368606
   },
   "-1180363988": {
     "name": "Innsbruck - 2018 Worlds Short Lap",
@@ -374,6 +379,11 @@
     "road": 41,
     "time": 481924
   },
+  "-1461878196": {
+    "name": "Makuri Islands - Kaze Kicker",
+    "road": 129,
+    "time": 297875
+  },
   "334944296": {
     "name": "Makuri Islands - Liminal Loop",
     "road": 134,
@@ -594,6 +604,11 @@
     "road": 215,
     "time": 125000
   },
+  "750613981": {
+    "name": "New York - Hudson Hustle",
+    "road": 4,
+    "time": 173716
+  },
   "-629007892": {
     "name": "New York - Hudson Roll",
     "road": 3,
@@ -799,6 +814,11 @@
     "road": 0,
     "time": 997004
   },
+  "-2050201736": {
+    "name": "Richmond - Cobbled Crown",
+    "road": 0,
+    "time": 971264
+  },
   "54700404": {
     "name": "Richmond - Libby Hill After Party",
     "road": 0,
@@ -893,6 +913,11 @@
     "name": "Scotland - Scotland Smash",
     "road": 9,
     "time": 1001990
+  },
+  "-808628934": {
+    "name": "Scotland - The Epiloch",
+    "road": 2,
+    "time": 905000
   },
   "-632261715": {
     "name": "Scotland - The Muckle Yin",
@@ -1403,6 +1428,11 @@
     "name": "Watopia - Three Sisters Reverse",
     "road": 0,
     "time": 987522
+  },
+  "-758947221": {
+    "name": "Watopia - Three Step Sisters",
+    "road": 0,
+    "time": 987894
   },
   "-928742216": {
     "name": "Watopia - Tick Tock",
