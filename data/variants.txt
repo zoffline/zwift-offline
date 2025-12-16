@@ -189,7 +189,19 @@
       "value": true
     },
     {
-      "name": "game_1_103_new_achievements_screen"
+      "name": "game_1_103_fill_right_hand_rewards_page",
+      "value": true
+    },
+    {
+      "name": "game_1_103_new_achievements_screen",
+      "value": true
+    },
+    {
+      "name": "game_1_104_quest_activity_cards"
+    },
+    {
+      "name": "game_1_104_wftnp_advertising_fix",
+      "value": true
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -1571,7 +1583,8 @@
       }
     },
     {
-      "name": "game_1_99_draft_indicator"
+      "name": "game_1_99_draft_indicator",
+      "value": true
     },
     {
       "name": "game_1_99_power_segment_arch",
@@ -1814,8 +1827,7 @@
       "value": true
     },
     {
-      "name": "game_crash_recovery",
-      "values": {}
+      "name": "game_crash_recovery"
     },
     {
       "name": "game_danum",
@@ -1833,6 +1845,10 @@
     {
       "name": "game_disable_cached_subgroup_protobuf",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_disable_end_ride_delete_snapshot_fix",
       "values": {}
     },
     {
@@ -1856,7 +1872,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "155754"
+            "stringValue": "156559"
           },
           "canary_test": {
             "boolValue": true
@@ -2041,24 +2057,7 @@
       "values": {}
     },
     {
-      "name": "game_instrumental_rock_bass",
-      "value": true,
-      "values": {
-        "fields": {
-          "end": {
-            "varintValue": "33313218958"
-          },
-          "ints": {
-            "stringValue": ""
-          },
-          "routes": {
-            "stringValue": "104170948"
-          },
-          "start": {
-            "varintValue": "1756310158"
-          }
-        }
-      }
+      "name": "game_instrumental_rock_bass"
     },
     {
       "name": "game_lauterbrunnen",
@@ -2125,7 +2124,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.103.0"
+            "stringValue": "1.104.0"
           }
         }
       }
@@ -2408,6 +2407,9 @@
     {
       "name": "quest_service_awards_xp",
       "values": {}
+    },
+    {
+      "name": "quest_stage_cards"
     },
     {
       "name": "unload_homescreen_before_game_load",

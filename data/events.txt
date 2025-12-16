@@ -56,13 +56,6 @@
     "sport": 0
   },
   {
-    "name": "Innsbruck KOM After Party",
-    "route": 3649347250,
-    "distance": 37192.8,
-    "course": 9,
-    "sport": 0
-  },
-  {
     "name": "InnsbruckConti",
     "route": 3101693166,
     "distance": 12941.6,
@@ -147,6 +140,13 @@
     "sport": 0
   },
   {
+    "name": "Makuri Islands - Neon Shore Loop",
+    "route": 3600776267,
+    "distance": 34074.9,
+    "course": 13,
+    "sport": 0
+  },
+  {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54964.1,
@@ -196,13 +196,6 @@
     "sport": 0
   },
   {
-    "name": "New York - No Sleep Till Brooklyn",
-    "route": 104170948,
-    "distance": 32401.8,
-    "course": 8,
-    "sport": 0
-  },
-  {
     "name": "New York - Park Perimeter Reverse",
     "route": 2202609830,
     "distance": 9915.9,
@@ -241,13 +234,6 @@
     "name": "Richmond - Cobbled Crown",
     "route": 2244765560,
     "distance": 24305.3,
-    "course": 2,
-    "sport": 0
-  },
-  {
-    "name": "Richmond Rollercoaster",
-    "route": 948831673,
-    "distance": 17120.2,
     "course": 2,
     "sport": 0
   },
@@ -329,13 +315,6 @@
     "sport": 1
   },
   {
-    "name": "Watopia - Jarvis Seaside Sprint",
-    "route": 2661047295,
-    "distance": 15331.8,
-    "course": 6,
-    "sport": 0
-  },
-  {
     "name": "Watopia - Jungle Circuit Reverse",
     "route": 2839057126,
     "distance": 14150.6,
@@ -367,13 +346,6 @@
     "name": "Watopia - Seaside Sprint",
     "route": 3454338139,
     "distance": 9253.1,
-    "course": 6,
-    "sport": 0
-  },
-  {
-    "name": "Watopia - Southern Coast Cruise",
-    "route": 3680493479,
-    "distance": 26291.8,
     "course": 6,
     "sport": 0
   },
@@ -465,13 +437,6 @@
     "name": "Yorkshire - Harrogate Circuit Reverse",
     "route": 620436060,
     "distance": 13855.2,
-    "course": 11,
-    "sport": 0
-  },
-  {
-    "name": "Yorkshire Double Loop",
-    "route": 1788218813,
-    "distance": 29670.4,
     "course": 11,
     "sport": 0
   }

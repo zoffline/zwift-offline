@@ -434,6 +434,11 @@
     "road": 4,
     "time": 33833
   },
+  "-694191029": {
+    "name": "Makuri Islands - Neon Shore Loop",
+    "road": 4,
+    "time": 731960
+  },
   "246712730": {
     "name": "Makuri Islands - Railways and Rooftops",
     "road": 19,
