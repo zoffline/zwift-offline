@@ -4077,6 +4077,11 @@ def api_fitness_fitness_goals_history():
     return '', 204
 
 
+@app.route('/api/d-lock-service/device/authenticate', methods=['POST'])
+def api_d_lock_service_device_authenticate():
+    return '', 204
+
+
 @app.teardown_request
 def teardown_request(exception):
     db.session.close()
