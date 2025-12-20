@@ -57,8 +57,8 @@
           "bUseSockCDA": {
             "boolValue": true
           },
-          "maxSlopeRateOfChange": {
-            "numberValue": 0.05
+          "bUseTrainerSlopeScale": {
+            "boolValue": true
           }
         }
       }
@@ -166,10 +166,6 @@
       }
     },
     {
-      "name": "game_1_101_enable_task_rewards_section",
-      "values": {}
-    },
-    {
       "name": "game_1_101_robopacer_timer_ui",
       "value": true
     },
@@ -178,18 +174,34 @@
       "values": {}
     },
     {
-      "name": "game_1_102_draft_slope_fix"
+      "name": "game_1_102_draft_slope_fix",
+      "value": true
     },
     {
       "name": "game_1_102_split_zp_set_messages",
       "value": true
     },
     {
-      "name": "game_1_102_unpair_all_devices",
+      "name": "game_1_102_unpair_all_devices"
+    },
+    {
+      "name": "game_1_103_custom_loop_point",
       "value": true
     },
     {
-      "name": "game_1_103_new_achievements_screen"
+      "name": "game_1_103_fill_right_hand_rewards_page",
+      "value": true
+    },
+    {
+      "name": "game_1_103_new_achievements_screen",
+      "value": true
+    },
+    {
+      "name": "game_1_104_quest_activity_cards"
+    },
+    {
+      "name": "game_1_104_wftnp_advertising_fix",
+      "value": true
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -208,7 +220,8 @@
       }
     },
     {
-      "name": "game_1_18_holiday_mode"
+      "name": "game_1_18_holiday_mode",
+      "value": true
     },
     {
       "name": "game_1_20_home_screen",
@@ -335,11 +348,6 @@
     },
     {
       "name": "game_1_39_movement_recorder",
-      "values": {}
-    },
-    {
-      "name": "game_1_39_repack_rampage_steering_route_list",
-      "value": true,
       "values": {}
     },
     {
@@ -1520,7 +1528,15 @@
       "value": true
     },
     {
-      "name": "game_1_96_info_highlight"
+      "name": "game_1_96_info_highlight",
+      "value": true,
+      "values": {
+        "fields": {
+          "week_streak": {
+            "stringValue": "week_streak"
+          }
+        }
+      }
     },
     {
       "name": "game_1_96_roaddecal_tags",
@@ -1567,7 +1583,8 @@
       }
     },
     {
-      "name": "game_1_99_draft_indicator"
+      "name": "game_1_99_draft_indicator",
+      "value": true
     },
     {
       "name": "game_1_99_power_segment_arch",
@@ -1724,6 +1741,9 @@
       "values": {}
     },
     {
+      "name": "game_android_local_data_path_direct"
+    },
+    {
       "name": "game_android_perf_testing",
       "values": {}
     },
@@ -1807,8 +1827,7 @@
       "value": true
     },
     {
-      "name": "game_crash_recovery",
-      "values": {}
+      "name": "game_crash_recovery"
     },
     {
       "name": "game_danum",
@@ -1826,6 +1845,10 @@
     {
       "name": "game_disable_cached_subgroup_protobuf",
       "value": true,
+      "values": {}
+    },
+    {
+      "name": "game_disable_end_ride_delete_snapshot_fix",
       "values": {}
     },
     {
@@ -1849,7 +1872,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "154978"
+            "stringValue": "157229"
           },
           "canary_test": {
             "boolValue": true
@@ -2034,31 +2057,15 @@
       "values": {}
     },
     {
-      "name": "game_instrumental_rock_bass",
-      "value": true,
-      "values": {
-        "fields": {
-          "end": {
-            "varintValue": "33313218958"
-          },
-          "ints": {
-            "stringValue": ""
-          },
-          "routes": {
-            "stringValue": "104170948"
-          },
-          "start": {
-            "varintValue": "1756310158"
-          }
-        }
-      }
+      "name": "game_instrumental_rock_bass"
     },
     {
       "name": "game_lauterbrunnen",
       "values": {}
     },
     {
-      "name": "game_levelup_vfx"
+      "name": "game_levelup_vfx",
+      "value": true
     },
     {
       "name": "game_lightningsocks",
@@ -2078,6 +2085,9 @@
     {
       "name": "game_nb_world_load",
       "values": {}
+    },
+    {
+      "name": "game_nubra"
     },
     {
       "name": "game_off_route_path_prediction",
@@ -2114,7 +2124,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.102.0"
+            "stringValue": "1.104.0"
           }
         }
       }
@@ -2381,6 +2391,10 @@
       "value": true
     },
     {
+      "name": "mobile_cp_curve_fix",
+      "values": {}
+    },
+    {
       "name": "noesis_compressed_textures"
     },
     {
@@ -2393,6 +2407,9 @@
     {
       "name": "quest_service_awards_xp",
       "values": {}
+    },
+    {
+      "name": "quest_stage_cards"
     },
     {
       "name": "unload_homescreen_before_game_load",
