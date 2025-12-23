@@ -3962,13 +3962,24 @@ def update_streaks(player_id, activity):
 def api_fitness_streaks():
     return get_streaks(current_user.player_id).SerializeToString(), 200
 
-@app.route('/api/fitness/metrics-and-goals', methods=['GET'])  # TODO: fitnessScore, trainingStatus, numStreakSavers, givenXp, better default goals
+def fitness_score(player_id, date):
+    today = yesterday = 0
+    for i in range(41, -1, -1):
+        day = date - datetime.timedelta(days=i)
+        stmt = sqlalchemy.text("SELECT SUM(tss) FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)")
+        row = db.session.execute(stmt, {"p": player_id, "d": day}).first()
+        tss = row[0] if row[0] else 0
+        yesterday = today
+        today = yesterday + (tss - yesterday) / 42
+    return today
+
+@app.route('/api/fitness/metrics-and-goals', methods=['GET'])  # TODO: trainingStatus, numStreakSavers, givenXp, better default goals
 @jwt_to_session_cookie
 @login_required
 def api_fitness_metrics_and_goals():
     if request.headers['Accept'] == 'application/json':
         try:
-            date = datetime.datetime.strptime(request.args.get('month') + request.args.get('weekOf') + request.args.get('year'), "%m%d%Y")
+            date = datetime.datetime.strptime("%s-%s-%s 00:00:00+00:00" % (request.args.get('year'), request.args.get('month'), request.args.get('weekOf')), "%Y-%m-%d %H:%M:%S%z")
         except:
             return '', 404
         fitness = {"fitnessMetrics": []}
@@ -3977,11 +3988,12 @@ def api_fitness_metrics_and_goals():
             stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
                 FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :s) AND strftime('%s', start_date) <= strftime('%s', :e)""")
             row = db.session.execute(stmt, {"p": current_user.player_id, "s": start, "e": end}).first()
-            week = {"startOfWeek": start.strftime('%Y-%m-%d'), "fitnessScore": 0, "totalDistanceKilometers": row[0] / 1000 if row[0] else 0,
+            week = {"startOfWeek": start.strftime('%Y-%m-%d'), "totalDistanceKilometers": row[0] / 1000 if row[0] else 0,
                 "totalElevationMeters": int(row[1]) if row[1] else 0, "totalDurationMinutes": int(row[2] / 60000) if row[2] else 0,
                 "totalKilojoules": int(row[3]) if row[3] else 0, "totalCalories": int(row[4]) if row[4] else 0,
                 "totalTSS": row[5] if row[5] else 0, "useMetric": get_partial_profile(current_user.player_id).use_metric,
                 "weekStreak": get_streaks(current_user.player_id).cur_streak, "numStreakSavers": 0, "days": {}, "trainingStatus": "FRESH"}
+            week["fitnessScore"] = fitness_score(current_user.player_id, end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc))
             for i in range(0, 7):
                 day = start + datetime.timedelta(days=i)
                 stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
@@ -4020,7 +4032,7 @@ def api_fitness_metrics_and_goals():
             stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
                 FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :s) AND strftime('%s', start_date) <= strftime('%s', :e)""")
             row = db.session.execute(stmt, {"p": current_user.player_id, "s": start, "e": end}).first()
-            week.fitness_score = 0
+            week.fitness_score = fitness_score(current_user.player_id, end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc))
             week.distance = int(row[0]) if row[0] else 0
             week.elevation = int(row[1]) if row[1] else 0
             week.moving_time = int(round(row[2], -4)) if row[2] else 0
