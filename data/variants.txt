@@ -2402,7 +2402,8 @@
       "value": true
     },
     {
-      "name": "progress_report"
+      "name": "progress_report",
+      "value": true
     },
     {
       "name": "quest_service_awards_xp",
