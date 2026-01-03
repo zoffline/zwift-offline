@@ -3962,18 +3962,30 @@ def update_streaks(player_id, activity):
 def api_fitness_streaks():
     return get_streaks(current_user.player_id).SerializeToString(), 200
 
-def fitness_score(player_id, date):
+def ewma(player_id, date, days):
     today = yesterday = 0
-    for i in range(41, -1, -1):
+    for i in range(days - 1, -1, -1):
         day = date - datetime.timedelta(days=i)
         stmt = sqlalchemy.text("SELECT SUM(tss) FROM activity WHERE player_id = :p AND strftime('%F', start_date) = strftime('%F', :d)")
         row = db.session.execute(stmt, {"p": player_id, "d": day}).first()
         tss = row[0] if row[0] else 0
         yesterday = today
-        today = yesterday + (tss - yesterday) / 42
+        today = yesterday * math.e ** (-1 / days) + tss * (1 - math.e ** (-1 / days))
     return today
 
-@app.route('/api/fitness/metrics-and-goals', methods=['GET'])  # TODO: trainingStatus, numStreakSavers, givenXp, better default goals
+def training_status(fitness, form):
+    if fitness == 0:
+        return "READY"
+    status = fitness - form
+    if status < -30:
+        return "OVERREACHING"
+    if -30 <= status < 0:
+        return "PRODUCTIVE"
+    if 0 <= status < 25:
+        return "FRESH"
+    return "DETRAINING"
+
+@app.route('/api/fitness/metrics-and-goals', methods=['GET'])  # TODO: numStreakSavers, givenXp, better default goals
 @jwt_to_session_cookie
 @login_required
 def api_fitness_metrics_and_goals():
@@ -3992,8 +4004,10 @@ def api_fitness_metrics_and_goals():
                 "totalElevationMeters": int(row[1]) if row[1] else 0, "totalDurationMinutes": int(row[2] / 60000) if row[2] else 0,
                 "totalKilojoules": int(row[3]) if row[3] else 0, "totalCalories": int(row[4]) if row[4] else 0,
                 "totalTSS": row[5] if row[5] else 0, "useMetric": get_partial_profile(current_user.player_id).use_metric,
-                "weekStreak": get_streaks(current_user.player_id).cur_streak, "numStreakSavers": 0, "days": {}, "trainingStatus": "FRESH"}
-            week["fitnessScore"] = fitness_score(current_user.player_id, end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc))
+                "weekStreak": get_streaks(current_user.player_id).cur_streak, "numStreakSavers": 0, "days": {}}
+            end_date = end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc)
+            week["fitnessScore"] = ewma(current_user.player_id, end_date, 42)
+            week["trainingStatus"] = training_status(week["fitnessScore"], ewma(current_user.player_id, end_date, 7))
             for i in range(0, 7):
                 day = start + datetime.timedelta(days=i)
                 stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
@@ -4032,14 +4046,15 @@ def api_fitness_metrics_and_goals():
             stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
                 FROM activity WHERE player_id = :p AND strftime('%s', start_date) >= strftime('%s', :s) AND strftime('%s', start_date) <= strftime('%s', :e)""")
             row = db.session.execute(stmt, {"p": current_user.player_id, "s": start, "e": end}).first()
-            week.fitness_score = fitness_score(current_user.player_id, end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc))
+            end_date = end if end < datetime.datetime.now(datetime.timezone.utc) else datetime.datetime.now(datetime.timezone.utc)
+            week.fitness_score = ewma(current_user.player_id, end_date, 42)
+            week.status = training_status(week.fitness_score, ewma(current_user.player_id, end_date, 7))
             week.distance = int(row[0]) if row[0] else 0
             week.elevation = int(row[1]) if row[1] else 0
             week.moving_time = int(round(row[2], -4)) if row[2] else 0
             week.work = int(row[3]) if row[3] else 0
             week.calories = int(row[4]) if row[4] else 0
             week.tss = row[5] if row[5] else 0
-            week.status = "FRESH"
             for i in range(0, 7):
                 day = start + datetime.timedelta(days=i)
                 stmt = sqlalchemy.text("""SELECT SUM(distanceInMeters), SUM(total_elevation), SUM(movingTimeInMs), SUM(work), SUM(calories), SUM(tss)
