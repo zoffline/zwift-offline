@@ -108,7 +108,18 @@
       }
     },
     {
-      "name": "ftp_estimate_v2"
+      "name": "ftp_estimate_v2",
+      "value": true,
+      "values": {
+        "fields": {
+          "femaleVals": {
+            "stringValue": "1.0, 1.8, 2.6"
+          },
+          "maleVals": {
+            "stringValue": "1.2, 2.2, 3.0"
+          }
+        }
+      }
     },
     {
       "name": "game_101_hud_ncgb"
@@ -195,6 +206,9 @@
     {
       "name": "game_1_103_new_achievements_screen",
       "value": true
+    },
+    {
+      "name": "game_1_104_connection_type_icons"
     },
     {
       "name": "game_1_104_quest_activity_cards"
@@ -1497,16 +1511,17 @@
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
+      "value": true,
       "values": {
         "fields": {
           "BodyTextureName": {
-            "stringValue": "RPBodyTourFever_DM.tga"
+            "stringValue": "RPBody_DM_TDZ_2026.tga"
           },
           "GlowTextureName": {
-            "stringValue": "Glow_TourFever.tga"
+            "stringValue": "Glow_A.tga"
           },
           "LimbsTextureName": {
-            "stringValue": "RPLimbsTourFever_DM.tga"
+            "stringValue": "RPLimbs_DM_TDZ_2026.tga"
           }
         }
       }
@@ -1837,6 +1852,41 @@
       "name": "game_debug_screenshots",
       "value": true,
       "values": {}
+    },
+    {
+      "name": "game_default_deco",
+      "value": true,
+      "values": {
+        "fields": {
+          "world1": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world10": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world13": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world2": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world3": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world4": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world5": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world7": {
+            "stringValue": "tourdezwift2026"
+          },
+          "world9": {
+            "stringValue": "tourdezwift2026"
+          }
+        }
+      }
     },
     {
       "name": "game_disable_ant_plus_msg_queue",
@@ -2410,7 +2460,8 @@
       "values": {}
     },
     {
-      "name": "quest_stage_cards"
+      "name": "quest_stage_cards",
+      "value": true
     },
     {
       "name": "unload_homescreen_before_game_load",

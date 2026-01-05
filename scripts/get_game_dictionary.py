@@ -26,7 +26,8 @@ route_exceptions = {
     'WATOPIAS WAISTBAND': 'WATOPIA\'S WAISTBAND',
     'RICHMOND UCI REVERSE': 'RICHMOND 2015 WORLDS REVERSE',
     'CASTLE CRIT (RUNNING)': 'CASTLE CRIT RUN',
-    'TRIPLE TWISTS': 'TRIPLE TWIST'
+    'TRIPLE TWISTS': 'TRIPLE TWIST',
+    'PEAKY PAVE': 'PEAKY PAVÉ'
 }
 
 with open('../data/game_dictionary.txt') as f:
