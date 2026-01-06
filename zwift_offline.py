@@ -1202,6 +1202,10 @@ def api_empty_arrays():
 def api_assetcms(path):
     return jsonify()
 
+@app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
+def api_head_unit_bff(path):
+    return jsonify({"items":[]})
+
 def activity_moving_time(activity):
     try:
         return int((datetime.datetime.strptime(activity.end_date, '%Y-%m-%dT%H:%M:%SZ') - datetime.datetime.strptime(activity.start_date, '%Y-%m-%dT%H:%M:%SZ')).total_seconds() * 1000)
