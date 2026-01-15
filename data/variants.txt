@@ -1917,7 +1917,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "157229"
+            "stringValue": "158014"
           },
           "canary_test": {
             "boolValue": true
@@ -2164,15 +2164,7 @@
       "values": {}
     },
     {
-      "name": "game_routes_delivery",
-      "value": true,
-      "values": {
-        "fields": {
-          "version": {
-            "stringValue": "1.105.0"
-          }
-        }
-      }
+      "name": "game_routes_delivery"
     },
     {
       "name": "game_sentry_log_upload",
