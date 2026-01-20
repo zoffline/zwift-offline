@@ -1221,8 +1221,7 @@
       }
     },
     {
-      "name": "game_1_76_second_entitlements_chunk",
-      "values": {}
+      "name": "game_1_76_second_entitlements_chunk"
     },
     {
       "name": "game_1_76_teleportation_fix",
@@ -2164,7 +2163,15 @@
       "values": {}
     },
     {
-      "name": "game_routes_delivery"
+      "name": "game_routes_delivery",
+      "value": true,
+      "values": {
+        "fields": {
+          "version": {
+            "stringValue": "1.105.0"
+          }
+        }
+      }
     },
     {
       "name": "game_sentry_log_upload",
