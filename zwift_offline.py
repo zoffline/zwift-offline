@@ -32,6 +32,7 @@ from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user,
 from gevent.pywsgi import WSGIServer
 from google.protobuf.json_format import MessageToDict, Parse
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -1073,9 +1074,8 @@ def settings(username):
 @app.route("/download", methods=["POST"])
 @login_required
 def download():
-    file = os.path.join(STORAGE_DIR, str(current_user.player_id), request.form['filename'])
-    if os.path.isfile(file):
-        return send_file(file, as_attachment=True)
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
+    return send_from_directory(profile_dir, request.form['filename'], as_attachment=True)
 
 @app.route("/download/<int:player_id>/avatarLarge.jpg", methods=["GET"])
 def download_avatarLarge(player_id):
@@ -1646,14 +1646,14 @@ def relay_race_event_starting_line_id(event_id):
 def api_zfiles():
     if request.headers['Source'] == 'zwift-companion':
         zfile = json.loads(request.stream.read())
-        zfile_folder = zfile['folder']
-        zfile_filename = zfile['name']
+        zfile_folder = secure_filename(zfile['folder'])
+        zfile_filename = secure_filename(zfile['name'])
         zfile_file = base64.b64decode(zfile['content'])
     else:
         zfile = zfiles_pb2.ZFileProto()
         zfile.ParseFromString(request.stream.read())
-        zfile_folder = zfile.folder
-        zfile_filename = zfile.filename
+        zfile_folder = secure_filename(zfile.folder)
+        zfile_filename = secure_filename(zfile.filename)
         zfile_file = zfile.file
     zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile_folder)
     if not make_dir(zfiles_dir):
@@ -2496,9 +2496,9 @@ def api_profiles_activities_id(player_id, activity_id):
         return response, 200
 
     create_power_curve(player_id, BytesIO(activity.fit))
-    save_fit(player_id, '%s - %s' % (activity_id, activity.fit_filename), activity.fit)
+    save_fit(player_id, '%s - %s' % (activity_id, secure_filename(activity.fit_filename)), activity.fit)
     if current_user.enable_ghosts:
-        save_ghost(player_id, quote(activity.name, safe=' '))
+        save_ghost(player_id, quote(secure_filename(activity.name), safe=' '))
     if activity.sport == profile_pb2.Sport.CYCLING and activity.distanceInMeters >= 2000:
         update_streaks(player_id, activity)
     # For using with upload_activity
@@ -3439,7 +3439,7 @@ def relay_worlds_attributes():
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:
-                    save_bookmark(state, quote(command[9:], safe=' '))
+                    save_bookmark(state, quote(secure_filename(command[9:]), safe=' '))
                     send_message('Bookmark saved', recipients=[chat_message.player_id])
                 else:
                     send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
