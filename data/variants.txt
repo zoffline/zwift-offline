@@ -68,7 +68,33 @@
       "values": {}
     },
     {
-      "name": "experiment_hero_section"
+      "name": "experiment_hero_section",
+      "value": true,
+      "values": {
+        "fields": {
+          "button_hint": {
+            "boolValue": true
+          },
+          "collect_feedback": {
+            "boolValue": false
+          },
+          "default_route_hash": {
+            "varintValue": "3395698268"
+          },
+          "show_beta_tag": {
+            "boolValue": true
+          },
+          "small_hero_card": {
+            "boolValue": true
+          },
+          "swap_foryou_challenges_rows": {
+            "boolValue": true
+          },
+          "tune_activity_icon": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "fitness_widget",
@@ -208,7 +234,8 @@
       "value": true
     },
     {
-      "name": "game_1_104_connection_type_icons"
+      "name": "game_1_104_connection_type_icons",
+      "value": true
     },
     {
       "name": "game_1_104_new_activity_title_description"
@@ -218,8 +245,8 @@
       "value": true,
       "values": {
         "fields": {
-          "includeQuests": {
-            "stringValue": "tourdezwift2026"
+          "excludeQuests": {
+            "stringValue": "gettingstarted,gettingstartedshort"
           }
         }
       }
@@ -229,11 +256,19 @@
       "value": true
     },
     {
+      "name": "game_1_105_background_pairing",
+      "values": {}
+    },
+    {
       "name": "game_1_105_route_elevation_graph",
       "value": true
     },
     {
       "name": "game_1_105_zui_logout_earlier",
+      "values": {}
+    },
+    {
+      "name": "game_1_106_zml_rnl",
       "values": {}
     },
     {
@@ -1210,17 +1245,6 @@
       }
     },
     {
-      "name": "game_1_76_routes_new_tag",
-      "value": true,
-      "values": {
-        "fields": {
-          "days_until_tag_expires": {
-            "varintValue": "30"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_76_second_entitlements_chunk"
     },
     {
@@ -1499,7 +1523,15 @@
       }
     },
     {
-      "name": "game_1_92_for_you_recommendations_bff"
+      "name": "game_1_92_for_you_recommendations_bff",
+      "value": true,
+      "values": {
+        "fields": {
+          "add_training_peaks": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
@@ -2152,7 +2184,21 @@
       "value": true
     },
     {
-      "name": "game_return_to_home"
+      "name": "game_return_to_home",
+      "value": true,
+      "values": {
+        "fields": {
+          "forced_logout_enabled": {
+            "boolValue": true
+          },
+          "forced_logout_threshold_minutes": {
+            "varintValue": "30"
+          },
+          "idle_time_analytic_threshold_minutes": {
+            "varintValue": "10"
+          }
+        }
+      }
     },
     {
       "name": "game_road_graph_in_game",
@@ -2168,7 +2214,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.105.0"
+            "stringValue": "1.106.0"
           }
         }
       }
@@ -2397,11 +2443,6 @@
       "values": {}
     },
     {
-      "name": "gfx_useemptyshadowmaps",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "gfx_waipio",
       "value": true
     },
@@ -2411,7 +2452,10 @@
       "values": {
         "fields": {
           "deferred_preview": {
-            "boolValue": true
+            "boolValue": false
+          },
+          "gn_lights": {
+            "boolValue": false
           }
         }
       }
@@ -2442,7 +2486,8 @@
       "values": {}
     },
     {
-      "name": "noesis_compressed_textures"
+      "name": "noesis_compressed_textures",
+      "value": true
     },
     {
       "name": "noesis_dlc",
@@ -2451,6 +2496,10 @@
     {
       "name": "progress_report",
       "value": true
+    },
+    {
+      "name": "quest_progress_view_extra_rewards",
+      "values": {}
     },
     {
       "name": "quest_service_awards_xp",
