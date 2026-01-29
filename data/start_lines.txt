@@ -136,8 +136,13 @@
   },
   "-1338434275": {
     "name": "Gravel Mountain - Gravel Mountain Reverse",
-    "road": 3,
-    "time": 368606
+    "road": 0,
+    "time": 545000
+  },
+  "1295302121": {
+    "name": "Gravel Mountain - The Rattle Battle",
+    "road": 0,
+    "time": 655000
   },
   "-1180363988": {
     "name": "Innsbruck - 2018 Worlds Short Lap",

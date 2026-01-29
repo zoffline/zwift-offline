@@ -1203,7 +1203,9 @@ def api_assetcms(path):
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
 def api_head_unit_bff(path):
-    return jsonify({"items":[]})
+    if path == "carousels/home-challenges":
+        return jsonify({"items":[]})
+    return jsonify([])
 
 def activity_moving_time(activity):
     try:

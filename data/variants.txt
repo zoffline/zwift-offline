@@ -68,7 +68,33 @@
       "values": {}
     },
     {
-      "name": "experiment_hero_section"
+      "name": "experiment_hero_section",
+      "value": true,
+      "values": {
+        "fields": {
+          "button_hint": {
+            "boolValue": true
+          },
+          "collect_feedback": {
+            "boolValue": false
+          },
+          "default_route_hash": {
+            "varintValue": "3395698268"
+          },
+          "show_beta_tag": {
+            "boolValue": true
+          },
+          "small_hero_card": {
+            "boolValue": true
+          },
+          "swap_foryou_challenges_rows": {
+            "boolValue": true
+          },
+          "tune_activity_icon": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "fitness_widget",
@@ -208,14 +234,42 @@
       "value": true
     },
     {
-      "name": "game_1_104_connection_type_icons"
+      "name": "game_1_104_connection_type_icons",
+      "value": true
     },
     {
-      "name": "game_1_104_quest_activity_cards"
+      "name": "game_1_104_new_activity_title_description"
+    },
+    {
+      "name": "game_1_104_quest_activity_cards",
+      "value": true,
+      "values": {
+        "fields": {
+          "excludeQuests": {
+            "stringValue": "gettingstarted,gettingstartedshort"
+          }
+        }
+      }
     },
     {
       "name": "game_1_104_wftnp_advertising_fix",
       "value": true
+    },
+    {
+      "name": "game_1_105_background_pairing",
+      "values": {}
+    },
+    {
+      "name": "game_1_105_route_elevation_graph",
+      "value": true
+    },
+    {
+      "name": "game_1_105_zui_logout_earlier",
+      "values": {}
+    },
+    {
+      "name": "game_1_106_zml_rnl",
+      "values": {}
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -353,10 +407,6 @@
       }
     },
     {
-      "name": "game_1_34_save_device_profiles_on_all_platforms",
-      "values": {}
-    },
-    {
       "name": "game_1_39_event_settings",
       "values": {}
     },
@@ -400,23 +450,6 @@
           },
           "standardPress": {
             "numberValue": 250.0
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_41_0_bc1_release",
-      "value": true,
-      "values": {
-        "fields": {
-          "game_1_41_0_bc1_release": {
-            "boolValue": false
-          },
-          "min_firmware_version_kickrcore": {
-            "stringValue": "1.3.17"
-          },
-          "min_firmware_version_st3": {
-            "stringValue": "5.0"
           }
         }
       }
@@ -1069,7 +1102,7 @@
       "values": {
         "fields": {
           "challenge_carousel_id": {
-            "stringValue": "prod_home_challenge_carousel"
+            "stringValue": "prod_1_105_minimum"
           }
         }
       }
@@ -1212,19 +1245,7 @@
       }
     },
     {
-      "name": "game_1_76_routes_new_tag",
-      "value": true,
-      "values": {
-        "fields": {
-          "days_until_tag_expires": {
-            "varintValue": "30"
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_76_second_entitlements_chunk",
-      "values": {}
+      "name": "game_1_76_second_entitlements_chunk"
     },
     {
       "name": "game_1_76_teleportation_fix",
@@ -1297,11 +1318,6 @@
     },
     {
       "name": "game_1_80_vesuvius",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_82_event_series_quest_card",
       "value": true,
       "values": {}
     },
@@ -1507,7 +1523,15 @@
       }
     },
     {
-      "name": "game_1_92_for_you_recommendations_bff"
+      "name": "game_1_92_for_you_recommendations_bff",
+      "value": true,
+      "values": {
+        "fields": {
+          "add_training_peaks": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_1_92_robo_pacer_custom_skin",
@@ -1547,6 +1571,9 @@
       "value": true,
       "values": {
         "fields": {
+          "ultimate_rewards": {
+            "stringValue": "ultimate_rewards"
+          },
           "week_streak": {
             "stringValue": "week_streak"
           }
@@ -1573,8 +1600,7 @@
       "value": true
     },
     {
-      "name": "game_1_98_prevent_creation_zp_controller_sensor_relay_sensor",
-      "value": true
+      "name": "game_1_98_prevent_creation_zp_controller_sensor_relay_sensor"
     },
     {
       "name": "game_1_98_soft_delete_activity"
@@ -1922,7 +1948,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "157229"
+            "stringValue": "158014"
           },
           "canary_test": {
             "boolValue": true
@@ -2158,7 +2184,21 @@
       "value": true
     },
     {
-      "name": "game_return_to_home"
+      "name": "game_return_to_home",
+      "value": true,
+      "values": {
+        "fields": {
+          "forced_logout_enabled": {
+            "boolValue": true
+          },
+          "forced_logout_threshold_minutes": {
+            "varintValue": "30"
+          },
+          "idle_time_analytic_threshold_minutes": {
+            "varintValue": "10"
+          }
+        }
+      }
     },
     {
       "name": "game_road_graph_in_game",
@@ -2174,7 +2214,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.104.0"
+            "stringValue": "1.106.0"
           }
         }
       }
@@ -2327,6 +2367,9 @@
       "values": {}
     },
     {
+      "name": "game_watopian_force_1080p"
+    },
+    {
       "name": "game_wd1_data_acq"
     },
     {
@@ -2400,11 +2443,6 @@
       "values": {}
     },
     {
-      "name": "gfx_useemptyshadowmaps",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "gfx_waipio",
       "value": true
     },
@@ -2414,7 +2452,10 @@
       "values": {
         "fields": {
           "deferred_preview": {
-            "boolValue": true
+            "boolValue": false
+          },
+          "gn_lights": {
+            "boolValue": false
           }
         }
       }
@@ -2445,7 +2486,8 @@
       "values": {}
     },
     {
-      "name": "noesis_compressed_textures"
+      "name": "noesis_compressed_textures",
+      "value": true
     },
     {
       "name": "noesis_dlc",
@@ -2454,6 +2496,10 @@
     {
       "name": "progress_report",
       "value": true
+    },
+    {
+      "name": "quest_progress_view_extra_rewards",
+      "values": {}
     },
     {
       "name": "quest_service_awards_xp",
@@ -2466,20 +2512,6 @@
     {
       "name": "unload_homescreen_before_game_load",
       "value": true
-    },
-    {
-      "name": "visual_lean_v2",
-      "value": true,
-      "values": {
-        "fields": {
-          "leanScalar": {
-            "numberValue": 0.5
-          },
-          "maxLeanDelta": {
-            "numberValue": 35.0
-          }
-        }
-      }
     },
     {
       "name": "zwift_launcher_osx_config"

@@ -44,14 +44,21 @@
   {
     "name": "Gravel Mountain",
     "route": 3687150686,
-    "distance": 5368.2,
+    "distance": 5396.2,
+    "course": 16,
+    "sport": 0
+  },
+  {
+    "name": "Gravel Mountain - The Rattle Battle",
+    "route": 1295302121,
+    "distance": 5396.3,
     "course": 16,
     "sport": 0
   },
   {
     "name": "Gravel Mountain Reverse",
     "route": 2956533021,
-    "distance": 5199.3,
+    "distance": 5239.1,
     "course": 16,
     "sport": 0
   },
@@ -150,13 +157,6 @@
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54964.1,
-    "course": 8,
-    "sport": 0
-  },
-  {
-    "name": "New York - Empire Elevation",
-    "route": 1671282746,
-    "distance": 25978.3,
     "course": 8,
     "sport": 0
   },
