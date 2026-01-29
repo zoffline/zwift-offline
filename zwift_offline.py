@@ -26,12 +26,12 @@ from copy import deepcopy
 from functools import wraps
 from io import BytesIO
 from shutil import copyfile
-from urllib.parse import quote
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
 from google.protobuf.json_format import MessageToDict, Parse
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -1073,9 +1073,8 @@ def settings(username):
 @app.route("/download", methods=["POST"])
 @login_required
 def download():
-    file = os.path.join(STORAGE_DIR, str(current_user.player_id), request.form['filename'])
-    if os.path.isfile(file):
-        return send_file(file, as_attachment=True)
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
+    return send_from_directory(profile_dir, request.form['filename'], as_attachment=True)
 
 @app.route("/download/<int:player_id>/avatarLarge.jpg", methods=["GET"])
 def download_avatarLarge(player_id):
@@ -1646,14 +1645,14 @@ def relay_race_event_starting_line_id(event_id):
 def api_zfiles():
     if request.headers['Source'] == 'zwift-companion':
         zfile = json.loads(request.stream.read())
-        zfile_folder = zfile['folder']
-        zfile_filename = zfile['name']
+        zfile_folder = secure_filename(zfile['folder'])
+        zfile_filename = secure_filename(zfile['name'])
         zfile_file = base64.b64decode(zfile['content'])
     else:
         zfile = zfiles_pb2.ZFileProto()
         zfile.ParseFromString(request.stream.read())
-        zfile_folder = zfile.folder
-        zfile_filename = zfile.filename
+        zfile_folder = secure_filename(zfile.folder)
+        zfile_filename = secure_filename(zfile.filename)
         zfile_file = zfile.file
     zfiles_dir = os.path.join(STORAGE_DIR, str(current_user.player_id), zfile_folder)
     if not make_dir(zfiles_dir):
@@ -1662,7 +1661,7 @@ def api_zfiles():
         zfile_filename = zfile_filename.decode('utf-8', 'ignore')
     except AttributeError:
         pass
-    with open(os.path.join(zfiles_dir, quote(zfile_filename, safe=' ')), 'wb') as fd:
+    with open(os.path.join(zfiles_dir, zfile_filename), 'wb') as fd:
         fd.write(zfile_file)
     row = Zfile.query.filter_by(folder=zfile_folder, filename=zfile_filename, player_id=current_user.player_id).first()
     if not row:
@@ -1701,7 +1700,7 @@ def api_zfiles_list():
 @login_required
 def api_zfiles_download(file_id):
     row = Zfile.query.filter_by(id=file_id).first()
-    zfile = os.path.join(STORAGE_DIR, str(row.player_id), row.folder, quote(row.filename, safe=' '))
+    zfile = os.path.join(STORAGE_DIR, str(row.player_id), row.folder, row.filename)
     if os.path.isfile(zfile):
         return send_file(zfile, as_attachment=True, download_name=row.filename)
     else:
@@ -1713,7 +1712,7 @@ def api_zfiles_download(file_id):
 def api_zfiles_delete(file_id):
     row = Zfile.query.filter_by(id=file_id).first()
     try:
-        os.remove(os.path.join(STORAGE_DIR, str(row.player_id), row.folder, quote(row.filename, safe=' ')))
+        os.remove(os.path.join(STORAGE_DIR, str(row.player_id), row.folder, row.filename))
     except Exception as exc:
         logger.warning('api_zfiles_delete: %s' % repr(exc))
     db.session.delete(row)
@@ -2496,9 +2495,9 @@ def api_profiles_activities_id(player_id, activity_id):
         return response, 200
 
     create_power_curve(player_id, BytesIO(activity.fit))
-    save_fit(player_id, '%s - %s' % (activity_id, activity.fit_filename), activity.fit)
+    save_fit(player_id, '%s - %s' % (activity_id, secure_filename(activity.fit_filename)), activity.fit)
     if current_user.enable_ghosts:
-        save_ghost(player_id, quote(activity.name, safe=' '))
+        save_ghost(player_id, secure_filename(activity.name))
     if activity.sport == profile_pb2.Sport.CYCLING and activity.distanceInMeters >= 2000:
         update_streaks(player_id, activity)
     # For using with upload_activity
@@ -3439,7 +3438,7 @@ def relay_worlds_attributes():
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:
-                    save_bookmark(state, quote(command[9:], safe=' '))
+                    save_bookmark(state, secure_filename(command[9:]))
                     send_message('Bookmark saved', recipients=[chat_message.player_id])
                 else:
                     send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
