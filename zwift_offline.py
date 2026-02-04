@@ -161,6 +161,7 @@ map_override = {}
 climb_override = {}
 global_bookmarks = {}
 global_race_results = {}
+zwift_online_sessions = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
@@ -1477,6 +1478,14 @@ def logout_player(player_id):
 @login_required
 def api_users_logout():
     logout_player(current_user.player_id)
+    if current_user.player_id in zwift_online_sessions:
+        zwift = zwift_online_sessions[current_user.player_id]
+        if 'refresh_token' in zwift:
+            try:
+                online_sync.logout(zwift['session'], zwift['refresh_token'])
+            except Exception as exc:
+                logger.warning("api_users_logout: %s" % repr(exc))
+        zwift_online_sessions.pop(current_user.player_id)
     return '', 204
 
 
@@ -2386,25 +2395,37 @@ def intervals_upload(player_id, activity):
         logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
 
 
+def zwift_online_session(player_id):
+    if not player_id in zwift_online_sessions:
+        zwift_online_sessions[player_id] = {}
+        zwift_online_sessions[player_id]['session'] = requests.session()
+    zwift = zwift_online_sessions[player_id]
+    if not 'access_token' in zwift or not zwift['access_token']:
+        zwift['access_token'] = None
+        zwift_credentials = '%s/%s/zwift_credentials.bin' % (STORAGE_DIR, player_id)
+        if os.path.isfile(zwift_credentials):
+            username, password = decrypt_credentials(zwift_credentials)
+            try:
+                zwift['access_token'], zwift['refresh_token'] = online_sync.login(zwift['session'], username, password)
+            except Exception as exc:
+                logger.warning("zwift_online_session: %s" % repr(exc))
+    return zwift
+
 def zwift_upload(player_id, activity):
-    zwift_credentials = '%s/%s/zwift_credentials.bin' % (STORAGE_DIR, player_id)
-    if not os.path.exists(zwift_credentials):
-        logger.info("zwift_credentials.bin missing, skip Zwift activity update")
-        return
-    username, password = decrypt_credentials(zwift_credentials)
-    try:
-        session = requests.session()
-        access_token, refresh_token = online_sync.login(session, username, password)
-        activity.player_id = online_sync.get_player_id(session, access_token)
-        new_activity = activity_pb2.Activity()
-        new_activity.CopyFrom(activity)
-        new_activity.ClearField('id')
-        new_activity.ClearField('fit')
-        activity.id = online_sync.create_activity(session, access_token, new_activity)
-        online_sync.upload_activity(session, access_token, activity)
-        online_sync.logout(session, refresh_token)
-    except Exception as exc:
-        logger.warning("Zwift upload failed. No internet? %s" % repr(exc))
+    zwift = zwift_online_session(player_id)
+    if zwift['access_token']:
+        try:
+            activity.player_id = online_sync.get_player_id(zwift['session'], zwift['access_token'])
+            new_activity = activity_pb2.Activity()
+            new_activity.CopyFrom(activity)
+            new_activity.ClearField('id')
+            new_activity.ClearField('fit')
+            activity.id = online_sync.create_activity(zwift['session'], zwift['access_token'], new_activity)
+            online_sync.upload_activity(zwift['session'], zwift['access_token'], activity)
+        except Exception as exc:
+            logger.warning("Zwift upload failed. No internet? %s" % repr(exc))
+    else:
+        logger.info("No access token, skip Zwift activity update")
 
 
 def moving_average(iterable, n):
@@ -4110,7 +4131,17 @@ def api_fitness_fitness_goals_history():
 
 
 @app.route('/api/d-lock-service/device/authenticate', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
 def api_d_lock_service_device_authenticate():
+    zwift = zwift_online_session(current_user.player_id)
+    if zwift['access_token']:
+        try:
+            return online_sync.device_authenticate(zwift['session'], zwift['access_token'], request.stream.read())
+        except Exception as exc:
+            logger.warning("api_d_lock_service_device_authenticate: %s" % repr(exc))
+    else:
+        logger.info("No access token, skip Zwift device authenticate")
     return '', 204
 
 
