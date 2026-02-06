@@ -206,25 +206,3 @@ def get_player_id(session, access_token):
 
     except requests.exceptions.RequestException as e:
         print('HTTP Request failed: %s' % e)
-
-
-def device_authenticate(session, access_token, request_data):
-    try:
-        response = session.post(
-            url="https://us-or-rly101.zwift.com/api/d-lock-service/device/authenticate",
-            headers={
-                "Content-Type": "application/x-protobuf-lite",
-                "Accept": "application/x-protobuf-lite",
-                "Connection": "keep-alive",
-                "Host": "us-or-rly101.zwift.com",
-                "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
-                "Authorization": "Bearer %s" % access_token,
-                "Accept-Language": "en-us",
-            },
-            data=request_data,
-        )
-
-        return response.content, response.status_code
-
-    except requests.exceptions.RequestException as e:
-        print('HTTP Request failed: %s' % e)

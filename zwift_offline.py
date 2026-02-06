@@ -4136,8 +4136,11 @@ def api_fitness_fitness_goals_history():
 def api_d_lock_service_device_authenticate():
     zwift = zwift_online_session(current_user.player_id)
     if zwift['access_token']:
+        headers = dict(request.headers)
+        headers['Authorization'] = "Bearer %s" % zwift['access_token']
         try:
-            return online_sync.device_authenticate(zwift['session'], zwift['access_token'], request.stream.read())
+            response = zwift['session'].post(url="https://us-or-rly101.zwift.com/api/d-lock-service/device/authenticate", headers=headers, data=request.stream.read())
+            return response.content, response.status_code
         except Exception as exc:
             logger.warning("api_d_lock_service_device_authenticate: %s" % repr(exc))
     else:
