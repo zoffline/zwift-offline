@@ -2551,9 +2551,6 @@
       "values": {}
     },
     {
-      "name": "zwift_launcher_osx_use_local_appdata"
-    },
-    {
       "name": "zwift_launcher_update_interval",
       "value": true,
       "values": {
@@ -2579,7 +2576,8 @@
       }
     },
     {
-      "name": "zwift_launcher_win_use_local_appdata"
+      "name": "zwift_launcher_win_use_local_appdata",
+      "value": true
     }
   ]
 }
