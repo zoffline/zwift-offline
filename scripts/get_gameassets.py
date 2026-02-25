@@ -6,6 +6,23 @@ import threading
 import xml.etree.ElementTree as ET
 from urllib3 import PoolManager
 from binascii import crc32
+from urllib3.util import connection
+import dns.resolver
+
+_orig_create_connection = connection.create_connection
+_public_resolver = dns.resolver.Resolver()
+_public_resolver.nameservers = ["8.8.8.8", "1.1.1.1", "9.9.9.9"]
+
+def _resolve_with_public_dns(host: str) -> str:
+    answers = _public_resolver.resolve(host, "A")
+    return answers[0].to_text()
+
+def patched_create_connection(address, *args, **kwargs):
+    host, port = address
+    ip = _resolve_with_public_dns(host)
+    return _orig_create_connection((ip, port), *args, **kwargs)
+
+connection.create_connection = patched_create_connection
 
 def sigint_handler(num, frame):
     os._exit(0)
