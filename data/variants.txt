@@ -117,7 +117,20 @@
     },
     {
       "name": "free_trial_update",
-      "values": {}
+      "value": true,
+      "values": {
+        "fields": {
+          "apple_payment_button_enabled": {
+            "boolValue": true
+          },
+          "explore_button_enabled": {
+            "boolValue": true
+          },
+          "use_web_payment": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "friend_is_zwifting_message",
@@ -238,7 +251,8 @@
       "value": true
     },
     {
-      "name": "game_1_104_new_activity_title_description"
+      "name": "game_1_104_new_activity_title_description",
+      "value": true
     },
     {
       "name": "game_1_104_quest_activity_cards",
@@ -268,6 +282,13 @@
     },
     {
       "name": "game_1_106_zml_rnl",
+      "values": {}
+    },
+    {
+      "name": "game_1_107_assert_on_failed_device_set"
+    },
+    {
+      "name": "game_1_107_zg_remove_duplicate_znetwork_update",
       "values": {}
     },
     {
@@ -559,50 +580,12 @@
       "values": {}
     },
     {
-      "name": "game_1_46_necod_23",
-      "values": {
-        "fields": {
-          "necod_23_max": {
-            "stringValue": "1.2.2"
-          },
-          "necod_23_min": {
-            "stringValue": "1.2.0"
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_46_necod_6",
-      "values": {
-        "fields": {
-          "necod_6_max": {
-            "stringValue": "5.2.2"
-          },
-          "necod_6_min": {
-            "stringValue": "5.1.6"
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_46_necod_9",
-      "values": {
-        "fields": {
-          "necod_9_max": {
-            "stringValue": "1.1.0"
-          },
-          "necod_9_min": {
-            "stringValue": "1.1.0"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_46_virtual_shifting_leak_prevention",
       "values": {}
     },
     {
-      "name": "game_1_48_conditional_entities"
+      "name": "game_1_48_conditional_entities",
+      "value": true
     },
     {
       "name": "game_1_48_show_rssi",
@@ -1100,7 +1083,7 @@
       "values": {
         "fields": {
           "challenge_carousel_id": {
-            "stringValue": "prod_1_105_minimum"
+            "stringValue": "prod_1_108_minimum"
           }
         }
       }
@@ -1243,10 +1226,6 @@
       }
     },
     {
-      "name": "game_1_76_second_entitlements_chunk",
-      "value": true
-    },
-    {
       "name": "game_1_76_teleportation_fix",
       "value": true,
       "values": {}
@@ -1340,6 +1319,9 @@
             "boolValue": true
           },
           "ShouldApplyBonusXPFromExternalActivity": {
+            "boolValue": true
+          },
+          "ShouldShowStreaksUIFromRunningActivity": {
             "boolValue": true
           }
         }
@@ -1776,7 +1758,7 @@
             "varintValue": "1772211600"
           },
           "alpe_reward_spinner_ended": {
-            "varintValue": "1776643199"
+            "varintValue": "1776668399"
           }
         }
       }
@@ -1790,11 +1772,6 @@
     },
     {
       "name": "game_android_perf_testing",
-      "values": {}
-    },
-    {
-      "name": "game_android_skip_copy_from_apk",
-      "value": true,
       "values": {}
     },
     {
@@ -1864,6 +1841,10 @@
       "values": {}
     },
     {
+      "name": "game_coffeestop_early_middle_timer",
+      "value": true
+    },
+    {
       "name": "game_coffeestop_set_cooldown_seconds",
       "values": {}
     },
@@ -1888,39 +1869,7 @@
       "values": {}
     },
     {
-      "name": "game_default_deco",
-      "value": true,
-      "values": {
-        "fields": {
-          "world1": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world10": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world13": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world2": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world3": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world4": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world5": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world7": {
-            "stringValue": "tourdezwift2026"
-          },
-          "world9": {
-            "stringValue": "tourdezwift2026"
-          }
-        }
-      }
+      "name": "game_default_deco"
     },
     {
       "name": "game_disable_ant_plus_msg_queue",
@@ -1956,7 +1905,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "158465"
+            "stringValue": "158801"
           },
           "canary_test": {
             "boolValue": true
@@ -2131,6 +2080,20 @@
       "values": {}
     },
     {
+      "name": "game_level_expansion",
+      "value": true,
+      "values": {
+        "fields": {
+          "BankedXPMultiplier": {
+            "varintValue": "2"
+          },
+          "DecoupleFromEntitlements": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
       "name": "game_levelup_vfx",
       "value": true
     },
@@ -2180,7 +2143,7 @@
             "varintValue": "1772211600"
           },
           "epic_kom_reward_spinner_ended": {
-            "varintValue": "1776643199"
+            "varintValue": "1776668399"
           },
           "flat_out_fast_spinner_begin": {
             "varintValue": "1773673200"
@@ -2192,7 +2155,7 @@
             "varintValue": "1772211600"
           },
           "hilly_kom_reward_spinner_ended": {
-            "varintValue": "1776643199"
+            "varintValue": "1776668399"
           },
           "jarvis_kom_reward_spinner_begin": {
             "varintValue": "1772211600"
@@ -2250,23 +2213,6 @@
       "value": true
     },
     {
-      "name": "game_return_to_home",
-      "value": true,
-      "values": {
-        "fields": {
-          "forced_logout_enabled": {
-            "boolValue": true
-          },
-          "forced_logout_threshold_minutes": {
-            "varintValue": "30"
-          },
-          "idle_time_analytic_threshold_minutes": {
-            "varintValue": "10"
-          }
-        }
-      }
-    },
-    {
       "name": "game_road_graph_in_game",
       "value": true
     },
@@ -2280,7 +2226,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.107.0"
+            "stringValue": "1.108.0"
           }
         }
       }
@@ -2605,9 +2551,6 @@
       "values": {}
     },
     {
-      "name": "zwift_launcher_osx_use_local_appdata"
-    },
-    {
       "name": "zwift_launcher_update_interval",
       "value": true,
       "values": {
@@ -2633,7 +2576,8 @@
       }
     },
     {
-      "name": "zwift_launcher_win_use_local_appdata"
+      "name": "zwift_launcher_win_use_local_appdata",
+      "value": true
     }
   ]
 }

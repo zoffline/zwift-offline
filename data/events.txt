@@ -51,7 +51,7 @@
   {
     "name": "Gravel Mountain - The Rattle Battle",
     "route": 1295302121,
-    "distance": 5396.3,
+    "distance": 5396.4,
     "course": 16,
     "sport": 0
   },
