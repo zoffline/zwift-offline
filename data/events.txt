@@ -42,23 +42,23 @@
     "sport": 0
   },
   {
-    "name": "Gravel Mountain",
+    "name": "Gravel Mountain - Red Rock Loop",
     "route": 3687150686,
-    "distance": 5396.2,
+    "distance": 5509.6,
+    "course": 16,
+    "sport": 0
+  },
+  {
+    "name": "Gravel Mountain - Red Rock Run",
+    "route": 967374265,
+    "distance": 5510.5,
     "course": 16,
     "sport": 0
   },
   {
     "name": "Gravel Mountain - The Rattle Battle",
     "route": 1295302121,
-    "distance": 5396.4,
-    "course": 16,
-    "sport": 0
-  },
-  {
-    "name": "Gravel Mountain Reverse",
-    "route": 2956533021,
-    "distance": 5239.1,
+    "distance": 5509.8,
     "course": 16,
     "sport": 0
   },
