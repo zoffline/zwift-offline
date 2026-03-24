@@ -655,12 +655,12 @@ def login():
             db.session.commit()
             if not make_profile_dir(user.player_id):
                 return '', 500
-            return redirect(url_for("user_home", username=username, enable_ghosts=bool(user.enable_ghosts), online=get_online()))
+            return redirect(url_for("user_home", username=username))
         else:
             flash("Invalid username or password.")
 
     if current_user.is_authenticated and current_user.remember:
-        return redirect(url_for("user_home", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), online=get_online()))
+        return redirect(url_for("user_home", username=current_user.username))
 
     user = User.verify_token(request.args.get('token'))
     if user:
