@@ -130,17 +130,17 @@
     "time": 519342
   },
   "-607816610": {
-    "name": "Gravel Mountain - Gravel Mountain",
+    "name": "Gravel Mountain - Red Rock Loop",
     "road": 0,
     "time": 655000
   },
-  "-1338434275": {
-    "name": "Gravel Mountain - Gravel Mountain Reverse",
-    "road": 0,
-    "time": 545000
-  },
   "1295302121": {
-    "name": "Gravel Mountain - The Rattle Battle",
+    "name": "Gravel Mountain - Red Rock Loop Arcade",
+    "road": 0,
+    "time": 655000
+  },
+  "967374265": {
+    "name": "Gravel Mountain - Red Rock Run",
     "road": 0,
     "time": 655000
   },
@@ -533,6 +533,11 @@
     "name": "Makuri Islands - Yoru Run",
     "road": 4,
     "time": 731960
+  },
+  "-1773341604": {
+    "name": "Makuri Islands - Yumezi Grit",
+    "road": 0,
+    "time": 25592
   },
   "-1858871695": {
     "name": "New York - 2022 Cycling Esports World Championships Route",
