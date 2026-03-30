@@ -348,8 +348,7 @@
       "name": "game_1_110_auto_pairing_fixes"
     },
     {
-      "name": "game_1_110_disable_sensor_relay_on_ble",
-      "value": true
+      "name": "game_1_110_disable_sensor_relay_on_ble"
     },
     {
       "name": "game_1_110_high_density_just_watch"
@@ -591,8 +590,7 @@
     },
     {
       "name": "game_1_43_3_ble_dll_v2",
-      "value": true,
-      "values": {}
+      "value": true
     },
     {
       "name": "game_1_43_android_road_height_fixup",
@@ -633,8 +631,7 @@
     },
     {
       "name": "game_1_44_1dc_fix_2",
-      "value": true,
-      "values": {}
+      "value": true
     },
     {
       "name": "game_1_45_climb_portal_achievements",
@@ -827,7 +824,6 @@
     },
     {
       "name": "game_1_52_ble_adv_sd",
-      "value": true,
       "values": {}
     },
     {
@@ -854,8 +850,7 @@
       }
     },
     {
-      "name": "game_1_53_zui_tp",
-      "values": {}
+      "name": "game_1_53_zui_tp"
     },
     {
       "name": "game_1_54_m0b1",
@@ -1264,8 +1259,7 @@
       "values": {}
     },
     {
-      "name": "game_1_76_dpr",
-      "values": {}
+      "name": "game_1_76_dpr"
     },
     {
       "name": "game_1_76_max_clubs_to_display",
@@ -1939,7 +1933,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "159643"
+            "stringValue": "160088"
           },
           "canary_test": {
             "boolValue": true
