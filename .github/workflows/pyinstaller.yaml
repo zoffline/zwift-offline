@@ -24,7 +24,7 @@ jobs:
         pathInArchive: "upx-4.2.2-win64/upx.exe"
 
     - run: pip install -r requirements.txt
-    - run: pip install pyinstaller garth
+    - run: pip install pyinstaller garth==0.6.3
     - run: pyinstaller standalone.spec
 
     - uses: actions/upload-artifact@v4

@@ -152,6 +152,7 @@ to generate your own certificates and do the same.
 * Patch after every installation or update:
   * Install/update Zwift from Google play, but do not start it yet.
     * If you have already started it go to `Android Settings > Applications > Zwift` and clear data or uninstall and reinstall the app.
+  * __NOTE:__ ZofflineObb doesn't work on Android 15 and later versions. As a workaround, you can patch the OBB file on Windows. See [#505](https://github.com/zoffline/zwift-offline/issues/505) for details.
   * Open the `ZofflineObb` app and run it (allow access to storage)
   * Wait for process to finish (5-10min)
   * Run Zwift, hopefully it verifies download and runs
@@ -234,12 +235,9 @@ To obtain your current profile:
 
 <details><summary>Garmin Connect</summary>
 
-* If running from source, install garth: ``pip install garth``
-* If needed, create a file ``garmin_domain.txt`` in the ``storage`` directory containing the domain
-  * For China use ``garmin.cn``
-* Use the "Settings - Garmin" button in the launcher window to enter your credentials (if using Android, access ``https://<zoffline_ip>/garmin/zoffline/``).
-* If your account has multi-factor authentication, run the script ``garmin_auth.py`` and move the resulting ``garth`` folder (saved in whatever directory you ran ``garmin_auth.py`` in) into the ``storage/1`` directory.
-  * Or, if using the Windows zoffline.exe version without Python installed you can run ``garmin_auth.exe`` obtained from https://github.com/oldnapalm/zoffline-helper/releases/latest instead.
+* __NOTE:__ Garmin Connect login is no longer supported ([matin/garth#222](https://github.com/matin/garth/discussions/222)).
+* Use [this script](https://gist.github.com/coleman8er/5c8e192d2aa3c8a3a6220c5702e8a5e6) to login and save tokens.
+* Move the resulting ``oauth1_token.json`` and ``oauth2_token.json`` from `~/.garth` (`C:\Users\<username>\.garth`) to `storage/1/garth`.
 
 </details>
 

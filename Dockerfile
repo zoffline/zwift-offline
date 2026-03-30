@@ -5,7 +5,7 @@ WORKDIR /usr/src/app/zwift-offline
 COPY . .
 
 RUN pip install --no-cache-dir --root-user-action=ignore -r requirements.txt
-RUN pip install --no-cache-dir --root-user-action=ignore garth
+RUN pip install --no-cache-dir --root-user-action=ignore garth==0.6.3
 
 RUN chmod 777 storage
 

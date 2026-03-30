@@ -2344,22 +2344,11 @@ def garmin_upload(player_id, activity):
         if garth.client.oauth2_token.expired:
             garth.client.refresh_oauth2()
             garth.save(tokens_dir)
-    except:
-        garmin_credentials = '%s/%s/garmin_credentials.bin' % (STORAGE_DIR, player_id)
-        if not os.path.exists(garmin_credentials):
-            logger.info("garmin_credentials.bin missing, skip Garmin activity update")
-            return
-        username, password = decrypt_credentials(garmin_credentials)
-        try:
-            garth.login(username, password)
-            garth.save(tokens_dir)
-        except Exception as exc:
-            logger.warning("Garmin login failed: %s" % repr(exc))
-            return
+    except Exception as exc:
+        logger.warning("garmin_upload: %s" % repr(exc))
+        return
     try:
-        requests.post('https://connectapi.%s/upload-service/upload' % GARMIN_DOMAIN,
-            files={"file": (activity.fit_filename, BytesIO(activity.fit))},
-            headers={'authorization': str(garth.client.oauth2_token)})
+        garth.client.post("connectapi", "/upload-service/upload", api=True, files={"file": (activity.fit_filename, BytesIO(activity.fit))})
     except Exception as exc:
         logger.warning("Garmin upload failed. No internet? %s" % repr(exc))
 
