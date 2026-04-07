@@ -9,6 +9,7 @@ message Attributes {
     optional GarageItemLastSelected garage_last_selected = 23;
     optional BikeProgress bike_progress = 24;
     optional SpecialEventSeen special_event_seen = 25;
+    optional DataCollectionConsent data_collection_consent = 29;
 }
 
 message GameSettings {
@@ -56,4 +57,10 @@ message BikeUpgrade {
     optional uint64 time = 1;
     optional uint32 level = 2;
     optional uint32 price = 3;
+}
+
+message DataCollectionConsent {
+    optional string device = 1;
+    optional int32 consent = 2;
+    optional uint64 time = 3;
 }

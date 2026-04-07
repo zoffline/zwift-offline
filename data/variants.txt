@@ -224,10 +224,6 @@
       "values": {}
     },
     {
-      "name": "game_1_102_draft_slope_fix",
-      "value": true
-    },
-    {
       "name": "game_1_102_split_zp_set_messages",
       "value": true
     },
@@ -277,8 +273,7 @@
       "value": true
     },
     {
-      "name": "game_1_105_zui_logout_earlier",
-      "values": {}
+      "name": "game_1_105_zui_logout_earlier"
     },
     {
       "name": "game_1_106_zml_rnl",
@@ -298,7 +293,8 @@
       "name": "game_1_108_challenge_poster_cards"
     },
     {
-      "name": "game_1_108_data_collection_consent"
+      "name": "game_1_108_data_collection_consent",
+      "value": true
     },
     {
       "name": "game_1_108_known_devices_v2",
@@ -348,6 +344,9 @@
       "name": "game_1_110_auto_pairing_fixes"
     },
     {
+      "name": "game_1_110_customizable_workout_hud"
+    },
+    {
       "name": "game_1_110_disable_sensor_relay_on_ble"
     },
     {
@@ -362,6 +361,14 @@
     },
     {
       "name": "game_1_110_square_integration"
+    },
+    {
+      "name": "game_1_110_trial_banner",
+      "values": {}
+    },
+    {
+      "name": "game_1_111_personalize_experience",
+      "values": {}
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -380,8 +387,7 @@
       }
     },
     {
-      "name": "game_1_18_holiday_mode",
-      "value": true
+      "name": "game_1_18_holiday_mode"
     },
     {
       "name": "game_1_20_home_screen",
@@ -850,7 +856,18 @@
       }
     },
     {
-      "name": "game_1_53_zui_tp"
+      "name": "game_1_53_zui_tp",
+      "value": true,
+      "values": {
+        "fields": {
+          "disk_cache_max_size_bytes": {
+            "varintValue": "104857600"
+          },
+          "memory_cache_max_size_bytes": {
+            "varintValue": "104857600"
+          }
+        }
+      }
     },
     {
       "name": "game_1_54_m0b1",
@@ -1131,7 +1148,7 @@
       "values": {
         "fields": {
           "challenge_carousel_id": {
-            "stringValue": "prod_1_108_minimum"
+            "stringValue": "prod_home_challenge_carousel"
           }
         }
       }
@@ -1156,11 +1173,6 @@
     },
     {
       "name": "game_1_74_intersection_level_lock_override_by_route",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_74_sku_enhance",
       "value": true,
       "values": {}
     },
@@ -1520,10 +1532,6 @@
     },
     {
       "name": "game_1_91_center_hud_onroute_update",
-      "value": true
-    },
-    {
-      "name": "game_1_91_nav_bar_social_tab",
       "value": true
     },
     {
@@ -1900,10 +1908,6 @@
       "name": "game_default_deco"
     },
     {
-      "name": "game_disable_ant_plus_msg_queue",
-      "values": {}
-    },
-    {
       "name": "game_disable_cached_subgroup_protobuf",
       "value": true,
       "values": {}
@@ -2254,7 +2258,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.110.0"
+            "stringValue": "1.111.0"
           }
         }
       }
@@ -2280,11 +2284,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_settings_service",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_show_about_menu",
@@ -2518,6 +2517,23 @@
     {
       "name": "noesis_dlc",
       "value": true
+    },
+    {
+      "name": "outdoor_accumulator_quest_widget_settings",
+      "value": true,
+      "values": {
+        "fields": {
+          "hide_secondary_widget_when_not_setup": {
+            "boolValue": false
+          },
+          "qr_code_data_id": {
+            "stringValue": "zc_connections"
+          },
+          "qr_code_state_enabled": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "progress_report",
