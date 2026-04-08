@@ -139,6 +139,11 @@
     "road": 0,
     "time": 655000
   },
+  "1437969615": {
+    "name": "Gravel Mountain - Red Rock Loop Reverse",
+    "road": 0,
+    "time": 535000
+  },
   "967374265": {
     "name": "Gravel Mountain - Red Rock Run",
     "road": 0,
