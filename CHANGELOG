@@ -1,5 +1,10 @@
 # Only breaking changes in releases will be documented here.
 
+Update to Zwift_1.0.160809:
+  * This update requires Zwift Launcher 1.1.16 which replaces Zwift's cacert.pem. You will need
+    to re-append cert-zwift-com.pem to Zwift's cacert.pem.
+
+
 Update to Zwift_1.0.159921:
   * This update requires Zwift Launcher 1.1.15 which replaces Zwift's cacert.pem. You will need
     to re-append cert-zwift-com.pem to Zwift's cacert.pem.
