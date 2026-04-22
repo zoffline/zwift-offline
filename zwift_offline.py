@@ -62,6 +62,9 @@ import fitness_pb2
 import structured_events_pb2
 
 import online_sync
+import intervals_workouts
+import trainingpeaks_workouts
+import workout_state
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -860,6 +863,163 @@ def backup_file(file):
     if os.path.isfile(file):
         copyfile(file, "%s-%s.bak" % (file, datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S")))
 
+
+def save_player_zfile(player_id, folder, filename, content):
+    zfiles_dir = os.path.join(STORAGE_DIR, str(player_id), folder)
+    if not make_dir(zfiles_dir):
+        raise IOError("failed to create zfiles directory")
+    with open(os.path.join(zfiles_dir, filename), 'wb') as fd:
+        fd.write(content)
+    timestamp = int(time.time())
+    row = Zfile.query.filter_by(folder=folder, filename=filename, player_id=player_id).first()
+    if not row:
+        row = Zfile(folder=folder, filename=filename, timestamp=timestamp, player_id=player_id)
+        db.session.add(row)
+    else:
+        row.timestamp = timestamp
+    db.session.commit()
+    return row
+
+
+def remove_player_zfiles_by_prefix(player_id, folder, prefix):
+    rows = Zfile.query.filter_by(folder=folder, player_id=player_id)
+    removed = False
+    for row in rows:
+        if not row.filename.startswith(prefix):
+            continue
+        removed = True
+        try:
+            os.remove(os.path.join(STORAGE_DIR, str(row.player_id), row.folder, row.filename))
+        except FileNotFoundError:
+            pass
+        except Exception as exc:
+            logger.warning('remove_player_zfiles_by_prefix: %s' % repr(exc))
+        db.session.delete(row)
+    if removed:
+        db.session.commit()
+
+
+def load_workout_metadata(player_id, provider):
+    payload = workout_state.load_metadata(STORAGE_DIR, player_id, provider)
+    if payload is None:
+        return None
+    return payload
+
+
+def save_workout_metadata(player_id, provider, event, filename):
+    return workout_state.save_metadata(STORAGE_DIR, player_id, provider, event, filename)
+
+
+def clear_workout_metadata(player_id, provider):
+    workout_state.clear_metadata(STORAGE_DIR, player_id, provider)
+
+
+def load_intervals_workout_metadata(player_id):
+    return load_workout_metadata(player_id, 'intervals-icu')
+
+
+def save_intervals_workout_metadata(player_id, event, filename):
+    return save_workout_metadata(player_id, 'intervals-icu', event, filename)
+
+
+def clear_intervals_workout_metadata(player_id):
+    clear_workout_metadata(player_id, 'intervals-icu')
+
+
+def load_active_workout_provider(player_id):
+    return workout_state.load_active_provider(STORAGE_DIR, player_id)
+
+
+def save_active_workout_provider(player_id, provider):
+    workout_state.save_active_provider(STORAGE_DIR, player_id, provider)
+
+
+def available_workout_providers_for_player(player_id):
+    providers = set()
+    intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
+    if os.path.exists(intervals_credentials):
+        providers.add('intervals-icu')
+    if load_trainingpeaks_bridge_folder(player_id):
+        providers.add('trainingpeaks')
+    return providers
+
+
+def resolve_workout_provider_for_player(player_id):
+    return workout_state.resolve_active_provider(load_active_workout_provider(player_id), available_workout_providers_for_player(player_id))
+
+
+def activate_workout_provider(player_id, provider):
+    save_active_workout_provider(player_id, provider)
+    if provider == 'intervals-icu':
+        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'trainingpeaks-')
+    elif provider == 'trainingpeaks':
+        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'intervals-icu-')
+        clear_intervals_workout_metadata(player_id)
+
+
+def sync_intervals_workout_for_player(player_id):
+    intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
+    if not os.path.exists(intervals_credentials):
+        return {"status": "missing_credentials", "message": "Intervals.icu credentials are not configured."}
+    athlete_id, api_key = decrypt_credentials(intervals_credentials)
+    if not athlete_id or not api_key:
+        return {"status": "missing_credentials", "message": "Intervals.icu credentials are incomplete."}
+
+    activate_workout_provider(player_id, 'intervals-icu')
+
+    def store_workout(filename, content, event):
+        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'intervals-icu-')
+        save_player_zfile(player_id, 'customworkouts', filename, content)
+        save_intervals_workout_metadata(player_id, event, filename)
+
+    try:
+        result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout)
+        if result['status'] == 'no_workout':
+            clear_intervals_workout_metadata(player_id)
+        return result
+    except Exception as exc:
+        logger.warning('sync_intervals_workout_for_player: %s' % repr(exc))
+        return {"status": "error", "message": "Intervals.icu workout sync failed."}
+
+
+def trainingpeaks_bridge_folder_file(player_id):
+    return os.path.join(STORAGE_DIR, str(player_id), 'trainingpeaks_bridge_folder.txt')
+
+
+def load_trainingpeaks_bridge_folder(player_id):
+    file = trainingpeaks_bridge_folder_file(player_id)
+    if not os.path.exists(file):
+        return ''
+    with open(file) as fd:
+        return fd.read().strip()
+
+
+def save_trainingpeaks_bridge_folder(player_id, folder):
+    file = trainingpeaks_bridge_folder_file(player_id)
+    with open(file, 'w') as fd:
+        fd.write(folder.strip())
+
+
+def sync_trainingpeaks_workout_for_player(player_id):
+    folder = load_trainingpeaks_bridge_folder(player_id)
+    if not folder:
+        return {
+            'status': 'missing_folder',
+            'message': 'Set a TrainingPeaks bridge folder first. Export .zwo workouts there, then sync again.',
+        }
+
+    activate_workout_provider(player_id, 'trainingpeaks')
+    remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'trainingpeaks-')
+
+    def store_workout(filename, content, workout):
+        save_player_zfile(player_id, 'customworkouts', filename, content)
+
+    try:
+        return trainingpeaks_workouts.sync_exported_workouts(folder, store_workout)
+    except Exception as exc:
+        logger.warning('sync_trainingpeaks_workout_for_player: %s' % repr(exc))
+        return {'status': 'error', 'message': 'TrainingPeaks bridge sync failed.'}
+
 @app.route("/profile/<username>/", methods=["GET", "POST"])
 @login_required
 def profile(username):
@@ -958,6 +1118,38 @@ def intervals(username):
         return redirect(url_for('settings', username=current_user.username))
     cred = decrypt_credentials(file)
     return render_template("intervals.html", username=current_user.username, aid=cred[0], akey=cred[1])
+
+
+@app.route("/intervals/<username>/sync", methods=["GET"])
+@login_required
+def intervals_sync(username):
+    result = sync_intervals_workout_for_player(current_user.player_id)
+    flash(result['message'])
+    return redirect(url_for('intervals', username=current_user.username))
+
+
+@app.route("/trainingpeaks/<username>/", methods=["GET", "POST"])
+@login_required
+def trainingpeaks(username):
+    if request.method == 'POST':
+        save_trainingpeaks_bridge_folder(current_user.player_id, request.form['bridge_folder'])
+        flash('TrainingPeaks bridge folder saved.')
+        return redirect(url_for('trainingpeaks', username=current_user.username))
+    bridge_folder = load_trainingpeaks_bridge_folder(current_user.player_id)
+    return render_template(
+        "trainingpeaks.html",
+        username=current_user.username,
+        message=trainingpeaks_workouts.PARTNER_ACCESS_MESSAGE,
+        bridge_folder=bridge_folder,
+    )
+
+
+@app.route("/trainingpeaks/<username>/sync", methods=["GET"])
+@login_required
+def trainingpeaks_sync(username):
+    result = sync_trainingpeaks_workout_for_player(current_user.player_id)
+    flash(result['message'])
+    return redirect(url_for('trainingpeaks', username=current_user.username))
 
 
 @app.route("/user/<username>/")
@@ -2377,10 +2569,11 @@ def intervals_upload(player_id, activity):
         logger.info("intervals_credentials.bin missing, skip Intervals.icu activity update")
         return
     athlete_id, api_key = decrypt_credentials(intervals_credentials)
+    workout_metadata = load_intervals_workout_metadata(player_id)
     try:
-        from requests.auth import HTTPBasicAuth
-        url = 'http://intervals.icu/api/v1/athlete/%s/activities?name=%s' % (athlete_id, activity.name)
-        requests.post(url, files = {"file": BytesIO(activity.fit)}, auth = HTTPBasicAuth('API_KEY', api_key))
+        result = intervals_workouts.upload_activity(athlete_id, api_key, activity, workout_metadata=workout_metadata)
+        if result.get('paired'):
+            clear_intervals_workout_metadata(player_id)
     except Exception as exc:
         logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
 
@@ -4446,6 +4639,14 @@ def start_zwift():
     selected_climb = request.form['climb']
     if selected_climb != 'CALENDAR':
         climb_override[request.remote_addr] = selected_climb
+    provider = resolve_workout_provider_for_player(current_user.player_id)
+    sync_result = None
+    if provider == 'intervals-icu':
+        sync_result = sync_intervals_workout_for_player(current_user.player_id)
+    elif provider == 'trainingpeaks':
+        sync_result = sync_trainingpeaks_workout_for_player(current_user.player_id)
+    if sync_result and sync_result['status'] in ('synced', 'error'):
+        flash(sync_result['message'])
     return redirect("/ride", 302)
 
 

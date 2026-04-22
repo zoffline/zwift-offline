@@ -8,6 +8,7 @@
     <div class="col-md-12">
       <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
       {% if aid or akey %}
+        <a href="{{ url_for('intervals_sync', username=username) }}" class="btn btn-sm btn-secondary">Sync today's workout</a>
         <a href="/delete/intervals_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
       {% endif %}
     </div>
