@@ -252,14 +252,7 @@
     },
     {
       "name": "game_1_104_quest_activity_cards",
-      "value": true,
-      "values": {
-        "fields": {
-          "excludeQuests": {
-            "stringValue": "gettingstarted,gettingstartedshort"
-          }
-        }
-      }
+      "value": true
     },
     {
       "name": "game_1_104_wftnp_advertising_fix",
@@ -369,7 +362,7 @@
     },
     {
       "name": "game_1_111_remove_hero_quests_from_challenge_carousel",
-      "values": {}
+      "value": true
     },
     {
       "name": "game_1_111_stop_calling_legacy_campaign_service",
@@ -1565,12 +1558,6 @@
       "value": true,
       "values": {
         "fields": {
-          "next_up": {
-            "stringValue": "next_up"
-          },
-          "tuning_screen": {
-            "stringValue": "tuning_screen"
-          },
           "ultimate_rewards": {
             "stringValue": "ultimate_rewards"
           },
@@ -1920,7 +1907,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "160612"
+            "stringValue": "161037"
           },
           "canary_test": {
             "boolValue": true
@@ -2363,6 +2350,9 @@
           "goandigo": {
             "boolValue": false
           },
+          "removebigspin2026": {
+            "boolValue": true
+          },
           "tdf2025": {
             "boolValue": false
           },
@@ -2448,8 +2438,7 @@
       "values": {}
     },
     {
-      "name": "log_ble_packets",
-      "values": {}
+      "name": "log_ble_packets"
     },
     {
       "name": "mobile_cp_curve_fix",
