@@ -34,7 +34,7 @@ class DiscordBot(discord.Client):
             await message.channel.send(self.help_msg)
         elif message.content == '!ping':
             await message.channel.send('pong')
-        elif message.channel == self.channel and not message.author.bot and not message.content.startswith('!'):
+        elif message.guild.id == self.channel_id and not message.author.bot and not message.content.startswith('!'):
             zwift_offline.send_message(message.content, message.author.name)
 
 
