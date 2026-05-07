@@ -57,7 +57,6 @@ class DiscordThread(threading.Thread):
         self.intents = discord.Intents.default()
         self.intents.members = True
         self.intents.message_content = True
-        self.loop = asyncio.get_event_loop()
         self.start()
 
     async def starter(self):
@@ -65,6 +64,8 @@ class DiscordThread(threading.Thread):
         await self.discord_bot.start(self.token)
 
     def run(self):
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
         try:
             self.loop.run_until_complete(self.starter())
         except Exception as exc:
