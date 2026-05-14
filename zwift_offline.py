@@ -62,6 +62,7 @@ import fitness_pb2
 import structured_events_pb2
 
 import online_sync
+import scripts.coros_upload as coros_upload
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -960,6 +961,19 @@ def intervals(username):
     return render_template("intervals.html", username=current_user.username, aid=cred[0], akey=cred[1])
 
 
+@app.route("/coros/<username>/", methods=["GET", "POST"])
+@login_required
+def coros(username):
+    file = '%s/%s/coros_credentials.bin' % (STORAGE_DIR, current_user.player_id)
+    if request.method == "POST":
+        if request.form['email'] == "" or request.form['password'] == "":
+            flash("COROS credentials can't be empty.")
+            return render_template("coros.html", username=current_user.username, email=request.form['email'], password=request.form['password'])
+        encrypt_credentials(file, (request.form['email'], request.form['password']))
+    cred = decrypt_credentials(file)
+    return render_template("coros.html", username=current_user.username, email=cred[0], password=cred[1])
+
+
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
@@ -1088,7 +1102,7 @@ def download_avatarLarge(player_id):
 @app.route("/delete/<path:filename>", methods=["GET"])
 @login_required
 def delete(filename):
-    credentials = ['zwift_credentials.bin', 'intervals_credentials.bin']
+    credentials = ['zwift_credentials.bin', 'intervals_credentials.bin', 'coros_credentials.bin']
     strava = ['strava_api.bin', 'strava_token.txt']
     garmin = ['garmin_credentials.bin', 'garth/oauth1_token.json']
     if filename not in credentials + strava + garmin:
@@ -2475,6 +2489,7 @@ def activity_uploads(player_id, activity):
     runalyze_upload(player_id, activity)
     intervals_upload(player_id, activity)
     zwift_upload(player_id, activity)
+    coros_upload(player_id, activity)
     logout_player(player_id)
 
 @app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>', methods=['PUT', 'DELETE'])

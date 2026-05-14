@@ -1,0 +1,47 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">COROS</div></h1>
+  {% if username != "zoffline" %}
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-12">
+      <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+      {% if email or password %}
+        <a href="/delete/coros_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-5 top-buffer">
+      <form id="coros" action="{{ url_for('coros', username=username) }}" method="post">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">COROS email</label>
+            <input type="text" id="email" name="email" value="{{ email }}" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">COROS password</label>
+            <input type="password" id="password" name="password" value="{{ password }}" class="form-control form-control-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Submit" class="btn btn-sm btn-light">
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item py-2">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

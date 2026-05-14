@@ -9,3 +9,6 @@ stravalib==1.1.0
 dnspython==2.6.1
 fitdecode==0.10.0
 werkzeug==3.1.5
+boto3==1.37.0
+urllib3==2.3.0
+certifi==2025.1.1
