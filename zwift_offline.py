@@ -2379,7 +2379,7 @@ def intervals_upload(player_id, activity):
     athlete_id, api_key = decrypt_credentials(intervals_credentials)
     try:
         from requests.auth import HTTPBasicAuth
-        url = 'http://intervals.icu/api/v1/athlete/%s/activities?name=%s' % (athlete_id, activity.name)
+        url = 'https://intervals.icu/api/v1/athlete/%s/activities?name=%s' % (athlete_id, activity.name)
         requests.post(url, files = {"file": BytesIO(activity.fit)}, auth = HTTPBasicAuth('API_KEY', api_key))
     except Exception as exc:
         logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
