@@ -9,6 +9,7 @@ services:
             - TZ=Europe/London
         volumes:
             - ./storage/:/usr/src/app/zwift-offline/storage
+            - ${ZWIFT_WORKOUTS_DIR:-~/Documents/Zwift/Workouts}:/root/Documents/Zwift/Workouts
         ports:
             - 80:80
             - 443:443

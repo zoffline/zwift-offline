@@ -65,6 +65,7 @@ import online_sync
 import intervals_workouts
 import trainingpeaks_workouts
 import workout_state
+import local_zwift_workouts
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -948,13 +949,66 @@ def resolve_workout_provider_for_player(player_id):
     return workout_state.resolve_active_provider(load_active_workout_provider(player_id), available_workout_providers_for_player(player_id))
 
 
+def local_zwift_workouts_root():
+    return os.path.expanduser('~/Documents/Zwift/Workouts')
+
+
+def export_local_zwift_workout(player_id, filename, content):
+    return local_zwift_workouts.export_workout(local_zwift_workouts_root(), player_id, filename, content)
+
+
+def remove_local_zwift_workouts_by_prefixes(player_id, prefixes):
+    return local_zwift_workouts.remove_prefixed_workouts(local_zwift_workouts_root(), player_id, prefixes)
+
+
+def managed_workout_prefixes(provider):
+    if provider == 'intervals-icu':
+        return {'intervals-icu-'}
+    if provider == 'trainingpeaks':
+        return {'trainingpeaks-'}
+    return set()
+
+
+def clear_managed_workouts_for_provider(player_id, provider, clear_metadata=True):
+    prefixes = managed_workout_prefixes(provider)
+    for prefix in prefixes:
+        remove_player_zfiles_by_prefix(player_id, 'customworkouts', prefix)
+    if prefixes:
+        remove_local_zwift_workouts_by_prefixes(player_id, prefixes)
+    if provider == 'intervals-icu' and clear_metadata:
+        clear_intervals_workout_metadata(player_id)
+
+
+def current_workout_sync_status(player_id, provider=None):
+    provider = provider or resolve_workout_provider_for_player(player_id)
+    if not provider:
+        return None
+    metadata = load_workout_metadata(player_id, provider)
+    if not metadata:
+        return {
+            'provider': provider,
+            'metadata': None,
+            'server_file_exists': False,
+            'local_status': None,
+        }
+    filename = metadata.get('filename')
+    server_file = os.path.join(STORAGE_DIR, str(player_id), 'customworkouts', filename) if filename else ''
+    local_status = local_zwift_workouts.health_report(local_zwift_workouts_root(), player_id, filename) if filename else None
+    return {
+        'provider': provider,
+        'metadata': metadata,
+        'server_file_exists': bool(filename and os.path.exists(server_file)),
+        'server_file': server_file,
+        'local_status': local_status,
+    }
+
+
 def activate_workout_provider(player_id, provider):
     save_active_workout_provider(player_id, provider)
     if provider == 'intervals-icu':
-        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'trainingpeaks-')
+        clear_managed_workouts_for_provider(player_id, 'trainingpeaks', clear_metadata=False)
     elif provider == 'trainingpeaks':
-        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'intervals-icu-')
-        clear_intervals_workout_metadata(player_id)
+        clear_managed_workouts_for_provider(player_id, 'intervals-icu')
 
 
 def sync_intervals_workout_for_player(player_id):
@@ -966,16 +1020,31 @@ def sync_intervals_workout_for_player(player_id):
         return {"status": "missing_credentials", "message": "Intervals.icu credentials are incomplete."}
 
     activate_workout_provider(player_id, 'intervals-icu')
+    stored = {}
 
     def store_workout(filename, content, event):
-        remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'intervals-icu-')
-        save_player_zfile(player_id, 'customworkouts', filename, content)
-        save_intervals_workout_metadata(player_id, event, filename)
+        clear_managed_workouts_for_provider(player_id, 'intervals-icu', clear_metadata=False)
+        stored['zfile'] = save_player_zfile(player_id, 'customworkouts', filename, content)
+        stored['local_export'] = export_local_zwift_workout(player_id, filename, content)
+        stored['metadata'] = save_intervals_workout_metadata(player_id, event, filename)
 
     try:
         result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout)
         if result['status'] == 'no_workout':
-            clear_intervals_workout_metadata(player_id)
+            clear_managed_workouts_for_provider(player_id, 'intervals-icu')
+            return {
+                **result,
+                'sync_status': current_workout_sync_status(player_id, 'intervals-icu'),
+                'message': 'No Intervals.icu workout found for today. Cleared stale managed exports.',
+            }
+        if result['status'] == 'synced':
+            sync_status = current_workout_sync_status(player_id, 'intervals-icu')
+            return {
+                **result,
+                'local_export': stored.get('local_export'),
+                'sync_status': sync_status,
+                'message': '%s Local Zwift workout catalog prepared.' % result['message'],
+            }
         return result
     except Exception as exc:
         logger.warning('sync_intervals_workout_for_player: %s' % repr(exc))
@@ -1009,13 +1078,28 @@ def sync_trainingpeaks_workout_for_player(player_id):
         }
 
     activate_workout_provider(player_id, 'trainingpeaks')
-    remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'trainingpeaks-')
+    clear_managed_workouts_for_provider(player_id, 'trainingpeaks', clear_metadata=False)
+    exports = []
 
     def store_workout(filename, content, workout):
         save_player_zfile(player_id, 'customworkouts', filename, content)
+        exports.append(export_local_zwift_workout(player_id, filename, content))
 
     try:
-        return trainingpeaks_workouts.sync_exported_workouts(folder, store_workout)
+        result = trainingpeaks_workouts.sync_exported_workouts(folder, store_workout)
+        if result['status'] == 'no_workout':
+            clear_managed_workouts_for_provider(player_id, 'trainingpeaks', clear_metadata=False)
+            return {
+                **result,
+                'message': 'No .zwo workouts were found in the TrainingPeaks bridge folder. Cleared stale managed exports.',
+            }
+        if result['status'] == 'synced':
+            return {
+                **result,
+                'local_exports': exports,
+                'message': '%s Local Zwift workout catalog prepared.' % result['message'],
+            }
+        return result
     except Exception as exc:
         logger.warning('sync_trainingpeaks_workout_for_player: %s' % repr(exc))
         return {'status': 'error', 'message': 'TrainingPeaks bridge sync failed.'}
@@ -1113,11 +1197,23 @@ def intervals(username):
     if request.method == "POST":
         if request.form['athlete_id'] == "" or request.form['api_key'] == "":
             flash("Intervals.icu credentials can't be empty.")
-            return render_template("intervals.html", username=current_user.username)
+            return render_template(
+                "intervals.html",
+                username=current_user.username,
+                sync_status=current_workout_sync_status(current_user.player_id, 'intervals-icu'),
+                active_provider=resolve_workout_provider_for_player(current_user.player_id),
+            )
         encrypt_credentials(file, (request.form['athlete_id'], request.form['api_key']))
         return redirect(url_for('settings', username=current_user.username))
     cred = decrypt_credentials(file)
-    return render_template("intervals.html", username=current_user.username, aid=cred[0], akey=cred[1])
+    return render_template(
+        "intervals.html",
+        username=current_user.username,
+        aid=cred[0],
+        akey=cred[1],
+        sync_status=current_workout_sync_status(current_user.player_id, 'intervals-icu'),
+        active_provider=resolve_workout_provider_for_player(current_user.player_id),
+    )
 
 
 @app.route("/intervals/<username>/sync", methods=["GET"])
@@ -1155,8 +1251,18 @@ def trainingpeaks_sync(username):
 @app.route("/user/<username>/")
 @login_required
 def user_home(username):
-    return render_template("user_home.html", username=current_user.username, enable_ghosts=bool(current_user.enable_ghosts), climbs=CLIMBS,
-        online=get_online(), is_admin=current_user.is_admin, restarting=restarting, restarting_in_minutes=restarting_in_minutes)
+    return render_template(
+        "user_home.html",
+        username=current_user.username,
+        enable_ghosts=bool(current_user.enable_ghosts),
+        climbs=CLIMBS,
+        online=get_online(),
+        is_admin=current_user.is_admin,
+        restarting=restarting,
+        restarting_in_minutes=restarting_in_minutes,
+        active_workout_provider=resolve_workout_provider_for_player(current_user.player_id),
+        workout_sync_status=current_workout_sync_status(current_user.player_id),
+    )
 
 def enqueue_player_update(player_id, wa_bytes):
     if not player_id in player_update_queue:
@@ -4645,7 +4751,7 @@ def start_zwift():
         sync_result = sync_intervals_workout_for_player(current_user.player_id)
     elif provider == 'trainingpeaks':
         sync_result = sync_trainingpeaks_workout_for_player(current_user.player_id)
-    if sync_result and sync_result['status'] in ('synced', 'error'):
+    if sync_result and sync_result['status'] in ('synced', 'no_workout', 'error'):
         flash(sync_result['message'])
     return redirect("/ride", 302)
 

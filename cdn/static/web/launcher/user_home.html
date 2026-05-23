@@ -29,6 +29,25 @@
   </div>
   <div class="row">
     <div class="col-sm-6 col-md-5">
+      {% if workout_sync_status %}
+        <ul class="list-group top-buffer">
+          <li class="list-group-item py-2">
+            <div class="text-shadow">Workout provider: {{ active_workout_provider or 'not selected' }}</div>
+            {% if workout_sync_status.metadata %}
+              <div class="text-shadow"><small>{{ workout_sync_status.metadata.name or workout_sync_status.metadata.filename }}</small></div>
+            {% else %}
+              <div class="text-shadow"><small>No synced workout cached yet.</small></div>
+            {% endif %}
+          </li>
+          <li class="list-group-item py-2">
+            {% if workout_sync_status.local_status %}
+              <div class="text-shadow">Local workout catalog: {{ 'ready for launch' if workout_sync_status.local_status.healthy else 'needs refresh' }}</div>
+            {% else %}
+              <div class="text-shadow">Local workout catalog: waiting for next sync</div>
+            {% endif %}
+          </li>
+        </ul>
+      {% endif %}
       <form method="POST" action="/start-zwift" class="top-buffer">
         <div class="row">
           <div class="col-md-12">

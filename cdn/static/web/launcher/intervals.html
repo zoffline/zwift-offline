@@ -32,6 +32,36 @@
           </div>
         </div>
       </form>
+      {% if sync_status %}
+        <ul class="list-group top-buffer">
+          <li class="list-group-item py-2">
+            <div class="text-shadow">Active provider: {{ active_provider or 'not selected' }}</div>
+          </li>
+          <li class="list-group-item py-2">
+            {% if sync_status.metadata %}
+              <div class="text-shadow">Synced workout: {{ sync_status.metadata.name or sync_status.metadata.filename }}</div>
+              <div class="text-shadow"><small>{{ sync_status.metadata.filename }}</small></div>
+              {% if sync_status.metadata.start_date_local %}
+                <div class="text-shadow"><small>{{ sync_status.metadata.start_date_local }}</small></div>
+              {% endif %}
+            {% else %}
+              <div class="text-shadow">No synced Intervals workout is cached right now.</div>
+              <div class="text-shadow"><small>Use "Sync today's workout" before launching Zwift.</small></div>
+            {% endif %}
+          </li>
+          <li class="list-group-item py-2">
+            {% if sync_status.local_status %}
+              <div class="text-shadow">Local Zwift catalog: {{ 'ready for launch' if sync_status.local_status.healthy else 'needs refresh' }}</div>
+              <div class="text-shadow"><small>File: {{ 'present' if sync_status.local_status.file_exists else 'missing' }} | Manifest: {{ 'present' if sync_status.local_status.manifest_entry_exists else 'missing' }}</small></div>
+              {% if sync_status.local_status.manifest_entry %}
+                <div class="text-shadow"><small>Guid {{ sync_status.local_status.manifest_entry.guid }}, checksum {{ sync_status.local_status.manifest_entry.checksum }}</small></div>
+              {% endif %}
+            {% else %}
+              <div class="text-shadow">Local Zwift catalog: waiting for next sync</div>
+            {% endif %}
+          </li>
+        </ul>
+      {% endif %}
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="list-group top-buffer">
