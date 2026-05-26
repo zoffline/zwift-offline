@@ -464,6 +464,11 @@
     "road": 70,
     "time": 134959
   },
+  "-1375227966": {
+    "name": "Makuri Islands - Roundikaze",
+    "road": 129,
+    "time": 250890
+  },
   "-691331742": {
     "name": "Makuri Islands - Sea to Tree",
     "road": 0,
@@ -514,6 +519,11 @@
     "road": 4,
     "time": 872173
   },
+  "362278484": {
+    "name": "Makuri Islands - Twilight Crit",
+    "road": 4,
+    "time": 873144
+  },
   "1457923570": {
     "name": "Makuri Islands - Twilight Harbor",
     "road": 4,
@@ -524,6 +534,11 @@
     "road": 0,
     "time": 880596
   },
+  "-202736804": {
+    "name": "Makuri Islands - Urumaze",
+    "road": 129,
+    "time": 250890
+  },
   "1941800093": {
     "name": "Makuri Islands - Valley to Mountaintop",
     "road": 0,
@@ -533,6 +548,11 @@
     "name": "Makuri Islands - Wandering Flats",
     "road": 0,
     "time": 297800
+  },
+  "811898717": {
+    "name": "Makuri Islands - WhatYumeziWereLost",
+    "road": 73,
+    "time": 143208
   },
   "152965568": {
     "name": "Makuri Islands - Yoru Run",

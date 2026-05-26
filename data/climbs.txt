@@ -32,12 +32,20 @@
     "road": "10033"
   },
   {
+    "name": "Col de Sarenne (12.8 km / 922 m)",
+    "road": "10056"
+  },
+  {
     "name": "Col de la Couillole (18.1 km / 1202 m)",
     "road": "10025"
   },
   {
     "name": "Col de la Croix Saint-Robert (5.7 km / 345 m)",
     "road": "10047"
+  },
+  {
+    "name": "Col de la Croix de Fer (27.1 km / 1557 m)",
+    "road": "10053"
   },
   {
     "name": "Col de la Madeleine (14.3 km / 1110 m)",
@@ -56,6 +64,10 @@
     "road": "10032"
   },
   {
+    "name": "Col du Galibier (Valloire) (17.9 km / 1223 m)",
+    "road": "10055"
+  },
+  {
     "name": "Col du Platzerwasel (7.9 km / 596 m)",
     "road": "10008"
   },
@@ -66,6 +78,10 @@
   {
     "name": "Col du Tourmalet (17.1 km / 1216 m)",
     "road": "10010"
+  },
+  {
+    "name": "Col du T\u00e9l\u00e9graphe (11.9 km / 844 m)",
+    "road": "10054"
   },
   {
     "name": "Coll d'Ordino (10.3 km / 505 m)",
