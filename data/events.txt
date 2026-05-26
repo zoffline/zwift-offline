@@ -140,6 +140,34 @@
     "sport": 0
   },
   {
+    "name": "Makuri Islands - Roundikaze",
+    "route": 2919739330,
+    "distance": 18338.2,
+    "course": 13,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Twilight Crit",
+    "route": 362278484,
+    "distance": 3903.8,
+    "course": 13,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - Urumaze",
+    "route": 4092230492,
+    "distance": 24755.2,
+    "course": 13,
+    "sport": 0
+  },
+  {
+    "name": "Makuri Islands - WhatYumeziWereLost",
+    "route": 811898717,
+    "distance": 17561.3,
+    "course": 13,
+    "sport": 0
+  },
+  {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54964.1,

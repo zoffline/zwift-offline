@@ -88,7 +88,7 @@
             "boolValue": true
           },
           "swap_foryou_challenges_rows": {
-            "boolValue": true
+            "boolValue": false
           },
           "tune_activity_icon": {
             "boolValue": true
@@ -97,23 +97,7 @@
       }
     },
     {
-      "name": "fitness_widget",
-      "values": {
-        "fields": {
-          "goal_unit": {
-            "stringValue": "kJ"
-          },
-          "is_distance_time_goals_visible": {
-            "boolValue": true
-          },
-          "is_fitness_score_visible": {
-            "boolValue": true
-          },
-          "is_light_theme": {
-            "boolValue": false
-          }
-        }
-      }
+      "name": "fitness_widget"
     },
     {
       "name": "free_trial_update",
@@ -274,6 +258,9 @@
       "values": {}
     },
     {
+      "name": "game_1_106_zp_over_usb"
+    },
+    {
       "name": "game_1_107_assert_on_failed_device_set"
     },
     {
@@ -369,7 +356,8 @@
       "value": true
     },
     {
-      "name": "game_1_110_square_integration"
+      "name": "game_1_110_square_integration",
+      "value": true
     },
     {
       "name": "game_1_110_trial_banner",
@@ -384,30 +372,48 @@
       "value": true
     },
     {
-      "name": "game_1_111_stop_calling_legacy_campaign_service",
+      "name": "game_1_112_use_steering_and_braking_on_zp",
       "value": true
     },
     {
-      "name": "game_1_112_tune_experiment",
+      "name": "game_1_113_lan_timeout_lowering",
       "value": true,
       "values": {
         "fields": {
-          "tune_button": {
-            "stringValue": "MORE OPTIONS"
+          "connect_timeout_seconds": {
+            "varintValue": "5"
+          },
+          "inactivity_timeout_seconds": {
+            "varintValue": "10"
           }
         }
       }
     },
     {
-      "name": "game_1_112_use_steering_and_braking_on_zp",
-      "value": true
-    },
-    {
-      "name": "game_1_113_lan_timeout_lowering"
-    },
-    {
       "name": "game_1_113_quest_xp_reward_icons",
       "value": true
+    },
+    {
+      "name": "game_1_114_camera",
+      "value": true
+    },
+    {
+      "name": "game_1_114_flush_structured_events",
+      "value": true
+    },
+    {
+      "name": "game_1_114_level_up_off_by_one_fix"
+    },
+    {
+      "name": "game_1_114_load_routes_early"
+    },
+    {
+      "name": "game_1_114_next_up_expandable_explanation",
+      "value": true
+    },
+    {
+      "name": "game_1_114_next_up_quest_tag",
+      "values": {}
     },
     {
       "name": "game_1_15_assert_disable_abort",
@@ -488,10 +494,6 @@
       }
     },
     {
-      "name": "game_1_29_new_local_trainer_profile",
-      "values": {}
-    },
-    {
       "name": "game_1_29_player_highlight",
       "value": true,
       "values": {
@@ -504,17 +506,6 @@
           },
           "UseStencilForDeferred": {
             "boolValue": true
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_30_campaign_fullscreen_modal",
-      "value": true,
-      "values": {
-        "fields": {
-          "shortNames": {
-            "stringValue": "tomi2022,tdz2023ride,tdz2023run,tow2023ride,tow2023run,portaltest2,climbportal2023,missyuci,towfall2023ride,climbportaltest3,za2023,towfall2023run,tdz2024ride,tdz2024run,tbs2024ride,springtraining2024,climbportal2024,zwiftacademy2024,zwiftcampbaseline2024,tow2024ride,tourdezwift2025ride,zwiftgames2025,zwiftbigspin2025,zwiftcampinsideout2025"
           }
         }
       }
@@ -668,10 +659,6 @@
       "name": "game_1_45_climb_portal_achievements",
       "value": true,
       "values": {}
-    },
-    {
-      "name": "game_1_48_conditional_entities",
-      "value": true
     },
     {
       "name": "game_1_48_show_rssi",
@@ -901,10 +888,6 @@
       "values": {}
     },
     {
-      "name": "game_1_60_sbsv2",
-      "values": {}
-    },
-    {
       "name": "game_1_62_tapi_workouts",
       "value": true,
       "values": {}
@@ -1040,11 +1023,6 @@
       "values": {}
     },
     {
-      "name": "game_1_66_missing_log_capture",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_66_tpeaks_multiday",
       "value": true,
       "values": {
@@ -1136,11 +1114,6 @@
       "values": {}
     },
     {
-      "name": "game_1_71_prevent_sending_ble_messages_prior_com_setup",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_72_fence_test_2024_08",
       "value": true,
       "values": {}
@@ -1155,16 +1128,7 @@
       "values": {}
     },
     {
-      "name": "game_1_74_zp_manual_calibration",
-      "values": {}
-    },
-    {
       "name": "game_1_75_bypass_zpe"
-    },
-    {
-      "name": "game_1_75_sweeper_check",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_76_bike_leveling",
@@ -1294,21 +1258,11 @@
       "values": {}
     },
     {
-      "name": "game_1_78_sweeper_check",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_78_zp_sh",
       "value": true
     },
     {
       "name": "game_1_79_category_enforcement_event_join",
-      "value": true,
-      "values": {}
-    },
-    {
-      "name": "game_1_79_ppb",
       "value": true,
       "values": {}
     },
@@ -1322,11 +1276,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_79_tts_alp",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_80_new_route_time_estimate",
@@ -1413,11 +1362,6 @@
       }
     },
     {
-      "name": "game_1_86_shifting_warnings",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "game_1_86_zg_ftp_for_robopacers",
       "value": true,
       "values": {}
@@ -1456,11 +1400,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_89_trainer_firmware_outdated_warning",
-      "value": true,
-      "values": {}
     },
     {
       "name": "game_1_90_event_after_party",
@@ -1565,10 +1504,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_96_roaddecal_tags",
-      "value": true
     },
     {
       "name": "game_1_97_delay_device_assignment_completed_event",
@@ -1744,8 +1679,23 @@
       "value": true,
       "values": {
         "fields": {
+          "cervelo_s5_2026": {
+            "boolValue": false
+          },
           "dt_swiss_arc_wheels": {
             "boolValue": true
+          },
+          "reserve_34_front_wheel": {
+            "boolValue": false
+          },
+          "reserve_34_rear_wheel": {
+            "boolValue": false
+          },
+          "reserve_57_front_wheel": {
+            "boolValue": false
+          },
+          "reserve_57_rear_wheel": {
+            "boolValue": false
           }
         }
       }
@@ -1774,10 +1724,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_android_improved_ram_detection",
-      "values": {}
     },
     {
       "name": "game_android_local_data_path_direct",
@@ -1905,7 +1851,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "160612"
+            "stringValue": "161567"
           },
           "canary_test": {
             "boolValue": true
@@ -2096,6 +2042,31 @@
       "values": {}
     },
     {
+      "name": "game_mochi",
+      "values": {
+        "fields": {
+          "config": {
+            "stringValue": "{}"
+          },
+          "manifest": {
+            "stringValue": "{}"
+          },
+          "recommended_video": {
+            "stringValue": "lochlong_1440"
+          },
+          "server_address": {
+            "stringValue": "https://rlcpmryhtpcsqfgd.dev-gs.zwift.com"
+          },
+          "showDLCTab": {
+            "boolValue": false
+          },
+          "use_parallel_download": {
+            "boolValue": true
+          }
+        }
+      }
+    },
+    {
       "name": "game_nb_world_load",
       "values": {}
     },
@@ -2219,7 +2190,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.113.0"
+            "stringValue": "1.114.0"
           }
         }
       }
@@ -2230,10 +2201,6 @@
     },
     {
       "name": "game_sentry_screenshot_capture"
-    },
-    {
-      "name": "game_sentry_tracing",
-      "values": {}
     },
     {
       "name": "game_session_data",
@@ -2252,7 +2219,8 @@
       "values": {}
     },
     {
-      "name": "game_spatial_frame_time_telemetry"
+      "name": "game_spatial_frame_time_telemetry",
+      "value": true
     },
     {
       "name": "game_staged_quest_rewards_ui",
@@ -2417,11 +2385,6 @@
       }
     },
     {
-      "name": "game_zp_create_full_trainer_on_swap",
-      "value": true,
-      "values": {}
-    },
-    {
       "name": "gfx_drawinstanced",
       "value": true,
       "values": {}
@@ -2459,12 +2422,7 @@
       "values": {}
     },
     {
-      "name": "iterable_embedded_messages",
-      "values": {}
-    },
-    {
-      "name": "kit_override_using_triggers",
-      "values": {}
+      "name": "iterable_embedded_messages"
     },
     {
       "name": "log_ble_packets"
@@ -2519,6 +2477,20 @@
     {
       "name": "quest_stage_cards",
       "value": true
+    },
+    {
+      "name": "recumbent_bike_enabled",
+      "value": true,
+      "values": {
+        "fields": {
+          "grant_bike": {
+            "boolValue": true
+          },
+          "revoke_bike": {
+            "boolValue": false
+          }
+        }
+      }
     },
     {
       "name": "unload_homescreen_before_game_load",
