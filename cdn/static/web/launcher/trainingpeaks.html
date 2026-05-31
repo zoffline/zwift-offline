@@ -11,15 +11,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-8 col-md-6 top-buffer">
-      <div class="list-group">
-        <div class="list-group-item py-2">
-          <div class="text-shadow">{{ message }}</div>
-        </div>
-        <div class="list-group-item py-2">
-          <div class="text-shadow">Manual bridge mode: export TrainingPeaks workouts as .zwo files into a local folder, save that folder path here, then click "Import workouts".</div>
-        </div>
-      </div>
+    <div class="col-sm-8 col-md-6">
       <form id="trainingpeaks" action="{{ url_for('trainingpeaks', username=username) }}" method="post" class="top-buffer">
         <div class="row">
           <div class="col-md-12">
@@ -44,6 +36,16 @@
           </ul>
         {% endif %}
       {% endwith %}
+    </div>
+    <div class="col-sm-8 col-md-6">
+      <div class="list-group top-buffer">
+        <div class="list-group-item py-2">
+          <div class="text-shadow">{{ message }}</div>
+        </div>
+        <div class="list-group-item py-2">
+          <div class="text-shadow">Manual bridge mode: export TrainingPeaks workouts as .zwo files into a folder, save that folder path here, then click "Import workouts".</div>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
