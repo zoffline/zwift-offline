@@ -83,5 +83,21 @@
         {% endif %}
       {% endwith %}
     </div>
+    {% if workout_sync_status %}
+      <div class="col-sm-8 col-md-6">
+        <ul class="list-group top-buffer">
+          <li class="list-group-item py-2">
+            <div class="text-shadow">Workout provider: {{ active_workout_provider or 'not selected' }}</div>
+          </li>
+          <li class="list-group-item py-2">
+            {% if workout_sync_status.metadata %}
+              <div class="text-shadow"><small>{{ workout_sync_status.metadata.name or workout_sync_status.metadata.filename }}</small></div>
+            {% else %}
+              <div class="text-shadow"><small>No synced workout.</small></div>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

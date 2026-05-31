@@ -8,6 +8,7 @@
     <div class="col-md-12">
       <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
       {% if aid or akey %}
+        <a href="{{ url_for('intervals_sync', username=username) }}" class="btn btn-sm btn-secondary">Sync today's workout</a>
         <a href="/delete/intervals_credentials.bin" class="btn btn-sm btn-danger">Remove credentials</a>
       {% endif %}
     </div>
@@ -43,5 +44,19 @@
         {% endif %}
       {% endwith %}
     </div>
+    {% if sync_status and aid and akey %}
+      <div class="col-sm-8 col-md-6">
+        <ul class="list-group top-buffer">
+          <li class="list-group-item py-2">
+            {% if sync_status.metadata %}
+              <div class="text-shadow">Synced workout: {{ sync_status.metadata.name or sync_status.metadata.filename }}</div>
+            {% else %}
+              <div class="text-shadow">No synced Intervals workout.</div>
+              <div class="text-shadow"><small>Use "Sync today's workout" before launching Zwift.</small></div>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

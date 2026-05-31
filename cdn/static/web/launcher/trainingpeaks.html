@@ -1,0 +1,51 @@
+{% extends "./layout.html" %}
+{% block content %}
+  <h1><div class="text-shadow">TrainingPeaks</div></h1>
+  {% if username != "zoffline" %}
+    <h4 class="text-shadow">Logged in as {{ username }}</h4>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-12">
+      <a href="{{ url_for('settings', username=username) }}" class="btn btn-sm btn-secondary">Back</a>
+      <a href="{{ url_for('trainingpeaks_sync', username=username) }}" class="btn btn-sm btn-secondary">Import workouts</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-8 col-md-6">
+      <form id="trainingpeaks" action="{{ url_for('trainingpeaks', username=username) }}" method="post" class="top-buffer">
+        <div class="row">
+          <div class="col-md-12">
+            <label class="col-form-label col-form-label-sm text-shadow">Bridge folder</label>
+            <input type="text" id="bridge_folder" name="bridge_folder" value="{{ bridge_folder }}" class="form-control form-control-sm" placeholder="/path/to/TrainingPeaks/exports">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 top-buffer">
+            <input type="submit" value="Save bridge folder" class="btn btn-sm btn-light">
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-group top-buffer">
+          {% for message in messages %}
+            <li class="list-group-item py-2">
+              <div class="text-shadow">{{ message }}</div>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+    <div class="col-sm-8 col-md-6">
+      <div class="list-group top-buffer">
+        <div class="list-group-item py-2">
+          <div class="text-shadow">{{ message }}</div>
+        </div>
+        <div class="list-group-item py-2">
+          <div class="text-shadow">Manual bridge mode: export TrainingPeaks workouts as .zwo files into a folder, save that folder path here, then click "Import workouts".</div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
