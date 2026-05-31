@@ -77,6 +77,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
               - TZ=Europe/London
           volumes:
               - ./storage/:/usr/src/app/zwift-offline/storage
+              - ${ZWIFT_WORKOUTS_DIR:-~/Documents/Zwift/Workouts}:/root/Documents/Zwift/Workouts
           ports:
               - 80:80
               - 443:443
@@ -85,6 +86,7 @@ zoffline can be installed on the same machine as Zwift or another local machine.
           restart: unless-stopped
   ```
   * In the ``volumes`` tag replace ``./storage/`` before the ``:`` with the directory path you want to use as your local zoffline data store.
+  * Set ``ZWIFT_WORKOUTS_DIR`` if your local Zwift workouts folder is not ``~/Documents/Zwift/Workouts``.
 * If you are not running zoffline on the same PC that Zwift is running: create a ``server-ip.txt`` file in the ``storage`` directory containing the IP address of the PC running zoffline.
 * Start zoffline with: ``docker-compose up -d``
 </details>
@@ -437,4 +439,3 @@ this project and does not endorse this project.
 
 All product and company names are trademarks of their respective holders. Use of
 them does not imply any affiliation with or endorsement by them.
-
