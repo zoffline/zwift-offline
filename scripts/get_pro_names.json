@@ -1,0 +1,455 @@
+{
+  "XDS Astana Team": {
+    "abv": "XAT",
+    "jersey_name": "ASTANA PRO TEAM",
+    "jersey_signature": 1969335676,
+    "helmet_name": "Ekoi",
+    "helmet_signature": 2566547961
+  },
+  "Uno-X Mobility": {
+    "abv": "UXM",
+    "womens_jersey_name": "Uno-X Mobility 2025",
+    "womens_jersey_signature": 1955353089,
+    "jersey_name": "Uno-X Mobility 2025",
+    "jersey_signature": 1955353089,
+    "bike_name": "Ridley Noah Fast 2019",
+    "bike_signature": 4288910569
+  },
+  "UAE Team Emirates - XRG": {
+    "abv": "UEX",
+    "jersey_name": "UAE",
+    "jersey_signature": 1751349769,
+    "bike_name": "Colnago V3RS",
+    "bike_signature": 3628259811,
+    "front_wheel_name": "Enve G23",
+    "front_wheel_signature": 190867464,
+    "rear_wheel_name": "Enve SES 4.5 PRO",
+    "rear_wheel_signature": 635106022
+  },
+  "Team Visma | Lease a Bike": {
+    "abv": "TVL",
+    "bike_name": "Cervelo Aspero 5",
+    "bike_signature": 1025859452,
+    "helmet_name": "Giro Vanquish",
+    "helmet_signature": 302247979
+  },
+  "Team Picnic PostNL": {
+    "abv": "TPP"
+  },
+  "Team Jayco AlUla": {
+    "abv": "JAY",
+    "jersey_name": "Team Jayco Alula 2023",
+    "jersey_signature": 1912060275,
+    "bike_name": "Giant Propel Advanced SL Disc",
+    "bike_signature": 103914490,
+    "front_wheel_name": "Cadex 42",
+    "front_wheel_signature": 1497226614,
+    "rear_wheel_name": "Cadex Max 50",
+    "rear_wheel_signature": 689667921,
+    "helmet_name": "Giant Backwards Cap",
+    "helmet_signature": 3630601017
+  },
+  "Soudal Quick-Step": {
+    "abv": "SOQ",
+    "jersey_name": "Soudal Quick-Step",
+    "jersey_signature": 1343864259,
+    "bike_name": "Specialized S-Works Tarmac SL8",
+    "bike_signature": 687998653,
+    "front_wheel_name": "Roval Alpinist CLX",
+    "front_wheel_signature": 192959988,
+    "rear_wheel_name": "Roval PROJECT 74",
+    "rear_wheel_signature": 21937401,
+    "helmet_name": "Specialized 2019",
+    "helmet_signature": 1081853028
+  },
+  "Red Bull - BORA - hansgrohe": {
+    "abv": "RBH",
+    "jersey_name": "Bora-Hansgrohe",
+    "jersey_signature": 321508751,
+    "bike_frame_colour_name": "Specialized Tarmac Pro-Bora Hansgrohe",
+    "bike_frame_colour_signature": 4047656247,
+    "front_wheel_name": "Roval Alpinist CLX",
+    "front_wheel_signature": 192959988,
+    "rear_wheel_name": "Roval PROJECT 74",
+    "rear_wheel_signature": 21937401,
+    "helmet_name": "Specialized 2019",
+    "helmet_signature": 1081853028,
+    "shoe_name": "Specialized Mix Tape",
+    "shoe_signature": 4004475280
+  },
+  "NSN Cycling Team": {
+    "abv": "NSN",
+    "jersey_name": "Sumo Leamington Cycling Team",
+    "jersey_signature": 584555341,
+    "bike_name": "Scott Foil 2023",
+    "bike_signature": 43434703,
+    "front_wheel_name": "Zipp ZIPP 303 XPLR SW",
+    "front_wheel_signature": 162142627,
+    "rear_wheel_name": "Zipp 808",
+    "rear_wheel_signature": 214800767
+  },
+  "Alpecin-Premier Tech": {
+    "abv": "APT",
+    "jersey_name": "Alpecin–Premier Tech 2026",
+    "jersey_signature": 3896519682,
+    "bike_frame_colour_name": "Canyon Aeroad 2021-Aeroad Alpecin Fenix 2021",
+    "bike_frame_colour_signature": 3850644062,
+    "front_wheel_name": "Shimano DURA-ACE C60",
+    "front_wheel_signature": 272842014,
+    "rear_wheel_name": "Shimano C40",
+    "rear_wheel_signature": 530549195,
+    "helmet_name": "ABUS GameChanger",
+    "helmet_signature": 1387973863
+  },
+  "Movistar Team": {
+    "abv": "MOV",
+    "womens_jersey_name": "Movistar",
+    "womens_jersey_signature": 1218867486,
+    "jersey_name": "Movistar",
+    "jersey_signature": 1218867486,
+    "bike_frame_colour_name": "Canyon Aeroad Team Edition-Movistar 2023",
+    "bike_frame_colour_signature": 2280475316,
+    "front_wheel_name": "Zipp ZIPP 303 XPLR SW",
+    "front_wheel_signature": 162142627,
+    "rear_wheel_name": "Zipp 808",
+    "rear_wheel_signature": 214800767,
+    "helmet_name": "ABUS GameChanger",
+    "helmet_signature": 1387973863,
+    "shoe_name": "Fizik Vento Infinito Carbon",
+    "shoe_signature": 3251024571
+  },
+  "Bahrain - Victorious": {
+    "abv": "TBV"
+  },
+  "Decathlon CMA CGM Team": {
+    "abv": "DCT",
+    "jersey_name": "Decathlon CMA CGM Team",
+    "jersey_signature": 1431906776,
+    "bike_name": "VanRysel RCR-F",
+    "bike_signature": 2412086003,
+    "front_wheel_name": "SwissSide HADRON Ultimate 650",
+    "front_wheel_signature": 3197301744,
+    "rear_wheel_name": "SwissSide HADRON Ultimate 650",
+    "rear_wheel_signature": 1196922082
+  },
+  "EF Education - EasyPost": {
+    "abv": "EFE",
+    "bike_frame_colour_name": "Cannondale Super Six Evo-Education First",
+    "bike_frame_colour_signature": 507139888,
+    "helmet_name": "POC Ventral Air EF",
+    "helmet_signature": 3707571564,
+    "shoe_name": "nimbl Zwift Games",
+    "shoe_signature": 1021228769
+  },
+  "Groupama - FDJ United": {
+    "abv": "GFC",
+    "jersey_name": "Groupama FDJ",
+    "jersey_signature": 3020536025,
+    "front_wheel_name": "Miche Deva RD 62",
+    "front_wheel_signature": 3023364973,
+    "rear_wheel_name": "Miche Deva RD 62",
+    "rear_wheel_signature": 3790155372
+  },
+  "INEOS Grenadiers": {
+    "abv": "IGD",
+    "jersey_name": "INEOS Grenadiers 2022 Pro",
+    "jersey_signature": 542207259,
+    "bike_frame_colour_name": "Pinarello Dogma F12-Ineos",
+    "bike_frame_colour_signature": 3218850857
+  },
+  "Lidl - Trek": {
+    "abv": "LTK",
+    "womens_jersey_name": "Trek",
+    "womens_jersey_signature": 2757515117,
+    "jersey_name": "Trek",
+    "jersey_signature": 2757515117,
+    "bike_frame_colour_name": "Trek Super Caliber 2020-Trek Super Caliber",
+    "bike_frame_colour_signature": 2447024760,
+    "front_wheel_name": "Bontrager Aeolus5",
+    "front_wheel_signature": 702195190,
+    "rear_wheel_name": "Bontrager Aeolus5",
+    "rear_wheel_signature": 3594144634
+  },
+  "Lotto Intermarché": {
+    "abv": "LOI",
+    "jersey_name": "Lotto",
+    "jersey_signature": 4130579852,
+    "helmet_name": "Ekoi",
+    "helmet_signature": 2566547961
+  },
+  "Netcompany INEOS": {
+    "abv": "NCI",
+    "bike_frame_colour_name": "Pinarello Dogma F12-Ineos",
+    "bike_frame_colour_signature": 3218850857
+  },
+  "Tudor Pro Cycling Team": {
+    "abv": "TUD",
+    "jersey_name": "NTT Pro Cycling Team",
+    "jersey_signature": 3612223524,
+    "bike_name": "BMC SLR01",
+    "bike_signature": 389045293,
+    "front_wheel_name": "DTSwiss ARC 1100 DICUT 65",
+    "front_wheel_signature": 195571528,
+    "rear_wheel_name": "DTSwiss ARC 1100 DICUT 85/Disc",
+    "rear_wheel_signature": 590647095
+  },
+  "Pinarello Q36.5 Pro Cycling Team": {
+    "abv": "PQT",
+    "jersey_name": "Q36.5 Pro Team",
+    "jersey_signature": 1185917078,
+    "bike_name": "Pinarello Dogma GR",
+    "bike_signature": 425163914,
+    "front_wheel_name": "Zipp ZIPP 303 XPLR SW",
+    "front_wheel_signature": 162142627,
+    "rear_wheel_name": "Zipp 808",
+    "rear_wheel_signature": 214800767,
+    "helmet_name": "ABUS GameChanger",
+    "helmet_signature": 1387973863
+  },
+  "Cofidis": {
+    "abv": "COF",
+    "jersey_name": "Team Cofidis",
+    "jersey_signature": 900253913
+  },
+  "TotalEnergies": {
+    "abv": "TEN",
+    "bike_name": "Cube Litening C:68X",
+    "bike_signature": 1703496698,
+    "front_wheel_name": "Shimano DURA-ACE C60",
+    "front_wheel_signature": 272842014,
+    "rear_wheel_name": "Shimano C40",
+    "rear_wheel_signature": 530549195
+  },
+  "Unibet Rose Rockets": {
+    "abv": "URR",
+    "helmet_name": "Kask Elemento",
+    "helmet_signature": 857849616
+  },
+  "Caja Rural - Seguros RGA": {
+    "abv": "CJR"
+  },
+  "Team Polti VisitMalta": {
+    "abv": "PTV",
+    "helmet_name": "Kask Elemento",
+    "helmet_signature": 857849616
+  },
+  "Burgos Burpellet BH": {
+    "abv": "BBH",
+    "helmet_name": "Ekoi",
+    "helmet_signature": 2566547961
+  },
+  "Equipo Kern Pharma": {
+    "abv": "EKP",
+    "bike_name": "Giant Propel Advanced SL Disc",
+    "bike_signature": 103914490,
+    "front_wheel_name": "Cadex 42",
+    "front_wheel_signature": 1497226614,
+    "rear_wheel_name": "Cadex Max 50",
+    "rear_wheel_signature": 689667921,
+    "shoe_name": "Bont Helix",
+    "shoe_signature": 2095963351
+  },
+  "Bardiani CSF 7 Saber": {
+    "abv": "BCS",
+    "front_wheel_name": "Campagnolo Bora Ultra 35",
+    "front_wheel_signature": 1053884173,
+    "rear_wheel_name": "Campagnolo Bora Ultra 35",
+    "rear_wheel_signature": 1614586487
+  },
+  "Solution Tech NIPPO Rali": {
+    "abv": "TFT"
+  },
+  "FDJ United - SUEZ": {
+    "abv": "TFS",
+    "womens_jersey_name": "FDJ Suez",
+    "womens_jersey_signature": 1668644908,
+    "jersey_name": "FDJ Suez",
+    "jersey_signature": 1668644908,
+    "bike_name": "Specialized S-Works Tarmac SL8",
+    "bike_signature": 687998653,
+    "front_wheel_name": "Roval Alpinist CLX",
+    "front_wheel_signature": 192959988,
+    "rear_wheel_name": "Roval PROJECT 74",
+    "rear_wheel_signature": 21937401,
+    "helmet_name": "Specialized 2019",
+    "helmet_signature": 1081853028,
+    "shoe_name": "Specialized Mix Tape",
+    "shoe_signature": 4004475280
+  },
+  "UAE Team L'IMAD": {
+    "abv": "UAD",
+    "womens_jersey_name": "UAE",
+    "womens_jersey_signature": 1751349769,
+    "jersey_name": "UAE",
+    "jersey_signature": 1751349769,
+    "bike_name": "Colnago V3RS",
+    "bike_signature": 3628259811,
+    "front_wheel_name": "Enve G23",
+    "front_wheel_signature": 190867464,
+    "rear_wheel_name": "Enve SES 4.5 PRO",
+    "rear_wheel_signature": 635106022
+  },
+  "Team SD Worx - Protime": {
+    "abv": "SDW",
+    "womens_jersey_name": "Team SD Worx",
+    "womens_jersey_signature": 1494272741,
+    "jersey_name": "Team SD Worx",
+    "jersey_signature": 1494272741,
+    "bike_name": "Specialized S-Works Tarmac SL8",
+    "bike_signature": 687998653,
+    "front_wheel_name": "Roval Alpinist CLX",
+    "front_wheel_signature": 192959988,
+    "rear_wheel_name": "Roval PROJECT 74",
+    "rear_wheel_signature": 21937401
+  },
+  "CANYON//SRAM": {
+    "abv": "CSR",
+    "womens_jersey_name": "CANYON//SRAM Generation",
+    "womens_jersey_signature": 189587516,
+    "jersey_name": "CANYON//SRAM Generation",
+    "jersey_signature": 189587516,
+    "bike_frame_colour_name": "Canyon Aeroad 2021-Canyon Aeroad 2020 ZA Men",
+    "bike_frame_colour_signature": 4285075766
+  },
+  "Fenix-Premier Tech": {
+    "abv": "FPC",
+    "womens_jersey_name": "Fenix-Premier Tech 2026 TdFFaZ",
+    "womens_jersey_signature": 339424314,
+    "jersey_name": "Fenix-Premier Tech 2026 TdFFaZ",
+    "jersey_signature": 339424314
+  },
+  "AG Insurance - Soudal Team": {
+    "abv": "AGS",
+    "womens_jersey_name": "AG Insurance - Soudal",
+    "womens_jersey_signature": 1633681400,
+    "jersey_name": "AG Insurance - Soudal",
+    "jersey_signature": 1633681400,
+    "bike_name": "Specialized S-Works Tarmac SL8",
+    "bike_signature": 687998653,
+    "front_wheel_name": "Roval Alpinist CLX",
+    "front_wheel_signature": 192959988,
+    "rear_wheel_name": "Roval PROJECT 74",
+    "rear_wheel_signature": 21937401,
+    "helmet_name": "Specialized 2019",
+    "helmet_signature": 1081853028,
+    "shoe_name": "Specialized Mix Tape",
+    "shoe_signature": 4004475280
+  },
+  "EF Education-Oatly": {
+    "abv": "EFO"
+  },
+  "Liv AlUla Jayco": {
+    "abv": "LIV",
+    "womens_jersey_name": "Liv Alula Jayco 2025",
+    "womens_jersey_signature": 1099349849,
+    "jersey_name": "Liv Alula Jayco 2025",
+    "jersey_signature": 1099349849,
+    "bike_frame_colour_name": "Liv LivLangma2021-Liv Langma",
+    "bike_frame_colour_signature": 3593209473,
+    "front_wheel_name": "Cadex 42",
+    "front_wheel_signature": 1497226614,
+    "rear_wheel_name": "Cadex Max 50",
+    "rear_wheel_signature": 689667921
+  },
+  "Laboral Kutxa - Fundación Euskadi": {
+    "abv": "LKF"
+  },
+  "Human Powered Health": {
+    "abv": "HPH",
+    "womens_jersey_name": "Human Powered Health Fan",
+    "womens_jersey_signature": 854534852,
+    "jersey_name": "Human Powered Health Fan",
+    "jersey_signature": 854534852,
+    "bike_name": "Factor One",
+    "bike_signature": 3469325930
+  },
+  "VolkerWessels Cycling Team": {
+    "abv": "VWT",
+    "bike_name": "Specialized S-Works Tarmac SL8",
+    "bike_signature": 687998653,
+    "front_wheel_name": "FFWD RYOT55",
+    "front_wheel_signature": 4237316283,
+    "rear_wheel_name": "FFWD RYOT55",
+    "rear_wheel_signature": 4151096267,
+    "helmet_name": "Specialized 2019",
+    "helmet_signature": 1081853028
+  },
+  "Cofidis Women Team": {
+    "abv": "CWT",
+    "womens_jersey_name": "Team Cofidis",
+    "womens_jersey_signature": 900253913,
+    "jersey_name": "Team Cofidis",
+    "jersey_signature": 900253913
+  },
+  "Liv AlUla Jayco Women's Continental Team": {
+    "abv": "LJA",
+    "womens_jersey_name": "Continental",
+    "womens_jersey_signature": 273275384,
+    "jersey_name": "Continental",
+    "jersey_signature": 273275384
+  },
+  "Lotto Intermarché Ladies": {
+    "abv": "LIL",
+    "womens_jersey_name": "Lotto",
+    "womens_jersey_signature": 4130579852,
+    "jersey_name": "Lotto",
+    "jersey_signature": 4130579852
+  },
+  "NEXETIS": {
+    "abv": "NXT",
+    "front_wheel_name": "DTSwiss ARC 1100 DICUT 65",
+    "front_wheel_signature": 195571528,
+    "rear_wheel_name": "DTSwiss ARC 1100 DICUT 85/Disc",
+    "rear_wheel_signature": 590647095,
+    "helmet_name": "Giro Vanquish",
+    "helmet_signature": 302247979
+  },
+  "Hitec Products - Fluid Control": {
+    "abv": "HPU"
+  },
+  "Ma Petite Entreprise": {
+    "abv": "MPE",
+    "bike_name": "Factor One",
+    "bike_signature": 3469325930,
+    "helmet_name": "Ekoi",
+    "helmet_signature": 2566547961
+  },
+  "Vini Fantini - BePink": {
+    "abv": "BPK",
+    "womens_jersey_name": "Vini Fantini",
+    "womens_jersey_signature": 1805412330,
+    "jersey_name": "Vini Fantini",
+    "jersey_signature": 1805412330
+  },
+  "Mayenne Monbana My Pie": {
+    "abv": "MMM"
+  },
+  "UAE Development Team L'IMAD": {
+    "abv": "UDT",
+    "womens_jersey_name": "UAE",
+    "womens_jersey_signature": 1751349769,
+    "jersey_name": "UAE",
+    "jersey_signature": 1751349769
+  },
+  "St Michel - Preference Home - Auber93": {
+    "abv": "AUB",
+    "bike_name": "Cannondale Super Six Evo",
+    "bike_signature": 529764489,
+    "front_wheel_name": "Mavic Cosmic CXR60c",
+    "front_wheel_signature": 288225210,
+    "rear_wheel_name": "Mavic Cosmic Ultimate UST",
+    "rear_wheel_signature": 413360396
+  },
+  "Minimax Cycling Team": {
+    "abv": "MNX"
+  },
+  "Aromitalia Vaiano": {
+    "abv": "VAI"
+  },
+  "XDS China Women Team": {
+    "abv": "XCW"
+  },
+  "Li Ning Star Ladies": {
+    "abv": "LNL"
+  }
+}
