@@ -4,29 +4,67 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '*'
 
 jobs:
   build:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
+        cache: 'pip'
 
-    - uses: engineerd/configurator@v0.0.10
-      with:
-        name: "upx.exe"
-        url: "https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-win64.zip"
-        pathInArchive: "upx-4.2.2-win64/upx.exe"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller garth==0.6.3
 
-    - run: pip install -r requirements.txt
-    - run: pip install pyinstaller garth==0.6.3
-    - run: pyinstaller standalone.spec
+    - name: Download and extract UPX
+      run: |
+        $url = "https://github.com/upx/upx/releases/download/v5.2.1/upx-5.2.1-win64.zip"
+        $output = "$env:TEMP\upx.zip"
+        $extractPath = "$env:TEMP\upx"
+        Invoke-WebRequest -Uri $url -OutFile $output
+        Expand-Archive -Path $output -DestinationPath $extractPath -Force
+        Add-Content -Path $env:GITHUB_PATH -Value "$extractPath\upx-5.2.1-win64"
 
-    - uses: actions/upload-artifact@v4
+    - name: Build executable
+      run: |
+        pyinstaller standalone.spec
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
         path: dist/*
+
+    - name: Create release
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG_NAME: ${{ github.ref_name }}
+      shell: bash
+      run: |
+        VERSION=$(xmllint --xpath "string(//Zwift/@version)" cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml)
+        cat << EOF > notes.md
+        zoffline Windows only standalone executable for Zwift $VERSION.
+
+        Note: The executable is made with pyinstaller. An unfortunate side effect is that some anti-virus software may falsely flag pyinstaller executables as malware. This is a [known issue](https://github.com/pyinstaller/pyinstaller/issues?q=is%3Aissue%20label%3Aantivirus-false-positives) and unavoidable. If you prefer, you can not use this exe and instead run zoffline directly from the source code (2nd installation method in the README).
+        EOF
+        if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+          gh release edit "$TAG_NAME" --title "zoffline for Zwift $VERSION" --notes-file notes.md
+        else
+          gh release create "$TAG_NAME" --title "zoffline for Zwift $VERSION" --notes-file notes.md
+        fi
+        gh release upload "$TAG_NAME" dist/* --clobber
