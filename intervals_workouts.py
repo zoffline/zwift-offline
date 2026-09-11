@@ -92,10 +92,6 @@ def upload_activity(athlete_id, api_key, activity, workout_metadata=None, sessio
     upload_url = build_activity_upload_url(base_url, athlete_id, activity.name, paired_event_id=paired_event_id)
     upload_response = session.post(upload_url, files={"file": BytesIO(activity.fit)}, auth=HTTPBasicAuth("API_KEY", api_key), timeout=30)
     upload_response.raise_for_status()
-    if paired_event_id:
-        mark_done_url = f"{base_url}/athlete/{athlete_id}/events/{paired_event_id}/mark-done"
-        mark_done_response = session.post(mark_done_url, auth=HTTPBasicAuth("API_KEY", api_key), timeout=30)
-        mark_done_response.raise_for_status()
     return {
         "status": "uploaded",
         "paired": bool(paired_event_id),
