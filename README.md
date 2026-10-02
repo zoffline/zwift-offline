@@ -254,21 +254,10 @@ To obtain your current profile:
 <details><summary>Android (non-rooted device)</summary>
 
 * Install apk-mitm (https://github.com/shroudedcode/apk-mitm)
-* Open ``apk-mitm/dist/tools/apktool.js`` (run ``npm root -g`` to find its location) and edit it like this:
-  ``` js
-      decode(inputPath, outputPath) {
-          return this.run([
-              'decode',
-              '-resm', // add this
-              'dummy', // add this
-              inputPath,
-              '--output',
-              outputPath,
-              '--frame-path',
-              this.options.frameworkPath,
-          ], 'decoding');
-      }
-  ```
+* [OPTIONAL] To enable the fitness widget, install Apktool (https://github.com/iBotPeaches/Apktool)
+  * Run ``apktool d zca.apk -o zca_decoded``
+  * Edit ``zca_decoded/res/xml/remote_config_defaults.xml`` changing ``react_native_fitness_view`` to ``true``
+  * Run ``apktool b zca_decoded -o zca.apk``
 * Copy the file [ssl/cert-zwift-com.pem](https://github.com/zoffline/zwift-offline/raw/master/ssl/cert-zwift-com.pem) in this repo and the Zwift Companion apk (e.g. ``zca.apk``) to a known location
 * Open Command Prompt, cd to that location and run
   * ``apk-mitm --certificate cert-zwift-com.pem zca.apk``

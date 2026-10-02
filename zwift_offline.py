@@ -342,6 +342,7 @@ class GoalMetrics(db.Model):
     weekGoalTimeMinutes = db.Column(db.Integer)
     lastUpdated = db.Column(db.Text)
     currentGoalSetting = db.Column(db.Text)
+    currentGoalSource = db.Column(db.Text)
 
 class Playback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -4584,6 +4585,7 @@ with app.app_context():
     if check_columns(Playback, 'playback'):
         update_playback()
     check_columns(RouteResult, 'route_result')
+    check_columns(GoalMetrics, 'goal_metrics')
     migrate_database()
     db.session.close()
 
