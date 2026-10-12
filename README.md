@@ -246,6 +246,7 @@ To obtain your current profile:
 
 * Use the "Settings - Intervals" button in the launcher window to enter your credentials (if using Android, access ``https://<zoffline_ip>/intervals/zoffline/``).
 * Copy "Athlete ID" and "API Key" from https://intervals.icu/settings under "Developer Settings".
+* When Intervals.icu is the selected workout provider, starting Zwift syncs today's workout even if the client skips the web launcher (e.g. Android with a saved login). Sync failures do not prevent game login.
 
 </details>
 
