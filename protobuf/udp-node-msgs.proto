@@ -17,6 +17,7 @@ enum WA_TYPE {
 	WAT_RQ_PROF = 9; //proto::RequestProfileFromServer
 	WAT_INV_W = 10;  //proto::ReceiveInvitationWorldAttribute
 	WAT_KICKED = 11; //no payload
+	PLAYER_FITNESS_METRICS_UPDATED = 18; //no payload
 	WAT_WTIME = 100; //g_WorldTime := payload (GOD message, may be ignored if ZWIFT\CONFIG\IGNOREGODMESSAGES=1)
 	WAT_RTIME = 101; //BlimpEntity::SetRoadTime(payload), also GOD message
 	WAT_B_ACT = 102; //BikeEntity::PerformAction(payload)
