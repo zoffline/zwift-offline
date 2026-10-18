@@ -47,14 +47,18 @@ with zo.app.app_context():
     zo.make_profile_dir(901)
 
 client = zo.app.test_client()
+# Let None represent an absent header, rather than Flask's default test agent.
+client.environ_base.pop('HTTP_USER_AGENT', None)
 with client.session_transaction() as session:
     session['_user_id'] = user_id
     session['_fresh'] = True
 
 login = zo.login_pb2.LoginRequest(key=b'0123456789abcdef')
+ANDROID_USER_AGENT = 'Zwift/1.0 (Android 14)'
 
-def game_login():
-    response = client.post('/api/users/login', data=login.SerializeToString())
+def game_login(user_agent=ANDROID_USER_AGENT):
+    headers = {} if user_agent is None else {'User-Agent': user_agent}
+    response = client.post('/api/users/login', data=login.SerializeToString(), headers=headers)
     assert response.status_code == 200, response.data
     parsed = zo.login_pb2.LoginResponse()
     parsed.ParseFromString(response.data)
@@ -67,13 +71,28 @@ with patch.object(zo, 'resolve_workout_provider_for_player', return_value='inter
     game_login()
     sync.assert_called_once_with(901, timeout=(2, 3))
 
+# Desktop clients retain launcher/manual sync; missing and empty headers are safe.
+for user_agent in [
+    'Zwift/1.0 (Windows 11)', 'Zwift/1.0 (Macintosh)',
+    'Mozilla/5.0 (X11; Linux x86_64)', None, '',
+]:
+    with patch.object(zo, 'sync_workout_at_game_login') as sync:
+        game_login(user_agent)
+        sync.assert_not_called()
+
+# Match platform names case-insensitively.
+with patch.object(zo, 'sync_workout_at_game_login') as sync:
+    game_login('Zwift/1.0 (aNdRoId 14)')
+    sync.assert_called_once_with(901)
+
 # Exercise the real bearer-token-to-session decorator used by a cached app login.
 with zo.app.test_request_context():
     saved_token = zo.fake_jwt_with_session_cookie(encode_cookie(user_id))['access_token']
 with patch.object(zo, 'resolve_workout_provider_for_player', return_value='intervals-icu'), \
      patch.object(zo, 'sync_intervals_workout_for_player', return_value={'status':'synced'}) as sync:
     response = zo.app.test_client().post('/api/users/login', data=login.SerializeToString(),
-                                        headers={'Authorization':'Bearer '+saved_token})
+                                        headers={'Authorization':'Bearer '+saved_token,
+                                                 'User-Agent': ANDROID_USER_AGENT})
     assert response.status_code == 200
     sync.assert_called_once_with(901, timeout=(2, 3))
 
@@ -98,7 +117,10 @@ for provider in [None, 'trainingpeaks']:
         sync.assert_not_called()
 
 # Authentication still rejects requests that have no session/token.
-assert zo.app.test_client().post('/api/users/login', data=login.SerializeToString()).status_code != 200
+with patch.object(zo, 'sync_workout_at_game_login') as sync:
+    assert zo.app.test_client().post('/api/users/login', data=login.SerializeToString(),
+                                    headers={'User-Agent': ANDROID_USER_AGENT}).status_code != 200
+    sync.assert_not_called()
 
 class Response:
     def __init__(self, payload=None, content=b''):
@@ -157,7 +179,10 @@ default_api = FakeIntervals([event])
 real_sync('test-athlete', 'test-key', lambda *args: None, session=default_api)
 assert default_api.timeouts == [30, 30]
 print(json.dumps({'status':'passed', 'checks':[
-    'authenticated game login imports today workout without web launcher',
+    'authenticated Android game login imports today workout without web launcher',
+    'desktop, missing and empty User-Agent skip game-login sync',
+    'Android User-Agent matching is case-insensitive',
+    'cached bearer-token login with Android User-Agent syncs',
     'timeouts and credential/provider errors do not deny login',
     'other providers and unlinked profiles untouched',
     'unauthenticated request rejected',

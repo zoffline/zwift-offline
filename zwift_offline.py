@@ -1688,7 +1688,8 @@ def api_users_login():
     req = login_pb2.LoginRequest()
     req.ParseFromString(request.stream.read())
     player_id = current_user.player_id
-    sync_workout_at_game_login(player_id)
+    if 'android' in request.headers.get('User-Agent', '').lower():
+        sync_workout_at_game_login(player_id)
     global_relay[player_id] = Relay(req.key)
     ghosts_enabled[player_id] = current_user.enable_ghosts
 
