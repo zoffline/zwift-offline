@@ -13,7 +13,7 @@ def metadata_file(storage_dir, player_id, provider):
 
 
 def build_metadata(provider, workout, filename):
-    return {
+    metadata = {
         'provider': provider,
         'event_id': workout.get('event_id', workout.get('id')),
         'name': workout.get('name', workout.get('title')),
@@ -22,6 +22,11 @@ def build_metadata(provider, workout, filename):
         'start_date': workout.get('start_date'),
         'synced_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
+    if provider == 'intervals-icu':
+        # Keep the provider's planned load; the home card must not estimate it.
+        metadata['description'] = workout.get('description')
+        metadata['icu_training_load'] = workout.get('icu_training_load')
+    return metadata
 
 
 def save_metadata(storage_dir, player_id, provider, workout, filename):

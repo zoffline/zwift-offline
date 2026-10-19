@@ -66,6 +66,7 @@ import intervals_workouts
 import trainingpeaks_workouts
 import workout_state
 import workouts_manifest
+import planned_workouts
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -1463,13 +1464,69 @@ def api_eventfeed():
 @app.route('/api/subscription/plan', methods=['GET'])
 @app.route('/api/quest/quests/all-quests', methods=['GET'])
 @app.route('/api/quest/quests/my-quests', methods=['GET'])
-@app.route('/api/workout/schedule/list', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
 @app.route('/api/assetcms/<path:path>', methods=['GET'])
 def api_assetcms(path):
     return jsonify()
+
+def current_planned_workout():
+    if resolve_workout_provider_for_player(current_user.player_id) != 'intervals-icu':
+        return None
+    if request.args.get('sport', 'CYCLING').upper() != 'CYCLING':
+        return None
+    metadata = load_intervals_workout_metadata(current_user.player_id)
+    return planned_workouts.build_workout(
+        STORAGE_DIR, current_user.player_id, metadata,
+        lambda workout_id: url_for('api_planned_workout_download', workout_id=workout_id, _external=True),
+    )
+
+
+def planned_workout_json(payload):
+    response = jsonify(payload)
+    response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+
+@app.route('/api/workout/schedule/list', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_workout_schedule_list():
+    workout = current_planned_workout()
+    return planned_workout_json([workout['schedule']] if workout else [])
+
+
+@app.route('/api/head-unit-bff/game-home', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_game_home():
+    workout = current_planned_workout()
+    return planned_workout_json(workout['home'] if workout else [])
+
+
+@app.route('/api/workout/workouts/<workout_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_planned_workout(workout_id):
+    workout = current_planned_workout()
+    if not workout or workout['id'] != workout_id:
+        return '', 404
+    return planned_workout_json(workout['schedule']['workoutSummary'])
+
+
+@app.route('/api/workout/workouts/<workout_id>/file.zwo', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_planned_workout_download(workout_id):
+    workout = current_planned_workout()
+    if not workout or workout['id'] != workout_id:
+        return '', 404
+    response = send_file(BytesIO(workout['content']), mimetype='application/xml',
+                         download_name=workout['filename'], max_age=0)
+    response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
 def api_head_unit_bff(path):
