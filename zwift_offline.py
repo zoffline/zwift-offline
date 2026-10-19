@@ -1494,6 +1494,8 @@ def api_empty_arrays():
 
 @app.route('/api/assetcms/<path:path>', methods=['GET'])
 def api_assetcms(path):
+    if path == 'delivery/tenant/production/static/asset/client_config/zwift/asset-cms-shared-artifacts/assets/client_config/partner_name_map.json/download':
+        return jsonify({'intervalsicu': 'Intervals icu'})
     return jsonify()
 
 def current_planned_workouts():

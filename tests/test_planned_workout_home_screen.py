@@ -353,8 +353,13 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
             self.assert_workout_download(response, expected[0]['workoutId'])
             response.close()
 
-    def test_for_you_and_other_placeholders_remain_unchanged(self):
+    def test_for_you_partner_name_and_other_placeholders(self):
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), {})
+        self.assertEqual(self.client.get(
+            '/api/assetcms/delivery/tenant/production/static/asset/client_config/zwift/'
+            'asset-cms-shared-artifacts/assets/client_config/partner_name_map.json/download'
+        ).get_json(), {'intervalsicu': 'Intervals icu'})
+        self.assertIsNone(self.client.get('/api/assetcms/other/download').get_json())
         self.assertEqual(self.client.get('/api/head-unit-bff/crm').get_json(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/home-challenges').get_json(), {'items': []})
 

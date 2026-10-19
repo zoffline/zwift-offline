@@ -19,6 +19,7 @@ identified the required ZWO `uniqueId` field.
 - `/api/head-unit-bff/carousels/for-you` returns `{}` so the client can display
   scheduled workouts in For You. This is the manually verified home-screen path;
   the separate Next Up card has not been independently verified.
+- The partner-name map labels the workout folder `Intervals icu`.
 - The original zfiles/manifest library remains available. Home-screen GETs do not
   synchronize, change state or create extra copies.
 
