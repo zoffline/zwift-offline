@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import re
+import tempfile
 
 
 def normalize_provider_name(provider):
@@ -31,10 +32,47 @@ def build_metadata(provider, workout, filename):
 
 def save_metadata(storage_dir, player_id, provider, workout, filename):
     payload = build_metadata(provider, workout, filename)
+    return write_metadata(storage_dir, player_id, provider, payload)
+
+
+def metadata_entries(payload):
+    """Read both the original single-workout format and a collection."""
+    if not isinstance(payload, dict):
+        return []
+    if 'workouts' in payload:
+        values = payload['workouts']
+        return [item for item in values if isinstance(item, dict)] if isinstance(values, list) else []
+    return [payload]
+
+
+def save_metadata_collection(storage_dir, player_id, provider, entries):
+    entries = list(entries)
+    # Retain the first entry's fields for the existing settings/status UI.
+    payload = dict(entries[0]) if entries else {'provider': provider}
+    payload['workouts'] = entries
+    return write_metadata(storage_dir, player_id, provider, payload)
+
+
+def remove_metadata_entry(storage_dir, player_id, provider, event_id):
+    payload = load_metadata(storage_dir, player_id, provider)
+    entries = metadata_entries(payload)
+    remaining = [item for item in entries if str(item.get('event_id')) != str(event_id)]
+    if len(remaining) != len(entries):
+        save_metadata_collection(storage_dir, player_id, provider, remaining)
+
+
+def write_metadata(storage_dir, player_id, provider, payload):
     file = metadata_file(storage_dir, player_id, provider)
     os.makedirs(os.path.dirname(file), exist_ok=True)
-    with open(file, 'w') as fd:
-        json.dump(payload, fd)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(file), delete=False) as fd:
+            temporary = fd.name
+            json.dump(payload, fd)
+        os.replace(temporary, file)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.remove(temporary)
     return payload
 
 

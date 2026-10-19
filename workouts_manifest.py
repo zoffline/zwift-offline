@@ -84,11 +84,11 @@ def upsert_manifest_entry(workouts_dir, filename, content, timestamp=None):
     return entry
 
 
-def remove_prefixed_workouts(workouts_dir, prefixes):
+def remove_prefixed_workouts(workouts_dir, prefixes, keep_filenames=()):
     entries = load_manifest(workouts_dir)
     removed = 0
     for entry in entries:
-        if entry['name'].startswith(tuple(prefixes)):
+        if entry['name'].startswith(tuple(prefixes)) and entry['name'] not in keep_filenames:
             entry['deleted'] = True
             removed += 1
     save_manifest(workouts_dir, entries)

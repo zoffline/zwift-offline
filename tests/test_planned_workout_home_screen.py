@@ -351,5 +351,128 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
             self.assertTrue(self.client.get('/api/head-unit-bff/game-home').get_json())
         self.assertEqual((path.read_bytes(), path.stat().st_mtime_ns), before)
 
+    def sync_events(self, events, fail_id=None):
+        class Response:
+            def __init__(self, payload=None, content=b''):
+                self.payload, self.content = payload, content
+            def raise_for_status(self):
+                pass
+            def json(self):
+                return self.payload
+        class Provider:
+            def get(inner, url, **kwargs):
+                if '/events?' in url:
+                    return Response(payload=events)
+                event_id = int(url.split('/events/')[1].split('/')[0])
+                if event_id == fail_id:
+                    raise TimeoutError('synthetic download failure')
+                return Response(content=self.content.replace(b'Duration="60"',
+                                ('Duration="%s"' % event_id).encode()))
+        sync = zo.intervals_workouts.sync_workout
+        with patch.object(zo, 'decrypt_credentials', return_value=('test-athlete', 'test-key')), \
+             patch.object(zo.intervals_workouts, 'sync_workout',
+                          side_effect=lambda *args, **kwargs: sync(*args, session=Provider(), **kwargs)):
+            with zo.app.app_context():
+                return zo.sync_intervals_workout_for_player(self.player_id, timeout=(2, 3))
+
+    def today_events(self):
+        day = datetime.date.today().isoformat()
+        return [{'id': 101, 'name': 'First workout', 'start_date_local': day + 'T08:00:00'},
+                {'id': 102, 'name': 'Second workout', 'start_date_local': day + 'T18:00:00'}]
+
+    def test_all_today_workouts_have_distinct_cards_assets_and_stable_resync(self):
+        result = self.sync_events(self.today_events())
+        self.assertEqual((result['status'], result['count']), ('synced', 2))
+        items = self.schedule()
+        self.assertEqual(len(items), 2)
+        self.assertEqual(len({item['workoutId'] for item in items}), 2)
+        self.assertEqual(len({item['scheduleId'] for item in items}), 2)
+        for item, duration in zip(items, (101, 102)):
+            self.assertEqual(item['workoutSummary']['duration'], duration)
+            response = zo.app.test_client().get(item['workoutUri'])
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(('Duration="%s"' % duration).encode(), response.data)
+            response.close()
+            self.assertEqual(self.client.get('/api/workout/workouts/' + item['workoutId']).get_json(),
+                             item['workoutSummary'])
+        self.sync_events(self.today_events())
+        self.assertEqual(self.schedule(), items)
+        with zo.app.app_context():
+            rows = zo.Zfile.query.filter_by(player_id=self.player_id, folder='customworkouts').all()
+            self.assertEqual(len([row for row in rows if row.filename.startswith('intervals-icu-')]), 2)
+        folder = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts'
+        self.assertEqual(len(list(folder.glob('intervals-icu-*.zwo'))), 2)
+        entries = zo.workouts_manifest.load_manifest(str(folder))
+        self.assertEqual(len([entry for entry in entries if not entry['deleted']]), 2)
+
+    def test_partial_download_failure_preserves_the_previous_entire_collection(self):
+        self.sync_events(self.today_events())
+        before = self.schedule()
+        changed = self.today_events() + [dict(self.today_events()[1], id=103, name='Third workout')]
+        self.assertEqual(self.sync_events(changed, fail_id=103)['status'], 'error')
+        self.assertEqual(self.schedule(), before)
+        for item in before:
+            response = zo.app.test_client().get(item['workoutUri'])
+            self.assertEqual(response.status_code, 200)
+            response.close()
+
+    def test_batch_sync_preserves_unmanaged_library_files(self):
+        filename = 'manual-test-workout.zwo'
+        with zo.app.app_context():
+            zo.save_player_zfile(self.player_id, 'customworkouts', filename, self.content)
+            zo.update_workouts_manifest(self.player_id, 'customworkouts', filename, self.content)
+        try:
+            self.sync_events(self.today_events())
+            folder = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts'
+            self.assertEqual((folder / filename).read_bytes(), self.content)
+            entries = zo.workouts_manifest.load_manifest(str(folder))
+            self.assertTrue(any(entry['name'] == filename and not entry['deleted'] for entry in entries))
+        finally:
+            with zo.app.app_context():
+                zo.remove_player_zfiles_by_prefix(self.player_id, 'customworkouts', 'manual-test-')
+                zo.workouts_manifest.remove_prefixed_workouts(str(folder), {'manual-test-'})
+
+    def test_removed_or_renamed_event_is_reconciled_without_affecting_others(self):
+        events = self.today_events()
+        self.sync_events(events)
+        before = self.schedule()
+        self.sync_events([dict(events[1], name='Renamed second workout')])
+        remaining = self.schedule()
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0]['workoutId'], before[1]['workoutId'])
+        self.assertEqual(zo.app.test_client().get(before[0]['workoutUri']).status_code, 404)
+        response = zo.app.test_client().get(remaining[0]['workoutUri'])
+        self.assertEqual(response.status_code, 200)
+        response.close()
+        folder = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts'
+        self.assertEqual(len(list(folder.glob('intervals-icu-*.zwo'))), 1)
+
+    def test_completing_one_workout_keeps_the_other_download_available(self):
+        self.sync_events(self.today_events())
+        before = self.schedule()
+        with patch.object(zo, 'decrypt_credentials', return_value=('test-athlete', 'test-key')), \
+             patch.object(zo.intervals_workouts, 'upload_activity',
+                          return_value={'paired': True, 'paired_event_id': 101}):
+            with zo.app.app_context():
+                zo.intervals_upload(self.player_id, object())
+        self.assertEqual(self.schedule(), [before[1]])
+        self.assertEqual(zo.app.test_client().get(before[0]['workoutUri']).status_code, 404)
+        response = zo.app.test_client().get(before[1]['workoutUri'])
+        self.assertEqual(response.status_code, 200)
+        response.close()
+        with zo.app.app_context():
+            zo.clear_intervals_workout_metadata(self.player_id, 102)
+            self.assertIsNone(zo.current_workout_sync_status(self.player_id, 'intervals-icu')['metadata'])
+        self.assertEqual(self.schedule(), [])
+
+    def test_unpaired_activity_does_not_clear_any_workout(self):
+        self.sync_events(self.today_events())
+        before = self.schedule()
+        with patch.object(zo, 'decrypt_credentials', return_value=('test-athlete', 'test-key')), \
+             patch.object(zo.intervals_workouts, 'upload_activity', return_value={'paired': False}):
+            with zo.app.app_context():
+                zo.intervals_upload(self.player_id, object())
+        self.assertEqual(self.schedule(), before)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
