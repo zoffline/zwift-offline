@@ -128,13 +128,41 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
 
     def test_definition_and_asset_resolve_to_same_available_workout(self):
         item = self.schedule()[0]
+        self.assertEqual(item['workoutUri'],
+                         'https://cdn.zwift.com/tp-workouts/intervalsicu/' + item['workoutId'] + '.zwo')
+        self.assertEqual(item['workoutSummary']['workoutAssetUrl'], item['workoutUri'])
         response = self.client.get('/api/workout/workouts/' + item['workoutId'])
         self.assertEqual(response.get_json(), item['workoutSummary'])
-        response = self.client.get(urlsplit(item['workoutUri']).path)
+        response = self.client.get(item['workoutUri'], headers=self.bearer_headers())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, self.content)
         self.assertEqual(response.mimetype, 'application/xml')
         self.assertEqual(response.headers['Cache-Control'], 'private, no-store')
+        response.close()
+
+    def bearer_headers(self):
+        with zo.app.test_request_context():
+            token = zo.fake_jwt_with_session_cookie(encode_cookie(str(self.player_id)))['access_token']
+        return {'Authorization': 'Bearer ' + token}
+
+    def test_cdn_host_requires_authentication_and_rejects_other_profile(self):
+        item = self.schedule()[0]
+        client = zo.app.test_client()
+        self.assertIn(client.get(item['workoutUri']).status_code, (302, 401))
+        with zo.app.test_request_context():
+            other_token = zo.fake_jwt_with_session_cookie(encode_cookie('902'))['access_token']
+        self.assertEqual(client.get(item['workoutUri'],
+                         headers={'Authorization': 'Bearer ' + other_token}).status_code, 404)
+        self.assertEqual(client.get('https://cdn.zwift.com/tp-workouts/intervalsicu/not-a-workout.zwo',
+                         headers=self.bearer_headers()).status_code, 404)
+
+    def test_previous_api_download_stays_authenticated_and_byte_identical(self):
+        item = self.schedule()[0]
+        path = '/api/workout/workouts/' + item['workoutId'] + '/file.zwo'
+        self.assertIn(zo.app.test_client().get(path).status_code, (302, 401))
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, self.content)
         response.close()
 
     def test_original_workout_selection_and_manifest_still_work(self):

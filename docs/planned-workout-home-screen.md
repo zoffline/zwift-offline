@@ -19,7 +19,9 @@ change providers, write state or create another copy of the workout.
   `source=SCHEDULED` and `provider=intervalsicu`.
 - `GET /api/workout/workouts/{workoutId}` returns the matching workout summary.
 - `GET /api/workout/workouts/{workoutId}/file.zwo` serves the original file bytes.
-- All four endpoints use the existing authentication decorators and look
+- `GET /tp-workouts/intervalsicu/{workoutId}.zwo` serves those same bytes under
+  the CDN path used by the online reference.
+- All five endpoints use the existing authentication decorators and look
   up only the current player's workout. Multiplayer requires session/JWT
   authentication; single-player keeps its existing selected anonymous profile.
   Another player's workout
@@ -30,11 +32,17 @@ The card's `sourceId` matches `scheduleId`. Separate deterministic UUIDs are
 scoped to player/provider/event; the schedule ID also includes the local planned
 day. A manifest GUID or zfile row ID is not reused as a workout UUID.
 
-`workoutUri` and `workoutAssetUrl` point to the authenticated local API asset
-route, rather than the reference's online CDN file. Card, definition and asset
-must still be tested together in the native Android client, particularly whether
-its asset downloader supplies the game session/Bearer token for this API URL.
-No unauthenticated CDN download route has been introduced.
+`workoutUri` and `workoutAssetUrl` now use the reference's URL structure:
+`https://cdn.zwift.com/tp-workouts/intervalsicu/{workoutId}.zwo`.
+The normal zoffline DNS redirect for `cdn.zwift.com` must point to this server.
+The prior API download route remains available. Both routes require the existing
+session/Bearer authentication and current-player ownership in multiplayer mode;
+no unauthenticated CDN download route has been introduced.
+
+The native asset downloader must still be tested for session/Bearer forwarding
+to the CDN hostname. If it requests that URL without authentication, a login
+redirect is expected and should be treated as a separate compatibility issue,
+not solved by removing player isolation.
 
 ## Date, provider and file handling
 
@@ -81,5 +89,9 @@ stable IDs, session and Bearer authentication, single-player mode, player isolat
 state, provider/sport handling and read-only GET behavior. The previous expected
 failures have been replaced by positive contract checks.
 
-Native Android display/launch verification is still pending. This PR remains a
-draft for that test; the production deployment is not changed by the PR update.
+The first private native Android 1.122.0 test with the API-style asset URL failed
+to display the home card, although the workout selector worked and the client
+received non-empty home/schedule responses. No native request for the asset was
+observed. Matching the reference CDN hostname/path is the next comparison;
+native display/launch and download authentication remain unverified. The PR
+stays Draft. Passing server tests do not establish native-client compatibility.

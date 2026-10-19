@@ -1479,7 +1479,8 @@ def current_planned_workout():
     metadata = load_intervals_workout_metadata(current_user.player_id)
     return planned_workouts.build_workout(
         STORAGE_DIR, current_user.player_id, metadata,
-        lambda workout_id: url_for('api_planned_workout_download', workout_id=workout_id, _external=True),
+        lambda workout_id: 'https://cdn.zwift.com' + url_for(
+            'api_planned_workout_cdn_download', workout_id=workout_id),
     )
 
 
@@ -1515,6 +1516,8 @@ def api_planned_workout(workout_id):
     return planned_workout_json(workout['schedule']['workoutSummary'])
 
 
+@app.route('/tp-workouts/intervalsicu/<workout_id>.zwo', methods=['GET'],
+           endpoint='api_planned_workout_cdn_download')
 @app.route('/api/workout/workouts/<workout_id>/file.zwo', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
