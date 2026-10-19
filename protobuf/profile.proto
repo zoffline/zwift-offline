@@ -200,7 +200,7 @@ message PlayerProfile {
 	optional uint32 f130 = 130;
 	optional uint32 cur_streak = 131;
 	optional uint32 max_streak = 132;
-	optional uint64 last_ride = 133;
+	optional uint64 cur_streak_ride = 133;
 	optional uint32 week_ride_count = 134;
 	//optional uint32 cur_streak_distance = 135; // 135-140 no longer updated, replaced by 146-151?
 	//optional uint32 max_streak_distance = 136;
@@ -380,4 +380,5 @@ message Streaks {
 	optional uint32 max_streak_elevation = 7;
 	optional uint32 max_streak_calories = 8;
 	optional uint64 week_end = 9;
+	optional uint64 cur_streak_ride = 10;
 }

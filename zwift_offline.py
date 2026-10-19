@@ -4223,7 +4223,8 @@ def get_streaks(player_id):
             for field in ['cur_streak', 'cur_streak_distance', 'cur_streak_elevation', 'cur_streak_calories',
               'max_streak', 'max_streak_distance', 'max_streak_elevation', 'max_streak_calories']:
                 setattr(streaks, field, int(getattr(profile, field)))
-            streaks.week_end = int(get_week_range(datetime.datetime.fromtimestamp(profile.last_ride))[1].timestamp() * 1000)
+            streaks.week_end = int(get_week_range(datetime.datetime.fromtimestamp(profile.cur_streak_ride))[1].timestamp() * 1000)
+            streaks.cur_streak_ride = profile.cur_streak_ride * 1000
             with open(streaks_file, 'wb') as f:
                 f.write(streaks.SerializeToString())
     return streaks
@@ -4238,6 +4239,7 @@ def update_streaks(player_id, activity):
         streaks.cur_streak_calories = 0
     elif start_date > streaks.week_end:
         streaks.cur_streak += 1
+        streaks.cur_streak_ride = int(datetime.datetime.strptime(activity.start_date, '%Y-%m-%dT%H:%M:%S%z').timestamp() * 1000)
     streaks.cur_streak_distance += int(activity.distanceInMeters)
     streaks.cur_streak_elevation += int(activity.total_elevation)
     streaks.cur_streak_calories += int(activity.calories)
