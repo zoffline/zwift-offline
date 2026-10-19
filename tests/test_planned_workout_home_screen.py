@@ -89,6 +89,16 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(response.headers['Cache-Control'], 'private, no-store')
         return response.get_json()
 
+    def assert_workout_download(self, response, workout_id, original=None):
+        root = zo.ET.fromstring(response.data)
+        self.assertEqual(root.findtext('uniqueId'), workout_id)
+        root.remove(root.find('uniqueId'))
+        expected = zo.ET.fromstring(self.content if original is None else original)
+        unique_id = expected.find('uniqueId')
+        if unique_id is not None:
+            expected.remove(unique_id)
+        self.assertEqual(zo.ET.tostring(root), zo.ET.tostring(expected))
+
     def assert_no_card(self):
         self.assertEqual(self.schedule(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/game-home').get_json(), [])
@@ -138,15 +148,29 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(response.get_json(), item['workoutSummary'])
         response = zo.app.test_client().get(item['workoutUri'])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.content)
+        self.assert_workout_download(response, item['workoutId'])
         self.assertEqual(response.mimetype, 'application/xml')
         self.assertEqual(response.headers['Cache-Control'], 'private, no-store')
         response.close()
 
-    def bearer_headers(self):
-        with zo.app.test_request_context():
-            token = zo.fake_jwt_with_session_cookie(encode_cookie(str(self.player_id)))['access_token']
-        return {'Authorization': 'Bearer ' + token}
+    def test_download_normalizes_unique_id_without_rewriting_source_or_targets(self):
+        path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
+        workout_id = self.schedule()[0]['workoutId']
+        for value in (None, 'old-or-provider-identity', workout_id):
+            with self.subTest(identity=value):
+                root = zo.ET.fromstring(self.content)
+                if value is not None:
+                    zo.ET.SubElement(root, 'uniqueId').text = value
+                original = zo.ET.tostring(root)
+                path.write_bytes(original)
+                item = self.schedule()[0]
+                response = zo.app.test_client().get(item['workoutUri'])
+                self.assertEqual(response.status_code, 200)
+                self.assert_workout_download(response, workout_id, original)
+                self.assertEqual(path.read_bytes(), original)
+                if value == workout_id:
+                    self.assertEqual(response.data, original)
+                response.close()
 
     def test_cdn_host_requires_a_valid_scoped_signature(self):
         item = self.schedule()[0]
@@ -211,7 +235,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         # The private URL is a bearer capability for exactly the signed file.
         response = self.client_for(902).get(item['workoutUri'])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.content)
+        self.assert_workout_download(response, item['workoutId'])
         response.close()
 
     def test_download_signature_is_redacted_from_access_logs(self):
@@ -225,15 +249,6 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertNotIn(token, record.getMessage())
         self.assertIn(uri.path + '?[redacted]', record.getMessage())
         self.assertIn('HTTP/1.1" 200', record.getMessage())
-
-    def test_previous_api_download_stays_authenticated_and_byte_identical(self):
-        item = self.schedule()[0]
-        path = '/api/workout/workouts/' + item['workoutId'] + '/file.zwo'
-        self.assertIn(zo.app.test_client().get(path).status_code, (302, 401))
-        response = self.client.get(path)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.content)
-        response.close()
 
     def test_original_workout_selection_and_manifest_still_work(self):
         response = self.client.get('/api/zfiles/list?folder=customworkouts')
@@ -277,7 +292,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         headers = {'Authorization': 'Bearer ' + token}
         self.assertEqual(client.get('/api/workout/schedule/list', headers=headers).get_json(), [item])
         response = client.get(item['workoutUri'], headers=headers)
-        self.assertEqual(response.data, self.content)
+        self.assert_workout_download(response, item['workoutId'])
         response.close()
 
     def test_stale_and_future_workouts_have_no_card(self):
@@ -335,7 +350,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
             client = zo.app.test_client()
             self.assertEqual(client.get('/api/workout/schedule/list').get_json(), expected)
             response = client.get(expected[0]['workoutUri'])
-            self.assertEqual(response.data, self.content)
+            self.assert_workout_download(response, expected[0]['workoutId'])
             response.close()
 
     def test_for_you_and_other_placeholders_remain_unchanged(self):
@@ -415,6 +430,14 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
             response = zo.app.test_client().get(item['workoutUri'])
             self.assertEqual(response.status_code, 200)
             response.close()
+
+    def test_unexpected_api_payload_preserves_the_previous_entire_collection(self):
+        self.sync_events(self.today_events())
+        before = self.schedule()
+        for payload in (None, {'error': 'synthetic upstream failure'}, {'events': None}):
+            with self.subTest(payload=payload):
+                self.assertEqual(self.sync_events(payload)['status'], 'error')
+                self.assertEqual(self.schedule(), before)
 
     def test_batch_sync_preserves_unmanaged_library_files(self):
         filename = 'manual-test-workout.zwo'

@@ -25,9 +25,9 @@ def number(value, default=0):
 def planned_day(metadata):
     local = metadata.get('start_date_local')
     if local:
-        return datetime.datetime.fromisoformat(local).date()
+        return datetime.datetime.fromisoformat(local).date() if isinstance(local, str) else None
     value = metadata.get('start_date')
-    if not value:
+    if not isinstance(value, str) or not value:
         return None
     parsed = datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
     if parsed.tzinfo is None:

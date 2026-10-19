@@ -5,6 +5,7 @@ from io import BytesIO
 from urllib.parse import urlencode
 
 from requests.auth import HTTPBasicAuth
+import workout_state
 
 
 DEFAULT_BASE_URL = "https://intervals.icu/api/v1"
@@ -18,7 +19,7 @@ def normalize_events_payload(payload):
             value = payload.get(key)
             if isinstance(value, list):
                 return value
-    return []
+    raise ValueError('Unexpected Intervals.icu events response')
 
 
 def parse_datetime(value):
@@ -43,17 +44,6 @@ def parse_datetime(value):
 def parse_event_datetime(event):
     value = event.get("start_date_local") or event.get("start_date") or event.get("date")
     return parse_datetime(value)
-
-
-def choose_workout_event(events, now=None):
-    if not events:
-        return None
-    now = now or datetime.datetime.now(datetime.timezone.utc)
-    ordered = sorted(events, key=lambda event: parse_event_datetime(event) or datetime.datetime.max.replace(tzinfo=datetime.timezone.utc))
-    future = [event for event in ordered if (parse_event_datetime(event) or now) >= now]
-    if future:
-        return future[0]
-    return ordered[-1]
 
 
 def slugify_filename(value):
@@ -90,10 +80,8 @@ def activity_matches_workout(activity, workout_metadata):
 def matching_workout_metadata(activity, metadata):
     if not isinstance(metadata, dict):
         return None
-    values = metadata.get('workouts', [metadata])
-    if not isinstance(values, list):
-        return None
-    matches = [item for item in values if isinstance(item, dict) and activity_matches_workout(activity, item)]
+    matches = [item for item in workout_state.metadata_entries(metadata)
+               if activity_matches_workout(activity, item)]
     if len(matches) == 1 and 'workouts' not in metadata:
         return matches[0]
     # Date alone cannot identify one of several workouts. Only an exact,
@@ -125,7 +113,7 @@ def upload_activity(athlete_id, api_key, activity, workout_metadata=None, sessio
 
 def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, session=None, base_url=DEFAULT_BASE_URL, timeout=30):
     today = today or datetime.date.today()
-    now = now or datetime.datetime.now(datetime.timezone.utc)
+    # Retain the now argument for callers of the former single-workout import.
     session = session or __import__("requests")
 
     query = urlencode({
@@ -143,13 +131,15 @@ def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, sessi
         event_id = event.get('id')
         if isinstance(event_id, bool) or not str(event_id).isdigit() or int(event_id) <= 0:
             continue
-        date_value = event.get('start_date_local') or event.get('start_date') or event.get('date')
-        parsed = parse_datetime(date_value)
-        event_day = parsed.date() if parsed and event.get('start_date_local') else parsed.astimezone().date() if parsed else None
-        if event_day != today or event.get('category', 'WORKOUT') != 'WORKOUT':
+        parsed = parse_event_datetime(event)
+        if parsed is None:
+            continue
+        if not event.get('start_date_local'):
+            parsed = parsed.astimezone()
+        if parsed.date() != today or event.get('category', 'WORKOUT') != 'WORKOUT':
             continue
         unique[str(event_id)] = event
-    events = sorted(unique.values(), key=lambda event: (str(event.get('start_date_local') or event.get('start_date') or event.get('date')), str(event['id'])))
+    events = sorted(unique.values(), key=lambda event: (parse_event_datetime(event), str(event['id'])))
     if not events:
         return {"status": "no_workout", "message": f"No Intervals.icu workout found for {today.isoformat()}"}
 

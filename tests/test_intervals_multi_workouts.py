@@ -55,6 +55,17 @@ class MultipleIntervalsWorkouts(unittest.TestCase):
         with self.assertRaises(ET.ParseError):
             self.sync(Provider(self.events(), invalid_id=102), stored)
         self.assertEqual(stored, [])
+    def test_unexpected_provider_payload_is_not_an_empty_calendar(self):
+        for payload in (None, {}, {'error': 'synthetic failure'}, {'events': None}):
+            with self.subTest(payload=payload):
+                stored = []
+                with self.assertRaises(ValueError):
+                    self.sync(Provider(payload), stored)
+                self.assertEqual(stored, [])
+    def test_explicit_empty_calendar_remains_no_workout(self):
+        stored = []
+        self.assertEqual(self.sync(Provider([]), stored)['status'], 'no_workout')
+        self.assertEqual(stored, [])
     def test_all_today_events_are_imported_including_previously_paired(self):
         events = self.events()
         events[0]['paired_activity_id'] = 'synthetic-completed-activity'

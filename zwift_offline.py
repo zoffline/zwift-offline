@@ -1537,7 +1537,7 @@ def signed_planned_workout(player_id, metadata):
     )
     if workout:
         # Zwift's CDN downloader does not send the game login cookie. Grant
-        # access only to these exact bytes, for this player/workout, until the
+        # access only to this source file, for this player/workout, until the
         # end of its advertised local-day availability window.
         token = planned_workout_signer().dumps({
             'player_id': int(player_id), 'workout_id': workout['id'],
@@ -1582,16 +1582,6 @@ def api_planned_workout(workout_id):
     return planned_workout_json(workout['schedule']['workoutSummary'])
 
 
-@app.route('/api/workout/workouts/<workout_id>/file.zwo', methods=['GET'])
-@jwt_to_session_cookie
-@login_required
-def api_planned_workout_download(workout_id):
-    workout = current_planned_workout(workout_id)
-    if not workout or workout['id'] != workout_id:
-        return '', 404
-    return planned_workout_file_response(workout)
-
-
 @app.route('/tp-workouts/intervalsicu/<workout_id>.zwo', methods=['GET'])
 def api_planned_workout_cdn_download(workout_id):
     token = request.args.get('token', '')
@@ -1611,11 +1601,17 @@ def api_planned_workout_cdn_download(workout_id):
         return '', 404
     if payload.get('sha256') != hashlib.sha256(workout['content']).hexdigest():
         return '', 403
-    return planned_workout_file_response(workout)
-
-
-def planned_workout_file_response(workout):
-    response = send_file(BytesIO(workout['content']), mimetype='application/xml',
+    # Zwift's Training API loader requires the XML identity to match the
+    # advertised workout ID. Normalize only the response, never the source.
+    content = workout['content']
+    root = ET.fromstring(content)
+    unique_id = root.find('uniqueId')
+    if unique_id is None or unique_id.text != workout_id:
+        if unique_id is None:
+            unique_id = ET.SubElement(root, 'uniqueId')
+        unique_id.text = workout_id
+        content = ET.tostring(root, encoding='utf-8')
+    response = send_file(BytesIO(content), mimetype='application/xml',
                          download_name=workout['filename'], max_age=0)
     response.headers['Cache-Control'] = 'private, no-store'
     return response

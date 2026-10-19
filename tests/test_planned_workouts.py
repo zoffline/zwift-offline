@@ -80,7 +80,9 @@ class PlannedWorkouts(unittest.TestCase):
         for metadata in [None, [], {}, dict(self.metadata, event_id=None),
                          dict(self.metadata, event_id=True), dict(self.metadata, provider='trainingpeaks'),
                          dict(self.metadata, filename='../private.zwo'),
-                         dict(self.metadata, filename='other.zwo')]:
+                         dict(self.metadata, filename='other.zwo'),
+                         dict(self.metadata, start_date_local=123),
+                         dict(self.metadata, start_date_local=None, start_date=123)]:
             with self.subTest(metadata=metadata):
                 # None is deliberately passed straight through, not self.build's default.
                 self.assertIsNone(pw.build_workout(self.root, 901, metadata, lambda uid: uid, self.today))

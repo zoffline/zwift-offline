@@ -1,136 +1,80 @@
-# Scheduled Intervals workouts on game home
+# Intervals workouts on the home screen
 
-## Reference
+The schedule/Next Up response structure comes from
+[the online reference](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6257306924).
+[Native-client testing](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6269590334)
+established that the For You response must be an object and the CDN downloader
+cannot rely on a game login cookie. A subsequent
+[client log](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6273631903)
+identified the required ZWO `uniqueId` field.
 
-The response contract was supplied by a contributor in
-https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6257306924.
-`tests/fixtures/planned_workout_reference.json` preserves those response keys
-with synthetic names, identifiers, dates, URL and workout metrics.
-The subsequent native-client findings are documented in
-https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6269590334:
-the Windows CDN downloader sends no login cookie, and returning an object for
-`carousels/for-you` allows the scheduled workout to appear there. This does not
-establish that the separate Next Up card works.
+## Behavior
 
-The automatic Android import is separate (#543). This change reads the existing
-selected provider, metadata and ZWO file; home-screen GETs do not synchronize,
-change providers, write state or create another copy of the workout.
+- `/api/workout/schedule/list` returns every valid cycling workout synced for
+  today's local date, with separate stable workout/schedule IDs.
+- `/api/workout/workouts/{workoutId}` returns its summary.
+- `/api/head-unit-bff/game-home` returns the reference's single `nextUp` selection.
+- These API responses retain existing session/Bearer authentication. Single-player
+  mode retains its selected anonymous profile.
+- `/api/head-unit-bff/carousels/for-you` returns `{}` so the client can display
+  scheduled workouts in For You. This is the manually verified home-screen path;
+  the separate Next Up card has not been independently verified.
+- The original zfiles/manifest library remains available. Home-screen GETs do not
+  synchronize, change state or create extra copies.
 
-## API behavior
-
-- `GET /api/workout/schedule/list` returns all currently synced cycling workouts
-  for today from the selected Intervals.icu provider, each with its own IDs and URL.
-- `GET /api/head-unit-bff/game-home` returns the reference `nextUp` card, using
-  `source=SCHEDULED` and `provider=intervalsicu`, selecting the first valid entry.
-  That response has a single selected item; the schedule contains the full list.
-- `GET /api/workout/workouts/{workoutId}` returns the matching workout summary.
-- `GET /api/workout/workouts/{workoutId}/file.zwo` serves the original file bytes.
-- `GET /tp-workouts/intervalsicu/{workoutId}.zwo` serves those same bytes under
-  the CDN path used by the online reference, with a signed `token` query value.
-- The four API endpoints use the existing authentication decorators and look
-  up only the current player's workout. Multiplayer requires session/JWT;
-  single-player keeps its existing selected anonymous profile.
-- The CDN endpoint requires a valid signed URL instead of a session cookie.
-  A workout UUID alone cannot authorize a download. File responses use
-  `private, no-store`.
-- `GET /api/head-unit-bff/carousels/for-you` returns `{}`, matching the shape
-  found necessary in the contributor's native-client test.
-
-The card's `entityId`, schedule's `workoutId` and summary's `workoutId` match.
-The card's `sourceId` matches `scheduleId`. Separate deterministic UUIDs are
-scoped to player/provider/event; the schedule ID also includes the local planned
-day. A manifest GUID or zfile row ID is not reused as a workout UUID.
-
-`workoutUri` and `workoutAssetUrl` now use the reference's URL structure:
+The CDN URL is
 `https://cdn.zwift.com/tp-workouts/intervalsicu/{workoutId}.zwo?token=...`.
 The normal zoffline DNS redirect for `cdn.zwift.com` must point to this server.
-The prior session/Bearer-protected API download remains available. The CDN
-downloader needs no game cookie: its URL grants access to exactly one player's
-current workout bytes until the end of the advertised local-day window. The
-server signs the player ID, workout ID, expiry and SHA-256 using its existing
-secret key and a purpose-specific salt. Changed bytes, removed metadata,
-provider changes and stale planned dates revoke the old grant. A session for
-another player cannot issue a grant for someone else's workout, but anyone who
-possesses a still-valid signed URL can download its one file.
+The download needs no game cookie. Its private signed grant authorizes one
+player/workout/source-file SHA-256 until the advertised local-day expiry. Missing,
+modified or expired grants return 403 without a login redirect. Removed metadata,
+changed source bytes, provider changes and stale dates invalidate the grant.
+Anyone possessing a still-valid URL can download that one file; its UUID alone
+cannot authorize a download. CDN query values are redacted from the access logger.
+Signing uses itsdangerous, already required by Flask.
 
-The URL is therefore private. CDN query values are redacted from the existing
-zoffline access logger. Do not publish signed URLs in screenshots or captures.
-Missing, malformed, modified or expired signatures return 403 without a login
-redirect. The native client still needs to be tested for preserving the query
-value and completing the download. Signing uses itsdangerous, already present
-as a Flask dependency; no additional dependency is introduced.
+The response supplies `uniqueId` matching the advertised workout ID. If the source
+already has that identity its bytes are served directly; otherwise only the
+in-memory response is normalized. The stored ZWO, workout targets and original
+library download remain unchanged.
 
-## Date, provider and file handling
+## Import and metadata
 
-Only today's local planned date is advertised. The importer now downloads all
-today's workout events, including already paired events so they can be repeated.
-Duplicate event IDs are collapsed and entries are ordered by planned start. All
-files are downloaded and checked before storing the batch; a download failure
-retains the preceding collection. Reimport updates existing files/rows, removes
-only obsolete provider-managed filenames and preserves other library files.
-Collection metadata is replaced atomically and retains legacy first-entry fields
-for the existing settings view; old single-entry metadata remains readable.
+All today's workout events are downloaded and XML-checked before updating the
+managed cache, including already paired events for repeat workouts. Duplicate
+event IDs collapse to one. Reimport updates existing files/rows and removes only
+obsolete Intervals-managed filenames; other library files are preserved. A failed
+download or unexpected API response retains the previous collection. A genuine
+empty calendar still clears the provider's old managed cache.
 
-Local midnight and
-next midnight determine availability; daylight-saving changes produce 23/25-hour
-windows correctly. If only an offset/UTC `start_date` exists, convert it to the
-server's local day. The server's local timezone must match the existing import
-configuration.
+Collection metadata is replaced atomically and retains first-entry aliases for
+the existing settings view. Original single-entry metadata remains readable.
+An explicitly paired upload removes only that event. With collection metadata,
+only a unique exact workout title on the activity date forces a pairing; ambiguous
+cases are left to Intervals without removing entries. Legacy single metadata keeps
+its prior date-based behavior. A later sync can reimport all today's events.
 
-Missing/cleared metadata, stale/future dates, missing/unreadable/invalid files,
-unsafe filenames and symlinks produce no card. Completion removes only the explicitly paired event from the collection, leaving
-other signed downloads available. With collection metadata, the local uploader
-only forces a pairing for a unique exact workout title on the activity date;
-otherwise it leaves pairing to Intervals and removes no entry. Legacy single
-metadata retains its prior same-date behavior. A later explicit/game-login sync
-can reimport today's entries, including completed ones. TrainingPeaks,
-manual library workouts and running workouts are outside this initial scope.
-An explicit non-cycling `sport` query produces no cycling card.
-
-Without a matching workout, the schedule and game-home endpoints retain the
-previous empty-array response. `carousels/for-you` now returns an empty object;
-the later native-client test identified this response shape as necessary for
-the scheduled-workout fallback, although the captured online carousel itself
-contained built-in workouts/pace partners.
-
-## Summary values
-
-Name/description come from existing metadata or the ZWO. Duration and the six
-power-zone time percentages are derived from the ZWO, including intervals and
-linear ramps. Free-ride/unknown power has no invented power distribution.
-Difficulty is taken from the file when available, otherwise zero/unrated.
-Planned `icu_training_load` is retained on the next Intervals sync and used for
-`stressPoints`; legacy/missing load uses zero/unknown rather than a fitness
-estimate. Existing metadata remains readable; resync obtains the added source
-fields. Workout targets and content are not rewritten.
+Only today's cycling entries are advertised. Running, manual, TrainingPeaks and
+future-date cards are outside this change. The server's local timezone determines
+the day; DST windows use real local midnights. Missing/invalid metadata or files,
+unsafe filenames and symlinks do not produce cards. Duration/zones derive from the
+ZWO and planned load from provider metadata. Unknown power/load/difficulty is not
+replaced by a fitness estimate. The Android login trigger remains separate (#543).
 
 ## Validation
 
 ```sh
-python tests/test_planned_workouts.py
-python tests/test_intervals_multi_workouts.py
-python tests/test_planned_workout_home_screen.py
+python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-The first suite uses only the standard library. The integration suite uses the
-normal project dependencies, a real Flask test client, synthetic profiles and
-temporary storage. It needs no network or production data. It checks the supplied
-reference structure, original workout selection, linked definition/download,
-stable IDs, session and Bearer authentication, single-player mode, player isolation, missing/stale
-state, provider/sport handling and read-only GET behavior. CDN cases include
-cookie-free signed download, expiry boundaries, changed-content revocation,
-modified tokens, profile/workout scope, log redaction and unsigned denial.
-Batch tests cover all events, stable reimports, failure before storing any file,
-malformed XML, event removal/renaming, preservation of unmanaged files, legacy
-metadata and completion without clearing other workouts. The prior expected
-failures are positive contract checks.
+The 51 tests cover the reference contract, multiple workouts and stable reimports,
+legacy metadata, per-event completion, failure retention, manual-file preservation,
+XML identity/source preservation, signed cookie-free downloads, expiry/revocation,
+player/workout scope, log masking, dates/DST and read-only GETs. Integration tests
+use the normal dependencies, synthetic profiles and temporary storage; they need
+no network or production data. The test-only Werkzeug version shim accommodates
+the repository's existing Flask/Werkzeug dependency combination.
 
-The first private native Android 1.122.0 test with the API-style asset URL failed
-to display the home card, although the workout selector worked and the client
-received non-empty home/schedule responses. No native request for the asset was
-observed. The contributor later confirmed the missing-cookie failure on Windows
-and the required object response for the For You carousel. The signed CDN URL
-and object response address those findings. The user has now confirmed single-workout display under For You on Android.
-Native multi-workout display, launch and query-token download compatibility
-remain unverified. The PR stays Draft. Passing server
-tests do not establish native-client compatibility.
+The requester confirmed successful native Zwift testing at commit `6c37f9b`.
+Final review additionally corrected the required XML identity and malformed-response
+handling, with focused automated regression coverage on the final PR source.
