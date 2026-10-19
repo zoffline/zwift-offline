@@ -18,6 +18,7 @@ import requests
 import json
 import base64
 import uuid
+import hashlib
 import jwt
 import sqlalchemy
 import fitdecode
@@ -31,6 +32,7 @@ from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user,
 from gevent.pywsgi import WSGIServer
 from google.protobuf.json_format import MessageToDict, Parse
 from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import BadData, URLSafeSerializer
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.multipart import MIMEMultipart
@@ -72,6 +74,19 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
+
+
+class PlannedWorkoutLogFilter(logging.Filter):
+    def filter(self, record):
+        message = record.getMessage()
+        if '/tp-workouts/intervalsicu/' in message and '?' in message:
+            record.msg = re.sub(r'(/tp-workouts/intervalsicu/[^?\s"]+)\?[^\s"]+',
+                                r'\1?[redacted]', message)
+            record.args = ()
+        return True
+
+
+logger.addFilter(PlannedWorkoutLogFilter())
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -1472,16 +1487,38 @@ def api_assetcms(path):
     return jsonify()
 
 def current_planned_workout():
-    if resolve_workout_provider_for_player(current_user.player_id) != 'intervals-icu':
-        return None
     if request.args.get('sport', 'CYCLING').upper() != 'CYCLING':
         return None
-    metadata = load_intervals_workout_metadata(current_user.player_id)
-    return planned_workouts.build_workout(
-        STORAGE_DIR, current_user.player_id, metadata,
+    return planned_workout_for_player(current_user.player_id)
+
+
+def planned_workout_signer():
+    return URLSafeSerializer(app.config['SECRET_KEY'], salt='planned-workout-download-v1')
+
+
+def planned_workout_for_player(player_id):
+    if resolve_workout_provider_for_player(player_id) != 'intervals-icu':
+        return None
+    metadata = load_intervals_workout_metadata(player_id)
+    workout = planned_workouts.build_workout(
+        STORAGE_DIR, player_id, metadata,
         lambda workout_id: 'https://cdn.zwift.com' + url_for(
             'api_planned_workout_cdn_download', workout_id=workout_id),
     )
+    if workout:
+        # Zwift's CDN downloader does not send the game login cookie. Grant
+        # access only to these exact bytes, for this player/workout, until the
+        # end of its advertised local-day availability window.
+        token = planned_workout_signer().dumps({
+            'player_id': int(player_id), 'workout_id': workout['id'],
+            'expires': workout['schedule']['notAvailableAfter'] + 1,
+            'sha256': hashlib.sha256(workout['content']).hexdigest(),
+        })
+        uri = 'https://cdn.zwift.com' + url_for(
+            'api_planned_workout_cdn_download', workout_id=workout['id'], token=token)
+        workout['schedule']['workoutUri'] = uri
+        workout['schedule']['workoutSummary']['workoutAssetUrl'] = uri
+    return workout
 
 
 def planned_workout_json(payload):
@@ -1516,8 +1553,6 @@ def api_planned_workout(workout_id):
     return planned_workout_json(workout['schedule']['workoutSummary'])
 
 
-@app.route('/tp-workouts/intervalsicu/<workout_id>.zwo', methods=['GET'],
-           endpoint='api_planned_workout_cdn_download')
 @app.route('/api/workout/workouts/<workout_id>/file.zwo', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
@@ -1525,6 +1560,32 @@ def api_planned_workout_download(workout_id):
     workout = current_planned_workout()
     if not workout or workout['id'] != workout_id:
         return '', 404
+    return planned_workout_file_response(workout)
+
+
+@app.route('/tp-workouts/intervalsicu/<workout_id>.zwo', methods=['GET'])
+def api_planned_workout_cdn_download(workout_id):
+    token = request.args.get('token', '')
+    if not token or len(token) > 2048:
+        return '', 403
+    try:
+        payload = planned_workout_signer().loads(token)
+    except BadData:
+        return '', 403
+    if (not isinstance(payload, dict) or
+            type(payload.get('player_id')) is not int or payload['player_id'] <= 0 or
+            type(payload.get('expires')) is not int or payload['expires'] <= time.time() or
+            payload.get('workout_id') != workout_id):
+        return '', 403
+    workout = planned_workout_for_player(payload['player_id'])
+    if not workout or workout['id'] != workout_id:
+        return '', 404
+    if payload.get('sha256') != hashlib.sha256(workout['content']).hexdigest():
+        return '', 403
+    return planned_workout_file_response(workout)
+
+
+def planned_workout_file_response(workout):
     response = send_file(BytesIO(workout['content']), mimetype='application/xml',
                          download_name=workout['filename'], max_age=0)
     response.headers['Cache-Control'] = 'private, no-store'
@@ -1533,6 +1594,8 @@ def api_planned_workout_download(workout_id):
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
 def api_head_unit_bff(path):
+    if path == "carousels/for-you":
+        return jsonify({})
     if path == "carousels/home-challenges":
         return jsonify({"items":[]})
     return jsonify([])

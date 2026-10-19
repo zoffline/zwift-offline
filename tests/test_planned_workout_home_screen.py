@@ -10,7 +10,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 import uuid
 
 import werkzeug
@@ -128,12 +128,15 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
 
     def test_definition_and_asset_resolve_to_same_available_workout(self):
         item = self.schedule()[0]
-        self.assertEqual(item['workoutUri'],
-                         'https://cdn.zwift.com/tp-workouts/intervalsicu/' + item['workoutId'] + '.zwo')
+        uri = urlsplit(item['workoutUri'])
+        self.assertEqual(uri.scheme, 'https')
+        self.assertEqual(uri.netloc, 'cdn.zwift.com')
+        self.assertEqual(uri.path, '/tp-workouts/intervalsicu/' + item['workoutId'] + '.zwo')
+        self.assertTrue(parse_qs(uri.query)['token'][0])
         self.assertEqual(item['workoutSummary']['workoutAssetUrl'], item['workoutUri'])
         response = self.client.get('/api/workout/workouts/' + item['workoutId'])
         self.assertEqual(response.get_json(), item['workoutSummary'])
-        response = self.client.get(item['workoutUri'], headers=self.bearer_headers())
+        response = zo.app.test_client().get(item['workoutUri'])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, self.content)
         self.assertEqual(response.mimetype, 'application/xml')
@@ -145,16 +148,83 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
             token = zo.fake_jwt_with_session_cookie(encode_cookie(str(self.player_id)))['access_token']
         return {'Authorization': 'Bearer ' + token}
 
-    def test_cdn_host_requires_authentication_and_rejects_other_profile(self):
+    def test_cdn_host_requires_a_valid_scoped_signature(self):
         item = self.schedule()[0]
         client = zo.app.test_client()
-        self.assertIn(client.get(item['workoutUri']).status_code, (302, 401))
-        with zo.app.test_request_context():
-            other_token = zo.fake_jwt_with_session_cookie(encode_cookie('902'))['access_token']
-        self.assertEqual(client.get(item['workoutUri'],
-                         headers={'Authorization': 'Bearer ' + other_token}).status_code, 404)
-        self.assertEqual(client.get('https://cdn.zwift.com/tp-workouts/intervalsicu/not-a-workout.zwo',
-                         headers=self.bearer_headers()).status_code, 404)
+        path = urlsplit(item['workoutUri']).path
+        for query in ('', '?token=invalid', '?token=' + 'x' * 2049):
+            self.assertEqual(client.get(path + query).status_code, 403)
+        self.store_workout(902)
+        other_item = self.client_for(902).get('/api/workout/schedule/list').get_json()[0]
+        wrong_path = urlsplit(other_item['workoutUri']).path
+        query = urlsplit(item['workoutUri']).query
+        self.assertEqual(client.get(wrong_path + '?' + query).status_code, 403)
+
+    def signed_uri(self, uri, **changes):
+        parts = urlsplit(uri)
+        payload = zo.planned_workout_signer().loads(parse_qs(parts.query)['token'][0])
+        payload.update(changes)
+        query = urlencode({'token': zo.planned_workout_signer().dumps(payload)})
+        return urlunsplit(parts._replace(query=query))
+
+    def test_expired_tampered_and_invalid_download_grants_are_rejected(self):
+        item = self.schedule()[0]
+        client = zo.app.test_client()
+        for changes in ({'expires': 0}, {'expires': True}, {'expires': 'tomorrow'},
+                        {'player_id': '../901'}, {'player_id': True},
+                        {'sha256': 'wrong-content'}):
+            with self.subTest(changes=changes):
+                self.assertEqual(client.get(self.signed_uri(item['workoutUri'], **changes)).status_code, 403)
+        self.assertEqual(client.get(self.signed_uri(item['workoutUri'], player_id=902)).status_code, 404)
+        # Real tampering is not re-signed with the server's key.
+        uri = urlsplit(item['workoutUri'])
+        token = parse_qs(uri.query)['token'][0]
+        tampered = 'x' + token[1:]
+        self.assertEqual(client.get(uri.path + '?' + urlencode({'token': tampered})).status_code, 403)
+        self.assertNotIn('storage', client.get(uri.path).get_data(as_text=True))
+
+    def test_download_grant_expires_at_the_advertised_local_midnight(self):
+        item = self.schedule()[0]
+        uri = urlsplit(item['workoutUri'])
+        payload = zo.planned_workout_signer().loads(parse_qs(uri.query)['token'][0])
+        self.assertEqual(payload['expires'], item['notAvailableAfter'] + 1)
+        client = zo.app.test_client()
+        with patch.object(zo.time, 'time', return_value=payload['expires'] - 1):
+            response = client.get(item['workoutUri'])
+            self.assertEqual(response.status_code, 200)
+            response.close()
+        with patch.object(zo.time, 'time', return_value=payload['expires']):
+            self.assertEqual(client.get(item['workoutUri']).status_code, 403)
+
+    def test_resync_with_changed_bytes_revokes_the_previous_download_grant(self):
+        item = self.schedule()[0]
+        path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
+        path.write_bytes(self.content.replace(b'Duration="60"', b'Duration="120"'))
+        client = zo.app.test_client()
+        self.assertEqual(client.get(item['workoutUri']).status_code, 403)
+        response = client.get(self.schedule()[0]['workoutUri'])
+        self.assertEqual(response.status_code, 200)
+        response.close()
+
+    def test_signed_download_does_not_require_or_consult_the_logged_in_profile(self):
+        item = self.schedule()[0]
+        # The private URL is a bearer capability for exactly the signed file.
+        response = self.client_for(902).get(item['workoutUri'])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, self.content)
+        response.close()
+
+    def test_download_signature_is_redacted_from_access_logs(self):
+        item = self.schedule()[0]
+        uri = urlsplit(item['workoutUri'])
+        token = parse_qs(uri.query)['token'][0]
+        record = zo.logging.LogRecord('zoffline', zo.logging.INFO, '', 0,
+                                      'client "GET %s HTTP/1.1" 200',
+                                      (uri.path + '?' + uri.query,), None)
+        zo.PlannedWorkoutLogFilter().filter(record)
+        self.assertNotIn(token, record.getMessage())
+        self.assertIn(uri.path + '?[redacted]', record.getMessage())
+        self.assertIn('HTTP/1.1" 200', record.getMessage())
 
     def test_previous_api_download_stays_authenticated_and_byte_identical(self):
         item = self.schedule()[0]
@@ -185,7 +255,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(other.get('/api/workout/schedule/list').get_json(), [])
         self.assertEqual(other.get('/api/head-unit-bff/game-home').get_json(), [])
         self.assertEqual(other.get('/api/workout/workouts/' + item['workoutId']).status_code, 404)
-        self.assertEqual(other.get(urlsplit(item['workoutUri']).path).status_code, 404)
+        self.assertEqual(other.get(urlsplit(item['workoutUri']).path).status_code, 403)
         self.store_workout(902)
         other_id = other.get('/api/workout/schedule/list').get_json()[0]['workoutId']
         self.assertNotEqual(other_id, item['workoutId'])
@@ -194,9 +264,10 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         item = self.schedule()[0]
         anonymous = zo.app.test_client()
         for path in ['/api/workout/schedule/list', '/api/head-unit-bff/game-home',
-                     '/api/workout/workouts/' + item['workoutId'], urlsplit(item['workoutUri']).path]:
+                     '/api/workout/workouts/' + item['workoutId']]:
             with self.subTest(path=path):
                 self.assertIn(anonymous.get(path).status_code, (302, 401))
+        self.assertEqual(anonymous.get(urlsplit(item['workoutUri']).path).status_code, 403)
 
     def test_bearer_token_authorizes_card_and_download(self):
         item = self.schedule()[0]
@@ -205,7 +276,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         client = zo.app.test_client()
         headers = {'Authorization': 'Bearer ' + token}
         self.assertEqual(client.get('/api/workout/schedule/list', headers=headers).get_json(), [item])
-        response = client.get(urlsplit(item['workoutUri']).path, headers=headers)
+        response = client.get(item['workoutUri'], headers=headers)
         self.assertEqual(response.data, self.content)
         response.close()
 
@@ -214,12 +285,14 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         for offset in (-1, 1):
             self.update_metadata(start_date_local=(datetime.date.today() + datetime.timedelta(days=offset)).isoformat() + 'T18:00:00')
             self.assert_no_card()
-            self.assertEqual(self.client.get(urlsplit(old['workoutUri']).path).status_code, 404)
+            self.assertEqual(self.client.get(old['workoutUri']).status_code, 404)
 
     def test_cleared_completion_metadata_removes_card(self):
+        item = self.schedule()[0]
         with zo.app.app_context():
             zo.clear_intervals_workout_metadata(self.player_id)
         self.assert_no_card()
+        self.assertEqual(zo.app.test_client().get(item['workoutUri']).status_code, 404)
 
     def test_missing_or_invalid_zwo_removes_card(self):
         path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
@@ -261,12 +334,12 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         with patch.object(zo, 'MULTIPLAYER', False), patch.object(zo.login_manager, 'anonymous_user', zo.AnonUser):
             client = zo.app.test_client()
             self.assertEqual(client.get('/api/workout/schedule/list').get_json(), expected)
-            response = client.get(urlsplit(expected[0]['workoutUri']).path)
+            response = client.get(expected[0]['workoutUri'])
             self.assertEqual(response.data, self.content)
             response.close()
 
     def test_for_you_and_other_placeholders_remain_unchanged(self):
-        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), [])
+        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), {})
         self.assertEqual(self.client.get('/api/head-unit-bff/crm').get_json(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/home-challenges').get_json(), {'items': []})
 
