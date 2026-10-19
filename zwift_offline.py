@@ -169,6 +169,8 @@ zwift_online_tokens = {}
 restarting = False
 restarting_in_minutes = 0
 reload_pacer_bots = False
+global_peloton_bots = {} # follower bots of RoboPacer pelotons (see peloton.py)
+peloton_manager = None
 auto_group = {'id': None, 'road_id': None, 'is_forward': None, 'all': False, 'thread': None}
 
 with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
@@ -512,6 +514,8 @@ def get_partial_profile(player_id):
                 if f.id == 1766985504: #crc32 of "PACE PARTNER - ROUTE"
                     partial_profile.route = toSigned(f.number_value, 4) if f.number_value >= 0 else -toSigned(-f.number_value, 4)
                     break
+        elif player_id in global_peloton_bots.keys():
+            profile = global_peloton_bots[player_id].profile
         elif player_id in global_bots.keys():
             profile = global_bots[player_id].profile
         elif player_id > 10000000:
@@ -1315,6 +1319,8 @@ def reload_bots():
     global reload_pacer_bots
     if bool(current_user.is_admin):
         reload_pacer_bots = True
+        if peloton_manager:
+            peloton_manager.request_reload()
     return redirect(url_for('user_home', username=current_user.username))
 
 
@@ -2490,6 +2496,8 @@ def api_profiles():
         else:
             if p_id in global_pace_partners.keys():
                 profile = global_pace_partners[p_id].profile
+            elif p_id in global_peloton_bots.keys():
+                profile = global_peloton_bots[p_id].profile
             elif p_id in global_bots.keys():
                 profile = global_bots[p_id].profile
             else:
@@ -3439,6 +3447,9 @@ def relay_worlds_generic(server_realm=None, player_id=None):
             pace_partner_variables = global_pace_partners[p_id]
             pace_partner = pace_partner_variables.route.states[pace_partner_variables.position]
             add_player_to_world(pace_partner, course_world, is_pace_partner=True)
+        peloton_bots = global_peloton_bots
+        for p_id in peloton_bots.keys():
+            add_player_to_world(peloton_bots[p_id].route.states[0], course_world, is_bot=True)
         for p_id in global_bots.keys():
             bot_variables = global_bots[p_id]
             bot = bot_variables.route.states[bot_variables.position]
@@ -3629,6 +3640,8 @@ def relay_worlds_id_players_id(server_realm, player_id):
         state.world = get_course(state)
         state.route = get_partial_profile(player_id).route
         return state.SerializeToString()
+    if player_id in global_peloton_bots.keys():
+        return global_peloton_bots[player_id].route.states[0].SerializeToString()
     if player_id in global_bots.keys():
         bot = global_bots[player_id]
         return bot.route.states[bot.position].SerializeToString()
@@ -3717,6 +3730,12 @@ def relay_worlds_attributes():
                     if command == 'disperse':
                         for bot in global_bots.keys():
                             global_bots[bot].position = random.randrange(len(global_bots[bot].route.states))
+                elif (command == 'peloton' or command.startswith('peloton ')) and is_admin(current_user):
+                    if peloton_manager:
+                        reply = peloton_manager.chat_command(state, command[len('peloton'):])
+                    else:
+                        reply = 'No RoboPacers loaded (storage/robopacers)'
+                    send_message(reply, recipients=[chat_message.player_id])
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:
