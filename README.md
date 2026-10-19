@@ -337,6 +337,44 @@ To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST``
 * If you want to create a dynamic RoboPacer (increase power on climbs and decrease on descents) you can use [standalone_power.py](https://github.com/oldnapalm/zwift-offline/blob/master/standalone_power.py) (requires 2 ANT sticks, [python-ant](https://github.com/mch/python-ant) and [PowerMeterTx.py](https://github.com/oldnapalm/zwift-offline/blob/master/PowerMeterTx.py)).
 </details>
 
+<details><summary>Pelotons (RoboPacer + follower bots)</summary>
+
+* A peloton is one RoboPacer followed by a custom group of bots riding in formation around and behind it, so joining the pacer feels like riding in a real group.
+* Followers move up and back inside the group, drift laterally, stretch out on climbs (weaker riders lose some meters and come back on the flat), coast on descents and show realistic power (drafting), cadence and heart rate.
+* Quick way: ride next to a RoboPacer and type ``.peloton 20`` in chat (``.peloton`` shows the current size, ``.peloton off`` removes it). This writes ``storage/peloton.txt``.
+* Or create ``storage/peloton.txt`` manually. ``pacer`` is the RoboPacer folder name (inside ``storage/robopacers``) or its player ID. Every other field is optional:
+
+```json
+{
+  "pelotons": [
+    {
+      "pacer": "B - 3.3 WKG - Watopia - Volcano Climb",
+      "bots": 25,
+      "columns": 0,
+      "row_gap": 2.2,
+      "lateral_spacing": 65000,
+      "beside_pacer": 2,
+      "dynamics": 1.0,
+      "shuffle_interval": 30,
+      "draft": 0.7,
+      "climb_stretch": 1.0,
+      "max_drop": 40,
+      "riders": [
+        {"first_name": "Tadej", "last_name": "Pogacar", "country_code": 705, "is_male": true, "position": "front", "strength": 1.3},
+        {"first_name": "Ana", "last_name": "Lopez", "is_male": false, "weight": 55, "position": "back", "strength": 0.85}
+      ]
+    }
+  ]
+}
+```
+
+* ``bots``: total followers (max 200). Riders not listed in ``riders`` get random names (from ``bot.txt`` if it exists) and random equipment.
+* ``columns``: max width of the group (0 = automatic). ``row_gap``: meters between rows. ``lateral_spacing``: lateral distance between riders in ``roadPosition`` units (100000 = 1 meter, default 0.65 m). ``beside_pacer``: riders alongside the pacer.
+* ``dynamics``: 0 = rigid formation, 1 = normal, 2 = very lively. ``shuffle_interval``: average seconds between position changes. ``draft``: fraction of power used by a rider on a wheel. ``climb_stretch`` and ``max_drop``: how much the group stretches on climbs.
+* Each rider in ``riders`` accepts the same fields as ``bot.txt`` plus ``position`` (``front``, ``middle``, ``back`` or ``any``), ``strength`` (0.5 - 1.5), ``weight`` (kg), ``height`` (cm), ``cadence`` (rpm) and ``max_heart_rate``.
+* The file is reloaded automatically when it changes (also with "Reload bots" in the launcher page). Set ``"enabled": false`` to disable a peloton without deleting it.
+</details>
+
 <details><summary>Bookmarks</summary>
 
 * When you finish an activity, your last position will be saved as a bookmark.
