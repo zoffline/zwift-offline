@@ -1574,6 +1574,22 @@ def api_game_home():
     return planned_workout_json(workout['home'] if workout else [])
 
 
+@app.route('/api/head-unit-bff/carousels/for-you', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_for_you():
+    cards = [{
+        'recommendationType': 'workout', 'workoutUUID': workout['id'],
+        'workoutHash': None, 'assetUrl': workout['schedule']['workoutUri'],
+        'providerId': workout['schedule']['trainingProviderId'], 'provider': None,
+        'scheduleId': workout['schedule']['scheduleId'], 'score': 1.0,
+        'explanation': None, 'sourceData': None, 'source': 'SCHEDULED',
+        'sourceId': workout['schedule']['scheduleId'], 'ribbon': None,
+        'recommendedDurationMinutes': None,
+    } for workout in current_planned_workouts()]
+    return planned_workout_json(cards or {})
+
+
 @app.route('/api/workout/workouts/<workout_id>', methods=['GET'])
 @jwt_to_session_cookie
 @login_required
@@ -1621,8 +1637,6 @@ def api_planned_workout_cdn_download(workout_id):
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
 def api_head_unit_bff(path):
-    if path == "carousels/for-you":
-        return jsonify({})
     if path == "carousels/home-challenges":
         return jsonify({"items":[]})
     return jsonify([])

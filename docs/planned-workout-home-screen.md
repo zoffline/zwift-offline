@@ -3,7 +3,7 @@
 The schedule/Next Up response structure comes from
 [the online reference](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6257306924).
 [Native-client testing](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6269590334)
-established that the For You response must be an object and the CDN downloader
+established the empty For You object fallback and that the CDN downloader
 cannot rely on a game login cookie. A subsequent
 [client log](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6273631903)
 identified the required ZWO `uniqueId` field.
@@ -16,12 +16,22 @@ identified the required ZWO `uniqueId` field.
 - `/api/head-unit-bff/game-home` returns the reference's single `nextUp` selection.
 - These API responses retain existing session/Bearer authentication. Single-player
   mode retains its selected anonymous profile.
-- `/api/head-unit-bff/carousels/for-you` returns `{}` so the client can display
-  scheduled workouts in For You. This is the manually verified home-screen path;
-  the separate Next Up card has not been independently verified.
+- `/api/head-unit-bff/carousels/for-you` offers one recommendation per available
+  cycling workout, reusing its schedule ID, provider and signed asset URL.
+  It uses the same session/Bearer authentication and returns `{}` when empty.
 - The partner-name map labels the workout folder `Intervals icu`.
 - The original zfiles/manifest library remains available. Home-screen GETs do not
   synchronize, change state or create extra copies.
+
+The nonempty For You shape follows
+[the online reference](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6287951881),
+which contains built-in recommendations. Adapting it to Intervals workouts uses
+`providerId=intervalsicu`, `source=SCHEDULED` and each existing schedule ID as
+`scheduleId`/`sourceId`. These third-party values are an experimental adaptation;
+automated contract/link checks do not establish native display or launch support.
+The official server only shows one third-party workout on the home screen, so
+multiple For You cards are an extension of that behavior, pending a native test.
+Next Up retains its single selection, which fatsbrown has verified natively.
 
 The CDN URL is
 `https://cdn.zwift.com/tp-workouts/intervalsicu/{workoutId}.zwo?token=...`.
@@ -68,10 +78,10 @@ replaced by a fitness estimate. The Android login trigger remains separate (#543
 python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-The 51 tests cover the reference contract, multiple workouts and stable reimports,
+The 53 tests cover the reference contracts, multiple workouts and stable reimports,
 legacy metadata, per-event completion, failure retention, manual-file preservation,
 XML identity/source preservation, signed cookie-free downloads, expiry/revocation,
-player/workout scope, log masking, dates/DST and read-only GETs. Integration tests
+player/workout scope, log masking, dates/DST, For You links and read-only GETs. Integration tests
 use the normal dependencies, synthetic profiles and temporary storage; they need
 no network or production data. The test-only Werkzeug version shim accommodates
 the repository's existing Flask/Werkzeug dependency combination.

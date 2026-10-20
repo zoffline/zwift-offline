@@ -102,6 +102,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
     def assert_no_card(self):
         self.assertEqual(self.schedule(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/game-home').get_json(), [])
+        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), {})
 
     def update_metadata(self, **changes):
         path = Path(zo.workout_state.metadata_file(zo.STORAGE_DIR, self.player_id, 'intervals-icu'))
@@ -152,6 +153,19 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(response.mimetype, 'application/xml')
         self.assertEqual(response.headers['Cache-Control'], 'private, no-store')
         response.close()
+
+    def test_for_you_uses_reference_shape_with_linked_provider_workout(self):
+        # The reference is an online built-in recommendation. These explicit
+        # substitutions adapt it to our scheduled third-party workout.
+        item = self.schedule()[0]
+        reference = json.loads((ROOT / 'tests/fixtures/for_you_workout_reference.json').read_text())
+        reference.update(workoutUUID=item['workoutId'], assetUrl=item['workoutUri'],
+                         providerId='intervalsicu', scheduleId=item['scheduleId'],
+                         source='SCHEDULED', sourceId=item['scheduleId'])
+        response = self.client.get('/api/head-unit-bff/carousels/for-you')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Cache-Control'], 'private, no-store')
+        self.assertEqual(response.get_json(), [reference])
 
     def test_download_normalizes_unique_id_without_rewriting_source_or_targets(self):
         path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
@@ -269,6 +283,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         other = self.client_for(902)
         self.assertEqual(other.get('/api/workout/schedule/list').get_json(), [])
         self.assertEqual(other.get('/api/head-unit-bff/game-home').get_json(), [])
+        self.assertEqual(other.get('/api/head-unit-bff/carousels/for-you').get_json(), {})
         self.assertEqual(other.get('/api/workout/workouts/' + item['workoutId']).status_code, 404)
         self.assertEqual(other.get(urlsplit(item['workoutUri']).path).status_code, 403)
         self.store_workout(902)
@@ -279,6 +294,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         item = self.schedule()[0]
         anonymous = zo.app.test_client()
         for path in ['/api/workout/schedule/list', '/api/head-unit-bff/game-home',
+                     '/api/head-unit-bff/carousels/for-you',
                      '/api/workout/workouts/' + item['workoutId']]:
             with self.subTest(path=path):
                 self.assertIn(anonymous.get(path).status_code, (302, 401))
@@ -291,6 +307,8 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         client = zo.app.test_client()
         headers = {'Authorization': 'Bearer ' + token}
         self.assertEqual(client.get('/api/workout/schedule/list', headers=headers).get_json(), [item])
+        self.assertEqual(client.get('/api/head-unit-bff/carousels/for-you', headers=headers).get_json(),
+                         self.client.get('/api/head-unit-bff/carousels/for-you').get_json())
         response = client.get(item['workoutUri'], headers=headers)
         self.assert_workout_download(response, item['workoutId'])
         response.close()
@@ -340,6 +358,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
     def test_running_filter_does_not_show_cycling_card(self):
         self.assertEqual(self.client.get('/api/workout/schedule/list?sport=RUNNING').get_json(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/game-home?sport=RUNNING').get_json(), [])
+        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you?sport=RUNNING').get_json(), {})
         self.assertTrue(self.client.get('/api/workout/schedule/list?sport=CYCLING').get_json())
 
     def test_single_player_keeps_the_existing_anonymous_profile_behavior(self):
@@ -349,12 +368,14 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         with patch.object(zo, 'MULTIPLAYER', False), patch.object(zo.login_manager, 'anonymous_user', zo.AnonUser):
             client = zo.app.test_client()
             self.assertEqual(client.get('/api/workout/schedule/list').get_json(), expected)
+            self.assertEqual(client.get('/api/head-unit-bff/carousels/for-you').get_json(),
+                             self.client.get('/api/head-unit-bff/carousels/for-you').get_json())
             response = client.get(expected[0]['workoutUri'])
             self.assert_workout_download(response, expected[0]['workoutId'])
             response.close()
 
     def test_for_you_partner_name_and_other_placeholders(self):
-        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), {})
+        self.assertTrue(self.client.get('/api/head-unit-bff/carousels/for-you').get_json())
         self.assertEqual(self.client.get(
             '/api/assetcms/delivery/tenant/production/static/asset/client_config/zwift/'
             'asset-cms-shared-artifacts/assets/client_config/partner_name_map.json/download'
@@ -369,6 +390,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         with patch.object(zo, 'sync_intervals_workout_for_player', side_effect=AssertionError('no sync on GET')):
             self.assertTrue(self.schedule())
             self.assertTrue(self.client.get('/api/head-unit-bff/game-home').get_json())
+            self.assertTrue(self.client.get('/api/head-unit-bff/carousels/for-you').get_json())
         self.assertEqual((path.read_bytes(), path.stat().st_mtime_ns), before)
 
     def sync_events(self, events, fail_id=None):
@@ -407,16 +429,27 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(len(items), 2)
         self.assertEqual(len({item['workoutId'] for item in items}), 2)
         self.assertEqual(len({item['scheduleId'] for item in items}), 2)
-        for item, duration in zip(items, (101, 102)):
+        cards = self.client.get('/api/head-unit-bff/carousels/for-you').get_json()
+        self.assertEqual([card['workoutUUID'] for card in cards], [item['workoutId'] for item in items])
+        self.assertEqual(self.client.get('/api/head-unit-bff/game-home').get_json()['nextUp']['selected']['entityId'],
+                         items[0]['workoutId'])
+        for item, card, duration in zip(items, cards, (101, 102)):
+            self.assertEqual(card['assetUrl'], item['workoutUri'])
+            self.assertEqual(card['scheduleId'], item['scheduleId'])
+            self.assertEqual(card['sourceId'], item['scheduleId'])
+            self.assertEqual(card['providerId'], item['trainingProviderId'])
             self.assertEqual(item['workoutSummary']['duration'], duration)
-            response = zo.app.test_client().get(item['workoutUri'])
+            response = zo.app.test_client().get(card['assetUrl'])
             self.assertEqual(response.status_code, 200)
+            root = zo.ET.fromstring(response.data)
+            self.assertEqual(root.findtext('uniqueId'), card['workoutUUID'])
             self.assertIn(('Duration="%s"' % duration).encode(), response.data)
             response.close()
             self.assertEqual(self.client.get('/api/workout/workouts/' + item['workoutId']).get_json(),
                              item['workoutSummary'])
         self.sync_events(self.today_events())
         self.assertEqual(self.schedule(), items)
+        self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), cards)
         with zo.app.app_context():
             rows = zo.Zfile.query.filter_by(player_id=self.player_id, folder='customworkouts').all()
             self.assertEqual(len([row for row in rows if row.filename.startswith('intervals-icu-')]), 2)
@@ -424,6 +457,19 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(len(list(folder.glob('intervals-icu-*.zwo'))), 2)
         entries = zo.workouts_manifest.load_manifest(str(folder))
         self.assertEqual(len([entry for entry in entries if not entry['deleted']]), 2)
+
+    def test_for_you_has_no_duplicates_or_fixed_two_card_limit(self):
+        events = self.today_events()
+        events.append(dict(events[1], id=103, name='Third workout'))
+        self.sync_events(events)
+        path = Path(zo.workout_state.metadata_file(zo.STORAGE_DIR, self.player_id, 'intervals-icu'))
+        payload = json.loads(path.read_text())
+        payload['workouts'].append(dict(payload['workouts'][0]))
+        path.write_text(json.dumps(payload))
+        cards = self.client.get('/api/head-unit-bff/carousels/for-you').get_json()
+        self.assertEqual(len(cards), 3)
+        self.assertEqual({card['workoutUUID'] for card in cards},
+                         {item['workoutId'] for item in self.schedule()})
 
     def test_partial_download_failure_preserves_the_previous_entire_collection(self):
         self.sync_events(self.today_events())
