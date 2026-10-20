@@ -181,7 +181,8 @@
       "value": true
     },
     {
-      "name": "game_1_102_unpair_all_devices"
+      "name": "game_1_102_unpair_all_devices",
+      "value": true
     },
     {
       "name": "game_1_103_fill_right_hand_rewards_page",
@@ -226,10 +227,6 @@
       "value": true
     },
     {
-      "name": "game_1_105_zui_logout_earlier",
-      "value": true
-    },
-    {
       "name": "game_1_106_zml_rnl"
     },
     {
@@ -244,18 +241,7 @@
       "value": true
     },
     {
-      "name": "game_1_108_allow_experimental_uploading",
-      "value": true,
-      "values": {
-        "fields": {
-          "allow_mochi_uploading": {
-            "boolValue": false
-          },
-          "allow_portal_uploading": {
-            "boolValue": false
-          }
-        }
-      }
+      "name": "game_1_108_allow_experimental_uploading"
     },
     {
       "name": "game_1_108_challenge_poster_cards",
@@ -377,7 +363,21 @@
       "value": true
     },
     {
-      "name": "game_1_115_wattlock"
+      "name": "game_1_115_wattlock",
+      "value": true,
+      "values": {
+        "fields": {
+          "cache_gear_selection": {
+            "boolValue": true
+          },
+          "display_locked_value": {
+            "boolValue": true
+          },
+          "drop_button_support": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_1_116_deprecate_wahoo_ant_burst_mode",
@@ -564,7 +564,15 @@
       "value": true
     },
     {
+      "name": "game_1_123_allow_hide_cursor_on_idle",
+      "value": true
+    },
+    {
       "name": "game_1_123_clear_devices_on_shutdown",
+      "value": true
+    },
+    {
+      "name": "game_1_123_cursor_hide_requires_focus",
       "value": true
     },
     {
@@ -580,7 +588,16 @@
       "value": true
     },
     {
+      "name": "game_1_124_0_image_download"
+    },
+    {
       "name": "game_1_124_any_point_route_completion"
+    },
+    {
+      "name": "game_1_124_debounce_recommendations_wa"
+    },
+    {
+      "name": "game_1_124_tymewear_vital_pro"
     },
     {
       "name": "game_1_17_noesis_enabled",
@@ -727,34 +744,7 @@
       }
     },
     {
-      "name": "game_1_42_teleport_bikeentity_validation",
-      "value": true,
-      "values": {
-        "fields": {
-          "maxPacketTimeMS": {
-            "varintValue": "5000"
-          },
-          "maxProjectedDistance": {
-            "numberValue": 30.0
-          },
-          "maxReconTime": {
-            "numberValue": 5.0
-          },
-          "paddingDistance": {
-            "numberValue": 1.0
-          },
-          "reconAttempts": {
-            "varintValue": "5"
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_42_teleport_deprecate_pedalassist_state"
-    },
-    {
-      "name": "game_1_43_3_ble_dll_v2",
-      "value": true
+      "name": "game_1_43_3_ble_dll_v2"
     },
     {
       "name": "game_1_43_android_road_height_fixup"
@@ -985,7 +975,7 @@
       "values": {
         "fields": {
           "hero_carousel_id": {
-            "stringValue": "home_page_hero_carousel_121"
+            "stringValue": "home_page_hero_carousel_123"
           }
         }
       }
@@ -1098,14 +1088,7 @@
     },
     {
       "name": "game_1_77_prevent_teleport_to_player_type",
-      "value": true,
-      "values": {
-        "fields": {
-          "restricted_teleports": {
-            "stringValue": "{\"Player Type\":[{\"NORMAL,PRO_CYCLIST,ZWIFT_STAFF,AMBASSADOR,VERIFIED,ZED,ZAC,PRO_TRIATHLETE,PRO_RUNNER,PACER_BOT,BROADCASTER,COMMUNITY_LEADER,RIDE_LEADER\":[{\"World ID\":1,\"Road IDs\":[193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229]}]}]}"
-          }
-        }
-      }
+      "value": true
     },
     {
       "name": "game_1_77_ttt_team_car_shows_znl_when_fanviewing",
@@ -1129,29 +1112,6 @@
     {
       "name": "game_1_83_climb_portal_for_you",
       "value": true
-    },
-    {
-      "name": "game_1_83_streaks_backend_migration",
-      "value": true,
-      "values": {
-        "fields": {
-          "ContinueToUpdatePlayerProfileWithStreaks": {
-            "boolValue": true
-          },
-          "GetUserStreaksDataFromBackend": {
-            "boolValue": true
-          },
-          "IgnoreNonQualifyingAndDeletedActivities": {
-            "boolValue": true
-          },
-          "ShouldApplyBonusXPFromExternalActivity": {
-            "boolValue": true
-          },
-          "ShouldShowStreaksUIFromRunningActivity": {
-            "boolValue": true
-          }
-        }
-      }
     },
     {
       "name": "game_1_83_training_partner_post_workout_survey",
@@ -1479,7 +1439,7 @@
       "values": {
         "fields": {
           "branch_prefix": {
-            "stringValue": "art/,data/fall-26-early-access-build"
+            "stringValue": "art/"
           }
         }
       }
@@ -1493,7 +1453,20 @@
     },
     {
       "name": "game_camera_spill",
-      "value": true
+      "value": true,
+      "values": {
+        "fields": {
+          "Geo_01": {
+            "stringValue": "release;JNGRKCNAQE"
+          },
+          "Geo_02": {
+            "stringValue": "release;JNGRKCNAQE"
+          },
+          "Geo_03": {
+            "stringValue": "release;JNGRKCNAQE"
+          }
+        }
+      }
     },
     {
       "name": "game_check_for_video_updates"
@@ -1550,7 +1523,7 @@
             "stringValue": "dlc_asset"
           },
           "build_id": {
-            "stringValue": "166686"
+            "stringValue": "167409"
           },
           "canary_test": {
             "boolValue": true
@@ -1621,23 +1594,7 @@
     },
     {
       "name": "game_instrumental_rock_bass",
-      "value": true,
-      "values": {
-        "fields": {
-          "end": {
-            "varintValue": "4102470000"
-          },
-          "ints": {
-            "stringValue": "1920002,1,3,1 1920002,1,0,0 1920003,1,1,0 1920003,1,3,0 350010,1,3,0 350010,1,0,0 350011,1,1,0 350011,1,3,1"
-          },
-          "routes": {
-            "stringValue": "1156630474,121619062,1353706660,1374321160,1396603072,1507816665,162354031,1805916570,1998473375,2076673816,2125439468,2155564554,3266658632,3288023593,3306391797,3464446734,3649244236,4045681681,4123597378,4217462305,4236593520,458819181,568123398,966890401"
-          },
-          "start": {
-            "varintValue": "1788847200"
-          }
-        }
-      }
+      "value": true
     },
     {
       "name": "game_lauterbrunnen"
@@ -1664,7 +1621,8 @@
       "value": true
     },
     {
-      "name": "game_loading_screen_for_return_to_homescreen"
+      "name": "game_loading_screen_for_return_to_homescreen",
+      "value": true
     },
     {
       "name": "game_log_rssi"
@@ -1703,6 +1661,9 @@
     {
       "name": "game_patch_noesis_loc",
       "value": true
+    },
+    {
+      "name": "game_points_racing"
     },
     {
       "name": "game_prize_wheel_schedule",
@@ -1790,7 +1751,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.123.0"
+            "stringValue": "1.124.0"
           }
         }
       }
@@ -1916,6 +1877,9 @@
     },
     {
       "name": "game_wd1_data_acq"
+    },
+    {
+      "name": "game_whalesplash"
     },
     {
       "name": "game_world_deco_packages",
