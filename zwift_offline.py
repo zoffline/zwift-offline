@@ -1038,10 +1038,12 @@ def sync_intervals_workout_for_player(player_id, timeout=30):
         return {"status": "missing_credentials", "message": "Intervals.icu credentials are incomplete."}
 
     activate_workout_provider(player_id, 'intervals-icu')
-    stored = []
+    entries = []
 
     def store_workout(filename, content, event):
-        stored.append((filename, content, event))
+        save_player_zfile(player_id, 'customworkouts', filename, content)
+        update_workouts_manifest(player_id, 'customworkouts', filename, content)
+        entries.append(workout_state.build_metadata('intervals-icu', event, filename))
 
     try:
         result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout, timeout=timeout)
@@ -1053,11 +1055,6 @@ def sync_intervals_workout_for_player(player_id, timeout=30):
                 'message': 'No Intervals.icu workout found for today.',
             }
         if result['status'] == 'synced':
-            entries = []
-            for filename, content, event in stored:
-                save_player_zfile(player_id, 'customworkouts', filename, content)
-                update_workouts_manifest(player_id, 'customworkouts', filename, content)
-                entries.append(workout_state.build_metadata('intervals-icu', event, filename))
             workout_state.save_metadata_collection(STORAGE_DIR, player_id, 'intervals-icu', entries)
             keep = {item['filename'] for item in entries}
             remove_player_zfiles_by_prefix(player_id, 'customworkouts', 'intervals-icu-', keep)
@@ -1513,9 +1510,9 @@ def planned_workout_signer():
     return URLSafeSerializer(app.config['SECRET_KEY'], salt='planned-workout-download-v1')
 
 
-def planned_workout_for_player(player_id, workout_id=None):
+def planned_workout_for_player(player_id, workout_id):
     return next((item for item in planned_workouts_for_player(player_id)
-                 if workout_id is None or item['id'] == workout_id), None)
+                 if item['id'] == workout_id), None)
 
 
 def planned_workouts_for_player(player_id):
@@ -1595,7 +1592,7 @@ def api_for_you():
 @login_required
 def api_planned_workout(workout_id):
     workout = current_planned_workout(workout_id)
-    if not workout or workout['id'] != workout_id:
+    if not workout:
         return '', 404
     return planned_workout_json(workout['schedule']['workoutSummary'])
 
@@ -1615,7 +1612,7 @@ def api_planned_workout_cdn_download(workout_id):
             payload.get('workout_id') != workout_id):
         return '', 403
     workout = planned_workout_for_player(payload['player_id'], workout_id)
-    if not workout or workout['id'] != workout_id:
+    if not workout:
         return '', 404
     if payload.get('sha256') != hashlib.sha256(workout['content']).hexdigest():
         return '', 403
