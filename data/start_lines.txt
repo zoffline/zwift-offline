@@ -7,7 +7,7 @@
   "947394567": {
     "name": "Crit City - Downtown Dolphin",
     "road": 0,
-    "time": 628605
+    "time": 642925
   },
   "-1419308404": {
     "name": "Crit City - The Bell Lap",
@@ -70,7 +70,7 @@
     "time": 305075
   },
   "941280950": {
-    "name": "France - Peaky Pav\u00c3\u00a9",
+    "name": "France - Peaky Pav\u00e9",
     "road": 26,
     "time": 296827
   },
@@ -136,6 +136,16 @@
   },
   "1295302121": {
     "name": "Gravel Mountain - Red Rock Loop Arcade",
+    "road": 0,
+    "time": 655000
+  },
+  "-2021220203": {
+    "name": "Gravel Mountain - Red Rock Loop Arcade 3",
+    "road": 0,
+    "time": 655000
+  },
+  "434255158": {
+    "name": "Gravel Mountain - Red Rock Loop Arcade 4",
     "road": 0,
     "time": 655000
   },
@@ -424,6 +434,11 @@
     "road": 129,
     "time": 250890
   },
+  "-1375227966": {
+    "name": "Makuri Islands - Mech Isle Mayhem",
+    "road": 128,
+    "time": 897000
+  },
   "1453570384": {
     "name": "Makuri Islands - Neokyo All-Nighter",
     "road": 4,
@@ -463,11 +478,6 @@
     "name": "Makuri Islands - Rooftop Rendezvous",
     "road": 70,
     "time": 134959
-  },
-  "-1375227966": {
-    "name": "Makuri Islands - Roundikaze",
-    "road": 129,
-    "time": 250890
   },
   "-691331742": {
     "name": "Makuri Islands - Sea to Tree",
@@ -521,8 +531,8 @@
   },
   "362278484": {
     "name": "Makuri Islands - Twilight Crit",
-    "road": 4,
-    "time": 873144
+    "road": 18,
+    "time": 690576
   },
   "1457923570": {
     "name": "Makuri Islands - Twilight Harbor",
@@ -536,8 +546,8 @@
   },
   "-202736804": {
     "name": "Makuri Islands - Urumaze",
-    "road": 129,
-    "time": 250890
+    "road": 128,
+    "time": 897000
   },
   "1941800093": {
     "name": "Makuri Islands - Valley to Mountaintop",
@@ -550,9 +560,9 @@
     "time": 297800
   },
   "811898717": {
-    "name": "Makuri Islands - WhatYumeziWereLost",
-    "road": 73,
-    "time": 143208
+    "name": "Makuri Islands - WhatYumeziWe'reLost?",
+    "road": 0,
+    "time": 907719
   },
   "152965568": {
     "name": "Makuri Islands - Yoru Run",
@@ -815,12 +825,12 @@
     "time": 914800
   },
   "-930393161": {
-    "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es",
+    "name": "Paris - Champs-\u00c9lys\u00e9es",
     "road": 0,
     "time": 485823
   },
   "-1476431023": {
-    "name": "Paris - Champs-\u00c3\u2030lys\u00c3\u00a9es Run",
+    "name": "Paris - Champs-\u00c9lys\u00e9es Run",
     "road": 0,
     "time": 485875
   },
@@ -830,7 +840,7 @@
     "time": 972899
   },
   "-1153887298": {
-    "name": "Paris - Cr\u00c3\u00aape Escape",
+    "name": "Paris - Cr\u00eape Escape",
     "road": 0,
     "time": 485874
   },
@@ -872,7 +882,7 @@
   "2128895616": {
     "name": "Paris - Paris Pacer",
     "road": 0,
-    "time": 888371
+    "time": 889234
   },
   "-1489331213": {
     "name": "Paris - Paris Toujours",
@@ -882,7 +892,12 @@
   "-1978050323": {
     "name": "Paris - Rues in Rythme",
     "road": 0,
-    "time": 36583
+    "time": 36419
+  },
+  "764392844": {
+    "name": "Paris - Sacr\u00e9 Trois!",
+    "road": 0,
+    "time": 485874
   },
   "-2098947784": {
     "name": "Richmond - 2015 Worlds Course",
@@ -945,7 +960,7 @@
     "time": 365803
   },
   "-1982084789": {
-    "name": "Scotland - D\u00c3\u00b9n Dash",
+    "name": "Scotland - D\u00f9n Dash",
     "road": 2,
     "time": 905030
   },
@@ -1019,10 +1034,25 @@
     "road": 0,
     "time": 405170
   },
+  "1156630474": {
+    "name": "Watopia - 3 Lightning Laps",
+    "road": 200,
+    "time": 471000
+  },
   "-475871543": {
     "name": "Watopia - 5K Loop",
     "road": 47,
     "time": 339578
+  },
+  "1507816665": {
+    "name": "Watopia - 6 Lightning Laps",
+    "road": 200,
+    "time": 471000
+  },
+  "2125439468": {
+    "name": "Watopia - 9 Lightning Laps",
+    "road": 200,
+    "time": 471000
   },
   "1115260805": {
     "name": "Watopia - Accelerate to Elevate",
@@ -1033,6 +1063,16 @@
     "name": "Watopia - Beach Island Loop",
     "road": 0,
     "time": 987941
+  },
+  "-1106593263": {
+    "name": "Watopia - Beach Island Loop Run",
+    "road": 0,
+    "time": 987941
+  },
+  "-171369918": {
+    "name": "Watopia - Better Lap Than Never",
+    "road": 133,
+    "time": 954477
   },
   "1917017591": {
     "name": "Watopia - Big Flat 8",
@@ -1058,6 +1098,21 @@
     "name": "Watopia - Bigger Loop",
     "road": 0,
     "time": 12824
+  },
+  "-1028308664": {
+    "name": "Watopia - Caldera Coaster",
+    "road": 196,
+    "time": 813000
+  },
+  "966890401": {
+    "name": "Watopia - California Dreamin'",
+    "road": 196,
+    "time": 813000
+  },
+  "2076673816": {
+    "name": "Watopia - California Roll",
+    "road": 201,
+    "time": 555000
   },
   "-1699508175": {
     "name": "Watopia - Canopies and Coastlines",
@@ -1103,6 +1158,11 @@
     "name": "Watopia - Coastal Crown Loop",
     "road": 133,
     "time": 248735
+  },
+  "-830520562": {
+    "name": "Watopia - Crit Cross",
+    "road": 196,
+    "time": 813000
   },
   "-1406146301": {
     "name": "Watopia - Danger Noodle",
@@ -1169,6 +1229,16 @@
     "road": 0,
     "time": 987495
   },
+  "-1033345835": {
+    "name": "Watopia - Flat Route Run",
+    "road": 0,
+    "time": 12380
+  },
+  "1353706660": {
+    "name": "Watopia - Four Foalsmen",
+    "road": 81,
+    "time": 30600
+  },
   "-1416786329": {
     "name": "Watopia - Four Horsemen",
     "road": 0,
@@ -1184,6 +1254,11 @@
     "road": 81,
     "time": 32347
   },
+  "-980779374": {
+    "name": "Watopia - Going Coastal Run",
+    "road": 81,
+    "time": 30600
+  },
   "1993374659": {
     "name": "Watopia - Handful Of Gravel",
     "road": 35,
@@ -1196,6 +1271,11 @@
   },
   "-333494250": {
     "name": "Watopia - Hilltop Hustle",
+    "road": 149,
+    "time": 587992
+  },
+  "2031173606": {
+    "name": "Watopia - Hilltop Hustle Run",
     "road": 149,
     "time": 587992
   },
@@ -1218,6 +1298,11 @@
     "name": "Watopia - Hot Laps",
     "road": 0,
     "time": 987894
+  },
+  "-2139402742": {
+    "name": "Watopia - Island Interlude",
+    "road": 1,
+    "time": 90000
   },
   "-721879714": {
     "name": "Watopia - Italian Villas Circuit",
@@ -1254,18 +1339,53 @@
     "road": 35,
     "time": 546732
   },
+  "-1558536483": {
+    "name": "Watopia - Jungle Circuit Reverse Run",
+    "road": 35,
+    "time": 546788
+  },
+  "777967780": {
+    "name": "Watopia - Jungle Circuit Run",
+    "road": 35,
+    "time": 546788
+  },
   "-285836430": {
     "name": "Watopia - Jurassic Coast",
     "road": 81,
     "time": 935502
+  },
+  "-1006943703": {
+    "name": "Watopia - Laps, Camera, Traction",
+    "road": 201,
+    "time": 555000
+  },
+  "1998473375": {
+    "name": "Watopia - Lava Legs",
+    "road": 196,
+    "time": 813000
   },
   "-430109420": {
     "name": "Watopia - Legends and Lava",
     "road": 81,
     "time": 938107
   },
+  "568123398": {
+    "name": "Watopia - Lightning Lap",
+    "road": 200,
+    "time": 471000
+  },
+  "-77504991": {
+    "name": "Watopia - Lightning Lap Run",
+    "road": 200,
+    "time": 471000
+  },
   "243949867": {
     "name": "Watopia - Loop de Loop",
+    "road": 0,
+    "time": 987894
+  },
+  "-1839271769": {
+    "name": "Watopia - Loop de Loop Run",
     "road": 0,
     "time": 987894
   },
@@ -1273,6 +1393,11 @@
     "name": "Watopia - Loopin Lava",
     "road": 192,
     "time": 897647
+  },
+  "-58373776": {
+    "name": "Watopia - Loopipelago",
+    "road": 196,
+    "time": 813000
   },
   "-1282378735": {
     "name": "Watopia - May Field",
@@ -1299,6 +1424,16 @@
     "road": 36,
     "time": 706851
   },
+  "-988575499": {
+    "name": "Watopia - Miles of Isles",
+    "road": 200,
+    "time": 471000
+  },
+  "121619062": {
+    "name": "Watopia - Molten Momentum",
+    "road": 196,
+    "time": 813000
+  },
   "-1075893284": {
     "name": "Watopia - Mountain 8",
     "road": 0,
@@ -1308,6 +1443,11 @@
     "name": "Watopia - Mountain Mash",
     "road": 36,
     "time": 807569
+  },
+  "136182452": {
+    "name": "Watopia - Mountain Mash Run",
+    "road": 36,
+    "time": 806437
   },
   "-1328149290": {
     "name": "Watopia - Mountain Route",
@@ -1334,10 +1474,25 @@
     "road": 150,
     "time": 70000
   },
+  "-2113754818": {
+    "name": "Watopia - Oh Hill No Run",
+    "road": 150,
+    "time": 70000
+  },
+  "458819181": {
+    "name": "Watopia - One Ride to Rule Them All",
+    "road": 200,
+    "time": 471000
+  },
   "-1546309583": {
     "name": "Watopia - Out And Back Again",
     "road": 81,
     "time": 30600
+  },
+  "1396603072": {
+    "name": "Watopia - Pacific Pursuit",
+    "road": 0,
+    "time": 987894
   },
   "-736277954": {
     "name": "Watopia - Peak Performance",
@@ -1374,6 +1529,11 @@
     "road": 135,
     "time": 975720
   },
+  "1805916570": {
+    "name": "Watopia - Ring Leader",
+    "road": 201,
+    "time": 555000
+  },
   "-1327354915": {
     "name": "Watopia - Road To Ruins Reverse",
     "road": 0,
@@ -1389,6 +1549,11 @@
     "road": 36,
     "time": 762184
   },
+  "1140989693": {
+    "name": "Watopia - Road to Sky Run",
+    "road": 36,
+    "time": 713379
+  },
   "772562418": {
     "name": "Watopia - Run Path Reverse",
     "road": 47,
@@ -1399,10 +1564,25 @@
     "road": 81,
     "time": 30600
   },
+  "-249285615": {
+    "name": "Watopia - Seafoam Circuit",
+    "road": 201,
+    "time": 555000
+  },
+  "-645723060": {
+    "name": "Watopia - Seafoam Scamper",
+    "road": 201,
+    "time": 555000
+  },
   "-840629157": {
     "name": "Watopia - Seaside Sprint",
     "road": 0,
-    "time": 592082
+    "time": 609298
+  },
+  "-875179317": {
+    "name": "Watopia - Seaside Sprint Run",
+    "road": 0,
+    "time": 609298
   },
   "-1465337769": {
     "name": "Watopia - Serpentine 8",
@@ -1423,6 +1603,11 @@
     "name": "Watopia - Southern Coast Cruise",
     "road": 149,
     "time": 587992
+  },
+  "159415549": {
+    "name": "Watopia - Spiral Summit",
+    "road": 36,
+    "time": 791049
   },
   "-1033799550": {
     "name": "Watopia - Spiral into the Volcano",
@@ -1453,6 +1638,11 @@
     "name": "Watopia - Temple Trek",
     "road": 35,
     "time": 316087
+  },
+  "1434769940": {
+    "name": "Watopia - Temple Trek Run",
+    "road": 35,
+    "time": 313245
   },
   "2128890027": {
     "name": "Watopia - Tempus Fugit",
@@ -1503,6 +1693,11 @@
     "name": "Watopia - The Uber Pretzel",
     "road": 0,
     "time": 14181
+  },
+  "162354031": {
+    "name": "Watopia - The Watopia 150!",
+    "road": 200,
+    "time": 471000
   },
   "-1667361048": {
     "name": "Watopia - Three Little Sisters",
@@ -1564,6 +1759,11 @@
     "road": 0,
     "time": 987930
   },
+  "482200332": {
+    "name": "Watopia - Two Bridges Loop Run",
+    "road": 0,
+    "time": 987930
+  },
   "686828068": {
     "name": "Watopia - Volcano Circuit",
     "road": 23,
@@ -1573,6 +1773,16 @@
     "name": "Watopia - Volcano Circuit CCW",
     "road": 23,
     "time": 791297
+  },
+  "802314860": {
+    "name": "Watopia - Volcano Circuit CCW Run",
+    "road": 23,
+    "time": 791178
+  },
+  "764410120": {
+    "name": "Watopia - Volcano Circuit Run",
+    "road": 23,
+    "time": 791178
   },
   "849508252": {
     "name": "Watopia - Volcano Climb",
@@ -1594,6 +1804,11 @@
     "road": 0,
     "time": 985726
   },
+  "-997234195": {
+    "name": "Watopia - Volcano Flat Run",
+    "road": 0,
+    "time": 12178
+  },
   "-2076558014": {
     "name": "Watopia - WBR Climbing Series",
     "road": 0,
@@ -1609,6 +1824,11 @@
     "road": 81,
     "time": 30600
   },
+  "1374321160": {
+    "name": "Watopia - Watt Goes Up Must Come Down",
+    "road": 196,
+    "time": 813000
+  },
   "979250573": {
     "name": "Watopia - Watts of the Wild",
     "road": 0,
@@ -1618,6 +1838,11 @@
     "name": "Watopia - Whole Lotta Lava",
     "road": 23,
     "time": 791288
+  },
+  "1468250868": {
+    "name": "Watopia - Whole Lotta Lava Run",
+    "road": 23,
+    "time": 791178
   },
   "1724903700": {
     "name": "Watopia - ZG25 Queen",

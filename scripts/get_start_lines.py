@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 import json
 import subprocess
+import ftfy
 
 worlds = 'C:\\Program Files (x86)\\Zwift\\assets\\Worlds'
 
@@ -37,7 +38,7 @@ for directory in os.listdir(worlds):
             nameHash = int.from_bytes(int(route.get('nameHash')).to_bytes(4, 'little'), 'little', signed=True)
             checkpoints = list(tree.find('highrescheckpoint').iter('entry'))
             data[nameHash] = {
-                'name': '%s - %s' % (world_names[world], route.get('name').strip()),
+                'name': '%s - %s' % (world_names[world], ftfy.ftfy(route.get('name').strip())),
                 'road': int(checkpoints[0].get('road')),
                 'time': int(float(checkpoints[0].get('time')) * 1000000 + 5000)
             }

@@ -9,7 +9,7 @@
   {
     "name": "Crit City - Downtown Dolphin",
     "route": 947394567,
-    "distance": 2032.6,
+    "distance": 2059.2,
     "course": 12,
     "sport": 0
   },
@@ -44,6 +44,20 @@
   {
     "name": "Gravel Mountain - Red Rock Loop Arcade",
     "route": 1295302121,
+    "distance": 5396.4,
+    "course": 16,
+    "sport": 0
+  },
+  {
+    "name": "Gravel Mountain - Red Rock Loop Arcade 3",
+    "route": 2273747093,
+    "distance": 5396.4,
+    "course": 16,
+    "sport": 0
+  },
+  {
+    "name": "Gravel Mountain - Red Rock Loop Arcade 4",
+    "route": 434255158,
     "distance": 5396.4,
     "course": 16,
     "sport": 0
@@ -140,34 +154,6 @@
     "sport": 0
   },
   {
-    "name": "Makuri Islands - Roundikaze",
-    "route": 2919739330,
-    "distance": 18338.2,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Twilight Crit",
-    "route": 362278484,
-    "distance": 3903.8,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - Urumaze",
-    "route": 4092230492,
-    "distance": 24755.2,
-    "course": 13,
-    "sport": 0
-  },
-  {
-    "name": "Makuri Islands - WhatYumeziWereLost",
-    "route": 811898717,
-    "distance": 17561.3,
-    "course": 13,
-    "sport": 0
-  },
-  {
     "name": "New York - 2022 Cycling Esports World Championships Route",
     "route": 2436095601,
     "distance": 54964.1,
@@ -231,6 +217,13 @@
     "sport": 0
   },
   {
+    "name": "Paris - Sacr\u00e9 Trois!",
+    "route": 764392844,
+    "distance": 27355.7,
+    "course": 15,
+    "sport": 0
+  },
+  {
     "name": "Richmond - Cobbled Climbs Reverse",
     "route": 4194352271,
     "distance": 9277.1,
@@ -249,6 +242,13 @@
     "route": 1258415487,
     "distance": 4208.3,
     "course": 17,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Better Lap Than Never",
+    "route": 4123597378,
+    "distance": 50413.4,
+    "course": 6,
     "sport": 0
   },
   {
@@ -336,9 +336,9 @@
     "sport": 1
   },
   {
-    "name": "Watopia - Seaside Sprint",
-    "route": 3454338139,
-    "distance": 9253.1,
+    "name": "Watopia - Spiral Summit",
+    "route": 159415549,
+    "distance": 24019.9,
     "course": 6,
     "sport": 0
   },

@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 import json
 import subprocess
+import ftfy
 
 worlds = 'C:\\Program Files (x86)\\Zwift\\assets\\Worlds'
 
@@ -40,7 +41,7 @@ for directory in os.listdir(worlds):
                 if not name.startswith(wname):
                     name = '%s - %s' % (wname, name)
                 event = {
-                    'name': name,
+                    'name': ftfy.ftfy(name),
                     'route': int(route.get('nameHash')),
                     'distance': round(float(route.get('distanceInMeters')) + float(route.get('leadinDistanceInMeters')), 1),
                     'course': world_to_course[world][0],

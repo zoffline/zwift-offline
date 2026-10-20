@@ -10,6 +10,8 @@ message Attributes {
     optional BikeProgress bike_progress = 24;
     optional SpecialEventSeen special_event_seen = 25;
     optional DataCollectionConsent data_collection_consent = 29;
+    optional BikePaintColor bike_paint_color = 31;
+    optional BikeLastEquippedWheel bike_last_equipped_wheel = 32;
 }
 
 message GameSettings {
@@ -30,6 +32,8 @@ message GameSettings {
     optional int32 workout_stats_slot3 = 18;
     optional int32 ride_stats_workout_slot0 = 19;
     optional int32 ride_stats_workout_slot1 = 20;
+    optional int32 route_sort_index = 21;
+    optional int32 route_sort_descending = 22;
 }
 
 message GarageItemLastSelected {
@@ -69,4 +73,15 @@ message DataCollectionConsent {
     optional string signature = 1;
     optional int32 consent = 2;
     optional uint64 time = 3;
+}
+
+message BikePaintColor {
+    optional string signature = 1;
+    optional double color = 2;
+}
+
+message BikeLastEquippedWheel {
+    optional string signature = 1;
+    optional string front = 2;
+    optional string rear = 3;
 }
