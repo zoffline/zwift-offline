@@ -379,7 +379,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         self.assertEqual(self.client.get(
             '/api/assetcms/delivery/tenant/production/static/asset/client_config/zwift/'
             'asset-cms-shared-artifacts/assets/client_config/partner_name_map.json/download'
-        ).get_json(), {'intervalsicu': 'Intervals icu'})
+        ).get_json(), {'intervalsicu': 'Intervals.icu'})
         self.assertIsNone(self.client.get('/api/assetcms/other/download').get_json())
         self.assertEqual(self.client.get('/api/head-unit-bff/crm').get_json(), [])
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/home-challenges').get_json(), {'items': []})

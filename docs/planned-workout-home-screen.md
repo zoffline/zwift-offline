@@ -1,7 +1,7 @@
-# Intervals workouts on the home screen
+# Intervals.icu workouts on the home screen
 
 All valid cycling workouts synced for today's local date are offered in For You
-and the `Intervals icu` partner folder. Next Up selects the first workout.
+and the `Intervals.icu` partner folder. Next Up selects the first workout.
 Home-screen GETs only read the existing cache; the Android login trigger is
 separate (#543). Running, TrainingPeaks and future-day cards are outside scope.
 
@@ -24,7 +24,7 @@ with a valid URL can download that file; access logs redact CDN query values.
 The response supplies the required XML `uniqueId` matching the workout ID.
 Only the response is normalized when needed; stored ZWO files, training targets
 and the existing zfiles/manifest downloads are preserved. Duration/power zones
-come from the ZWO and planned load from Intervals metadata. Unknown fitness
+come from the ZWO and planned load from Intervals.icu metadata. Unknown fitness
 values are not estimated. Invalid metadata/files and unsafe paths produce no card.
 
 ## Import and compatibility
