@@ -186,8 +186,9 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
                     self.assertEqual(response.data, original)
                 response.close()
 
-    def test_normalized_unicode_workout_has_explicit_utf8_without_changing_source(self):
+    def test_workout_name_has_font_fallback_without_changing_source_or_targets(self):
         name = 'VO\u2082max \u2013 l\u00e4ngere Testintervalle'
+        readable_name = 'VO2max \u2013 l\u00e4ngere Testintervalle'
         description = 'Gr\u00f6\u00dfer & kleiner: Test mit Umlauten'
         original = (
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
@@ -199,20 +200,29 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
         path.write_bytes(original)
         self.update_metadata(name=name, description=description)
-        item = self.schedule()[0]
-        self.assertEqual(item['workoutSummary']['name'], name)
-        self.assertEqual(item['workoutSummary']['description'], description)
-        response = zo.app.test_client().get(item['workoutUri'])
-        self.assertEqual(response.status_code, 200)
-        self.assertRegex(response.data, br'^<\?xml[^>]*encoding=[\'"]utf-8[\'"]')
-        root = zo.ET.fromstring(response.data)
-        self.assertEqual(root.findtext('name'), name)
-        self.assertEqual(root.findtext('description'), description)
-        self.assertEqual(root.findtext('uniqueId'), item['workoutId'])
-        self.assertEqual(zo.ET.tostring(root.find('workout')),
-                         zo.ET.tostring(zo.ET.fromstring(original).find('workout')))
-        self.assertEqual(path.read_bytes(), original)
-        response.close()
+        workout_id = self.schedule()[0]['workoutId']
+        for identity in (None, 'old-identity', workout_id):
+            with self.subTest(identity=identity):
+                source = zo.ET.fromstring(original)
+                if identity is not None:
+                    zo.ET.SubElement(source, 'uniqueId').text = identity
+                source_bytes = zo.ET.tostring(source, encoding='utf-8', xml_declaration=True)
+                path.write_bytes(source_bytes)
+                item = self.schedule()[0]
+                self.assertEqual(item['workoutSummary']['name'], readable_name)
+                self.assertEqual(item['workoutSummary']['description'], description)
+                response = zo.app.test_client().get(item['workoutUri'])
+                self.assertEqual(response.status_code, 200)
+                root = zo.ET.fromstring(response.data)
+                self.assertEqual(root.findtext('name'), readable_name)
+                self.assertEqual(root.findtext('description'), description)
+                self.assertEqual(root.findtext('uniqueId'), workout_id)
+                self.assertEqual(zo.ET.tostring(root.find('workout')),
+                                 zo.ET.tostring(source.find('workout')))
+                self.assertEqual(path.read_bytes(), source_bytes)
+                metadata_path = Path(zo.workout_state.metadata_file(zo.STORAGE_DIR, self.player_id, 'intervals-icu'))
+                self.assertEqual(json.loads(metadata_path.read_text())['name'], name)
+                response.close()
 
     def test_cdn_host_requires_a_valid_scoped_signature(self):
         item = self.schedule()[0]

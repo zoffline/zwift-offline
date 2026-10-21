@@ -1621,11 +1621,19 @@ def api_planned_workout_cdn_download(workout_id):
     content = workout['content']
     root = ET.fromstring(content)
     unique_id = root.find('uniqueId')
-    if unique_id is None or unique_id.text != workout_id:
+    changed = unique_id is None or unique_id.text != workout_id
+    if changed:
         if unique_id is None:
             unique_id = ET.SubElement(root, 'uniqueId')
         unique_id.text = workout_id
-        content = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+    name = root.find('name')
+    if name is not None and name.text:
+        readable_name = planned_workouts.display_name(name.text)
+        if readable_name != name.text:
+            name.text = readable_name
+            changed = True
+    if changed:
+        content = ET.tostring(root, encoding='utf-8')
     response = send_file(BytesIO(content), mimetype='application/xml',
                          download_name=workout['filename'], max_age=0)
     response.headers['Cache-Control'] = 'private, no-store'

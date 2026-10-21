@@ -12,6 +12,11 @@ MAX_DURATION = 7 * 24 * 3600
 ZONE_LIMITS = (0.55, 0.75, 0.90, 1.05, 1.20)
 
 
+def display_name(name):
+    # Zwift's workout-card font may lack the subscript-two glyph.
+    return name.replace('\u2082', '2')
+
+
 def number(value, default=0):
     if isinstance(value, bool):
         return default
@@ -140,7 +145,7 @@ def build_workout(storage_dir, player_id, metadata, asset_url, today=None):
         summary = {
             'description': metadata.get('description') or details['description'],
             'workoutAssetUrl': uri, 'workoutId': workout_id, 'legacyId': 0,
-            'name': metadata.get('name') or details['name'],
+            'name': display_name(metadata.get('name') or details['name']),
             'difficulty': details['difficulty'], 'duration': details['duration'],
             'sport': 'CYCLING', 'lastCompletion': None,
             'zonePercentages': details['zonePercentages'],
