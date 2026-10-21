@@ -186,6 +186,34 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
                     self.assertEqual(response.data, original)
                 response.close()
 
+    def test_normalized_unicode_workout_has_explicit_utf8_without_changing_source(self):
+        name = 'VO\u2082max \u2013 l\u00e4ngere Testintervalle'
+        description = 'Gr\u00f6\u00dfer & kleiner: Test mit Umlauten'
+        original = (
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<workout_file><name>' + name + '</name>'
+            '<description>Gr\u00f6\u00dfer &amp; kleiner: Test mit Umlauten</description>'
+            '<sportType>bike</sportType><workout>'
+            '<SteadyState Duration="60" Power="0.5"/></workout></workout_file>'
+        ).encode('utf-8')
+        path = Path(zo.STORAGE_DIR) / str(self.player_id) / 'customworkouts' / self.filename
+        path.write_bytes(original)
+        self.update_metadata(name=name, description=description)
+        item = self.schedule()[0]
+        self.assertEqual(item['workoutSummary']['name'], name)
+        self.assertEqual(item['workoutSummary']['description'], description)
+        response = zo.app.test_client().get(item['workoutUri'])
+        self.assertEqual(response.status_code, 200)
+        self.assertRegex(response.data, br'^<\?xml[^>]*encoding=[\'"]utf-8[\'"]')
+        root = zo.ET.fromstring(response.data)
+        self.assertEqual(root.findtext('name'), name)
+        self.assertEqual(root.findtext('description'), description)
+        self.assertEqual(root.findtext('uniqueId'), item['workoutId'])
+        self.assertEqual(zo.ET.tostring(root.find('workout')),
+                         zo.ET.tostring(zo.ET.fromstring(original).find('workout')))
+        self.assertEqual(path.read_bytes(), original)
+        response.close()
+
     def test_cdn_host_requires_a_valid_scoped_signature(self):
         item = self.schedule()[0]
         client = zo.app.test_client()

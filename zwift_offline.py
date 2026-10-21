@@ -1625,7 +1625,7 @@ def api_planned_workout_cdn_download(workout_id):
         if unique_id is None:
             unique_id = ET.SubElement(root, 'uniqueId')
         unique_id.text = workout_id
-        content = ET.tostring(root, encoding='utf-8')
+        content = ET.tostring(root, encoding='utf-8', xml_declaration=True)
     response = send_file(BytesIO(content), mimetype='application/xml',
                          download_name=workout['filename'], max_age=0)
     response.headers['Cache-Control'] = 'private, no-store'
