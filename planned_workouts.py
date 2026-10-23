@@ -5,11 +5,51 @@ import math
 from pathlib import Path
 import uuid
 import xml.etree.ElementTree as ET
+import workout_state
 
 
 MAX_FILE_BYTES = 16 * 1024 * 1024
 MAX_DURATION = 7 * 24 * 3600
 ZONE_LIMITS = (0.55, 0.75, 0.90, 1.05, 1.20)
+
+
+def cache_dir(storage_dir):
+    return Path(storage_dir) / 'tp-workouts' / 'intervalsicu'
+
+
+def cache_file(storage_dir, workout_id):
+    if not isinstance(workout_id, str):
+        return None
+    try:
+        identity = uuid.UUID(workout_id)
+    except ValueError:
+        return None
+    if identity.version != 4 or str(identity) != workout_id:
+        return None
+    return cache_dir(storage_dir) / (workout_id + '.zwo')
+
+
+def store_workout(storage_dir, event, content, previous=None):
+    workout_id = (previous or {}).get('workout_id')
+    if cache_file(storage_dir, workout_id) is None:
+        workout_id = str(uuid.uuid4())
+    root = ET.fromstring(content)
+    identity = root.find('uniqueId')
+    if identity is None:
+        identity = ET.SubElement(root, 'uniqueId')
+    identity.text = workout_id
+    workout_state.write_file(cache_file(storage_dir, workout_id), ET.tostring(root, encoding='utf-8'))
+    metadata = workout_state.build_metadata('intervals-icu', event, workout_id + '.zwo')
+    metadata['workout_id'] = workout_id
+    return metadata
+
+
+def remove_workouts(storage_dir, entries, keep_ids=()):
+    for metadata in entries:
+        workout_id = metadata.get('workout_id')
+        path = cache_file(storage_dir, workout_id)
+        if path is not None and workout_id not in keep_ids:
+            path.unlink(missing_ok=True)
 
 
 def number(value, default=0):
@@ -102,8 +142,7 @@ def workout_details(content):
 def build_workout(storage_dir, player_id, metadata, asset_url, today=None):
     """Return one current workout or None; no network calls or state writes.
 
-    asset_url is a callback taking the stable workout UUID. All public response
-    fields are kept separate from the local filename and the source bytes.
+    asset_url is a callback taking the stored workout UUID.
     """
     if not isinstance(metadata, dict) or metadata.get('provider') != 'intervals-icu':
         return None
@@ -112,16 +151,13 @@ def build_workout(storage_dir, player_id, metadata, asset_url, today=None):
         if day != (today or datetime.date.today()):
             return None
         event_id = metadata.get('event_id')
-        filename = metadata.get('filename')
+        workout_id = metadata.get('workout_id')
+        path = cache_file(storage_dir, workout_id)
         if not isinstance(event_id, (str, int)) or isinstance(event_id, bool) or not str(event_id):
             return None
-        if (not isinstance(filename, str) or Path(filename).name != filename or
-                not filename.startswith('intervals-icu-') or not filename.endswith('.zwo')):
+        if path is None:
             return None
-        profile = Path(storage_dir) / str(player_id)
-        folder = profile / 'customworkouts'
-        path = folder / filename
-        if any(p.is_symlink() for p in (profile, folder, path)):
+        if any(p.is_symlink() for p in (path.parent.parent, path.parent, path)):
             return None
         if not path.is_file() or path.stat().st_size > MAX_FILE_BYTES:
             return None
@@ -132,7 +168,6 @@ def build_workout(storage_dir, player_id, metadata, asset_url, today=None):
         if details is None:
             return None
         identity = '%s:intervals-icu:%s' % (player_id, event_id)
-        workout_id = str(uuid.uuid5(uuid.NAMESPACE_URL, 'zoffline:workout:' + identity))
         schedule_id = str(uuid.uuid5(uuid.NAMESPACE_URL, 'zoffline:schedule:' + identity + ':' + day.isoformat()))
         uri = asset_url(workout_id)
         midnight = datetime.datetime.combine(day, datetime.time.min)
@@ -162,7 +197,6 @@ def build_workout(storage_dir, player_id, metadata, asset_url, today=None):
             'explanation': None, 'expires': None, 'title': 'LOC_TODAY_LOWER',
             'provider': 'intervalsicu', 'providerProperties': None, 'metadata': [],
         }}
-        return {'id': workout_id, 'filename': filename, 'content': content,
-                'schedule': schedule, 'home': home}
+        return {'id': workout_id, 'schedule': schedule, 'home': home}
     except (OSError, ValueError, TypeError, OverflowError, ET.ParseError):
         return None

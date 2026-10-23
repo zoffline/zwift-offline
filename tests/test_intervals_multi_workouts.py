@@ -5,6 +5,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -97,6 +98,17 @@ class MultipleIntervalsWorkouts(unittest.TestCase):
             payload = ws.load_metadata(folder, 901, 'intervals-icu')
             self.assertEqual(ws.metadata_entries(payload), [entries[1]])
             self.assertEqual(payload['filename'], '102.zwo')
+
+    def test_failed_atomic_write_preserves_the_previous_metadata(self):
+        with tempfile.TemporaryDirectory() as folder:
+            ws.save_metadata(folder, 901, 'intervals-icu', self.events()[0], 'first.zwo')
+            path = Path(ws.metadata_file(folder, 901, 'intervals-icu'))
+            before = path.read_bytes()
+            with patch.object(ws.os, 'replace', side_effect=OSError('synthetic publish failure')):
+                with self.assertRaises(OSError):
+                    ws.save_metadata(folder, 901, 'intervals-icu', self.events()[1], 'second.zwo')
+            self.assertEqual(path.read_bytes(), before)
+            self.assertEqual(list(path.parent.iterdir()), [path])
 
 
 if __name__ == '__main__':

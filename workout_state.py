@@ -62,18 +62,22 @@ def remove_metadata_entry(storage_dir, player_id, provider, event_id):
 
 
 def write_metadata(storage_dir, player_id, provider, payload):
-    file = metadata_file(storage_dir, player_id, provider)
+    write_file(metadata_file(storage_dir, player_id, provider), json.dumps(payload).encode('utf-8'))
+    return payload
+
+
+def write_file(file, content):
+    """Publish a complete file so concurrent readers never see a partial write."""
     os.makedirs(os.path.dirname(file), exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(file), delete=False) as fd:
+        with tempfile.NamedTemporaryFile(dir=os.path.dirname(file), delete=False) as fd:
             temporary = fd.name
-            json.dump(payload, fd)
+            fd.write(content)
         os.replace(temporary, file)
     finally:
         if temporary and os.path.exists(temporary):
             os.remove(temporary)
-    return payload
 
 
 def load_metadata(storage_dir, player_id, provider):

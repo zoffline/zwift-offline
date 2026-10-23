@@ -6,6 +6,7 @@ import sys
 import tempfile
 import time
 import unittest
+import uuid
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -17,15 +18,14 @@ class PlannedWorkouts(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
-        self.folder = self.root / '901' / 'customworkouts'
-        self.folder.mkdir(parents=True)
-        self.filename = 'intervals-icu-1234-test.zwo'
-        self.content = b'<workout_file><name>Test</name><sportType>bike</sportType><workout><SteadyState Duration="60" Power="0.5"/></workout></workout_file>'
-        (self.folder / self.filename).write_bytes(self.content)
         self.today = datetime.date(2026, 10, 19)
-        self.metadata = {'provider': 'intervals-icu', 'event_id': 1234, 'name': 'Test',
-                         'filename': self.filename, 'start_date_local': '2026-10-19T18:00:00',
-                         'icu_training_load': 12}
+        self.event = {'id': 1234, 'name': 'Test',
+                      'start_date_local': '2026-10-19T18:00:00', 'icu_training_load': 12}
+        content = b'<workout_file><name>Test</name><sportType>bike</sportType><workout><SteadyState Duration="60" Power="0.5"/></workout></workout_file>'
+        self.metadata = pw.store_workout(self.root, self.event, content)
+        self.folder = pw.cache_dir(self.root)
+        self.filename = self.metadata['filename']
+        self.content = (self.folder / self.filename).read_bytes()
 
     def build(self, metadata=None, player_id=901):
         return pw.build_workout(self.root, player_id, self.metadata if metadata is None else metadata,
@@ -38,14 +38,12 @@ class PlannedWorkouts(unittest.TestCase):
         self.assertEqual(first['id'], first['home']['nextUp']['selected']['entityId'])
         self.assertEqual(first['schedule']['scheduleId'], first['home']['nextUp']['sourceId'])
         self.assertEqual(first['schedule']['workoutUri'], first['schedule']['workoutSummary']['workoutAssetUrl'])
-        self.assertEqual(first['content'], self.content)
         self.assertEqual(first['schedule']['workoutSummary']['stressPoints'], 12)
 
-    def test_other_player_gets_different_ids(self):
-        folder = self.root / '902' / 'customworkouts'
-        folder.mkdir(parents=True)
-        (folder / self.filename).write_bytes(self.content)
-        self.assertNotEqual(self.build()['id'], self.build(player_id=902)['id'])
+    def test_separate_imports_get_different_random_ids(self):
+        other = pw.store_workout(self.root, self.event, self.content)
+        self.assertNotEqual(self.build()['id'], self.build(other, player_id=902)['id'])
+        self.assertEqual(uuid.UUID(other['workout_id']).version, 4)
 
     def test_stale_future_and_missing_dates_are_not_exposed(self):
         for date in ['2026-10-18T18:00:00', '2026-10-20T18:00:00', 'invalid', None]:
@@ -79,8 +77,8 @@ class PlannedWorkouts(unittest.TestCase):
     def test_bad_metadata_and_paths_are_rejected(self):
         for metadata in [None, [], {}, dict(self.metadata, event_id=None),
                          dict(self.metadata, event_id=True), dict(self.metadata, provider='trainingpeaks'),
-                         dict(self.metadata, filename='../private.zwo'),
-                         dict(self.metadata, filename='other.zwo'),
+                         dict(self.metadata, workout_id='../private'),
+                         dict(self.metadata, workout_id='not-a-uuid'),
                          dict(self.metadata, start_date_local=123),
                          dict(self.metadata, start_date_local=None, start_date=123)]:
             with self.subTest(metadata=metadata):
