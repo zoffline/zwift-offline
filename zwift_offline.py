@@ -66,11 +66,13 @@ import intervals_workouts
 import trainingpeaks_workouts
 import workout_state
 import workouts_manifest
+import planned_workouts
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
 logger.setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
+
 
 if getattr(sys, 'frozen', False):
     # If we're running as a pyinstaller bundle
@@ -933,12 +935,15 @@ def load_intervals_workout_metadata(player_id):
     return load_workout_metadata(player_id, 'intervals-icu')
 
 
-def save_intervals_workout_metadata(player_id, event, filename):
-    return save_workout_metadata(player_id, 'intervals-icu', event, filename)
-
-
-def clear_intervals_workout_metadata(player_id):
-    clear_workout_metadata(player_id, 'intervals-icu')
+def clear_intervals_workout_metadata(player_id, event_id=None):
+    entries = workout_state.metadata_entries(load_intervals_workout_metadata(player_id))
+    removed = entries if event_id is None else [item for item in entries
+                                              if str(item.get('event_id')) == str(event_id)]
+    planned_workouts.remove_workouts(STORAGE_DIR, removed)
+    if event_id is None:
+        clear_workout_metadata(player_id, 'intervals-icu')
+    else:
+        workout_state.remove_metadata_entry(STORAGE_DIR, player_id, 'intervals-icu', event_id)
 
 
 def load_active_workout_provider(player_id):
@@ -975,7 +980,8 @@ def clear_managed_workouts_for_provider(player_id, provider, clear_metadata=True
     prefixes = managed_workout_prefixes(provider)
     for prefix in prefixes:
         remove_player_zfiles_by_prefix(player_id, 'customworkouts', prefix)
-    if prefixes:
+    if prefixes and os.path.isfile(workouts_manifest.manifest_file(
+            os.path.join(STORAGE_DIR, str(player_id), 'customworkouts'))):
         workouts_manifest.remove_prefixed_workouts(os.path.join(STORAGE_DIR, str(player_id), 'customworkouts'), prefixes)
     if provider == 'intervals-icu' and clear_metadata:
         clear_intervals_workout_metadata(player_id)
@@ -986,14 +992,17 @@ def current_workout_sync_status(player_id, provider=None):
     if not provider:
         return None
     metadata = load_workout_metadata(player_id, provider)
-    if not metadata:
+    if not workout_state.metadata_entries(metadata):
         return {
             'provider': provider,
             'metadata': None,
             'server_file_exists': False,
         }
     filename = metadata.get('filename')
-    server_file = os.path.join(STORAGE_DIR, str(player_id), 'customworkouts', filename) if filename else ''
+    cached = planned_workouts.cache_file(STORAGE_DIR, metadata.get('workout_id')) if provider == 'intervals-icu' else None
+    server_file = str(cached) if cached else ''
+    if not server_file and filename:
+        server_file = os.path.join(STORAGE_DIR, str(player_id), 'customworkouts', filename)
     return {
         'provider': provider,
         'metadata': metadata,
@@ -1010,7 +1019,7 @@ def activate_workout_provider(player_id, provider):
         clear_managed_workouts_for_provider(player_id, 'intervals-icu')
 
 
-def sync_intervals_workout_for_player(player_id):
+def sync_intervals_workout_for_player(player_id, timeout=30):
     intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
     if not os.path.exists(intervals_credentials):
         return {"status": "missing_credentials", "message": "Intervals.icu credentials are not configured."}
@@ -1018,17 +1027,17 @@ def sync_intervals_workout_for_player(player_id):
     if not athlete_id or not api_key:
         return {"status": "missing_credentials", "message": "Intervals.icu credentials are incomplete."}
 
+    previous = workout_state.metadata_entries(load_intervals_workout_metadata(player_id))
+    by_event = {str(item.get('event_id')): item for item in previous}
     activate_workout_provider(player_id, 'intervals-icu')
-    stored = {}
+    entries = []
 
-    def store_workout(filename, content, event):
-        clear_managed_workouts_for_provider(player_id, 'intervals-icu', clear_metadata=False)
-        stored['zfile'] = save_player_zfile(player_id, 'customworkouts', filename, content)
-        update_workouts_manifest(player_id, 'customworkouts', filename, content)
-        stored['metadata'] = save_intervals_workout_metadata(player_id, event, filename)
+    def store_workout(_filename, content, event):
+        entries.append(planned_workouts.store_workout(
+            STORAGE_DIR, event, content, by_event.get(str(event['id']))))
 
     try:
-        result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout)
+        result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout, timeout=timeout)
         if result['status'] == 'no_workout':
             clear_managed_workouts_for_provider(player_id, 'intervals-icu')
             return {
@@ -1037,6 +1046,18 @@ def sync_intervals_workout_for_player(player_id):
                 'message': 'No Intervals.icu workout found for today.',
             }
         if result['status'] == 'synced':
+            workout_state.save_metadata_collection(STORAGE_DIR, player_id, 'intervals-icu', entries)
+            planned_workouts.remove_workouts(STORAGE_DIR, previous, {item['workout_id'] for item in entries})
+            # Retire copies made by the former zfiles importer only after a
+            # successful import; other custom workouts stay in the library.
+            if any(row.filename.startswith('intervals-icu-') for row in
+                   Zfile.query.filter_by(player_id=player_id, folder='customworkouts')):
+                clear_managed_workouts_for_provider(player_id, 'intervals-icu', clear_metadata=False)
+                manifest = Zfile.query.filter_by(player_id=player_id, folder='customworkouts',
+                                                filename=workouts_manifest.MANIFEST_FILENAME).first()
+                if manifest:
+                    manifest.timestamp = int(time.time())
+                    db.session.commit()
             sync_status = current_workout_sync_status(player_id, 'intervals-icu')
             return {
                 **result,
@@ -1463,13 +1484,94 @@ def api_eventfeed():
 @app.route('/api/subscription/plan', methods=['GET'])
 @app.route('/api/quest/quests/all-quests', methods=['GET'])
 @app.route('/api/quest/quests/my-quests', methods=['GET'])
-@app.route('/api/workout/schedule/list', methods=['GET'])
 def api_empty_arrays():
     return jsonify([])
 
 @app.route('/api/assetcms/<path:path>', methods=['GET'])
 def api_assetcms(path):
+    if path == 'delivery/tenant/production/static/asset/client_config/zwift/asset-cms-shared-artifacts/assets/client_config/partner_name_map.json/download':
+        return jsonify({'intervalsicu': 'Intervals.icu'})
     return jsonify()
+
+def current_planned_workouts():
+    if request.args.get('sport', 'CYCLING').upper() != 'CYCLING':
+        return []
+    return planned_workouts_for_player(current_user.player_id)
+
+
+def current_planned_workout(workout_id=None):
+    return next((item for item in current_planned_workouts()
+                 if workout_id is None or item['id'] == workout_id), None)
+
+
+def planned_workouts_for_player(player_id):
+    if resolve_workout_provider_for_player(player_id) != 'intervals-icu':
+        return []
+    entries = workout_state.metadata_entries(load_intervals_workout_metadata(player_id))
+    result, seen = [], set()
+    for metadata in entries:
+        workout = planned_workouts.build_workout(
+            STORAGE_DIR, player_id, metadata,
+            lambda workout_id: 'https://cdn.zwift.com' + url_for(
+                'api_planned_workout_cdn_download', workout_id=workout_id))
+        if workout and workout['id'] not in seen:
+            seen.add(workout['id'])
+            result.append(workout)
+    return result
+
+
+def planned_workout_json(payload):
+    response = jsonify(payload)
+    response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+
+@app.route('/api/workout/schedule/list', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_workout_schedule_list():
+    return planned_workout_json([workout['schedule'] for workout in current_planned_workouts()])
+
+
+@app.route('/api/head-unit-bff/game-home', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_game_home():
+    workout = current_planned_workout()
+    return planned_workout_json(workout['home'] if workout else [])
+
+
+@app.route('/api/head-unit-bff/carousels/for-you', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_for_you():
+    cards = [{
+        'recommendationType': 'workout', 'workoutUUID': workout['id'],
+        'workoutHash': None, 'assetUrl': workout['schedule']['workoutUri'],
+        'providerId': workout['schedule']['trainingProviderId'], 'provider': None,
+        'scheduleId': workout['schedule']['scheduleId'], 'score': 1.0,
+        'explanation': None, 'sourceData': None, 'source': 'SCHEDULED',
+        'sourceId': workout['schedule']['scheduleId'], 'ribbon': None,
+        'recommendedDurationMinutes': None,
+    } for workout in current_planned_workouts()]
+    return planned_workout_json(cards)
+
+
+@app.route('/api/workout/workouts/<workout_id>', methods=['GET'])
+@jwt_to_session_cookie
+@login_required
+def api_planned_workout(workout_id):
+    workout = current_planned_workout(workout_id)
+    if not workout:
+        return '', 404
+    return planned_workout_json(workout['schedule']['workoutSummary'])
+
+
+@app.route('/tp-workouts/intervalsicu/<uuid:workout_id>.zwo', methods=['GET'])
+def api_planned_workout_cdn_download(workout_id):
+    return send_from_directory(planned_workouts.cache_dir(STORAGE_DIR), str(workout_id) + '.zwo',
+                               mimetype='application/xml')
+
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
 def api_head_unit_bff(path):
@@ -2649,8 +2751,8 @@ def intervals_upload(player_id, activity):
     workout_metadata = load_intervals_workout_metadata(player_id)
     try:
         result = intervals_workouts.upload_activity(athlete_id, api_key, activity, workout_metadata=workout_metadata)
-        if result.get('paired'):
-            clear_intervals_workout_metadata(player_id)
+        if result.get('paired') and result.get('paired_event_id') is not None:
+            clear_intervals_workout_metadata(player_id, result.get('paired_event_id'))
     except Exception as exc:
         logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
 
