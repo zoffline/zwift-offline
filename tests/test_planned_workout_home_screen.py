@@ -503,8 +503,14 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         with zo.app.app_context():
             zo.save_player_zfile(self.player_id, 'customworkouts', self.filename, self.content)
             zo.update_workouts_manifest(self.player_id, 'customworkouts', self.filename, self.content)
+            zo.save_workout_metadata(self.player_id, 'intervals-icu', self.today_events()[0], self.filename)
+            self.assertEqual(zo.current_workout_sync_status(self.player_id, 'intervals-icu')['server_file'],
+                             str(folder / self.filename))
+        metadata_path = Path(zo.workout_state.metadata_file(zo.STORAGE_DIR, self.player_id, 'intervals-icu'))
+        before = metadata_path.read_bytes()
         self.assertEqual(self.sync_events(self.today_events(), fail_id=102)['status'], 'error')
         self.assertEqual((folder / self.filename).read_bytes(), self.content)
+        self.assertEqual(metadata_path.read_bytes(), before)
         self.assertEqual(self.sync_events(self.today_events())['status'], 'synced')
         self.assertFalse((folder / self.filename).exists())
         with zo.app.app_context():
