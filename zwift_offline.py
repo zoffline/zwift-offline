@@ -1010,7 +1010,7 @@ def activate_workout_provider(player_id, provider):
         clear_managed_workouts_for_provider(player_id, 'intervals-icu')
 
 
-def sync_intervals_workout_for_player(player_id):
+def sync_intervals_workout_for_player(player_id, timeout=30):
     intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
     if not os.path.exists(intervals_credentials):
         return {"status": "missing_credentials", "message": "Intervals.icu credentials are not configured."}
@@ -1028,7 +1028,7 @@ def sync_intervals_workout_for_player(player_id):
         stored['metadata'] = save_intervals_workout_metadata(player_id, event, filename)
 
     try:
-        result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout)
+        result = intervals_workouts.sync_workout(athlete_id, api_key, store_workout, timeout=timeout)
         if result['status'] == 'no_workout':
             clear_managed_workouts_for_provider(player_id, 'intervals-icu')
             return {
@@ -1668,6 +1668,19 @@ def api_gameinfo():
         r.mimetype = 'application/json'
         return r
 
+def sync_workout_at_game_login(player_id):
+    # Game login also runs when Android reuses a saved authentication token.
+    # Keep failures separate from authentication and leave other providers alone.
+    try:
+        if resolve_workout_provider_for_player(player_id) != 'intervals-icu':
+            return
+        result = sync_intervals_workout_for_player(player_id, timeout=(2, 3))
+        logger.info('Game login workout sync: player=%s status=%s',
+                    player_id, result.get('status', 'unknown'))
+    except Exception:
+        logger.warning('Game login workout sync failed for player %s; continuing login', player_id)
+
+
 @app.route('/api/users/login', methods=['POST'])
 @jwt_to_session_cookie
 @login_required
@@ -1675,6 +1688,8 @@ def api_users_login():
     req = login_pb2.LoginRequest()
     req.ParseFromString(request.stream.read())
     player_id = current_user.player_id
+    if 'android' in request.headers.get('User-Agent', '').lower():
+        sync_workout_at_game_login(player_id)
     global_relay[player_id] = Relay(req.key)
     ghosts_enabled[player_id] = current_user.enable_ghosts
 

@@ -103,7 +103,7 @@ def upload_activity(athlete_id, api_key, activity, workout_metadata=None, sessio
     }
 
 
-def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, session=None, base_url=DEFAULT_BASE_URL):
+def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, session=None, base_url=DEFAULT_BASE_URL, timeout=30):
     today = today or datetime.date.today()
     now = now or datetime.datetime.now(datetime.timezone.utc)
     session = session or __import__("requests")
@@ -114,7 +114,7 @@ def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, sessi
         "category": "WORKOUT",
     })
     events_url = f"{base_url}/athlete/{athlete_id}/events?{query}"
-    events_response = session.get(events_url, auth=HTTPBasicAuth("API_KEY", api_key), timeout=30)
+    events_response = session.get(events_url, auth=HTTPBasicAuth("API_KEY", api_key), timeout=timeout)
     events_response.raise_for_status()
     events = normalize_events_payload(events_response.json())
     event = choose_workout_event(events, now=now)
@@ -122,7 +122,7 @@ def sync_workout(athlete_id, api_key, store_workout, today=None, now=None, sessi
         return {"status": "no_workout", "message": f"No Intervals.icu workout found for {today.isoformat()}"}
 
     workout_url = f"{base_url}/athlete/{athlete_id}/events/{event['id']}/download.zwo"
-    workout_response = session.get(workout_url, auth=HTTPBasicAuth("API_KEY", api_key), timeout=30)
+    workout_response = session.get(workout_url, auth=HTTPBasicAuth("API_KEY", api_key), timeout=timeout)
     workout_response.raise_for_status()
 
     filename = build_workout_filename(event)
