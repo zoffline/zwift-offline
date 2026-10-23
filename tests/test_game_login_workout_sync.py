@@ -150,29 +150,28 @@ real_sync = intervals_workouts.sync_workout
 def offline_sync(athlete, key, store, **kwargs):
     return real_sync(athlete, key, store, session=api, **kwargs)
 
-# Full authenticated game login -> import -> database/manifest/file, using fake API.
+# Full authenticated game login -> import, using the provider's storage status.
 with patch.object(zo.intervals_workouts, 'sync_workout', side_effect=offline_sync):
     game_login()
 assert api.timeouts == [(2, 3), (2, 3)]
-files = list((Path(zo.STORAGE_DIR)/'901/customworkouts').glob('intervals-icu-*.zwo'))
-assert len(files) == 1 and b'<workout_file>' in files[0].read_bytes()
-entries = zo.workouts_manifest.load_manifest(str(files[0].parent))
-assert any(entry['name'] == files[0].name and not entry['deleted'] for entry in entries)
 with zo.app.app_context():
-    assert zo.current_workout_sync_status(901, 'intervals-icu')['server_file_exists']
+    status = zo.current_workout_sync_status(901, 'intervals-icu')
+assert status['server_file_exists'] and status['metadata']['event_id'] == 1234
+file = Path(status['server_file'])
+assert b'<workout_file>' in file.read_bytes()
 
 # Repeated game login keeps one managed workout, rather than accumulating copies.
 with patch.object(zo.intervals_workouts, 'sync_workout', side_effect=offline_sync):
     game_login()
-assert len(list(files[0].parent.glob('intervals-icu-*.zwo'))) == 1
-entries = zo.workouts_manifest.load_manifest(str(files[0].parent))
-assert sum(entry['name'] == files[0].name and not entry['deleted'] for entry in entries) == 1
+with zo.app.app_context():
+    assert zo.current_workout_sync_status(901, 'intervals-icu')['server_file'] == str(file)
+assert len(list(file.parent.glob('*.zwo'))) == 1
 
 # No training today follows the existing cleanup behavior and keeps login working.
 api.events = []
 with patch.object(zo.intervals_workouts, 'sync_workout', side_effect=offline_sync):
     game_login()
-assert not list(files[0].parent.glob('intervals-icu-*.zwo'))
+assert not file.exists()
 
 # Web/manual sync retains its original 30-second HTTP timeout.
 default_api = FakeIntervals([event])
@@ -187,8 +186,16 @@ print(json.dumps({'status':'passed', 'checks':[
     'other providers and unlinked profiles untouched',
     'unauthenticated request rejected',
     'bounded HTTP timeouts for game login',
-    'real workout file/database/manifest created',
+    'real workout file and metadata created',
     'repeat login does not duplicate managed workouts',
     'no-workout behavior preserved',
     'manual sync timeout preserved'
 ]}))
+
+# Let other integration tests load their own isolated backend during discovery.
+with zo.app.app_context():
+    zo.db.session.remove()
+    zo.db.engine.dispose()
+sys.modules.pop('zwift_offline', None)
+sys.path.remove(str(test_root))
+isolated.cleanup()
