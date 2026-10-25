@@ -34,8 +34,12 @@
               <label class="form-check-label text-shadow" for="achievements">Download achievements</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="save_zwift" name="save_zwift">
-              <label class="form-check-label text-shadow" for="save_zwift">Save credentials (upload activities)</label>
+              <input class="form-check-input" type="checkbox" id="zwift_upload" name="zwift_upload" {% if upload and uname and passw %}checked{% endif %}>
+              <label class="form-check-label text-shadow" for="zwift_upload">Upload activities</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="zwift_click" name="zwift_click" {% if click and uname and passw %}checked{% endif %}>
+              <label class="form-check-label text-shadow" for="zwift_click">Authenticate Click</label>
             </div>
           </div>
         </div>

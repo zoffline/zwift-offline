@@ -1100,11 +1100,13 @@ def profile(username):
     profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
     file = os.path.join(profile_dir, 'zwift_credentials.bin')
     cred = decrypt_credentials(file)
+    upload = os.path.join(profile_dir, 'zwift_upload.txt')
+    click = os.path.join(profile_dir, 'zwift_click.txt')
     if request.method == "POST":
         if request.form['username'] == "" or request.form['password'] == "":
             flash("Zwift credentials can't be empty.")
             return render_template("profile.html", username=current_user.username)
-        if not request.form.get("zwift_profile") and not request.form.get("achievements") and not request.form.get("save_zwift"):
+        if not any ([request.form.get("zwift_profile"), request.form.get("achievements"), request.form.get("zwift_upload"), request.form.get("zwift_click")]):
             flash("Select at least one option.")
             return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
         username = request.form['username']
@@ -1136,8 +1138,10 @@ def profile(username):
                         with open(achievements_file, 'wb') as f:
                             f.write(achievements)
                     online_sync.logout(session, refresh_token)
-                    if request.form.get("save_zwift"):
+                    if request.form.get("zwift_upload") or request.form.get("zwift_click"):
                         encrypt_credentials(file, (username, password))
+                    save_option(request.form.get("zwift_upload"), upload)
+                    save_option(request.form.get("zwift_click"), click)
                 except Exception as exc:
                     logger.warning('Zwift profile: %s' % repr(exc))
                     flash("Error downloading profile.")
@@ -1147,7 +1151,7 @@ def profile(username):
                 flash("Invalid username or password.")
                 return render_template("profile.html", username=current_user.username)
         return redirect(url_for('settings', username=current_user.username))
-    return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1])
+    return render_template("profile.html", username=current_user.username, uname=cred[0], passw=cred[1], upload=os.path.isfile(upload), click=os.path.isfile(click))
 
 
 @app.route("/garmin/<username>/", methods=["GET", "POST"])
@@ -2673,7 +2677,7 @@ def get_zwift_online_tokens(player_id):
 
 def zwift_upload(player_id, activity):
     tokens = get_zwift_online_tokens(player_id)
-    if tokens['access_token']:
+    if tokens['access_token'] and os.path.isfile("%s/%s/zwift_upload.txt" % (STORAGE_DIR, player_id)):
         with requests.session() as session:
             try:
                 activity.player_id = online_sync.get_player_id(session, tokens['access_token'])
@@ -4395,7 +4399,7 @@ def api_fitness_fitness_goals_history():
 @login_required
 def api_d_lock_service_device_authenticate():
     tokens = get_zwift_online_tokens(current_user.player_id)
-    if tokens['access_token']:
+    if tokens['access_token'] and os.path.isfile("%s/%s/zwift_click.txt" % (STORAGE_DIR, current_user.player_id)):
         headers = dict(request.headers)
         headers['Authorization'] = "Bearer %s" % tokens['access_token']
         with requests.session() as session:
