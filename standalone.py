@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from Crypto.Cipher import AES
 
 import zwift_offline as zo
+import peloton
 import udp_node_msgs_pb2
 import tcp_node_msgs_pb2
 import profile_pb2
@@ -85,6 +86,7 @@ global_ghosts = {}
 online = {}
 global_pace_partners = {}
 global_bots = {}
+peloton_manager = None
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
@@ -463,6 +465,7 @@ def load_pace_partners():
                     global_pace_partners[p.id] = BotVariables()
                     pp = global_pace_partners[p.id]
                     pp.profile = p
+                    pp.folder = d
                 with open(route, 'rb') as fd:
                     pp.route = udp_node_msgs_pb2.Ghost()
                     pp.route.ParseFromString(fd.read())
@@ -476,6 +479,8 @@ def play_pace_partners():
             if pp.position < len(pp.route.states) - 1: pp.position += 1
             else: pp.position = 0
             pp.route.states[pp.position].id = pp_id
+        if peloton_manager:
+            peloton_manager.tick(pacer_update_freq)
         pause = pacer_update_freq - (time.perf_counter() - start)
         if pause > 0: time.sleep(pause)
 
@@ -685,6 +690,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
         elif state.watchingRiderId in global_pace_partners.keys():
             pp = global_pace_partners[state.watchingRiderId]
             watching_state = pp.route.states[pp.position]
+        elif state.watchingRiderId in zo.global_peloton_bots.keys():
+            watching_state = zo.global_peloton_bots[state.watchingRiderId].route.states[0]
         elif state.watchingRiderId in global_bots.keys():
             bot = global_bots[state.watchingRiderId]
             watching_state = bot.route.states[bot.position]
@@ -708,6 +715,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
             for p_id in global_pace_partners.keys():
                 pp = global_pace_partners[p_id]
                 is_nearby, distance = nearby_distance(watching_state, pp.route.states[pp.position])
+                if is_nearby:
+                    nearby[p_id] = distance
+            peloton_bots = zo.global_peloton_bots
+            for p_id in peloton_bots.keys():
+                is_nearby, distance = nearby_distance(watching_state, peloton_bots[p_id].route.states[0])
                 if is_nearby:
                     nearby[p_id] = distance
         if t >= last_bot_updates[player_id] + bot_update_freq:
@@ -749,6 +761,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
             elif p_id in global_pace_partners.keys():
                 pp = global_pace_partners[p_id]
                 player = pp.route.states[pp.position]
+            elif p_id in zo.global_peloton_bots.keys():
+                player = zo.global_peloton_bots[p_id].route.states[0]
             elif p_id in global_bots.keys():
                 bot = global_bots[p_id]
                 player = bot.route.states[bot.position]
@@ -778,8 +792,19 @@ class UDPHandler(socketserver.BaseRequestHandler):
             relay.udp_t_sn += 1
             socket.sendto(r, client_address)
 
+def publish_peloton_bots(followers):
+    zo.global_peloton_bots = followers
+
+def forget_peloton_profiles(player_ids):
+    for player_id in player_ids:
+        zo.player_partial_profiles.pop(player_id, None)
+
 if os.path.isdir(PACE_PARTNERS_DIR):
     load_pace_partners()
+    peloton_manager = peloton.PelotonManager(STORAGE_DIR, global_pace_partners, get_names, zo.GD, zo.world_time,
+        publish_peloton_bots, forget_peloton_profiles, zo.logger)
+    peloton_manager.load()
+    zo.peloton_manager = peloton_manager
     pp = threading.Thread(target=play_pace_partners)
     pp.start()
 
