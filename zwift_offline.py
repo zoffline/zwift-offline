@@ -12,6 +12,7 @@ import time
 import math
 import threading
 import re
+import hashlib
 import smtplib
 import ssl
 import requests
@@ -29,7 +30,7 @@ from shutil import copyfile
 from flask import Flask, request, jsonify, redirect, render_template, url_for, flash, session, make_response, send_file, send_from_directory
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager, login_user, current_user, login_required, logout_user
 from gevent.pywsgi import WSGIServer
-from google.protobuf.json_format import MessageToDict, Parse
+from google.protobuf.json_format import MessageToDict, MessageToJson, Parse
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -1131,10 +1132,8 @@ def profile(username):
                                 json.dump(login_response_dict['economy_config'], f, indent=2)
                     if request.form.get("achievements"):
                         achievements = online_sync.query(session, access_token, "achievement/loadPlayerAchievements")
-                        achievements_file = '%s/achievements.bin' % profile_dir
-                        backup_file(achievements_file)
-                        with open(achievements_file, 'wb') as f:
-                            f.write(achievements)
+                        merge_achievements(profile_dir, achievements)
+                        download_official_data(session, access_token, profile_dir)
                     online_sync.logout(session, refresh_token)
                     if request.form.get("save_zwift"):
                         encrypt_credentials(file, (username, password))
@@ -1467,8 +1466,182 @@ def api_eventfeed():
 def api_empty_arrays():
     return jsonify([])
 
+# ---------------------------------------------------------------------------
+# Official data: route completion catalog, feature flags (variants) and DLC.
+#
+# Recent clients get new routes (e.g. Caldera Coaster, Seafoam Circuit) and
+# parts of the worlds through DLC packages, and enable new content through
+# feature flags that data/variants.txt does not have. Without them the new
+# Watopia islands are empty (road over flat water) and the routes are missing.
+#
+# When achievements are downloaded in Settings - Zwift (or automatically, if
+# credentials are saved), zoffline replays the client's own variant request on
+# the official server, saves the answer as the player's variants.txt override,
+# and downloads the DLC config and packages for that build into storage/dlc.
+# ---------------------------------------------------------------------------
+
+ROUTE_CATALOG_FILE = os.path.join(STORAGE_DIR, 'route_completion_achievements.bin')
+DLC_DIR = os.path.join(STORAGE_DIR, 'dlc')
+DLC_PREFIX = 'delivery/tenant/production/static/asset/dlc_asset/zwift/dlc/'
+DLC_PLATFORMS_FILE = os.path.join(DLC_DIR, 'platforms.txt')
+# flags whose server side zoffline does not implement (membership checks,
+# the client fails with SUB-903)
+UNSUPPORTED_FLAGS = ('game_1_117_feature_gate_entitlements', 'game_1_119_membership_view')
+refresh_lock = threading.Lock()
+
+def merge_achievements(profile_dir, downloaded):
+    """Add downloaded achievements to the local ones instead of replacing them:
+    badges earned offline never reach the official server."""
+    achievements_file = os.path.join(profile_dir, 'achievements.bin')
+    merged = profile_pb2.Achievements()
+    seen = set()
+    sources = [downloaded or b'']
+    if os.path.isfile(achievements_file):
+        with open(achievements_file, 'rb') as f:
+            sources.append(f.read())
+    for data in sources:
+        achievements = profile_pb2.Achievements()
+        try:
+            achievements.ParseFromString(data)
+        except Exception:
+            continue
+        for a in achievements.achievements:
+            if a.id not in seen:
+                seen.add(a.id)
+                merged.achievements.add().id = a.id
+    backup_file(achievements_file)
+    with open(achievements_file, 'wb') as f:
+        f.write(merged.SerializeToString())
+
+def save_route_completion_catalog(session, access_token):
+    status, _, body = online_sync.get_raw(session, access_token, 'api/achievement/route-completion-achievements')
+    if status == 200 and body:
+        with open(ROUTE_CATALOG_FILE, 'wb') as f:
+            f.write(body)
+    else:
+        logger.warning('route completion catalog: HTTP %s' % status)
+
+def save_official_variants(session, access_token, profile_dir):
+    """Replay the client's last variant request on the official server and save
+    the answer as the player's variants override."""
+    request_file = os.path.join(profile_dir, 'variant_request.bin')
+    if not os.path.isfile(request_file):
+        logger.warning('official variants: start Zwift once before downloading achievements')
+        return
+    with open(request_file, 'rb') as f:
+        body = f.read()
+    status, _, data = online_sync.post_raw(session, access_token, 'experimentation/v1/variant', body)
+    if status != 200:
+        logger.warning('official variants: HTTP %s' % status)
+        return
+    variants = variants_pb2.FeatureResponse()
+    variants.ParseFromString(data)
+    override = os.path.join(profile_dir, 'variants.txt')
+    backup_file(override)
+    with open(override, 'w') as f:
+        f.write(MessageToJson(variants))
+    with open(os.path.join(profile_dir, 'variant_request.replayed'), 'w') as f:
+        f.write(hashlib.sha256(body).hexdigest())
+    logger.info('official variants: %s saved' % len(variants.variants))
+
+def dlc_platforms():
+    """Platforms to download DLC for (win, mac, android, ios): the one zoffline
+    runs on plus the ones clients asked for (storage/dlc/platforms.txt)."""
+    platforms = {'mac' if sys.platform == 'darwin' else 'win'}
+    if os.path.isfile(DLC_PLATFORMS_FILE):
+        with open(DLC_PLATFORMS_FILE) as f:
+            platforms.update(p.strip() for p in f if p.strip())
+    return sorted(platforms)
+
+def dlc_package_paths(config):
+    return sorted({p['path'] for p in config.get('packages', []) if 'path' in p})
+
+def download_dlc_asset(session, access_token, build_id, path):
+    # the API answers with a redirect to assetcms.zwift.com, requests drops the
+    # Authorization header when following it, as the CDN expects
+    status, _, body = online_sync.get_raw(session, access_token, 'api/assetcms/%s%s/%s/download' % (DLC_PREFIX, build_id, path), '*/*')
+    if status == 200 and body:
+        dest = os.path.join(DLC_DIR, build_id, path)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        with open(dest, 'wb') as f:
+            f.write(body)
+        return True
+    logger.warning('dlc: %s/%s HTTP %s' % (build_id, path, status))
+    return False
+
+def save_dlc(session, access_token, profile_dir):
+    override = os.path.join(profile_dir, 'variants.txt')
+    if not os.path.isfile(override):
+        return
+    game_dlc = load_variants(override).get('game_dlc')
+    build_id = game_dlc.values.fields['build_id'].string_value if game_dlc else ''
+    if not build_id.isdigit():
+        logger.warning('dlc: no build_id in official variants')
+        return
+    if not os.path.isfile(os.path.join(DLC_DIR, build_id, 'dlc_config.json')) and \
+            not download_dlc_asset(session, access_token, build_id, 'dlc_config.json'):
+        return
+    with open(os.path.join(DLC_DIR, build_id, 'dlc_config.json')) as f:
+        packages = dlc_package_paths(json.load(f))
+    for platform in dlc_platforms():
+        for package in packages:
+            rel = '%s/%s.zip' % (platform, package)
+            if not os.path.isfile(os.path.join(DLC_DIR, build_id, rel)):
+                download_dlc_asset(session, access_token, build_id, rel)
+    logger.info('dlc: build %s, %s packages, platforms %s' % (build_id, len(packages), dlc_platforms()))
+
+def download_official_data(session, access_token, profile_dir):
+    for step in (lambda: save_route_completion_catalog(session, access_token),
+                 lambda: save_official_variants(session, access_token, profile_dir),
+                 lambda: save_dlc(session, access_token, profile_dir)):
+        try:
+            step()
+        except Exception as exc:
+            logger.warning('download_official_data: %s' % repr(exc))
+
+def official_data_stale(profile_dir, request_body):
+    marker = os.path.join(profile_dir, 'variant_request.replayed')
+    if not os.path.isfile(marker):
+        return True
+    with open(marker) as f:
+        if f.read().strip() != hashlib.sha256(request_body).hexdigest():
+            return True  # the client asks for other flags: it was updated
+    return time.time() - os.path.getmtime(marker) > 7 * 86400
+
+def refresh_official_data(profile_dir):
+    """Same as downloading achievements, in the background with saved credentials."""
+    if not refresh_lock.acquire(blocking=False):
+        return
+    try:
+        username, password = decrypt_credentials(os.path.join(profile_dir, 'zwift_credentials.bin'))
+        if not username:
+            return
+        with requests.session() as session:
+            access_token, refresh_token = online_sync.login(session, username, password)
+            merge_achievements(profile_dir, online_sync.query(session, access_token, "achievement/loadPlayerAchievements"))
+            download_official_data(session, access_token, profile_dir)
+            online_sync.logout(session, refresh_token)
+        logger.info('official data refreshed, restart Zwift to apply')
+    except Exception as exc:
+        logger.warning('refresh_official_data: %s' % repr(exc))
+    finally:
+        refresh_lock.release()
+
 @app.route('/api/assetcms/<path:path>', methods=['GET'])
 def api_assetcms(path):
+    if path.startswith(DLC_PREFIX):
+        rel = path[len(DLC_PREFIX):]
+        if rel.endswith('/download'):
+            rel = rel[:-len('/download')]
+        file = os.path.realpath(os.path.join(DLC_DIR, rel))
+        if file.startswith(os.path.realpath(DLC_DIR) + os.sep) and os.path.isfile(file):
+            return send_file(file)
+        parts = rel.split('/')
+        if len(parts) > 2 and rel.endswith('.zip') and parts[1] not in dlc_platforms():
+            # remember the client's platform for the next download
+            os.makedirs(DLC_DIR, exist_ok=True)
+            with open(DLC_PLATFORMS_FILE, 'a') as f:
+                f.write(parts[1] + '\n')
     return jsonify()
 
 @app.route('/api/head-unit-bff/<path:path>', methods=['GET'])
@@ -4077,11 +4250,24 @@ def create_variants_response(request, variants):
 @jwt_to_session_cookie
 @login_required
 def experimentation_v1_variant():
+    body = request.stream.read()
+    profile_dir = os.path.join(STORAGE_DIR, str(current_user.player_id))
+    try:
+        # kept to be replayed on the official server (see save_official_variants)
+        with open(os.path.join(profile_dir, 'variant_request.bin'), 'wb') as f:
+            f.write(body)
+        if os.path.isfile(os.path.join(profile_dir, 'zwift_credentials.bin')) and official_data_stale(profile_dir, body):
+            threading.Thread(target=refresh_official_data, args=(profile_dir,), daemon=True).start()
+    except Exception as exc:
+        logger.warning('experimentation_v1_variant: %s' % repr(exc))
     variants = load_variants(os.path.join(SCRIPT_DIR, "data", "variants.txt"))
-    override = os.path.join(STORAGE_DIR, str(current_user.player_id), "variants.txt")
+    override = os.path.join(profile_dir, "variants.txt")
     if os.path.isfile(override):
         variants.update(load_variants(override))
-    return create_variants_response(request.stream.read(), variants)
+    for name in UNSUPPORTED_FLAGS:
+        if name in variants:
+            variants[name].value = False
+    return create_variants_response(body, variants)
 
 @app.route('/experimentation/v1/machine-id-variant', methods=['POST'])
 def experimentation_v1_machine_id_variant():
@@ -4127,6 +4313,14 @@ def achievement_loadPlayerAchievements():
         with open(achievements_file, 'wb') as f:
             f.write(achievements.SerializeToString())
     return achievements.SerializeToString(), 200
+
+@app.route('/api/achievement/route-completion-achievements', methods=['GET'])
+def api_achievement_route_completion_achievements():
+    # without the catalog the client ignores route completions (catalog-not-loaded)
+    if os.path.isfile(ROUTE_CATALOG_FILE):
+        with open(ROUTE_CATALOG_FILE, 'rb') as f:
+            return f.read(), 200, {'Content-Type': 'application/x-protobuf-lite'}
+    return '', 404
 
 @app.route('/api/achievement/unlock', methods=['POST'])
 @jwt_to_session_cookie

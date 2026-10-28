@@ -87,6 +87,35 @@ def query(session, access_token, route):
         print('HTTP Request failed: %s' % e)
 
 
+def get_raw(session, access_token, route, accept="application/x-protobuf-lite"):
+    response = session.get(
+        url="https://us-or-rly101.zwift.com/%s" % route,
+        headers={
+            "Accept-Encoding": "gzip, deflate",
+            "Accept": accept,
+            "Connection": "keep-alive",
+            "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+            "Authorization": "Bearer %s" % access_token,
+        },
+    )
+    return response.status_code, response.headers.get("Content-Type", ""), response.content
+
+
+def post_raw(session, access_token, route, data, content_type="application/x-protobuf-lite"):
+    response = session.post(
+        url="https://us-or-rly101.zwift.com/%s" % route,
+        headers={
+            "Content-Type": content_type,
+            "Accept": content_type,
+            "Connection": "keep-alive",
+            "User-Agent": "Zwift/115 CFNetwork/758.0.2 Darwin/15.0.0",
+            "Authorization": "Bearer %s" % access_token,
+        },
+        data=data,
+    )
+    return response.status_code, response.headers.get("Content-Type", ""), response.content
+
+
 def api_login(session, access_token, login_request):
     try:
         response = session.post(

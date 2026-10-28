@@ -340,6 +340,15 @@ To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST``
 * If you want to create a dynamic RoboPacer (increase power on climbs and decrease on descents) you can use [standalone_power.py](https://github.com/oldnapalm/zwift-offline/blob/master/standalone_power.py) (requires 2 ANT sticks, [python-ant](https://github.com/mch/python-ant) and [PowerMeterTx.py](https://github.com/oldnapalm/zwift-offline/blob/master/PowerMeterTx.py)).
 </details>
 
+<details><summary>New routes and areas (DLC and official feature flags)</summary>
+
+* Recent Zwift versions get new routes (e.g. Caldera Coaster, Seafoam Circuit, The Watopia 150) and new areas through DLC packages, and enable new content through feature flags. Without them new Watopia islands show only the road over flat water and the routes are missing from the list.
+* To fetch them, start Zwift with zoffline once (the client's feature flag request is saved), then use "Settings - Zwift" with "Download achievements" checked. zoffline replays the client's request on the official server, saves the answer in ``storage/<player_id>/variants.txt`` and downloads the DLC config and packages into ``storage/dlc`` (about 230 MB). Restart Zwift afterwards. Once downloaded, they work without internet.
+* If "Save credentials" is checked, this is repeated automatically in the background when the client asks for a different set of flags (after a Zwift update) or once a week.
+* DLC is downloaded for the platform zoffline runs on (``mac`` or ``win``) and for any platform a client asked for (``storage/dlc/platforms.txt``, values ``win``, ``mac``, ``android``, ``ios``).
+* Downloaded achievements are merged with the ones earned offline. The route completion catalog is downloaded too, so route completion rewards are not ignored.
+</details>
+
 <details><summary>Bookmarks</summary>
 
 * When you finish an activity, your last position will be saved as a bookmark.
