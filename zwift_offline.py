@@ -66,6 +66,7 @@ import intervals_workouts
 import trainingpeaks_workouts
 import workout_state
 import workouts_manifest
+import free_strava
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 logger = logging.getLogger('zoffline')
@@ -790,19 +791,67 @@ def reset(username):
     return render_template("reset.html", username=current_user.username)
 
 
+def strava_upload_method(player_id):
+    file = '%s/%s/strava_upload_method.txt' % (STORAGE_DIR, player_id)
+    if not os.path.exists(file):
+        return 'paid'
+    with open(file) as f:
+        return f.readline().rstrip('\r\n')
+
+
 @app.route("/strava/<username>/", methods=["GET", "POST"])
 @login_required
 def strava(username):
     profile_dir = '%s/%s' % (STORAGE_DIR, current_user.player_id)
     api = '%s/strava_api.bin' % profile_dir
     token = os.path.isfile('%s/strava_token.txt' % profile_dir)
+    cookie_file = '%s/strava4_session.txt' % profile_dir
+    cookie = ''
+    if os.path.isfile(cookie_file):
+        with open(cookie_file) as f:
+            cookie = f.readline().rstrip('\r\n')
+    method = strava_upload_method(current_user.player_id)
     if request.method == "POST":
-        if request.form['client_id'] == "" or request.form['client_secret'] == "":
+        if '_strava4_session' in request.form:
+            if request.form['_strava4_session'] == "":
+                flash("Session cookie can't be empty.")
+            else:
+                cookie = request.form['_strava4_session']
+                with open(cookie_file, 'w') as f:
+                    f.write(cookie)
+                flash("Session cookie saved.")
+        elif 'method' in request.form:
+            if request.form['method'] in ('paid', 'free'):
+                method = request.form['method']
+                with open('%s/strava_upload_method.txt' % profile_dir, 'w') as f:
+                    f.write(method)
+                flash("Strava upload method saved.")
+        elif request.form['client_id'] == "" or request.form['client_secret'] == "":
             flash("Client ID and secret can't be empty.")
-            return render_template("strava.html", username=current_user.username, token=token)
-        encrypt_credentials(api, (request.form['client_id'], request.form['client_secret']))
+        else:
+            encrypt_credentials(api, (request.form['client_id'], request.form['client_secret']))
     cred = decrypt_credentials(api)
-    return render_template("strava.html", username=current_user.username, cid=cred[0], cs=cred[1], token=token)
+    return render_template("strava.html", username=current_user.username, cid=cred[0], cs=cred[1], token=token, cookie=cookie, method=method)
+
+
+@app.route("/strava/<username>/test", methods=["GET"])
+@login_required
+def strava_test(username):
+    cookie_file = '%s/%s/strava4_session.txt' % (STORAGE_DIR, current_user.player_id)
+    if not os.path.isfile(cookie_file):
+        flash("No session configured.")
+        return redirect(url_for('strava', username=current_user.username))
+    try:
+        with open(cookie_file) as f:
+            cookie = f.readline().rstrip('\r\n')
+        if free_strava.check_session(cookie):
+            flash("Session is valid.")
+        else:
+            flash("Session is not valid. Update the cookie.")
+    except Exception as exc:
+        logger.warning("strava_test: %s" % repr(exc))
+        flash("Could not reach Strava. Check your internet connection.")
+    return redirect(url_for('strava', username=current_user.username))
 
 
 @app.route("/strava_auth", methods=['GET'])
@@ -1358,7 +1407,7 @@ def download_avatarLarge(player_id):
 @login_required
 def delete(filename):
     credentials = ['zwift_credentials.bin', 'intervals_credentials.bin']
-    strava = ['strava_api.bin', 'strava_token.txt']
+    strava = ['strava_api.bin', 'strava_token.txt', 'strava4_session.txt']
     garmin = ['garmin_credentials.bin', 'garth/oauth1_token.json']
     if filename not in credentials + strava + garmin:
         return '', 403
@@ -2600,6 +2649,23 @@ def strava_upload(player_id, activity):
         logger.warning("Strava upload failed. No internet? %s" % repr(exc))
 
 
+def free_strava_upload(player_id, activity, photos):
+    file = '%s/%s/strava4_session.txt' % (STORAGE_DIR, player_id)
+    if not os.path.exists(file):
+        logger.info("strava4_session.txt missing, skip free Strava activity update")
+        return
+    try:
+        with open(file) as f:
+            cookie = f.readline().rstrip('\r\n')
+    except Exception as exc:
+        logger.warning("Failed to read %s. Skipping free Strava upload attempt: %s" % (file, repr(exc)))
+        return
+    try:
+        free_strava.upload_activity(cookie, activity.fit_filename, activity.fit, activity.name, photos=photos)
+    except Exception as exc:
+        logger.warning("Free Strava upload failed. No internet? %s" % repr(exc))
+
+
 def garmin_upload(player_id, activity):
     try:
         import garth
@@ -2739,8 +2805,11 @@ def save_ghost(player_id, name):
         with open(f, 'wb') as fd:
             fd.write(ghosts.rec.SerializeToString())
 
-def activity_uploads(player_id, activity):
-    strava_upload(player_id, activity)
+def activity_uploads(player_id, activity, photos):
+    if strava_upload_method(player_id) == 'free':
+        free_strava_upload(player_id, activity, photos)
+    else:
+        strava_upload(player_id, activity)
     garmin_upload(player_id, activity)
     runalyze_upload(player_id, activity)
     intervals_upload(player_id, activity)
@@ -2786,8 +2855,10 @@ def api_profiles_activities_id(player_id, activity_id):
     # For using with upload_activity
     with open('%s/%s/last_activity.bin' % (STORAGE_DIR, player_id), 'wb') as f:
         f.write(stream)
+    photos = [path for img in ActivityImage.query.filter_by(player_id=player_id, activity_id=activity.id)
+              if os.path.exists(path := '%s/%s/images/%s.jpg' % (STORAGE_DIR, player_id, img.id))]
     # Upload in separate thread to avoid client freezing if it takes longer than expected
-    upload = threading.Thread(target=activity_uploads, args=(player_id, activity))
+    upload = threading.Thread(target=activity_uploads, args=(player_id, activity, photos))
     upload.start()
     return response, 200
 
