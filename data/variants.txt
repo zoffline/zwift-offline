@@ -1413,6 +1413,7 @@
     },
     {
       "name": "game_VideoCapture",
+      "value": true,
       "values": {
         "fields": {
           "CloseClips": {
@@ -1431,8 +1432,7 @@
       }
     },
     {
-      "name": "game_VideoCaptureDefaultDisable",
-      "value": true
+      "name": "game_VideoCaptureDefaultDisable"
     },
     {
       "name": "game_accessory_visibility",

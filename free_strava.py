@@ -17,6 +17,11 @@ SPORT_TYPE = "VirtualRide"
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
 )
+VIDEO_EXTENSIONS = (".mp4", ".mov", ".m4v")
+
+
+def media_type(path):
+    return "2" if os.path.splitext(path)[1].lower() in VIDEO_EXTENSIONS else "1"
 
 
 def wait_ready(s, upload_id):
@@ -95,9 +100,13 @@ def parse_form(form):
 def upload_photo(s, token, athlete_id, photo):
     uid = str(uuid.uuid4())
     taken_at = int(os.path.getmtime(photo) * 1000)
+    kind = media_type(photo)
+    meta_data = {"athlete_id": athlete_id, "uuid": uid, "taken_at": taken_at}
+    if kind == "2":
+        meta_data["media_type"] = kind
     r = s.put(
         PHOTO_METADATA_URL,
-        data={"athlete_id": athlete_id, "uuid": uid, "taken_at": taken_at},
+        data=meta_data,
         headers={"X-CSRF-Token": token},
     )
     if not r.ok:
@@ -108,7 +117,7 @@ def upload_photo(s, token, athlete_id, photo):
     r = s.put(meta["uri"], data=raw, headers=meta["header"])
     if not r.ok:
         raise RuntimeError("Photo upload failed: %s" % photo)
-    return uid
+    return uid, kind
 
 
 def update_activity(s, aid, name=None, sport_type=None, photos=()):
@@ -137,10 +146,10 @@ def update_activity(s, aid, name=None, sport_type=None, photos=()):
         data[key] = sport_type
     count = 0
     for photo in photos:
-        uid = upload_photo(s, token, athlete_id, photo)
+        uid, kind = upload_photo(s, token, athlete_id, photo)
         data["photos[%s][caption]" % uid] = ""
         data["photos[%s][rank]" % uid] = str(count)
-        data["photos[%s][media_type]" % uid] = "1"
+        data["photos[%s][media_type]" % uid] = kind
         count += 1
     if not name and not sport_type and not count:
         return

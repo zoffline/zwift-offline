@@ -384,6 +384,12 @@ class ActivityImage(db.Model):
     player_id = db.Column(db.Integer, nullable=False)
     activity_id = db.Column(db.Integer, nullable=False)
 
+class ActivityMedia(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    activity_id = db.Column(db.Integer, nullable=False)
+    content_type = db.Column(db.Text, nullable=False)
+
 class PowerCurve(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, nullable=False)
@@ -2583,6 +2589,34 @@ def api_profiles_activities_images(player_id, activity_id):
         f.write(image.jpg)
     return jsonify({"id": row.id, "id_str": str(row.id)})
 
+@app.route('/api/profiles/<int:player_id>/activities/<int:activity_id>/medias', methods=['POST'])
+@jwt_to_session_cookie
+@login_required
+def api_profiles_activities_medias(player_id, activity_id):
+    req = activity_pb2.ActivityMediaSaveRequest()
+    req.ParseFromString(request.stream.read())
+    row = ActivityMedia(player_id=player_id, activity_id=activity_id, content_type=req.content_type)
+    db.session.add(row)
+    db.session.commit()
+    result = activity_pb2.ActivityMediaSaveResult()
+    result.upload_url = 'https://us-or-rly101.zwift.com/uploads/media/%s' % row.id
+    result.expiration_in_millis = int(time.time() * 1000) + 15 * 60 * 1000
+    result.signed_headers['Content-Type'].values.append(req.content_type)
+    return result.SerializeToString(), 200
+
+@app.route('/uploads/media/<int:media_id>', methods=['PUT'])
+def uploads_media(media_id):
+    row = db.session.get(ActivityMedia, media_id)
+    if not row:
+        return '', 400
+    medias_dir = '%s/%s/medias' % (STORAGE_DIR, row.player_id)
+    if not make_dir(medias_dir):
+        return '', 400
+    ext = 'mov' if 'quicktime' in row.content_type else 'mp4'
+    with open('%s/%s.%s' % (medias_dir, row.id, ext), 'wb') as f:
+        f.write(request.stream.read())
+    return '', 200
+
 def time_since(date):
     seconds = (world_time() - date) // 1000
     interval = seconds // 31536000
@@ -2995,6 +3029,8 @@ def api_profiles_activities_id(player_id, activity_id):
         f.write(stream)
     photos = [path for img in ActivityImage.query.filter_by(player_id=player_id, activity_id=activity.id)
               if os.path.exists(path := '%s/%s/images/%s.jpg' % (STORAGE_DIR, player_id, img.id))]
+    photos.extend([path for media in ActivityMedia.query.filter_by(player_id=player_id, activity_id=activity.id)
+              if os.path.exists(path := '%s/%s/medias/%s.%s' % (STORAGE_DIR, player_id, media.id, 'mov' if 'quicktime' in media.content_type else 'mp4'))])
     # Upload in separate thread to avoid client freezing if it takes longer than expected
     upload = threading.Thread(target=activity_uploads, args=(player_id, activity, photos))
     upload.start()

@@ -171,3 +171,18 @@ message ActivityImage {
 	required uint64 activity_id = 2;
 	required bytes jpg = 3;
 }
+
+message ActivityMediaSaveRequest {
+	optional string content_type = 1;
+	optional string checksum_sha1 = 2;
+}
+
+message ActivityMediaSaveResultKeyValues {
+	repeated string values = 1;
+}
+
+message ActivityMediaSaveResult {
+	required string upload_url = 1;
+	optional uint64 expiration_in_millis = 2;
+	map<string, ActivityMediaSaveResultKeyValues> signed_headers = 3;
+}
