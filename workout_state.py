@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import re
+import tempfile
 
 
 def normalize_provider_name(provider):
@@ -13,7 +14,7 @@ def metadata_file(storage_dir, player_id, provider):
 
 
 def build_metadata(provider, workout, filename):
-    return {
+    metadata = {
         'provider': provider,
         'event_id': workout.get('event_id', workout.get('id')),
         'name': workout.get('name', workout.get('title')),
@@ -22,15 +23,61 @@ def build_metadata(provider, workout, filename):
         'start_date': workout.get('start_date'),
         'synced_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
+    if provider == 'intervals-icu':
+        # Keep the provider's planned load; the home card must not estimate it.
+        metadata['description'] = workout.get('description')
+        metadata['icu_training_load'] = workout.get('icu_training_load')
+    return metadata
 
 
 def save_metadata(storage_dir, player_id, provider, workout, filename):
     payload = build_metadata(provider, workout, filename)
-    file = metadata_file(storage_dir, player_id, provider)
-    os.makedirs(os.path.dirname(file), exist_ok=True)
-    with open(file, 'w') as fd:
-        json.dump(payload, fd)
+    return write_metadata(storage_dir, player_id, provider, payload)
+
+
+def metadata_entries(payload):
+    """Read both the original single-workout format and a collection."""
+    if not isinstance(payload, dict):
+        return []
+    if 'workouts' in payload:
+        values = payload['workouts']
+        return [item for item in values if isinstance(item, dict)] if isinstance(values, list) else []
+    return [payload]
+
+
+def save_metadata_collection(storage_dir, player_id, provider, entries):
+    entries = list(entries)
+    # Retain the first entry's fields for the existing settings/status UI.
+    payload = dict(entries[0]) if entries else {'provider': provider}
+    payload['workouts'] = entries
+    return write_metadata(storage_dir, player_id, provider, payload)
+
+
+def remove_metadata_entry(storage_dir, player_id, provider, event_id):
+    payload = load_metadata(storage_dir, player_id, provider)
+    entries = metadata_entries(payload)
+    remaining = [item for item in entries if str(item.get('event_id')) != str(event_id)]
+    if len(remaining) != len(entries):
+        save_metadata_collection(storage_dir, player_id, provider, remaining)
+
+
+def write_metadata(storage_dir, player_id, provider, payload):
+    write_file(metadata_file(storage_dir, player_id, provider), json.dumps(payload).encode('utf-8'))
     return payload
+
+
+def write_file(file, content):
+    """Publish a complete file so concurrent readers never see a partial write."""
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=os.path.dirname(file), delete=False) as fd:
+            temporary = fd.name
+            fd.write(content)
+        os.replace(temporary, file)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.remove(temporary)
 
 
 def load_metadata(storage_dir, player_id, provider):
