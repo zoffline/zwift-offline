@@ -1538,7 +1538,7 @@ def api_workout_schedule_list():
 @login_required
 def api_game_home():
     workout = current_planned_workout()
-    return planned_workout_json(workout['home'] if workout else [])
+    return planned_workout_json(workout['home'] if workout else {})
 
 
 @app.route('/api/head-unit-bff/carousels/for-you', methods=['GET'])

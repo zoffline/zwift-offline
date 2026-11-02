@@ -14,7 +14,8 @@ and restart. The cached XML supplies that UUID as its required `uniqueId`; names
 descriptions and training targets retain their original Unicode/content.
 
 The authenticated schedule, summary, Next Up and For You endpoints reuse those
-IDs and the same CDN URL. For You returns a list, including `[]` when empty.
+IDs and the same CDN URL. Game home returns `{}` when no workout is available;
+For You returns a list, including `[]` when empty.
 Single-player mode retains its selected anonymous profile.
 
 `https://cdn.zwift.com/tp-workouts/intervalsicu/{workoutId}.zwo` serves the cached
@@ -57,6 +58,8 @@ References: [schedule/Next Up](https://github.com/zoffline/zwift-offline/pull/54
 [XML identity](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6273631903),
 [For You](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6287951881),
 [storage simplification](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6362438696).
-The requester and fatsbrown previously verified the native multi-card flow;
-fatsbrown tested three workouts on Windows/Zwift 1.124.0. This storage revision
-has automated coverage and still needs a native migration/display recheck.
+The requester and fatsbrown previously verified the native multi-card flow.
+Fatsbrown re-tested the storage revision with three workouts on Windows/Zwift
+1.124.0: all remained visible and startable, without custom-workout duplicates
+([confirmation](https://github.com/zoffline/zwift-offline/pull/544#issuecomment-6377676775)).
+The empty game-home response correction has automated regression coverage.

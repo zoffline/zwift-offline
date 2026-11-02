@@ -102,7 +102,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
 
     def assert_no_card(self):
         self.assertEqual(self.schedule(), [])
-        self.assertEqual(self.client.get('/api/head-unit-bff/game-home').get_json(), [])
+        self.assertEqual(self.client.get('/api/head-unit-bff/game-home').get_json(), {})
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you').get_json(), [])
 
     def update_metadata(self, **changes):
@@ -223,7 +223,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
         item = self.schedule()[0]
         other = self.client_for(902)
         self.assertEqual(other.get('/api/workout/schedule/list').get_json(), [])
-        self.assertEqual(other.get('/api/head-unit-bff/game-home').get_json(), [])
+        self.assertEqual(other.get('/api/head-unit-bff/game-home').get_json(), {})
         self.assertEqual(other.get('/api/head-unit-bff/carousels/for-you').get_json(), [])
         self.assertEqual(other.get('/api/workout/workouts/' + item['workoutId']).status_code, 404)
         response = other.get(urlsplit(item['workoutUri']).path)
@@ -309,7 +309,7 @@ class PlannedWorkoutHomeScreen(unittest.TestCase):
 
     def test_running_filter_does_not_show_cycling_card(self):
         self.assertEqual(self.client.get('/api/workout/schedule/list?sport=RUNNING').get_json(), [])
-        self.assertEqual(self.client.get('/api/head-unit-bff/game-home?sport=RUNNING').get_json(), [])
+        self.assertEqual(self.client.get('/api/head-unit-bff/game-home?sport=RUNNING').get_json(), {})
         self.assertEqual(self.client.get('/api/head-unit-bff/carousels/for-you?sport=RUNNING').get_json(), [])
         self.assertTrue(self.client.get('/api/workout/schedule/list?sport=CYCLING').get_json())
 
