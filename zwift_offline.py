@@ -1713,6 +1713,10 @@ def api_activity_feed_service_v2(feed_type, profile_id=None):
     ret = select_activities_json(profile_id, limit, start_after, in_progress)
     return jsonify(ret)
 
+@app.route('/api/activity-feed-service-v2/profiles/<int:profile_id>/activities/recoverable', methods=['GET'])
+def api_activity_feed_service_v2_profiles_activities_recoverable(profile_id):
+    return jsonify({"activity": None})
+
 def create_activity_file(fit_file, small_file, full_file=None):
     data = {"powerInWatts": [], "cadencePerMin": [], "heartRate": [], "distanceInCm": [], "speedInCmPerSec": [], "timeInSec": [], "altitudeInCm": [], "latlng": []}
     start_time = 0

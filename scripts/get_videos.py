@@ -15,7 +15,7 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'storage' / 'mochi'
-BASE_URL = 'https://loveturtle.zwift.com/1.0.1/'
+BASE_URL = 'https://loveturtle.zwift.com/1.0.2/'
 MANIFEST = 'watopian/watopian.manifest.json'
 BLOCK = 1024 * 1024
 LOG = logging.getLogger('video-download')

@@ -385,9 +385,6 @@
       "value": true
     },
     {
-      "name": "game_1_114_next_up_quest_tag"
-    },
-    {
       "name": "game_1_115_disable_empty_leaderboard",
       "value": true
     },
@@ -552,7 +549,18 @@
       "value": true
     },
     {
-      "name": "game_1_120_ble_auth_notification"
+      "name": "game_1_120_ble_auth_notification",
+      "value": true,
+      "values": {
+        "fields": {
+          "auth_error_detected_dialog": {
+            "boolValue": true
+          },
+          "pre_connection_dialog": {
+            "boolValue": true
+          }
+        }
+      }
     },
     {
       "name": "game_1_120_device_error_events",
@@ -562,7 +570,8 @@
       "name": "game_1_120_disable_r2h_sleep_aware_clock"
     },
     {
-      "name": "game_1_120_fitfile_recovery"
+      "name": "game_1_120_fitfile_recovery",
+      "value": true
     },
     {
       "name": "game_1_120_ride_leader_emoji_name_support",
@@ -654,7 +663,46 @@
       "name": "game_1_124_debounce_recommendations_wa"
     },
     {
+      "name": "game_1_124_disable_middleware_reconnect"
+    },
+    {
+      "name": "game_1_124_garage_when_moving"
+    },
+    {
       "name": "game_1_124_tymewear_vital_pro"
+    },
+    {
+      "name": "game_1_125_cmp_shf_sty"
+    },
+    {
+      "name": "game_1_125_mochi_favor_center_riding"
+    },
+    {
+      "name": "game_1_125_mochi_jersey_fallback"
+    },
+    {
+      "name": "game_1_125_mochi_route_duration_changes",
+      "value": true
+    },
+    {
+      "name": "game_1_125_mochi_turning_improvements"
+    },
+    {
+      "name": "game_1_125_mochi_ui_improvements"
+    },
+    {
+      "name": "game_1_125_mochi_vehicle_avoidance"
+    },
+    {
+      "name": "game_1_125_mochi_windows_hitch_fix"
+    },
+    {
+      "name": "game_1_125_route_profile_pin_wrap_fix",
+      "value": true
+    },
+    {
+      "name": "game_1_126_ftms3_send_and_scan",
+      "value": true
     },
     {
       "name": "game_1_17_noesis_enabled",
@@ -801,10 +849,8 @@
       }
     },
     {
-      "name": "game_1_43_3_ble_dll_v2"
-    },
-    {
-      "name": "game_1_43_android_road_height_fixup"
+      "name": "game_1_43_3_ble_dll_v2",
+      "value": true
     },
     {
       "name": "game_1_43_ride_data_leak_prevention"
@@ -837,10 +883,6 @@
           }
         }
       }
-    },
-    {
-      "name": "game_1_45_climb_portal_achievements",
-      "value": true
     },
     {
       "name": "game_1_48_tow_double_xp_routes_enabled",
@@ -981,14 +1023,6 @@
       }
     },
     {
-      "name": "game_1_51_zc_workout_asset_patch_fix",
-      "value": true
-    },
-    {
-      "name": "game_1_53_0_workout_detail_screen_tooltips",
-      "value": true
-    },
-    {
       "name": "game_1_53_enable_hardcoded_repackrush__for_you_carousel__card"
     },
     {
@@ -1009,18 +1043,10 @@
       "name": "game_1_54_m0b1"
     },
     {
-      "name": "game_1_55_0_workout_detail_screen_tooltips_running",
-      "value": true
-    },
-    {
       "name": "game_1_58_0_gender_to_event_category"
     },
     {
       "name": "game_1_59_queued_recommendations",
-      "value": true
-    },
-    {
-      "name": "game_1_62_tapi_workouts",
       "value": true
     },
     {
@@ -1071,17 +1097,6 @@
       "value": true
     },
     {
-      "name": "game_1_66_tpeaks_multiday",
-      "value": true,
-      "values": {
-        "fields": {
-          "num_days": {
-            "varintValue": "7"
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_67_asset_cms_tenant",
       "value": true,
       "values": {
@@ -1093,15 +1108,7 @@
       }
     },
     {
-      "name": "game_1_67_fit_file_timestamps_consistency",
-      "value": true
-    },
-    {
       "name": "game_1_67_sport_switch_to_change_cached_config",
-      "value": true
-    },
-    {
-      "name": "game_1_67_tp_cards",
       "value": true
     },
     {
@@ -1131,10 +1138,6 @@
     },
     {
       "name": "game_1_72_fence_test_2024_08",
-      "value": true
-    },
-    {
-      "name": "game_1_74_intersection_level_lock_override_by_route",
       "value": true
     },
     {
@@ -1171,41 +1174,12 @@
       "value": true
     },
     {
-      "name": "game_1_83_training_partner_post_workout_survey",
-      "value": true
-    },
-    {
-      "name": "game_1_86_fitness-service_goals",
-      "value": true,
-      "values": {
-        "fields": {
-          "enable_KJ_cal_SP": {
-            "boolValue": true
-          }
-        }
-      }
-    },
-    {
       "name": "game_1_86_zg_ftp_for_robopacers",
       "value": true
     },
     {
       "name": "game_1_88_ask_experience_level",
       "value": true
-    },
-    {
-      "name": "game_1_88_auto_start_climb_portal",
-      "value": true,
-      "values": {
-        "fields": {
-          "check_all_checkpoints": {
-            "boolValue": false
-          }
-        }
-      }
-    },
-    {
-      "name": "game_1_88_timingarch_experiment_1"
     },
     {
       "name": "game_1_89_action_bar_hint",
@@ -1440,6 +1414,9 @@
       "values": {
         "fields": {
           "CanyonAeroad_Green_2026": {
+            "boolValue": true
+          },
+          "Factor_ONE_2026": {
             "boolValue": true
           },
           "QuintanaRooVPri_2026": {
@@ -1692,6 +1669,9 @@
           "config": {
             "stringValue": "{\"manifest_folder\":\"watopian\",\"manifests\":[{\"key\":\"watopian.manifest.json\"}]}"
           },
+          "download_all_before_start": {
+            "boolValue": true
+          },
           "entitlement_mode": {
             "stringValue": "mochi"
           },
@@ -1702,7 +1682,7 @@
             "stringValue": "lochlong_1440"
           },
           "server_address": {
-            "stringValue": "https://loveturtle.zwift.com/1.0.1"
+            "stringValue": "https://loveturtle.zwift.com/1.0.2"
           },
           "showDLCTab": {
             "boolValue": false
@@ -1845,7 +1825,7 @@
       "values": {
         "fields": {
           "version": {
-            "stringValue": "1.124.0"
+            "stringValue": "1.125.0"
           }
         }
       }
@@ -2095,6 +2075,9 @@
     {
       "name": "progress_report",
       "value": true
+    },
+    {
+      "name": "quest_goal_specific_milestones"
     },
     {
       "name": "quest_progress_view_extra_rewards",

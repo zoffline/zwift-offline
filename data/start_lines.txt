@@ -989,6 +989,16 @@
     "road": 9,
     "time": 1001900
   },
+  "-913575777": {
+    "name": "Scotland - It's a bit Sgurry",
+    "road": 2,
+    "time": 958183
+  },
+  "1048389272": {
+    "name": "Scotland - It's really Sgurry",
+    "road": 2,
+    "time": 956921
+  },
   "742057576": {
     "name": "Scotland - Loch Loop",
     "road": 2,
@@ -1029,13 +1039,28 @@
     "road": 9,
     "time": 1001900
   },
+  "-895554793": {
+    "name": "Watopia - 1 x 3 Min Lightning Lap",
+    "road": 200,
+    "time": 471000
+  },
+  "568123398": {
+    "name": "Watopia - 1 x 4 Min Lightning Lap",
+    "road": 200,
+    "time": 471000
+  },
   "-54639337": {
     "name": "Watopia - 11.1 Ocean Blvd",
     "road": 0,
     "time": 405170
   },
   "1156630474": {
-    "name": "Watopia - 3 Lightning Laps",
+    "name": "Watopia - 3 x 3 Min Lightning Laps",
+    "road": 200,
+    "time": 471000
+  },
+  "2125439468": {
+    "name": "Watopia - 4 x 4 Min Lightning Laps",
     "road": 200,
     "time": 471000
   },
@@ -1045,12 +1070,7 @@
     "time": 339578
   },
   "1507816665": {
-    "name": "Watopia - 6 Lightning Laps",
-    "road": 200,
-    "time": 471000
-  },
-  "2125439468": {
-    "name": "Watopia - 9 Lightning Laps",
+    "name": "Watopia - 6 x 4 Min Lightning Laps",
     "road": 200,
     "time": 471000
   },
@@ -1368,11 +1388,6 @@
     "name": "Watopia - Legends and Lava",
     "road": 81,
     "time": 938107
-  },
-  "568123398": {
-    "name": "Watopia - Lightning Lap",
-    "road": 200,
-    "time": 471000
   },
   "-77504991": {
     "name": "Watopia - Lightning Lap Run",

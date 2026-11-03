@@ -217,13 +217,6 @@
     "sport": 0
   },
   {
-    "name": "Paris - Sacr\u00e9 Trois!",
-    "route": 764392844,
-    "distance": 27355.7,
-    "course": 15,
-    "sport": 0
-  },
-  {
     "name": "Richmond - Cobbled Climbs Reverse",
     "route": 4194352271,
     "distance": 9277.1,
@@ -241,6 +234,20 @@
     "name": "Scotland - Glasgow Reverse",
     "route": 1258415487,
     "distance": 4208.3,
+    "course": 17,
+    "sport": 0
+  },
+  {
+    "name": "Scotland - It's a bit Sgurry",
+    "route": 3381391519,
+    "distance": 19119.0,
+    "course": 17,
+    "sport": 0
+  },
+  {
+    "name": "Scotland - It's really Sgurry",
+    "route": 1048389272,
+    "distance": 31660.9,
     "course": 17,
     "sport": 0
   },
@@ -311,6 +318,20 @@
     "name": "Watopia - Jungle Circuit Reverse",
     "route": 2839057126,
     "distance": 14150.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Loopipelago",
+    "route": 4236593520,
+    "distance": 20575.6,
+    "course": 6,
+    "sport": 0
+  },
+  {
+    "name": "Watopia - Miles of Isles",
+    "route": 3306391797,
+    "distance": 29049.7,
     "course": 6,
     "sport": 0
   },
