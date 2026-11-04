@@ -104,6 +104,16 @@ def course_of(state):
 def road_of(state):
     return (state.aux3 & 0xff00) >> 8
 
+# Makuri, London, Yorkshire and Scotland drive on the left: there riders going forward use the NEGATIVE side of
+# roadPosition (below 10,000,000), everywhere else the positive one (measured on all recorded rides, see scripts/gen_road_limits.py)
+LEFT_TRAFFIC_COURSES = frozenset((7, 11, 13, 17))
+
+
+def plus_side_forward(state):
+    """True when the lane of this rider's direction is on the + side of the road centre line (roadPosition > 10,000,000)."""
+    return is_forward(state) != (course_of(state) in LEFT_TRAFFIC_COURSES)
+
+
 def is_forward(state):
     return (state.f19 & 4) != 0
 

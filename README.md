@@ -293,6 +293,11 @@ To enable support for multiple users perform the steps below:
 
 To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST`` or use the script ``run_ipv6.bat``.
 
+### Custom ports and running behind a reverse proxy [OPTIONAL]
+
+* To use other ports than 80 (CDN) and 443 (API), create a ``ports.txt`` file in the ``storage`` directory: the first line is the HTTP port and the second line is the HTTPS port. The environment variables ``ZOFFLINE_CDN_PORT`` and ``ZOFFLINE_API_PORT`` override them.
+* If a reverse proxy (Caddy, nginx...) terminates TLS in front of zoffline, set ``ZOFFLINE_API_USE_CERT=false``: the API then listens for plain HTTP.
+
 ### Extra features
 
 <details><summary>Ghosts</summary>
@@ -309,6 +314,7 @@ To enable support for IPv6 set the environment variable ``ZOFFLINE_SERVER_HOST``
 * Optionally, ``enable_bots.txt`` can contain a multiplier value (be careful, if the resulting number of bots is too high, it may cause performance issues or not work at all).
 * Type ``.group`` in chat to group the bots, or ``.groupall`` to include duplicates (if using multiplier). Type ``.autogroup`` or ``.autogroupall`` to automatically group whenever you change roads. Type ``.stopautogroup`` to stop automatic grouping, or ``.disperse`` to randomize positions.
 * Names, nationalities and equipment can be customized by creating a file ``bot.txt`` inside the ``storage`` folder. The script ``get_pro_names.py`` can be used to populate this file.
+  * A ready-made roster of professional riders with their current team kits is included as ``data/bot.txt``: copy it to ``storage/bot.txt`` to use it.
 * If you want some random bots, check [this repository](https://github.com/oldnapalm/zoffline-bots).
 </details>
 

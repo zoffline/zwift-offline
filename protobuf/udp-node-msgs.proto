@@ -50,6 +50,10 @@ enum UserBikeAction {
 	UBA_HOLIDAY_WAVE = 9; //not sure
 }
 
+message BikeAction { //WAT_B_ACT payload
+	optional UserBikeAction action = 1;
+}
+
 message WorldAttribute {
 	optional int64 wa_f1 = 1;          //not r/w by game? 587645624533328784, later 5876456 85771834256
 	optional int64 server_realm = 2;

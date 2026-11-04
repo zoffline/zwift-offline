@@ -1,8 +1,10 @@
 body {
     background-image: url('/style/background.jpg');
     background-repeat: no-repeat;
+    background-attachment: fixed;
     background-size: cover;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }

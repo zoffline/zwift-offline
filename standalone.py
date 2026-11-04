@@ -18,6 +18,7 @@ from Crypto.Cipher import AES
 
 import zwift_offline as zo
 import peloton
+import solo_blob
 import udp_node_msgs_pb2
 import tcp_node_msgs_pb2
 import profile_pb2
@@ -87,6 +88,7 @@ online = {}
 global_pace_partners = {}
 global_bots = {}
 peloton_manager = None
+solo_blob_manager = None
 global_news = {} #player id to dictionary of peer_player_id->worldTime
 global_relay = {}
 global_clients = {}
@@ -606,6 +608,13 @@ def is_ahead(state, roadTime):
             return True
     return False
 
+def varint_size(value):
+    size = 1
+    while value >= 0x80:
+        value >>= 7
+        size += 1
+    return size
+
 class UDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]
@@ -664,6 +673,10 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 discord.change_presence(len(online))
                 if discord.announce:
                     discord.send_message("%s in %s" % (('Running' if state.sport == profile_pb2.Sport.RUNNING else 'Riding'), get_route_name(state)), player_id)
+
+        #Solo blob: feed the anchor's live state to the group riding around him
+        if solo_blob_manager and state.roadTime:
+            solo_blob_manager.on_state(player_id, state)
 
         #Add handling of ghosts for player if it's missing
         if not player_id in global_ghosts.keys():
@@ -759,6 +772,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         message.player_id = player_id
         message.world_time = zo.world_time()
         message.cts_latency = message.world_time - recv.world_time
+        message_size = message.ByteSize()
         if len(nearby) > 100:
             nearby = dict(sorted(nearby.items(), key=lambda item: item[1]))
             nearby = dict(itertools.islice(nearby.items(), 100))
@@ -784,12 +798,17 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 if not p_id in online.keys():
                     player.worldTime = message.world_time - simulated_latency
                     player.groupId = 0 # fix bots in event only routes
-                if len(message.SerializeToString()) + len(player.SerializeToString()) > 1400:
+                # running size instead of re-serializing the whole message for every rider (was O(n^2));
+                # a states entry (field 8) costs 1 tag byte + the length varint + the payload
+                player_size = player.ByteSize()
+                if message_size + player_size > 1400:
                     new_msg = udp_node_msgs_pb2.ServerToClient()
                     new_msg.CopyFrom(message)
                     messages.append(new_msg)
                     del message.states[:]
+                    message_size = message.ByteSize()
                 message.states.append(player)
+                message_size += 1 + varint_size(player_size) + player_size
         messages.append(message)
         for i, msg in enumerate(messages):
             msg.num_msgs = len(messages)
@@ -801,7 +820,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
             socket.sendto(r, client_address)
 
 def publish_peloton_bots(followers):
-    zo.global_peloton_bots = followers
+    # keep the solo blob riders published in the same registry
+    blob_ids = range(solo_blob.RIDER_ID_BASE, solo_blob.RIDER_ID_BASE + solo_blob.MAX_BLOBS * solo_blob.RIDERS_PER_BLOB)
+    merged = dict(followers)
+    merged.update({k: v for k, v in zo.global_peloton_bots.items() if k in blob_ids})
+    zo.global_peloton_bots = merged
 
 def forget_peloton_profiles(player_ids):
     for player_id in player_ids:
@@ -815,6 +838,24 @@ if os.path.isdir(PACE_PARTNERS_DIR):
     zo.peloton_manager = peloton_manager
     pp = threading.Thread(target=play_pace_partners)
     pp.start()
+
+def play_solo_blob():
+    while True:
+        start = time.perf_counter()
+        try:
+            solo_blob_manager.tick(solo_blob.TICK_SECONDS)
+        except Exception as exc:
+            print('solo_blob tick: %s' % repr(exc))
+        pause = solo_blob.TICK_SECONDS - (time.perf_counter() - start)
+        if pause > 0: time.sleep(pause)
+
+solo_blob_manager = solo_blob.SoloBlobManager(STORAGE_DIR, get_names, zo.GD, zo.world_time,
+    lambda: zo.global_peloton_bots, lambda d: setattr(zo, 'global_peloton_bots', d), zo.logger, send_update=zo.enqueue_player_update)
+solo_blob_manager.load()
+zo.solo_blob_manager = solo_blob_manager
+solo_blob_thread = threading.Thread(target=play_solo_blob)
+solo_blob_thread.daemon = True
+solo_blob_thread.start()
 
 if os.path.isfile(ENABLE_BOTS_FILE):
     load_bots()
@@ -831,7 +872,7 @@ socketserver.ThreadingTCPServer.allow_reuse_address = True
 socketserver.ThreadingUDPServer.allow_reuse_address = True
 
 cdn_host = os.environ.get('ZOFFLINE_CDN_HOST', SERVER_HOST)
-cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', 80))
+cdn_port = int(os.environ.get('ZOFFLINE_CDN_PORT', zo.http_port))
 httpd = socketserver.ThreadingTCPServer((cdn_host, cdn_port), CDNHandler)
 zoffline_thread = threading.Thread(target=httpd.serve_forever)
 zoffline_thread.daemon = True

@@ -104,6 +104,16 @@ DATABASE_PATH = "%s/zwift-offline.db" % STORAGE_DIR
 DATABASE_CUR_VER = 3
 ZWIFT_VER_CUR = ET.parse('%s/cdn/gameassets/Zwift_Updates_Root/Zwift_ver_cur.xml' % SCRIPT_DIR).getroot().get('sversion')
 
+# Optional storage/ports.txt: first line = HTTP (CDN) port, second line = HTTPS (API) port. Handy when zoffline runs
+# behind a reverse proxy that owns 80/443. ZOFFLINE_CDN_PORT / ZOFFLINE_API_PORT still override them.
+http_port = 80
+https_port = 443
+PORTS_FILE = "%s/ports.txt" % STORAGE_DIR
+if os.path.isfile(PORTS_FILE):
+    with open(PORTS_FILE) as f:
+        http_port = int(f.readline().rstrip('\r\n'))
+        https_port = int(f.readline().rstrip('\r\n'))
+
 # For auth server
 AUTOLAUNCH_FILE = "%s/auto_launch.txt" % STORAGE_DIR
 SERVER_IP_FILE = "%s/server-ip.txt" % STORAGE_DIR
@@ -173,6 +183,7 @@ restarting_in_minutes = 0
 reload_pacer_bots = False
 global_peloton_bots = {} # follower bots of RoboPacer pelotons (see peloton.py)
 peloton_manager = None
+solo_blob_manager = None # live group riding around the local player (see solo_blob.py)
 auto_group = {'id': None, 'road_id': None, 'is_forward': None, 'all': False, 'thread': None}
 
 with open(os.path.join(SCRIPT_DIR, "data", "climbs.txt")) as f:
@@ -2875,6 +2886,10 @@ def runalyze_upload(player_id, activity):
         logger.warning("Runalyze upload failed. No internet? %s" % repr(exc))
 
 
+INTERVALS_UPLOAD_ATTEMPTS = 3
+INTERVALS_UPLOAD_RETRY_DELAY = 2  # seconds, multiplied by the attempt number
+
+
 def intervals_upload(player_id, activity):
     intervals_credentials = '%s/%s/intervals_credentials.bin' % (STORAGE_DIR, player_id)
     if not os.path.exists(intervals_credentials):
@@ -2882,12 +2897,23 @@ def intervals_upload(player_id, activity):
         return
     athlete_id, api_key = decrypt_credentials(intervals_credentials)
     workout_metadata = load_intervals_workout_metadata(player_id)
-    try:
-        result = intervals_workouts.upload_activity(athlete_id, api_key, activity, workout_metadata=workout_metadata)
-        if result.get('paired') and result.get('paired_event_id') is not None:
-            clear_intervals_workout_metadata(player_id, result.get('paired_event_id'))
-    except Exception as exc:
-        logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
+    # Retry only connection-level failures (TLS/DNS/connect): the request never reached the
+    # API, so a retry cannot create a duplicate. HTTP errors and read timeouts are not retried.
+    for attempt in range(1, INTERVALS_UPLOAD_ATTEMPTS + 1):
+        try:
+            result = intervals_workouts.upload_activity(athlete_id, api_key, activity, workout_metadata=workout_metadata)
+            if result.get('paired') and result.get('paired_event_id') is not None:
+                clear_intervals_workout_metadata(player_id, result.get('paired_event_id'))
+            return
+        except requests.exceptions.ConnectionError as exc:
+            if attempt == INTERVALS_UPLOAD_ATTEMPTS:
+                logger.warning("Intervals.icu upload failed after %d attempts: %s" % (attempt, repr(exc)))
+                return
+            logger.info("Intervals.icu upload attempt %d failed (%s), retrying" % (attempt, type(exc).__name__))
+            time.sleep(INTERVALS_UPLOAD_RETRY_DELAY * attempt)
+        except Exception as exc:
+            logger.warning("Intervals.icu upload failed. No internet? %s" % repr(exc))
+            return
 
 
 def get_zwift_online_tokens(player_id):
@@ -3977,6 +4003,12 @@ def relay_worlds_attributes():
                     else:
                         reply = 'No RoboPacers loaded (storage/robopacers)'
                     send_message(reply, recipients=[chat_message.player_id])
+                elif command == 'blob' or command.startswith('blob '):
+                    if solo_blob_manager:
+                        reply = solo_blob_manager.chat_command(chat_message.player_id, command[len('blob'):])
+                    else:
+                        reply = 'Solo blob not available'
+                    send_message(reply, recipients=[chat_message.player_id])
                 elif command == 'position':
                     logger.info('course %s road %s isForward %s roadTime %s route %s' % (get_course(state), road_id(state), is_forward(state), state.roadTime, state.route))
                 elif command.startswith('bookmark') and len(command) > 9:
@@ -3986,6 +4018,11 @@ def relay_worlds_attributes():
                     send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
                 return '', 201
         discord.send_message(chat_message.message, chat_message.player_id)
+    # gestures (elbow flick, hammer, toast, bell) steer the solo blob group
+    if player_update.wa_type == udp_node_msgs_pb2.WA_TYPE.WAT_B_ACT and solo_blob_manager:
+        reply = solo_blob_manager.on_raw_gesture(int(current_user.player_id), player_update.payload)
+        if reply:
+            send_message(reply, recipients=[int(current_user.player_id)])
     for receiving_player_id in online.keys():
         should_receive = False
         # Chat message
@@ -5084,14 +5121,17 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     logger.info("Server version %s is running." % ZWIFT_VER_CUR)
     SERVER_HOST = os.environ.get('ZOFFLINE_SERVER_HOST', '0.0.0.0')
     host = os.environ.get('ZOFFLINE_API_HOST', SERVER_HOST)
-    port = int(os.environ.get('ZOFFLINE_API_PORT', 443))
+    port = int(os.environ.get('ZOFFLINE_API_PORT', https_port))
     use_cert = os.environ.get('ZOFFLINE_API_USE_CERT', 'true').lower() == 'true'
     if host != SERVER_HOST or port != 443 or not use_cert:
         logger.info("Listening on %s:%d using certificate: %s", host, port, use_cert)
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context = None
     if use_cert:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(certfile='%s/cert-zwift-com.pem' % SSL_DIR, keyfile='%s/key-zwift-com.pem' % SSL_DIR)
-    server = CleanWSGIServer((host, port), app, log=logger, ssl_context=context)
+    # without a certificate serve plain HTTP (TLS is terminated by a reverse proxy in front of zoffline)
+    ssl_args = {'ssl_context': context} if context else {}
+    server = CleanWSGIServer((host, port), app, log=logger, **ssl_args)
     server.serve_forever()
 
 #    app.run(ssl_context=('%s/cert-zwift-com.pem' % SSL_DIR, '%s/key-zwift-com.pem' % SSL_DIR), port=443, threaded=True, host=SERVER_HOST) # debug=True, use_reload=False)

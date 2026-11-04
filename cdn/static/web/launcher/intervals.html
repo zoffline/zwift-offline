@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-6 col-md-5 top-buffer">
+    <div class="col-md-6 top-buffer">
       <form id="intervals" action="{{ url_for('intervals', username=username) }}" method="post">
         <div class="row">
           <div class="col-md-12">
@@ -44,19 +44,23 @@
         {% endif %}
       {% endwith %}
     </div>
-    {% if sync_status and aid and akey %}
-      <div class="col-sm-8 col-md-6">
-        <ul class="list-group top-buffer">
-          <li class="list-group-item py-2">
-            {% if sync_status.metadata %}
-              <div class="text-shadow">Synced workout: {{ sync_status.metadata.name or sync_status.metadata.filename }}</div>
-            {% else %}
-              <div class="text-shadow">No synced Intervals workout.</div>
-              <div class="text-shadow"><small>Use "Sync today's workout" before launching Zwift.</small></div>
-            {% endif %}
-          </li>
-        </ul>
+    <div class="col-md-6 top-buffer">
+      <ul class="list-group">
+        <li class="list-group-item py-2">
+          {% if sync_status and sync_status.metadata %}
+            <div class="text-shadow">Synced workout: {{ sync_status.metadata.name or sync_status.metadata.filename }}</div>
+          {% else %}
+            <div class="text-shadow">No synced Intervals workout.</div>
+            <div class="text-shadow"><small>Use "Sync today's workout" before launching Zwift.</small></div>
+          {% endif %}
+        </li>
+      </ul>
+      <div style="background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.35); border-radius:6px; padding:10px 14px; color:#f0f0f0; font-size:0.85rem; line-height:1.6; margin-top:10px;">
+        <strong>How to connect Intervals.icu:</strong><br>
+        1. Log in to intervals.icu → Settings → Developer Settings.<br>
+        2. Copy your <em>Athlete ID</em> (starts with i…) and generate an <em>API key</em>.<br>
+        3. Enter both on the left and save. Today's workout will sync and rides will pair to ICU automatically.
       </div>
-    {% endif %}
+    </div>
   </div>
 {% endblock %}
