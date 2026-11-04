@@ -6,6 +6,9 @@ zoffline also offers riding against ghosts (your previous rides). Enable this fe
 
 Additionally, zoffline's launcher allows selecting a specific map to ride on without mucking about with config files.
 
+# Deprecated
+This project is now deprecated and is without a maintainer. @fatsbrown has forked it and is currently keeping it up to date. Use his releases: https://github.com/fatsbrown/zwift-offline
+
 ## Install
 
 Setting up zoffline requires two primary steps. First, zoffline must be installed and run on a system before running Zwift (either on the system running Zwift or on another locally networked system).  Second, Zwift must be configured to use zoffline instead of the official Zwift server.
