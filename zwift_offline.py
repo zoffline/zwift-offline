@@ -1276,7 +1276,7 @@ def send_restarting_message():
         if restarting and restarting_in_minutes == 0:
             message = 'See you later! Look for the back online message.'
             send_message(message)
-            discord.send_message(message)
+            chat_bridges.send_message(message)
             time.sleep(6)
             os.kill(os.getpid(), signal.SIGINT)
 
@@ -1291,7 +1291,7 @@ def restart_server():
         restarting_in_minutes = 10
         send_restarting_message_thread = threading.Thread(target=send_restarting_message)
         send_restarting_message_thread.start()
-        discord.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
+        chat_bridges.send_message('Restarting / Shutting down in %s minutes. Save your progress or continue riding until server is back online' % restarting_in_minutes)
     return redirect(url_for('user_home', username=current_user.username))
 
 
@@ -1305,7 +1305,7 @@ def cancel_restart_server():
         restarting_in_minutes = 0
         message = 'Restart of the server has been cancelled. Ride on!'
         send_message(message)
-        discord.send_message(message)
+        chat_bridges.send_message(message)
     return redirect(url_for('user_home', username=current_user.username))
 
 
@@ -2817,7 +2817,7 @@ def api_profiles_activities_rideon(receiving_player_id):
 
     receiver = get_partial_profile(receiving_player_id)
     message = 'Ride on ' + receiver.first_name + ' ' + receiver.last_name + '!'
-    discord.send_message(message, sending_player_id)
+    chat_bridges.send_message(message, sending_player_id)
     return '{}', 200
 
 def stime_to_timestamp(stime):
@@ -3725,7 +3725,7 @@ def relay_worlds_attributes():
                 else:
                     send_message('Invalid command: %s' % command, recipients=[chat_message.player_id])
                 return '', 201
-        discord.send_message(chat_message.message, chat_message.player_id)
+        chat_bridges.send_message(chat_message.message, chat_message.player_id)
     for receiving_player_id in online.keys():
         should_receive = False
         # Chat message
@@ -4560,7 +4560,7 @@ def send_server_back_online_message():
     time.sleep(30)
     message = "Server version %s is back online. Ride on!" % ZWIFT_VER_CUR
     send_message(message)
-    discord.send_message(message)
+    chat_bridges.send_message(message)
 
 def remove_inactive():
     while True:
@@ -4718,14 +4718,14 @@ def start_zwift():
     return redirect("/ride", 302)
 
 
-def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_regroup_ghosts, passed_discord):
+def run_standalone(passed_online, passed_global_relay, passed_global_pace_partners, passed_global_bots, passed_global_ghosts, passed_regroup_ghosts, passed_chat_bridges):
     global online
     global global_relay
     global global_pace_partners
     global global_bots
     global global_ghosts
     global regroup_ghosts
-    global discord
+    global chat_bridges
     global login_manager
     online = passed_online
     global_relay = passed_global_relay
@@ -4733,7 +4733,7 @@ def run_standalone(passed_online, passed_global_relay, passed_global_pace_partne
     global_bots = passed_global_bots
     global_ghosts = passed_global_ghosts
     regroup_ghosts = passed_regroup_ghosts
-    discord = passed_discord
+    chat_bridges = passed_chat_bridges
     login_manager = LoginManager()
     login_manager.login_view = 'login'
     login_manager.session_protection = None

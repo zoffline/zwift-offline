@@ -63,17 +63,47 @@ PACE_PARTNERS_DIR = "%s/robopacers" % STORAGE_DIR
 FAKE_DNS_FILE = "%s/fake-dns.txt" % STORAGE_DIR
 ENABLE_BOTS_FILE = "%s/enable_bots.txt" % STORAGE_DIR
 DISCORD_CONFIG_FILE = "%s/discord.cfg" % STORAGE_DIR
+MATRIX_CONFIG_FILE = "%s/matrix.txt" % STORAGE_DIR
+
+class ChatBridges():
+    def __init__(self, bridges):
+        self.bridges = bridges
+
+    def send_message(self, message, sender_id=None):
+        for bridge in self.bridges:
+            try:
+                bridge.send_message(message, sender_id)
+            except Exception as exc:
+                print('Chat bridge exception: %s' % repr(exc))
+
+    def announce_message(self, message, sender_id=None):
+        for bridge in self.bridges:
+            if getattr(bridge, 'announce', False):
+                try:
+                    bridge.send_message(message, sender_id)
+                except Exception as exc:
+                    print('Chat bridge exception: %s' % repr(exc))
+            else:
+                print('Chat bridge %r skipped announce (announce disabled)' % getattr(bridge, 'name', bridge))
+
+    def change_presence(self, n):
+        for bridge in self.bridges:
+            try:
+                bridge.change_presence(n)
+            except Exception as exc:
+                print('Chat bridge exception: %s' % repr(exc))
+
+chat_bridges = []
 if os.path.isfile(DISCORD_CONFIG_FILE):
     from discord_bot import DiscordThread
-    discord = DiscordThread(DISCORD_CONFIG_FILE)
-else:
-    class DummyDiscord():
-        def send_message(self, msg, sender_id=None):
-            pass
-        def change_presence(self, n):
-            pass
-        announce = False
-    discord = DummyDiscord()
+    chat_bridges.append(DiscordThread(DISCORD_CONFIG_FILE))
+if os.path.isfile(MATRIX_CONFIG_FILE):
+    try:
+        from matrix_bot import MatrixThread
+        chat_bridges.append(MatrixThread(MATRIX_CONFIG_FILE))
+    except Exception as exc:
+        print('Matrix bridge disabled: %s' % repr(exc))
+chat_bridges = ChatBridges(chat_bridges)
 
 bot_update_freq = 3
 pacer_update_freq = 1
@@ -559,9 +589,8 @@ def remove_inactive():
             if zo.world_time() > online[p_id].worldTime + 30000:
                 zo.save_bookmark(online[p_id], 'Last ' + ('run' if online[p_id].sport == profile_pb2.Sport.RUNNING else 'ride'))
                 online.pop(p_id)
-                discord.change_presence(len(online))
-                if discord.announce:
-                    discord.send_message("Leaving", p_id)
+                chat_bridges.change_presence(len(online))
+                chat_bridges.announce_message("Leaving", p_id)
                 zo.logout_player(p_id)
         time.sleep(5)
 
@@ -648,9 +677,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 online[player_id] = state
             elif zo.world_time() < state.worldTime + 10000:
                 online[player_id] = state
-                discord.change_presence(len(online))
-                if discord.announce:
-                    discord.send_message("%s in %s" % (('Running' if state.sport == profile_pb2.Sport.RUNNING else 'Riding'), get_route_name(state)), player_id)
+                chat_bridges.change_presence(len(online))
+                chat_bridges.announce_message("%s in %s" % (('Running' if state.sport == profile_pb2.Sport.RUNNING else 'Riding'), get_route_name(state)), player_id)
 
         #Add handling of ghosts for player if it's missing
         if not player_id in global_ghosts.keys():
@@ -826,4 +854,4 @@ if os.path.exists(FAKE_DNS_FILE):
     dns = threading.Thread(target=fake_dns, args=(zo.server_ip,))
     dns.start()
 
-zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, regroup_ghosts, discord)
+zo.run_standalone(online, global_relay, global_pace_partners, global_bots, global_ghosts, regroup_ghosts, chat_bridges)
